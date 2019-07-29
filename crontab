@@ -1,0 +1,19 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+#MAILTO=mike.vartanian@nih.gov
+MAILTO=""
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * command to be executed
+3,8,13,18,23,28,33,38,43,48,51,56 * * * * /home/vartanianmh/strides/restart.sh >>  /home/vartanianmh/restart.log 2>&1
+7 20 * * 6 /home/vartanianmh/strides/sra_meta.sh >> /home/vartanianmh/sra_meta.log 2>&1
+8 05 * * * /home/vartanianmh/strides/nightly_maint.sh >> /home/vartanianmh/nightly_maint.log 2>&1
+#9 05 * * * /home/vartanianmh/strides/bigquery_export.sh >> /home/vartanianmh/bigquery_export.log 2>&1
