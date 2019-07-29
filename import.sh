@@ -5,7 +5,7 @@
 
 cd "$PANFS/export" || exit
 
-psql -h localhost -d grafana -t -X << HERE
+psql -h localhost -d grafana -X << HERE
     DROP VIEW IF EXISTS export_test;
     DROP TABLE IF EXISTS export;
     CREATE TABLE export (
@@ -31,7 +31,7 @@ for x in export."$DATE".*.gz; do
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-psql -h localhost -d grafana -t -X << HERE
+psql -h localhost -d grafana -X << HERE
     CREATE index export_start on export (start_ts);
     CREATE index export_source on export (source);
     CLUSTER export using export_start;
