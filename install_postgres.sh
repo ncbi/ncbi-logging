@@ -1,6 +1,7 @@
 #!/bin/bash
 
-. $HOME/strides/strides_env.sh
+# shellcheck source=/home/vartanianmh/strides/strides_env.sh
+. "$HOME/strides/strides_env.sh"
 
 SRCDIR="$PWD"
 #DATE=$(date "+%Y%m%d") #_%H%M%S
@@ -8,14 +9,14 @@ SRCDIR="$PWD"
 cd "$HOME" || exit
 rm -rf "$PGVER"
 tar -xaf "$SRCDIR/$PGVER.rel.tar.gz"
-cd "$HOME/$PGVER"
+cd "$HOME/$PGVER" || exit
 
 mkdir -p "logs"
 rm -rf "$PGDATA"
 mkdir -p "$PGDATA"
 
 initdb --data-checksums
-cd "$HOME"
+cd "$HOME" || exit
 #patch -p0 -i "$SRCDIR/postgresql.conf.patch" # Produce with diff -u
 cat <<-EOF > "$PGDATA/postgresql.conf"
 port = 5432

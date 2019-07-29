@@ -1,10 +1,12 @@
 #!/bin/bash
 
-. $HOME/strides/strides_env.sh
+# shellcheck source=/home/vartanianmh/strides/strides_env.sh
+. "$HOME/strides/strides_env.sh"
 
 echo "Starting"
 date
-export DATE=$(date "+%Y%m%d") #_%H%M%S
+DATE=$(date "+%Y%m%d") #_%H%M%S
+export DATE
 
 ./blast_dev.sh >> /tmp/mike_logs/blast_dev.log 2>&1
 ./sra_hackathon.sh >> /tmp/mike_logs/sra_hackathon.log 2>&1

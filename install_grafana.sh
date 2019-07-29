@@ -1,17 +1,18 @@
 #!/bin/bash
 
-. $HOME/strides/strides_env.sh
+# shellcheck source=/home/vartanianmh/strides/strides_env.sh
+. "$HOME/strides/strides_env.sh"
 
 ADMINPASSWORD=$(head -c 9 /dev/urandom | base64)
 PORT=3389
 
-cd "$HOME"
+cd "$HOME" || exit
 
 curl -O "https://dl.grafana.com/oss/release/$GRAFANAVER.linux-amd64.tar.gz"
 tar -xaf "$GRAFANAVER.linux-amd64.tar.gz"
 rm -f "$GRAFANAVER.linux-amd64.tar.gz"
 
-cd "$GRAFANAVER"
+cd "$GRAFANAVER" || exit
 mkdir -p data
 mkdir -p logs
 mkdir -p plugins

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-. $HOME/strides/strides_env.sh
+# shellcheck source=/home/vartanianmh/strides/strides_env.sh
+. "$HOME/strides/strides_env.sh"
 
 set +o errexit # same as -e
 set +o pipefail

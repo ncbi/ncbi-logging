@@ -28,6 +28,6 @@ bq extract \
     'strides_analytics.export' \
     "gs://strides_analytics/export/export.$DATE.*.csv.gz"
 
-rm $PANFS/export/export.$DATE.*
+rm $PANFS/export/export."$DATE".*
 
 gsutil -m cp -r "gs://strides_analytics/export/export.$DATE.*" "$PANFS/export/"

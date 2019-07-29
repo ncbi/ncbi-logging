@@ -1,7 +1,7 @@
 #!/bin/bash
 
-. $HOME/strides/strides_env.sh
-
+# shellcheck source=/home/vartanianmh/strides/strides_env.sh
+. "$HOME/strides/strides_env.sh"
 
 export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/strides-service-account-file.json
 gcloud config set account strides-data-bucket-log-reader@strides-sra-hackathon-data.iam.gserviceaccount.com

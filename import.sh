@@ -24,7 +24,8 @@ psql -h localhost -d grafana -t -X << HERE
 );
 HERE
 
-for x in export.$DATE.*.gz; do
+# NOTE: Not profitable to do this in parallel, some kind of contention
+for x in export."$DATE".*.gz; do
     echo "Loading $x"
     psql -h localhost -d grafana -c \
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
@@ -38,32 +39,32 @@ psql -h localhost -d grafana -t -X << HERE
     ANALYZE EXPORT;
 
 
-CREATE TEMP TABLE ips_export as select distinct ip, ip_int from export;
+    CREATE TEMP TABLE ips_export as select distinct ip, ip_int from export;
 
-DROP TABLE IF EXISTS ips_export2;
-CREATE TABLE ips_export2 as
-    select ips_export.ip, ip_int, domain, city_name, country_code
-    from ips_export, ip2location_db11_ipv4, rdns
-    WHERE
-        BOX(POINT(IP_FROM,IP_FROM),POINT(IP_TO,IP_TO)) @>
-        BOX(POINT (IP_INT,IP_INT), POINT(IP_INT,IP_INT))
-        AND RDNS.IP=ips_export.IP ;
-CREATE INDEX ips_export2_ip on ips_export2(ip);
-CREATE INDEX ips_export2_ipint on ips_export2(ip_int);
+    DROP TABLE IF EXISTS ips_export2;
+    CREATE TABLE ips_export2 as
+        select ips_export.ip, ip_int, domain, city_name, country_code
+        from ips_export, ip2location_db11_ipv4, rdns
+        WHERE
+            BOX(POINT(IP_FROM,IP_FROM),POINT(IP_TO,IP_TO)) @>
+            BOX(POINT (IP_INT,IP_INT), POINT(IP_INT,IP_INT))
+            AND RDNS.IP=ips_export.IP ;
+    CREATE INDEX ips_export2_ip on ips_export2(ip);
+    CREATE INDEX ips_export2_ipint on ips_export2(ip_int);
 
-DROP TABLE IF EXISTS export_test;
-CREATE TABLE EXPORT_test as
-    SELECT STATUS, CMDS, BYTECOUNT,
-        AGENT, CNT, ACC, START_TS, END_TS, SOURCE,
-        HOST,
-        CITY_NAME, COUNTRY_CODE, domain,
-        export.ip, export.ip_int
-    FROM EXPORT, IPS_EXPORT2
-    WHERE
-        export.ip_int=ips_export2.ip_int;
-    CREATE index export_test_start on export_test (start_ts);
-    CREATE index export_test_source on export_test (source);
-analyze export_test;
+    DROP TABLE IF EXISTS export_test;
+    CREATE TABLE EXPORT_test as
+        SELECT STATUS, CMDS, BYTECOUNT,
+            AGENT, CNT, ACC, START_TS, END_TS, SOURCE,
+            HOST,
+            CITY_NAME, COUNTRY_CODE, domain,
+            export.ip, export.ip_int
+        FROM EXPORT, IPS_EXPORT2
+        WHERE
+            export.ip_int=ips_export2.ip_int;
+        CREATE index export_test_start on export_test (start_ts);
+        CREATE index export_test_source on export_test (source);
+    ANALYZE EXPORT_TEST;
 
 
 HERE

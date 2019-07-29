@@ -1,6 +1,7 @@
 #!/bin/bash
 
-. $HOME/strides/strides_env.sh
+# shellcheck source=/home/vartanianmh/strides/strides_env.sh
+. "$HOME/strides/strides_env.sh"
 
 rm -rf "$PGVER" "$PGVER.tar.bz2" "$PGVER.rel.tar.gz"
 curl -O "https://ftp.postgresql.org/pub/source/v11.4/$PGVER.tar.bz2"
