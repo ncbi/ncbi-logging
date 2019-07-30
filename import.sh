@@ -49,26 +49,27 @@ psql -h localhost -d grafana << HERE
         select ips_export.ip, ip_int, domain, city_name, country_code
         from ips_export, ip2location_db11_ipv4, rdns
         WHERE
-            BOX(POINT(IP_FROM,IP_FROM),POINT(IP_TO,IP_TO)) @>
-            BOX(POINT (IP_INT,IP_INT), POINT(IP_INT,IP_INT))
-            AND RDNS.IP=ips_export.IP ;
+            BOX(POINT(ip_from,ip_from),POINT(ip_to,ip_to)) @>
+            BOX(POINT (ip_int,ip_int), POINT(ip_int,ip_int))
+            AND rdns.ip=ips_export.ip ;
     CREATE INDEX ips_export2_ip on ips_export2(ip);
     CREATE INDEX ips_export2_ipint on ips_export2(ip_int);
 
 
-    DROP TABLE IF EXISTS export_joined;
-    CREATE TABLE EXPORT_joined as
-        SELECT STATUS, CMDS, BYTECOUNT,
-            AGENT, CNT, ACC, START_TS, END_TS, SOURCE,
-            HOST,
-            CITY_NAME, COUNTRY_CODE, domain,
+    --DROP TABLE IF EXISTS export_joined;
+    CREATE TABLE export_joined as
+        SELECT status, cmds, bytecount,
+            agent, cnt, acc, start_ts, end_ts, source,
+            host,
+            city_name, country_code, domain,
             export.ip, export.ip_int
-        FROM EXPORT, IPS_EXPORT2
+        FROM export, ips_export2
         WHERE
-            export.ip_int=ips_export2.ip_int;
+            export.ip_int=ips_export2.ip_int
+        ORDER BY source, start_ts;
     CREATE index export_joined_start on export_joined (start_ts);
     CREATE index export_joined_source on export_joined (source);
-    ANALYZE EXPORT_joined;
+    ANALYZE export_joined;
 
     ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
     ALTER TABLE export_joined RENAME TO cloud_sessions;
