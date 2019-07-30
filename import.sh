@@ -6,7 +6,6 @@
 cd "$PANFS/export" || exit
 
 psql -h localhost -d grafana -X << HERE
-    DROP VIEW IF EXISTS export_test;
     DROP TABLE IF EXISTS export;
     CREATE TABLE export (
     status text,
@@ -52,8 +51,9 @@ psql -h localhost -d grafana -X << HERE
     CREATE INDEX ips_export2_ip on ips_export2(ip);
     CREATE INDEX ips_export2_ipint on ips_export2(ip_int);
 
-    DROP TABLE IF EXISTS export_test;
-    CREATE TABLE EXPORT_test as
+
+    DROP TABLE IF EXISTS export_joined;
+    CREATE TABLE EXPORT_joined as
         SELECT STATUS, CMDS, BYTECOUNT,
             AGENT, CNT, ACC, START_TS, END_TS, SOURCE,
             HOST,
@@ -62,9 +62,11 @@ psql -h localhost -d grafana -X << HERE
         FROM EXPORT, IPS_EXPORT2
         WHERE
             export.ip_int=ips_export2.ip_int;
-        CREATE index export_test_start on export_test (start_ts);
-        CREATE index export_test_source on export_test (source);
-    ANALYZE EXPORT_TEST;
+        CREATE index export_joined_start on export_joined (start_ts);
+        CREATE index export_joined_source on export_joined (source);
+    ANALYZE EXPORT_joined;
 
-
+    ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
+    ALTER TABLE export_joined RENAME TO cloud_sessions;
+    DROP TABLE IF EXISTS cloud_sessions_bak;
 HERE
