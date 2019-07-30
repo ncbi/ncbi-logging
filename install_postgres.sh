@@ -21,16 +21,16 @@ cd "$HOME" || exit
 cat <<-EOF > "$PGDATA/postgresql.conf"
 port = 5432
 max_connections = 100
-shared_buffers = 16GB # Entire DB is ~16GB
+shared_buffers = 32GB
 effective_cache_size = 100GB # intprod11 usually around this
-work_mem = 1GB
+work_mem = 2GB
 max_worker_processes = 16
 max_parallel_workers_per_gather = 8
 max_parallel_workers = 16
 log_autovacuum_min_duration = 250ms
 checkpoint_completion_target = 0.9
 default_statistics_target = 500
-max_wal_size = 1GB
+max_wal_size = 4GB
 min_wal_size = 512MB
 synchronous_commit = off
 datestyle = 'iso, mdy'
