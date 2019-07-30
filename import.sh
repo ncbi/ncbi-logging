@@ -30,12 +30,16 @@ for x in export."$DATE".*.gz; do
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-psql -h localhost -d grafana -X << HERE
+echo "Loaded"
+
+psql -h localhost -d grafana << HERE
+/*
     CREATE index export_start on export (start_ts);
     CREATE index export_source on export (source);
     CLUSTER export using export_start;
-    select count(*) from export;
     ANALYZE EXPORT;
+*/
+    select count(*) from export;
 
 
     CREATE TEMP TABLE ips_export as select distinct ip, ip_int from export;
@@ -62,11 +66,12 @@ psql -h localhost -d grafana -X << HERE
         FROM EXPORT, IPS_EXPORT2
         WHERE
             export.ip_int=ips_export2.ip_int;
-        CREATE index export_joined_start on export_joined (start_ts);
-        CREATE index export_joined_source on export_joined (source);
+    CREATE index export_joined_start on export_joined (start_ts);
+    CREATE index export_joined_source on export_joined (source);
     ANALYZE EXPORT_joined;
 
     ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
     ALTER TABLE export_joined RENAME TO cloud_sessions;
     DROP TABLE IF EXISTS cloud_sessions_bak;
+    DROP TABLE IF EXISTS export;
 HERE

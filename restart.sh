@@ -39,7 +39,10 @@ if [ "$?" -eq 1 ]; then
         myapp:app
 fi
 
-tar -cf - ~/pgdata/ > /dev/null 2>&1
+# Attempt to pin DB to RAM
+#tar -cf - ~/pgdata/ > /dev/null 2>&1
+time find ~/pgdata/ -type f -exec cat {} \; > /dev/null
+
 
 echo "-----------------------"
 
