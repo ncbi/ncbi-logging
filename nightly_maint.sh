@@ -21,6 +21,7 @@ psql -h localhost -d grafana -c "\\copy rdns FROM ips.new.tsv WITH DELIMITER E'\
 
 psql -h localhost -d grafana -f rdns.sql > /dev/null 2>&1
 psql -h localhost -d grafana -f accs.sql > /dev/null 2>&1
+gzip public_fix.csv &
 
 psql -h localhost -d grafana -c 'analyze'
 

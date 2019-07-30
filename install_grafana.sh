@@ -37,7 +37,7 @@ host = localhost
 name = grafana
 user = $USER
 log_queries = true
-max_open_conn = 8
+max_open_conn = 16
 conn_max_lifetime = 1800
 
 [analytics]

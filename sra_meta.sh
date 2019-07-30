@@ -24,12 +24,12 @@ wget -q -a metagenomes.log -O - 'https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.c
 wget -q -a viral.log -O - 'https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term="viruses"[orgn]' | grep -v "^$"  > viral.csv
 
 #6.5M
-cp public_fix.csv public_fix.csv.bak
+cp public_fix.csv.gz public_fix.csv.bak.gz
 wget -q -a public.log -O - 'https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term="public"[Access]' | grep -v "^$" | ~/strides/public_fix.py  > public_fix.csv
 LC=$(wc -l < public_fix.csv)
 if [ "$LC" -lt 5000000 ]; then
     echo "Short file: $LC"
-    cp public_fix.csv.bak public_fix.csv
+    gunzip -d -c public_fix.csv.bak.gz > public_fix.csv
 fi
 
 echo "------------"
