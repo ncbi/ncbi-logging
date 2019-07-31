@@ -37,7 +37,6 @@ psql -h localhost -d grafana << HERE
     CREATE index export_start on export (start_ts);
     CREATE index export_source on export (source);
     CLUSTER export using export_start;
-    ANALYZE EXPORT;
 */
     select count(*) from export;
 
@@ -77,7 +76,6 @@ COMMIT;
     CREATE index cloud_sessions_start on cloud_sessions (start_ts);
     CREATE index cloud_sessions_source on cloud_sessions (source);
 
-    ANALYZE cloud_sessions;
 
 BEGIN;
     DROP TABLE IF EXISTS last_used;

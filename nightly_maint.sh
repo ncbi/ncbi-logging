@@ -21,8 +21,6 @@ psql -h localhost -d grafana -f rdns.sql > /dev/null 2>&1
 psql -h localhost -d grafana -f accs.sql > /dev/null 2>&1
 gzip public_fix.csv &
 
-psql -h localhost -d grafana -c 'analyze'
-
 psql << USAGE
     SELECT nspname || '.' || relname AS "relation",
         pg_size_pretty(pg_total_relation_size(C.oid)) AS "total_size"
@@ -36,6 +34,8 @@ psql << USAGE
 USAGE
 
 ./import.sh
+
+psql -h localhost -d grafana -c 'analyze'
 
 pg_dump -h localhost -d grafana | \
      xz -T 20 -c > \
