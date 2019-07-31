@@ -58,6 +58,7 @@ EOF
 bin/grafana-cli plugins install grafana-worldmap-panel
 bin/grafana-cli plugins install satellogic-3d-globe-panel
 bin/grafana-cli plugins install doitintl-bigquery-datasource
+bin/grafana-cli plugins install grafana-piechart-panel
 
 nohup bin/grafana-server -config conf/grafana.ini web &
 
