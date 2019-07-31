@@ -4,9 +4,6 @@
 . "$HOME/strides/strides_env.sh"
 
 echo "Starting"
-date
-DATE=$(date "+%Y%m%d") #_%H%M%S
-export DATE
 
 ./blast_dev.sh >> /tmp/mike_logs/blast_dev.log 2>&1
 ./sra_hackathon.sh >> /tmp/mike_logs/sra_hackathon.log 2>&1

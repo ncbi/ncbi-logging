@@ -4,7 +4,6 @@
 . "$HOME/strides/strides_env.sh"
 
 SRCDIR="$PWD"
-#DATE=$(date "+%Y%m%d") #_%H%M%S
 
 cd "$HOME" || exit
 rm -rf "$PGVER"

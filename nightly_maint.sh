@@ -2,8 +2,6 @@
 
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
-date
-DATE=$(date "+%Y%m%d") #_%H%M%S
 
 pip3.6 list --outdated
 

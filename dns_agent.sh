@@ -184,9 +184,6 @@ wwwns.nlm.nih.gov
 EOF
 
 
-date
-DATE=$(date "+%Y%m%d") #_%H%M%S
-
 exit
 
 for host in $(sort -u hosts); do

@@ -5,8 +5,6 @@
 
 cd "$PANFS/export" || exit
 
-date
-
 psql -h localhost -d grafana -X << HERE
     DROP TABLE IF EXISTS export;
     CREATE TABLE export (

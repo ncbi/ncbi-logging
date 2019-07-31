@@ -6,8 +6,6 @@
 set +o errexit # same as -e
 set +o pipefail
 
-date
-
 cd /home/vartanianmh || exit
 
 PGSTATUS=$(pg_ctl status)

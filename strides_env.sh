@@ -38,3 +38,4 @@ case "$HOSTNAME" in
         ;;
 esac
 
+date

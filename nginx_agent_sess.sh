@@ -9,7 +9,6 @@ if [ ! -f $DB ] ; then
     touch $DB
 fi
 
-date
 #for file in `ls -1 -R /panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_????????.gz`;
 for file in `ls -1 -R /tmp/vartanianmh/panfs*access.log_????????.gz`;
 do

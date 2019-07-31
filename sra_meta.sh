@@ -3,9 +3,6 @@
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
 
-date
-DATE=$(date "+%Y%m%d") #_%H%M%S
-
 tar -cvaf "sra_meta.$DATE.tgz" ./*.csv
 
 # 1.2M

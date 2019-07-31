@@ -3,8 +3,6 @@
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
 
-date
-
 mkdir -p "$PANFS/export"
 
 cd "$PANFS/export" || exit
