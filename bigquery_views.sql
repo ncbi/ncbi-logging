@@ -133,3 +133,26 @@ FROM
   `fh-bigquery.geocode.201806_geolite2_city_ipv4_locs`
 WHERE
   network_bin=mask
+
+
+
+CREATE OR REPLACE TABLE
+  `ncbi-sandbox-blast.strides_analytics.export` AS
+SELECT
+  status,
+  ip,
+  domain,
+  cmds,
+  bytecount,
+  agent,
+  cnt,
+  acc,
+  start,
+  `end`,
+  source,
+IF
+  (REGEXP_CONTAINS(ip, ":"),
+    0,
+    NET.IPV4_TO_INT64(NET.SAFE_IP_FROM_STRING(ip)) ) AS ipint
+FROM
+  `ncbi-sandbox-blast.strides_analytics.combined`
