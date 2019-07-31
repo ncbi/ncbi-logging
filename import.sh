@@ -71,12 +71,30 @@ BEGIN;
     ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
     ALTER TABLE export_joined RENAME TO cloud_sessions;
 COMMIT;
+
     DROP index cloud_sessions_start;
     DROP index cloud_sessions_source;
     CREATE index cloud_sessions_start on cloud_sessions (start_ts);
     CREATE index cloud_sessions_source on cloud_sessions (source);
 
     ANALYZE cloud_sessions;
+
+BEGIN;
+    DROP TABLE IF EXISTS last_used;
+    CREATE TABLE last_used as
+        select acc, max(last) as last
+        from  (
+            select acc, date_trunc('day', start_ts) as last
+            from cloud_sessions
+            where source='SRA'
+            and acc ~ '[DES]RR[\d\.]{6,10}'
+            union all
+            select run as acc, '2018-12-01 00:00:00'::timestamp as last
+            from public
+        ) as roll2
+        group by acc;
+COMMIT;
+
     DROP TABLE IF EXISTS cloud_sessions_bak;
     DROP TABLE IF EXISTS export;
     DROP TABLE IF EXISTS ips_export2;
