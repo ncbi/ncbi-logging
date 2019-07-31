@@ -30,7 +30,6 @@ struct sess {
     string ip;
     string agent;
     string domain;
-    //    string url;
     string acc;
     set<string> cmds;
     set<string> status;
@@ -98,6 +97,7 @@ int main ( int argc, char *argv[] )
     char buf[4096];
     line.reserve ( sizeof buf );
     size_t successes = 0;
+    string sesskey;
     while ( fgets ( buf, sizeof ( buf ), stdin ) != nullptr ) {
         line.assign ( buf );
 
@@ -296,7 +296,6 @@ int main ( int argc, char *argv[] )
         sess.ip = remote_ip;
         sess.agent = user_agent.substr ( 0, 64 );
         sess.domain = host_header;
-        // sess.url = request_uri;
         sess.acc = request_uri;
         sess.status.emplace ( http_status );
         sess.cmds.emplace ( cmd );
@@ -307,7 +306,7 @@ int main ( int argc, char *argv[] )
 
         if constexpr ( debug ) { cout << "end is:" << sess.end << "\n"; }
 
-        string sesskey = remote_ip;
+        sesskey = remote_ip;
         sesskey += request_uri;
         sesskey += user_agent;
         sesskey += host_header;

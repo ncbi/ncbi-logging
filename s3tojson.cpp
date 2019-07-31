@@ -28,7 +28,6 @@ struct sess {
     string ip;
     string agent;
     string domain;
-    //    string url;
     string acc;
     set<string> cmds;
     set<string> status;
@@ -104,10 +103,10 @@ int main ( int argc, char *argv[] )
     char buf[4096];
     line.reserve ( sizeof buf );
     size_t successes = 0;
+    string sesskey;
     while ( nullptr != fgets ( buf, sizeof ( buf ), stdin ) ) {
         line.assign ( buf );
 
-        //    while ( getline ( cin, line ) ) {
         ++linecount;
         if ( line.size () < 10 ) {
             cerr << "short line: " << line << "\n";
@@ -282,7 +281,6 @@ int main ( int argc, char *argv[] )
 
         struct tm tm {
         };
-        // memset ( (void *)&tm, 0, sizeof tm );
         if ( strptime ( time.data (), "%d/%b/%Y:%H:%M:%S %z", &tm )
             == nullptr ) {
             cerr << "Couldn't parse time" << time << "\n";
@@ -327,7 +325,6 @@ int main ( int argc, char *argv[] )
         sess.ip = remote_ip;
         sess.agent = user_agent.substr ( 0, 64 );
         sess.domain = host_header;
-        // sess.url = request_uri;
         sess.acc = request_uri;
         sess.status.emplace ( http_status );
         sess.cmds.emplace ( cmd );
@@ -338,7 +335,7 @@ int main ( int argc, char *argv[] )
 
         if constexpr ( debug ) { cout << "end is:" << sess.end << "\n"; }
 
-        string sesskey = remote_ip;
+        sesskey = remote_ip;
         sesskey += request_uri;
         sesskey += user_agent;
         sesskey += bucket;
