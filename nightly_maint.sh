@@ -3,7 +3,7 @@
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
 
-pip3.6 list --outdated
+pip3.7 list --outdated
 
 psql -h localhost -d grafana -t -X -c 'select ips.ip  from ips left join rdns on ips.ip=rdns.ip where rdns.ip is null' > ips.new
 

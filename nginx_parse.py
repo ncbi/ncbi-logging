@@ -1,4 +1,4 @@
-#!/opt/python-all/bin/python3.6
+#!/opt/python-all/bin/python3.7
 import csv
 import datetime
 import json
@@ -7,19 +7,19 @@ import re
 import sys
 import time
 
-    # Not sure if NCBI deviates from standrad:
-    #      http://httpd.apache.org/docs/1.3/logs.html
-    # Client IP
-    # identd
-    # userid
-    # finishtime
-    # request
-    # status code
-    # size
-    # referrer
-    # ?
-    #
-    # 220.243.135.142 - - [21/Aug/2018:00:01:03 -0400] "ftp.ncbi.nlm.nih.gov" "GET /gene/GeneRIF/ HTTP/1.1" 301 258 0 "-" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Mobile Safari/537.36" "-" -pct 1340 - "NCBI-SID: -" port=80 258 492 text/html
+# Not sure if NCBI deviates from standrad:
+#      http://httpd.apache.org/docs/1.3/logs.html
+# Client IP
+# identd
+# userid
+# finishtime
+# request
+# status code
+# size
+# referrer
+# ?
+#
+# 220.243.135.142 - - [21/Aug/2018:00:01:03 -0400] "ftp.ncbi.nlm.nih.gov" "GET /gene/GeneRIF/ HTTP/1.1" 301 258 0 "-" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Mobile Safari/537.36" "-" -pct 1340 - "NCBI-SID: -" port=80 258 492 text/html
 pattern1 = r"""
     (?P<ip>\d{1,3} \. \d{1,3} \. \d{1,3} \. \d{1,3} )
     \s (?P<identd>[\S]+ )
@@ -114,17 +114,15 @@ for line in sys.stdin:
     end = start + datetime.timedelta(seconds=float(gd["time"]))
     bytecount = gd["size"]
 
-    s={}
-    s['ip']=ip
-    s['acc']=acc
-    s['agent']=agent
-    s['domain']=domain
-    s['res']=res
-    s['start']=str(start)
-    s['end']=str(end)
-    s['time']=gd["time"]
-    s['bytecount']=bytecount
+    s = {}
+    s["ip"] = ip
+    s["acc"] = acc
+    s["agent"] = agent
+    s["domain"] = domain
+    s["res"] = res
+    s["start"] = str(start)
+    s["end"] = str(end)
+    s["time"] = gd["time"]
+    s["bytecount"] = bytecount
 
     print(json.dumps(s))
-
-

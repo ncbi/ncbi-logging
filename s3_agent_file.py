@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3.7
 import datetime
 import dbm
 import http.client
@@ -10,7 +10,6 @@ import urllib
 
 # Usage: ./s3_agent.py sra-pub-src-1-logs 'SRA@S3'
 
-# pip3.6 install --user boto3
 import boto3
 
 # GLOBALS
@@ -159,7 +158,7 @@ def process_log(strides_ip, strides_port, source):
             acc = acc  # .split(".")[0]
         # Christiam suggests ignoring extension.
 
-        #logging.info(f"ACC  is {acc}")
+        # logging.info(f"ACC  is {acc}")
 
         ip = fields["remote_ip"]
         agent = fields["user_agent"]

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3.7
 # gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
 import csv
 import dbm
