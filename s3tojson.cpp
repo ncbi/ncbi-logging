@@ -5,11 +5,11 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <set>
 #include <sstream>
 #include <string>
 #include <time.h>
 #include <unordered_map>
-#include <unordered_set>
 
 // g++ --std=c++14 -Wall -O3 -Wextra -o logtojson logtojson.cpp
 
@@ -23,8 +23,8 @@ struct sess {
     string domain;
     //    string url;
     string acc;
-    unordered_set<string> cmds;
-    unordered_set<string> status;
+    set<string> cmds;
+    set<string> status;
     size_t bytecount;
     size_t cnt;
     double start;
@@ -33,7 +33,7 @@ struct sess {
 
 // Key is ip, url, agent, domain
 
-size_t linefind ( const string &line, char c, size_t s )
+[[nodiscard]] size_t linefind ( const string &line, char c, size_t s )
 {
     size_t e = line.find ( c, s );
     if ( e == string::npos ) {
@@ -91,7 +91,7 @@ int main ( int argc, char *argv[] )
     regex_search ( test, matches, accre );
     if ( matches.empty () ) return 1;
     size_t linecount = 0;
-    bool debug = false;
+    const bool debug = false;
     string line;
     // longest seen in wild is 2124 bytes
     char buf[4096];
@@ -114,76 +114,80 @@ int main ( int argc, char *argv[] )
             continue;
         }
 
-        if ( debug ) cout << "line is:" << line << "\n";
+        if constexpr ( debug ) cout << "line is:" << line << "\n";
 
 
         string bucket_owner = line.substr ( s, e - s );
-        if ( debug ) cout << "bucket_owner is:" << bucket_owner << ".\n";
+        if constexpr ( debug )
+            cout << "bucket_owner is:" << bucket_owner << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string bucket = line.substr ( s, e - s );
-        if ( debug ) cout << "bucket is:" << bucket << ".\n";
+        if constexpr ( debug ) cout << "bucket is:" << bucket << ".\n";
         s = e + 1;
 
         e = linefind ( line, ']', s );
         string time = line.substr ( s + 1, e - s );
-        if ( debug ) cout << "time is:" << time << ".\n";
+        if constexpr ( debug ) cout << "time is:" << time << ".\n";
         s = e + 2;
 
         e = linefind ( line, ' ', s );
         string remote_ip = line.substr ( s, e - s );
-        if ( debug ) cout << "remote_ip is:" << remote_ip << ".\n";
+        if constexpr ( debug ) cout << "remote_ip is:" << remote_ip << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string requester = line.substr ( s, e - s );
-        if ( debug ) cout << "requester is:" << requester << ".\n";
+        if constexpr ( debug ) cout << "requester is:" << requester << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string request_id = line.substr ( s, e - s );
-        if ( debug ) cout << "request_id is:" << request_id << ".\n";
+        if constexpr ( debug ) cout << "request_id is:" << request_id << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string operation = line.substr ( s, e - s );
-        if ( debug ) cout << "operation is:" << operation << ".\n";
+        if constexpr ( debug ) cout << "operation is:" << operation << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string key = line.substr ( s, e - s );
-        if ( debug ) cout << "key is:" << key << ".\n";
+        if constexpr ( debug ) cout << "key is:" << key << ".\n";
         s = e + 1;
 
         e = linefind ( line, '"', s + 1 );
         string request_uri = line.substr ( s + 1, e - s - 1 );
-        if ( debug ) cout << "request_uri is:" << request_uri << ".\n";
+        if constexpr ( debug )
+            cout << "request_uri is:" << request_uri << ".\n";
         s = e + 2;
 
         e = linefind ( line, ' ', s );
         string http_status = line.substr ( s, e - s );
-        if ( debug ) cout << "http_status is:" << http_status << ".\n";
+        if constexpr ( debug )
+            cout << "http_status is:" << http_status << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string error_code = line.substr ( s, e - s );
-        if ( debug ) cout << "error_code is:" << error_code << ".\n";
+        if constexpr ( debug ) cout << "error_code is:" << error_code << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string bytes_sent = line.substr ( s, e - s );
-        if ( debug ) cout << "bytes_sent is:" << bytes_sent << ".\n";
+        if constexpr ( debug ) cout << "bytes_sent is:" << bytes_sent << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string object_size = line.substr ( s, e - s );
-        if ( debug ) cout << "object_size is:" << object_size << ".\n";
+        if constexpr ( debug )
+            cout << "object_size is:" << object_size << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string total_time = line.substr ( s, e - s );
-        if ( debug ) cout << "total_time is:" << total_time << ".\n";
+        if constexpr ( debug ) cout << "total_time is:" << total_time << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
@@ -194,22 +198,22 @@ int main ( int argc, char *argv[] )
 
         e = linefind ( line, '"', s + 1 );
         string referrer = line.substr ( s + 1, e - s - 1 );
-        if ( debug ) cout << "referrer is:" << referrer << ".\n";
+        if constexpr ( debug ) cout << "referrer is:" << referrer << ".\n";
         s = e + 2;
 
         e = linefind ( line, '"', s + 1 );
         string user_agent = line.substr ( s + 1, e - s - 1 );
-        if ( debug ) cout << "user_agent is:" << user_agent << ".\n";
+        if constexpr ( debug ) cout << "user_agent is:" << user_agent << ".\n";
         s = e + 2;
 
         e = linefind ( line, ' ', s );
         string version_id = line.substr ( s, e - s );
-        if ( debug ) cout << "version_id is:" << version_id << ".\n";
+        if constexpr ( debug ) cout << "version_id is:" << version_id << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
         string host_id = line.substr ( s, e - s );
-        if ( debug ) cout << "host_id is:" << host_id << ".\n";
+        if constexpr ( debug ) cout << "host_id is:" << host_id << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
@@ -220,7 +224,8 @@ int main ( int argc, char *argv[] )
 
         e = linefind ( line, ' ', s );
         string cipher_suite = line.substr ( s, e - s );
-        if ( debug ) cout << "cipher_suite is:" << cipher_suite << ".\n";
+        if constexpr ( debug )
+            cout << "cipher_suite is:" << cipher_suite << ".\n";
         s = e + 1;
 
         e = linefind ( line, ' ', s );
@@ -231,11 +236,13 @@ int main ( int argc, char *argv[] )
 
         e = linefind ( line, ' ', s );
         string host_header = line.substr ( s, e - s );
-        if ( debug ) cout << "host_header is:" << host_header << ".\n";
+        if constexpr ( debug )
+            cout << "host_header is:" << host_header << ".\n";
         s = e + 1;
 
         string tls_version = line.substr ( s );
-        if ( debug ) cout << "tls_version is:" << tls_version << ".\n";
+        if constexpr ( debug )
+            cout << "tls_version is:" << tls_version << ".\n";
         s = e + 1;
 
         struct tm tm;
@@ -245,7 +252,7 @@ int main ( int argc, char *argv[] )
             continue;
         }
         time_t ltm = timegm ( &tm );
-        if ( debug ) cout << "time is: " << ltm << "\n";
+        if constexpr ( debug ) cout << "time is: " << ltm << "\n";
 
         if ( total_time == "-" ) total_time = "0";
 
@@ -254,10 +261,10 @@ int main ( int argc, char *argv[] )
         string cmd = request_uri.substr ( 0, s );
         request_uri = request_uri.substr ( s + 1 );
 
-        if ( debug ) cerr << "request was\n " + request_uri;
+        if constexpr ( debug ) cerr << "request was\n " + request_uri;
         smatch sm;
         if ( regex_search ( request_uri, sm, accre ) ) {
-            if ( debug ) {
+            if constexpr ( debug ) {
                 cerr << "hits:" << sm.size () << "\n";
                 cerr << "0: " << sm[0] << "\n";
                 cerr << "1: " << sm[1] << "\n";
@@ -291,7 +298,7 @@ int main ( int argc, char *argv[] )
         sess.start = (double)ltm;
         sess.end = sess.start + stol ( total_time ) / 1000.0;
 
-        if ( debug ) cout << "end is:" << sess.end << "\n";
+        if constexpr ( debug ) cout << "end is:" << sess.end << "\n";
 
         string sesskey = remote_ip + request_uri + user_agent + bucket;
         if ( sessions.count ( sesskey ) == 0 ) {

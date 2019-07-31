@@ -13,10 +13,10 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 gsutil du -s -h gs://strides_analytics/
-gsutil du -s -h gs://strides_analytics/export/
-gsutil du -s -h gs://strides_analytics/gs_prod/
-gsutil du -s -h gs://strides_analytics/s3_prod/
 gsutil du -s -h gs://strides_analytics/sra_prod/
+gsutil du -s -h gs://strides_analytics/s3_prod/
+gsutil du -s -h gs://strides_analytics/gs_prod/
+gsutil du -s -h gs://strides_analytics/export/
 gsutil du -s -h 'gs://strides_analytics/s3_prod/*jsonl.gz'
 gsutil du -s -h 'gs://strides_analytics/sra_prod/*jsonl.gz'
 
