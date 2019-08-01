@@ -38,4 +38,5 @@ case "$HOSTNAME" in
         ;;
 esac
 
+echo "_______________________________"
 date
