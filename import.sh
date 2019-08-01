@@ -76,7 +76,7 @@ COMMIT;
     CREATE index cloud_sessions_start on cloud_sessions (start_ts);
     CREATE index cloud_sessions_source on cloud_sessions (source);
 
-
+-- Materialized views, as tables in case we need to index them
 BEGIN;
     DROP TABLE IF EXISTS last_used;
     CREATE TABLE last_used as
@@ -92,6 +92,130 @@ BEGIN;
         ) as roll2
         group by acc;
 COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS last_used_interval;
+    CREATE TABLE last_used_interval as
+    select case
+        when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
+        then 'downloaded in last 30 days'
+        when date_trunc('day', age(localtimestamp, last)) > interval '180 days'
+        then 'never downloaded'
+        else 'downloaded 30..180 days ago'
+    end as metric,
+    count(*) as value
+    from last_used
+    group by metric;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS downloads_by_ip;
+    CREATE TABLE downloads_by_ip as
+        SELECT date_trunc('day', start_ts) as time,
+        source,
+        count(distinct ip) as unique_users
+        FROM
+        cloud_sessions
+        WHERE
+        ( cmds like '%GET%' or cmds like '%HEAD%' )
+        AND source != 'SRA'
+        GROUP BY time, source
+        ORDER BY time;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS last_used_interval;
+    CREATE TABLE last_used_interval as
+    select case
+        when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
+        then 'downloaded in last 30 days'
+        when date_trunc('day', age(localtimestamp, last)) > interval '180 days'
+        then 'never downloaded'
+        else 'downloaded 30..180 days ago'
+    end as metric,
+    count(*) as value
+    from last_used
+    group by metric;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS daily_downloads;
+    CREATE TABLE daily_downloads as
+    SELECT
+        date_trunc('day', start_ts) as time,
+        sum(bytecount) as bytes,
+        sum(cnt) as downloads
+    FROM
+    cloud_sessions
+    WHERE
+    ( cmds like '%GET%' or cmds like '%HEAD%' )
+    AND source!='SRA'
+    GROUP BY "time"
+    ORDER BY "time";
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS cloud_downloads;
+    CREATE TABLE cloud_downloads AS
+    select source || ' -> ' || domain as Path,
+    sum(cnt) as Downloads, sum(bytecount) as Bytes,
+    date_trunc('day', start_ts) as time
+    from cloud_sessions
+    where
+    ( cmds like '%GET%' or cmds like '%HEAD%' )
+    AND source!='SRA'
+    group by time, path
+    order by Downloads desc;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS download_domains;
+    CREATE TABLE download_domains as
+        select domain,
+        date_trunc('day', start_ts) as time,
+        sum(bytes) as Bytes
+        from sra_cloud
+        group by domain, time;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS cloud_organisms;
+    CREATE TABLE cloud_organisms as
+    select initcap(acc_desc) as Organism,
+    count(*) as popularity,
+    date_trunc('day', start_ts) as time
+    from cloud_sessions, accs
+    where
+    ( cmds like '%GET%' or cmds like '%HEAD%' )
+    AND cloud_sessions.acc=accs.acc
+    group by time, acc_desc
+    order by popularity desc
+    limit 500;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS sra_last_acc;
+    CREATE TABLE acc_last_acc as
+    select last as time, count(*) as accessions from (
+    select max(last) as last
+    from sra_last_used
+    group by acc) as roll
+    group by last
+    order by last;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS sra_cloud_downloads;
+    CREATE TABLE sra_cloud_downloads as
+    SELECT
+        date_trunc('day', start_ts) as time,
+        sum(bytes) as bytes,
+        sum(cnt) as downloads
+    FROM
+        sra_cloud
+    GROUP BY "time";
+COMMIT;
+
 
 DROP TABLE IF EXISTS cloud_sessions_bak;
 DROP TABLE IF EXISTS export;
