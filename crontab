@@ -15,7 +15,6 @@ MAILTO=""
 # *  *  *  *  * command to be executed
 3,8,13,18,23,28,33,38,43,48,51,56 * * * * /home/vartanianmh/strides/restart.sh >>  /home/vartanianmh/restart.log 2>&1
 7 20 * * 6 /home/vartanianmh/strides/sra_meta.sh >> /home/vartanianmh/sra_meta.log 2>&1
-# Needs to occur after strides_agent completes, Wolfgang's imports start at
-# 5:30
-30 4 * * * /home/vartanianmh/strides/nightly_maint.sh >> /home/vartanianmh/nightly_maint.log 2>&1
-#9 05 * * * /home/vartanianmh/strides/bigquery_export.sh >> /home/vartanianmh/bigquery_export.log 2>&1
+# Needs to occur after strides_agent's bigquery_export completes (~4:50),
+# but before Wolfgang's imports start at 5:30
+3 5 * * * /home/vartanianmh/strides/nightly_maint.sh >> /home/vartanianmh/nightly_maint.log 2>&1
