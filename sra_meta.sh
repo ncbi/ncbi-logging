@@ -29,4 +29,4 @@ if [ "$LC" -lt 5000000 ]; then
     gunzip -d -c public_fix.csv.bak.gz > public_fix.csv
 fi
 
-echo "------------"
+date

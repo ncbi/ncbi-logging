@@ -44,5 +44,4 @@ pg_dump -h localhost -d grafana | \
 e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
 
 date
-echo "-----------------------"
 
