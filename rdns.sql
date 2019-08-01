@@ -68,6 +68,11 @@ where ip like '134.174.%';
 update rdns set domain='poznan.pl' where ip like '150.%';
 update rdns set domain='ucsd.edu (UCSD) ' where ip like '169.228.%';
 
+update rdns set domain='georgetown.edu (Georgetown University)'
+where domain like '%georgetown.edu%';
+update rdns set domain='msu.edu (Michigan State University)'
+where domain like '%msu.edu%';
+
 update rdns set domain='dtu.dk (Technical University of Denmark)'
 where domain like '%dtu.dk%';
 

@@ -194,7 +194,7 @@ BEGIN;
 COMMIT;
 
 BEGIN;
-    DROP TABLE IF EXISTS sra_last_acc;
+    DROP TABLE IF EXISTS acc_last_acc;
     CREATE TABLE acc_last_acc as
     select last as time, count(*) as accessions from (
     select max(last) as last
