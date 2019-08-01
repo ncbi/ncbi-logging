@@ -1,11 +1,11 @@
 #include "json.hpp"
+#include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iostream>
-#include <regex>
 #include <set>
 #include <sstream>
 #include <string>
@@ -16,9 +16,7 @@ using std::cout;
 using std::invalid_argument;
 using std::max;
 using std::min;
-using std::regex;
 using std::set;
-using std::smatch;
 using std::string;
 using std::unordered_map;
 using json = nlohmann::json;
@@ -48,12 +46,36 @@ struct sess {
     return e;
 }
 
+[[nodiscard]] string findacc ( const string &str )
+{
+    size_t sz = str.size ();
+    if ( sz < 8 ) { return ""; }
+    const char *s = str.data ();
+
+    const char *r = static_cast<const char *> (
+        memchr ( static_cast<const char *> ( s + 1 ), 'R', sz - 6 ) );
+    if ( r != nullptr ) {
+        size_t start = r - s - 1;
+        if ( str[start + 2] == 'R' ) {
+            if ( str[start] == 'S' || str[start] == 'D' || str[start] == 'E' ) {
+                size_t d = 3;
+                while ( isdigit ( str[start + d] ) != 0 ) { ++d; }
+                if ( str[start + d] == '.'
+                    && ( isdigit ( str[start + d + 1] ) != 0 ) ) {
+                    d += 2;
+                }
+                return str.substr ( start, d );
+            }
+        }
+    }
+    return "";
+}
 
 int main ( int argc, char *argv[] )
 {
     if ( argc != 1 ) {
         cerr << "Usage: " << argv[0] << " stdin only\n";
-        return 1;
+        return __LINE__;
     }
 
     unordered_map<string, struct sess> sessions;
@@ -89,13 +111,18 @@ int main ( int argc, char *argv[] )
      * TLSv1.2
      */
 
-    regex accre (
-        ".*([DES]RR[\\d\\.]{6,10})", std::regex::icase | std::regex::optimize );
-
-    smatch matches;
     string test ( "fooSRR9668056" );
-    regex_search ( test, matches, accre );
-    if ( matches.empty () ) { return 1; }
+    if ( findacc ( test ) != "SRR9668056" ) { return __LINE__; }
+    test = "SRR1234567";
+    if ( findacc ( test ) != "SRR1234567" ) { return __LINE__; }
+    test = "DRR1234567.1";
+    if ( findacc ( test ) != "DRR1234567.1" ) { return __LINE__; }
+    test = "";
+    if ( !findacc ( test ).empty () ) { return __LINE__; }
+    test = "SRR";
+    if ( !findacc ( test ).empty () ) { return __LINE__; }
+
+
     size_t linecount = 0;
     const bool debug = false;
     string line;
@@ -297,18 +324,11 @@ int main ( int argc, char *argv[] )
         request_uri = request_uri.substr ( s + 1 );
 
         if constexpr ( debug ) { cerr << "request was\n " + request_uri; }
-        smatch sm;
-        if ( regex_search ( request_uri, sm, accre ) ) {
-            if constexpr ( debug ) {
-                cerr << "hits:" << sm.size () << "\n";
-                cerr << "0: " << sm[0] << "\n";
-                cerr << "1: " << sm[1] << "\n";
-            }
-            request_uri = sm[sm.size () - 1];
-        }
-        if ( debug ) {
-            cerr << "\n now is " + request_uri + "\n" << sm.size () << "\n";
-        }
+
+        string acc = findacc ( request_uri );
+        if ( !acc.empty () ) { request_uri = acc; }
+
+
         uint64_t bytecount = 0;
         try {
             if ( bytes_sent != "-" ) { bytecount = stol ( bytes_sent ); }
