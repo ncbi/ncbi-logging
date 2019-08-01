@@ -93,7 +93,7 @@ BEGIN;
         group by acc;
 COMMIT;
 
-    DROP TABLE IF EXISTS cloud_sessions_bak;
-    DROP TABLE IF EXISTS export;
-    DROP TABLE IF EXISTS ips_export2;
+DROP TABLE IF EXISTS cloud_sessions_bak;
+DROP TABLE IF EXISTS export;
+DROP TABLE IF EXISTS ips_export2;
 HERE

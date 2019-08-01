@@ -66,7 +66,10 @@ update rdns set domain='Longwood Medical (harvard.edu)'
 where ip like '134.174.%';
 
 update rdns set domain='poznan.pl' where ip like '150.%';
-update rdns set domain='ucsd.edu' where ip like '169.228.%';
+update rdns set domain='ucsd.edu (UCSD) ' where ip like '169.228.%';
+
+update rdns set domain='dtu.dk (Technical University of Denmark)'
+where domain like '%dtu.dk%';
 
 update rdns set domain='Japan National Institute of Genetics (nig.ac.jp)'
 where ip like '133.39.%';
