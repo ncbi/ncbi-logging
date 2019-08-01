@@ -305,6 +305,10 @@ int main ( int argc, char *argv[] )
             cout << "tls_version is:" << tls_version << ".\n";
         }
         // s = e + 1;
+        if ( tls_version.rfind ( "TLSv1" ) != 0 ) {
+            cerr << " no TLS version: " << tls_version << "\n";
+            continue;
+        }
 
         struct tm tm {
         };
