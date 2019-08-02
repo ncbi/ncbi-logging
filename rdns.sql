@@ -123,7 +123,24 @@ where ip like '152.51.%';
 update rdns set domain='Dartmouth College (dartmouth.edu)'
 where ip like '129.170.%';
 
+update rdns set domain='Hoffmann LaRoche (roche.com)'
+where ip like '196.3.5%';
 
+update rdns set domain='Pittsburgh Supercomputing Center (psc.edu)'
+where ip like '128.182.%';
+
+update rdns set domain='MIT (mit.edu)'
+where ip like '18.4%';
+
+update rdns set domain='Nongkeyuan Science & Technology Information (cnnic.cn)'
+where ip like '210.73.154.%';
+
+update rdns set
+domain='National Jewish Medical and Research Center Corporation (njhelath.org)'
+where ip like '205.143.248.%';
+
+update rdns set domain='University of Calgary (ucalgary.ca)'
+where ip like '136.159.%';
 
 
 update rdns set domain='BostonGene (bostongene.com)' where ip = '104.130.59.32';
@@ -194,10 +211,10 @@ update rdns set domain='Hackathon - vkt-mongodb02' where ip='35.245.126.160';
 
 
 
-select ip, sum(bytes)
+select ip as unknown_ip, sum(bytes)
     from sra_sessions
     where domain='unknown'
-    group by ip
+    group by unknown_ip
     order by sum(bytes) desc
     limit 10;
 
