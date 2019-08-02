@@ -30,9 +30,9 @@ for x in export."$DATE".*.gz; do
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-echo "Loaded"
+echo "Loaded export"
 
-psql -h localhost -d grafana << HERE
+time psql -h localhost -d grafana << HERE
 /*
     CREATE index export_start on export (start_ts);
     CREATE index export_source on export (source);
@@ -221,3 +221,4 @@ DROP TABLE IF EXISTS cloud_sessions_bak;
 DROP TABLE IF EXISTS export;
 DROP TABLE IF EXISTS ips_export2;
 HERE
+
