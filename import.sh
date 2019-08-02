@@ -157,7 +157,10 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS cloud_downloads;
     CREATE TABLE cloud_downloads AS
-    select source || ' -> ' || domain as Path,
+    select source || ' -> ' || domain
+    || ' @ ' || city_name
+    || ', ' || country_code
+    as Path,
     sum(cnt) as Downloads, sum(bytecount) as Bytes,
     date_trunc('day', start_ts) as time
     from cloud_sessions

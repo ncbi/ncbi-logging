@@ -111,6 +111,21 @@ where ip like '128.135.%';
 update rdns set domain='University of Hawaii (hawaii.edu)'
 where ip like '168.105.%';
 
+update rdns set domain='Northern Arizona University (nazu.edu)'
+where ip like '134.114.%';
+
+update rdns set domain='Georgetown University (georgetown.edu)'
+where ip like '141.161.13.%';
+
+update rdns set domain='GlaxoSmithKline (gsk.com)'
+where ip like '152.51.%';
+
+update rdns set domain='Dartmouth College (dartmouth.edu)'
+where ip like '129.170.%';
+
+
+
+
 update rdns set domain='BostonGene (bostongene.com)' where ip = '104.130.59.32';
 
 update rdns set domain='Helmholtz Zentrum Muenchen' where ip like '146.107.%';
