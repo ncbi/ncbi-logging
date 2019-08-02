@@ -160,6 +160,12 @@ update rdns set domain='xlate.ufl.edu (University of Florida)' where domain='unk
 update rdns set domain='verizonbusiness.com (Verizon Business)'
 where ip like '65.196.%';
 
+update rdns set domain='level3.com (Level 3 Communications)'
+where ip like '4.16.%';
+
+update rdns set domain='rcn.net (RCN Corporation)'
+where ip like '207.237.188.%';
+
 update rdns set domain='IANA Reserved' where
     ip like '0.%' or
     ip like '10.%' or
