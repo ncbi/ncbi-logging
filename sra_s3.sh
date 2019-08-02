@@ -34,9 +34,10 @@ done
 
 time "$HOME/strides/s3tojson" < \
     "$LOGDIR/s3_prod/$YESTERDAY.combine" | \
-    gzip -9 -v -c > "$LOGDIR/s3_prod/$YESTERDAY.jsonl.gz"
+    gzip -9 -v -c > "$LOGDIR/s3_prod/$YESTERDAY.jsonl.gz" \
+    2> "$LOGDIR/s3_prod/$YESTERDAY.err"
 
-time gzip -9 -v "$LOGDIR/s3_prod/$YESTERDAY.combine" &
+time gzip -9 -v "$LOGDIR/s3_prod/$YESTERDAY.combine"
 
 #    ./s3_agent.py "$LOG_BUCKET" 'SRA@S3'
 

@@ -33,7 +33,7 @@ psql << USAGE
     LIMIT 20;
 USAGE
 
-./import.sh
+./import.sh >> ~/import.log 2>&1
 
 psql -h localhost -d grafana -c 'analyze'
 
