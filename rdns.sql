@@ -43,26 +43,26 @@ update rdns set domain='fhcrc.org (Fred Hutchinson Cancer Research Center)'
     where ip like '140.107.%';
 update rdns set domain='nus.edu.sg (National University of Singapore)'
     where ip like '137.132.%';
-update rdns set domain='Tarbiat-Modares University (modares.ac.ir)'
+update rdns set domain='modares.acir (Tarbiat-Modares University'
     where domain='unknown' and ip like '194.225.1%';
-update rdns set domain='MITRE (mitre.org)' where domain='unknown'
+update rdns set domain='mitre.org (MITRE)' where domain='unknown'
     and ip like '192.80.55.%';
-update rdns set domain='Children''s Hospital of Philadelphia (chop.edu)'
+update rdns set domain='chop.edu (Children''s Hospital of Philadelphia)'
     where ip like '159.14.%';
 
-update rdns set domain='Universitaet Basel (unibas.ch)'
+update rdns set domain='unibas.ch (Universitaet Basel)'
     where ip like '131.152.%';
-update rdns set domain='University of Massachusetts Amherst (umass.edu)'
+update rdns set domain='umass.edu (University of Massachusetts Amherst)'
     where ip like '205.172.16%';
-update rdns set domain='University of Georgia (uga.edu)'
+update rdns set domain='uga.edu (University of Georgia)'
     where ip like '128.192.%';
-update rdns set domain='Shanghai Jiaotong University (net.edu.cn)'
+update rdns set domain='net.edu.cn (Shanghai Jiaotong University)'
     where ip like '202.120.4%';
-update rdns set domain='South Dakota State University (sdstate.edu)'
+update rdns set domain='sdstate.edu (South Dakota State University)'
     where ip like '137.216.%';
 
 update rdns set domain='clemson.edu' where ip like '205.186.62.%';
-update rdns set domain='Longwood Medical (harvard.edu)'
+update rdns set domain='harvard.edu (Longwood Medical)'
 where ip like '134.174.%';
 
 update rdns set domain='poznan.pl' where ip like '150.%';
@@ -76,10 +76,10 @@ where domain like '%msu.edu%';
 update rdns set domain='dtu.dk (Technical University of Denmark)'
 where domain like '%dtu.dk%';
 
-update rdns set domain='Japan National Institute of Genetics (nig.ac.jp)'
+update rdns set domain='nig.ac.jp (Japan National Institute of Genetics)'
 where ip like '133.39.%';
 
-update rdns set domain='Korea Telecom (or.kr)'
+update rdns set domain='br.kr (Korea Telecom)'
 where ip like '218.15%';
 
 update rdns set domain='Fundacio Privada Centre de Regulacio Genomica'
@@ -88,10 +88,10 @@ where ip like '84.88.66.%';
 update rdns set domain='Paris VII Denis Diderot University'
 where ip like '81.194.28.%';
 
-update rdns set domain='Connecticut Education Network (uconn.edu)'
+update rdns set domain='uconn.edu (Connecticut Education Network)'
 where ip like '162.221.11.%';
 
-update rdns set domain='Penn State University (psu.edu)'
+update rdns set domain='psu.edu (Penn State University)'
 where ip like '128.118.%';
 
 update rdns set domain='Marine Biological Laboratory'
@@ -103,58 +103,62 @@ where ip like '147.47.%';
 update rdns set domain='Wuhan Hua Zhong Augulture University'
 where ip like '211.69.141.%';
 
-update rdns set domain='University of California, Davis (ucdavis.edu)'
+update rdns set domain='ucdavis.edu (University of California, Davis)'
 where ip like '128.120.%';
 
-update rdns set domain='University of Chicago (uchiacgo.edu)'
+update rdns set domain='uchicago.edu (University of Chicago)'
 where ip like '128.135.%';
-update rdns set domain='University of Hawaii (hawaii.edu)'
+update rdns set domain='hawaii.edu (University of Hawaii)'
 where ip like '168.105.%';
 
-update rdns set domain='Northern Arizona University (nazu.edu)'
+update rdns set domain='nazu.edu (Northern Arizona University)'
 where ip like '134.114.%';
 
-update rdns set domain='Georgetown University (georgetown.edu)'
+update rdns set domain='georgetown.edu (Georgetown University)'
 where ip like '141.161.13.%';
 
-update rdns set domain='GlaxoSmithKline (gsk.com)'
+update rdns set domain='gsk.com (GlaxoSmithKline)'
 where ip like '152.51.%';
 
-update rdns set domain='Dartmouth College (dartmouth.edu)'
+update rdns set domain='dartmouth.edu (Dartmouth College)'
 where ip like '129.170.%';
 
-update rdns set domain='Hoffmann LaRoche (roche.com)'
+update rdns set domain='roche.com (Hoffmann LaRoche)'
 where ip like '196.3.5%';
 
-update rdns set domain='Pittsburgh Supercomputing Center (psc.edu)'
+update rdns set domain='psc.edu (Pittsburgh Supercomputing Center)'
 where ip like '128.182.%';
 
-update rdns set domain='MIT (mit.edu)'
+update rdns set domain='mit.edu (MIT)'
 where ip like '18.4%';
 
-update rdns set domain='Nongkeyuan Science & Technology Information (cnnic.cn)'
+update rdns set domain='cnnic.ch (Nongkeyuan Science & Technology Information)'
 where ip like '210.73.154.%';
 
 update rdns set
-domain='National Jewish Medical and Research Center Corporation (njhelath.org)'
+domain='njhelath.org (National Jewish Medical and Research Center Corporation)'
 where ip like '205.143.248.%';
 
-update rdns set domain='University of Calgary (ucalgary.ca)'
+update rdns set domain='ucalgary.ca (University of Calgary)'
 where ip like '136.159.%';
 
+update rdns set domain='cannantv.tv (Cable Of The Carolinas Inc)'
+where ip like '72.46.72.%';
 
-update rdns set domain='BostonGene (bostongene.com)' where ip = '104.130.59.32';
+update rdns set domain='bostongene.com (BostonGene)' where ip = '104.130.59.32';
 
 update rdns set domain='Helmholtz Zentrum Muenchen' where ip like '146.107.%';
 
-update rdns set domain='nlm.nih.gov (NIH.gov)' where domain='unknown' and
+update rdns set domain='nlm.nih.gov (NLM)' where domain='unknown' and
     ip like '10.10.8%' or
     ip like '130.14.%';
-update rdns set domain='nih.gov (NIH.gov)' where domain='unknown' and
+update rdns set domain='nih.gov (NIH)' where domain='unknown' and
     ip like '128.231.%' or
     ip like '156.40.2%';
-update rdns set domain='xlate.ufl.edu (UFL.edu)' where domain='unknown' and
+update rdns set domain='xlate.ufl.edu (University of Florida)' where domain='unknown' and
     ip like '128.227.%';
+update rdns set domain='verizonbusiness.com (Verizon Business)'
+where ip like '65.196.%';
 
 update rdns set domain='IANA Reserved' where
     ip like '0.%' or
@@ -166,17 +170,17 @@ update rdns set domain='IANA Reserved' where
     ip like '192.168.%';
 
 
-update rdns set domain='Science Park Watergraafsmeer (surfsara.nl)'
+update rdns set domain='sursara.nl (Science Park Watergraafsmeer)'
 where ip like '145.100.4%';
 update rdns set domain='Baylor College of Medicine'
 where ip like '128.249.%';
 update rdns set domain='Rothamsted Research Institute'
 where ip like '149.155.2%';
-update rdns set domain='Meiji University (meiji.ac.jp)'
+update rdns set domain='meiji.acp.jp (Meiji University)'
 where ip like '133.26.%';
-update rdns set domain='The Rockefeller University (rockefeller.edu)'
+update rdns set domain='rockefeller.edu (The Rockefeller University)'
 where ip like '128.85.%' or ip like '129.85.%';
-update rdns set domain='University of South Florida (usf.edu)'
+update rdns set domain='usf.edu (University of South Florida)'
 where ip like '131.247.%';
 update rdns set domain='Celgene Corporation'
 where ip like '38.99.110.%';
