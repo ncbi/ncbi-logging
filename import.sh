@@ -52,7 +52,7 @@ CREATE TABLE ips_export2 as
         BOX(POINT (ip_int,ip_int), POINT(ip_int,ip_int))
         AND rdns.ip=ips_export.ip ;
 
-SELECT count(*) AS ips_export2_clount FROM ips_export2;
+SELECT count(*) AS ips_export2_count FROM ips_export2;
 
 CREATE INDEX ips_export2_ip on ips_export2(ip);
 CREATE INDEX ips_export2_ipint on ips_export2(ip_int);
@@ -76,13 +76,14 @@ BEGIN;
     ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
     ALTER TABLE export_joined RENAME TO cloud_sessions;
 COMMIT;
+DROP TABLE IF EXISTS cloud_sessions_bak;
 
 SELECT count(*) AS cloud_sessions_count FROM cloud_sessions;
 
-    DROP index cloud_sessions_start;
-    DROP index cloud_sessions_source;
-    CREATE index cloud_sessions_start on cloud_sessions (start_ts);
-    CREATE index cloud_sessions_source on cloud_sessions (source);
+DROP index cloud_sessions_start;
+DROP index cloud_sessions_source;
+CREATE index cloud_sessions_start on cloud_sessions (start_ts);
+CREATE index cloud_sessions_source on cloud_sessions (source);
 
 -- Materialized views, AS tables in case we need to index them
 BEGIN;
@@ -227,10 +228,6 @@ BEGIN;
     GROUP BY "time";
 COMMIT;
 
-
-DROP TABLE IF EXISTS cloud_sessions_bak;
-DROP TABLE IF EXISTS export;
-DROP TABLE IF EXISTS ips_export2;
 HERE
 
 date
