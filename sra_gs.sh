@@ -7,14 +7,13 @@ export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec
 export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
-for BUCKET in $(seq 7); do
-    LOG_BUCKET="sra-pub-run-$BUCKET-logs"
+for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
     echo "Processing $LOG_BUCKET"
     mkdir -p "/tmp/mike_logs/$LOG_BUCKET"
     gsutil -m rsync -r "gs://$LOG_BUCKET" "/tmp/mike_logs/$LOG_BUCKET"
 
-
     cd "/tmp/mike_logs/$LOG_BUCKET" || exit
+
     for OBJ in *usage*; do
     # sra-pub-run-1_usage_2019_06_24_03_00_00_07378a0db72e87e0b4_v0
         DT=${OBJ//_}
@@ -31,7 +30,7 @@ for BUCKET in $(seq 7); do
 
     done
 
-    ~/strides/gs_agent_all.py "$LOG_BUCKET" "SRA@GS"
+#    ~/strides/gs_agent_all.py "$LOG_BUCKET" "SRA@GS"
 
     echo "Processed  $LOG_BUCKET"
 done
