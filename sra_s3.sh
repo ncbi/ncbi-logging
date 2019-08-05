@@ -45,14 +45,8 @@ export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab43
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-
-gsutil -m rsync -r "$LOGDIR/s3_prod/" \
-    gs://strides_analytics/s3_prod/
-
-#rsync -a "$LOGDIR/s3_prod/" \
-#    /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod/
-
-
+gsutil -m rsync -r "$LOGDIR/s3_prod/" gs://strides_analytics/s3_prod/
+cp -n -v "$LOGDIR/s3_prod/*gz" $PANFS/s3_prod/
 
 echo "Done"
 date
