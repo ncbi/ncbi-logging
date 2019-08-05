@@ -151,14 +151,15 @@ BEGIN;
     CREATE TABLE daily_downloads as
     SELECT
         date_trunc('day', start_ts) AS time,
+        source,
         sum(bytecount) AS bytes,
         sum(cnt) AS downloads
     FROM
     cloud_sessions
     WHERE
     ( cmds like '%GET%' or cmds like '%HEAD%' )
+    GROUP BY "time", source
     AND source!='SRA'
-    GROUP BY "time"
     ORDER BY "time";
 COMMIT;
 
