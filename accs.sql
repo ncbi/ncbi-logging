@@ -3,8 +3,9 @@ delete from public;
 
 UPDATE accs SET acc_desc=scientificname FROM public
     WHERE
-    run=acc OR
-    run=split_part(acc,'.',1);
+    (run=acc OR
+    run=split_part(acc,'.',1))
+    AND acc_desc!=scientificname;
 
 UPDATE accs SET acc_desc='Non-redundant protein sequence'
     WHERE acc_part='nr' or acc LIKE '%nr_v5%';

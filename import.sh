@@ -159,7 +159,6 @@ BEGIN;
     WHERE
     ( cmds like '%GET%' or cmds like '%HEAD%' )
     GROUP BY "time", source
-    AND source!='SRA'
     ORDER BY "time";
 COMMIT;
 
