@@ -10,7 +10,7 @@ do
     outfile=$(echo "$file" | tr -d '/')
     cp -n -v "$file" "$PANFS/sra_prod/$outfile"
 
-    outdir=`echo "$outfile" | pcregrep -o "20[\d]{6}" | head -1`
+    outdir=$(echo "$outfile" | pcregrep -o "20[\d]{6}" | head -1)
     outdir="/tmp/mike_logs/sra_prod/$outdir"
     mkdir -p "$outdir"
     if [ ! -e "$outdir/$outfile" ]; then
