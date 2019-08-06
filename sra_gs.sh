@@ -43,8 +43,7 @@ export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 gsutil -m rsync -r /tmp/mike_logs/gs_prod \
     gs://strides_analytics/gs_prod
 
-rsync -av /tmp/mike_logs/gs_prod/ \
-    /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/gs_prod/
+rsync -av /tmp/mike_logs/gs_prod/ "$PANFS/gs_prod/"
 
 echo "Done"
 date

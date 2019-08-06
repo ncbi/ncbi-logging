@@ -3,9 +3,6 @@
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
 
-YESTERDAY_DASH=$(date -d "yesterday" "+%Y-%m-%d")
-YESTERDAY=${YESTERDAY_DASH//-}
-
 mkdir -p /tmp/mike_logs/sra_prod
 
 for file in /panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/*/access.log_????????.*.gz;

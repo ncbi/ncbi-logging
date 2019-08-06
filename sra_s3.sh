@@ -3,9 +3,6 @@
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
 
-YESTERDAY_DASH=$(date -d "yesterday" "+%Y-%m-%d")
-YESTERDAY=${YESTERDAY_DASH//-}
-
 # NOTES:
 # * aws s3 ls is much faster than other methods on buckets with
 #   huge numbers of objects
