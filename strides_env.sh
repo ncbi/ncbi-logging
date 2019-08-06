@@ -34,10 +34,10 @@ cd /home/vartanianmh/strides || exit
 
 case "$HOSTNAME" in
     iebdev11)
-        renice +19 -p $$
+        renice +19 -p $$ > /dev/null 2>&1
         ;;
     lmem05)
-        renice +19 -p $$
+        renice +19 -p $$ > /dev/null 2>&1
         ;;
     *)
         ;;
