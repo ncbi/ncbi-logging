@@ -70,6 +70,7 @@ DROP TABLE export;
 SELECT count(*) AS export_joined_count FROM EXPORT_JOINED;
 
 BEGIN;
+-- Closest thing to an atomic swap of table
     ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
     ALTER TABLE export_joined RENAME TO cloud_sessions;
 COMMIT;
@@ -86,7 +87,8 @@ CREATE index cloud_sessions_source on cloud_sessions (source);
 update cloud_sessions set city_name='Mountain View', country_code='US'
 where ip like '35.245.%';
 
--- Materialized views, AS tables in case we need to index them
+
+-- Create materialized views, AS tables in case we need to index them
 BEGIN;
     DROP TABLE IF EXISTS last_used;
     CREATE TABLE last_used as
@@ -227,17 +229,20 @@ BEGIN;
     DROP TABLE IF EXISTS last_used_cost;
     CREATE TABLE last_used_cost AS
     SELECT
-    sum(cast (size_mb as integer))/1024 as gb,
+    SUM(CAST (size_mb AS INTEGER))/1024 as gb,
     case
         when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
         then 'downloaded in last 30 days'
         when date_trunc('day', age(localtimestamp, last)) > interval '180 days'
         then 'never downloaded'
         else 'downloaded 30..180 days ago'
-    end AS metric
-    from last_used, public
-    where last_used.acc=public.run
-    group by metric;
+    END AS metric
+    FROM LAST_USED, PUBLIC
+    WHERE
+    LAST_USED.ACC=PUBLIC.RUN
+    AND TO_DATE(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') <
+    CURRENT_DATE - INTERVAL '180 DAYS'
+    GROUP BY METRIC;
 
     DROP TABLE IF EXISTS storage_cost;
     CREATE TABLE storage_cost (class text, savings double precision);
