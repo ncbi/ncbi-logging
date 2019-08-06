@@ -20,7 +20,7 @@ gsutil du -s -h gs://strides_analytics/export/
 gsutil du -s -h 'gs://strides_analytics/s3_prod/*jsonl.gz'
 gsutil du -s -h 'gs://strides_analytics/sra_prod/*jsonl.gz'
 
-gsutil rm -f "gs://strides_analytics/export/export.$DATE.*"
+gsutil -m rm -f "gs://strides_analytics/export/export.$DATE.*"
 
 bq rm -f strides_analytics.export
 
