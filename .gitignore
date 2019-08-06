@@ -2,3 +2,5 @@
 bigqueries.sql.*
 IP2LO*
 postgresql-*tar.gz
+*.gcda
+*.result
