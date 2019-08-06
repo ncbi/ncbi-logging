@@ -8,7 +8,7 @@ mkdir -p /tmp/mike_logs/sra_prod
 for file in /panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/*/access.log_????????.*.gz;
 do
     outfile=$(echo "$file" | tr -d '/')
-    cp -n -v "$file" "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/sra_prod/$outfile"
+    cp -n -v "$file" "$PANFS/sra_prod/$outfile"
 
     outdir=`echo "$outfile" | pcregrep -o "20[\d]{6}" | head -1`
     outdir="/tmp/mike_logs/sra_prod/$outdir"
@@ -30,11 +30,6 @@ export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 
 gsutil -m rsync -r /tmp/mike_logs/sra_prod gs://strides_analytics/sra_prod
-
-#rsync -av /tmp/mike_logs/sra_prod/ \
-#    /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/sra_prod/
-
-
 
 chmod g+rx /tmp/mike_logs
 chmod g+r /tmp/mike_logs/*
