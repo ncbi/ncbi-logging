@@ -85,6 +85,10 @@ DROP index cloud_sessions_source;
 CREATE index cloud_sessions_start on cloud_sessions (start_ts);
 CREATE index cloud_sessions_source on cloud_sessions (source);
 
+-- Fix: IP2LOCATION gets this very wrong
+update cloud_sessions set city_name='Mountain View', country_code='US'
+where ip like '35.245.%';
+
 -- Materialized views, AS tables in case we need to index them
 BEGIN;
     DROP TABLE IF EXISTS last_used;
@@ -133,21 +137,6 @@ BEGIN;
 COMMIT;
 
 BEGIN;
-    DROP TABLE IF EXISTS last_used_interval;
-    CREATE TABLE last_used_interval as
-    select case
-        when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
-        then 'downloaded in last 30 days'
-        when date_trunc('day', age(localtimestamp, last)) > interval '180 days'
-        then 'never downloaded'
-        else 'downloaded 30..180 days ago'
-    end AS metric,
-    count(*) AS value
-    FROM last_used
-    group by metric;
-COMMIT;
-
-BEGIN;
     DROP TABLE IF EXISTS daily_downloads;
     CREATE TABLE daily_downloads as
     SELECT
@@ -176,8 +165,7 @@ BEGIN;
     where
     ( cmds like '%GET%' or cmds like '%HEAD%' )
     AND source!='SRA'
-    group by time, path
-    order by Downloads desc;
+    group by time, path;
 COMMIT;
 
 BEGIN;
