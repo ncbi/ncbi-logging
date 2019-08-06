@@ -33,11 +33,6 @@ done
 echo "Loaded export"
 
 time psql -h localhost -d grafana << HERE
-/*
-    CREATE index export_start on export (start_ts);
-    CREATE index export_source on export (source);
-    CLUSTER export using export_start;
-*/
 select count(*) AS export_count FROM export;
 
 
@@ -69,6 +64,8 @@ CREATE TABLE export_joined as
     WHERE
         export.ip_int=ips_export2.ip_int
     ORDER BY source, start_ts;
+
+DROP TABLE export;
 
 SELECT count(*) AS export_joined_count FROM EXPORT_JOINED;
 
@@ -225,6 +222,44 @@ BEGIN;
     ORDER BY bytes DESC
     LIMIT 100;
 COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS last_used_cost;
+    CREATE TABLE last_used_cost AS
+    SELECT
+    sum(cast (size_mb as integer))/1024 as gb,
+    case
+        when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
+        then 'downloaded in last 30 days'
+        when date_trunc('day', age(localtimestamp, last)) > interval '180 days'
+        then 'never downloaded'
+        else 'downloaded 30..180 days ago'
+    end AS metric
+    from last_used, public
+    where last_used.acc=public.run
+    group by metric;
+
+    DROP TABLE IF EXISTS storage_cost;
+    CREATE TABLE storage_cost (class text, savings double precision);
+    INSERT INTO storage_cost
+        SELECT 'Nearline/Infrequent' as class,
+        gb*2.5
+        FROM last_used_cost
+        WHERE metric='never downloaded';
+
+    INSERT INTO storage_cost
+        SELECT 'Coldline/Glacier' as class,
+        gb*3.6
+        FROM last_used_cost
+        WHERE metric='never downloaded';
+
+    INSERT INTO storage_cost
+        SELECT 'Coldline/Glacier Deep' as class,
+        gb*3.91
+        FROM last_used_cost
+        WHERE metric='never downloaded';
+COMMIT;
+
 
 HERE
 
