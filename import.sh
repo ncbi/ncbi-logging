@@ -323,6 +323,27 @@ BEGIN;
         order by time;
 COMMIT;
 
+BEGIN;
+    CREATE TEMP TABLE public_dt AS SELECT
+        run,
+        TO_TIMESTAMP(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') as released
+    FROM PUBLIC
+    WHERE releasedate > '2019-01-01';
+
+    CREATE TEMP TABLE last_dt AS SELECT
+    substring(acc from '[DES]RR\w+') as acc, last
+    from last_used
+    where acc ~ '[DES]RR\w+';
+
+    CREATE TEMP TABLE mean_time_use AS
+    SELECT last_dt.acc as acc, last, released, last - released as delay
+    FROM public_dt, last_dt
+    WHERE public_dt.run=last_dt.acc;
+
+    DROP TABLE IF EXISTS mean_latency;
+    CREATE TABLE mean_latency AS
+    SELECT AVG(delay) from mean_time_use where delay > '0 days';
+COMMIT;
 
 HERE
 
