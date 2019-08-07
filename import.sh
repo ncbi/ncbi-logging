@@ -312,6 +312,18 @@ BEGIN;
         ORDER BY LOCATION;
 COMMIT;
 
+BEGIN;
+    DROP TABLE IF EXISTS OBJECT_LOAD;
+    CREATE TABLE OBJECT_LOAD AS
+        SELECT date_trunc('day', last_modified) as time,
+        count(*) as num_accessions,
+        sum(bytecount) as bytes_uploaded
+        from cloud_objects
+        group by time
+        order by time;
+COMMIT;
+
+
 HERE
 
 date
