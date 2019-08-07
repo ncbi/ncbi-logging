@@ -42,8 +42,8 @@ done
 echo "Loaded exports"
 
 time psql -h localhost -d grafana << HERE
-select count(*) AS export_count FROM export;
-select count(*) AS export_objects FROM export_objects;
+SELECT count(*) AS export_count FROM export;
+SELECT count(*) AS export_objects FROM export_objects;
 
 
 CREATE TABLE IF NOT EXISTS cloud_objects (
@@ -70,13 +70,13 @@ INSERT INTO CLOUD_OBJECTS SELECT
     from export_objects;
 
 DROP TABLE export_objects;
+SELECT COUNT(*) AS Cloud_Objects from cloud_objects;
 
-
-CREATE TEMP TABLE ips_export AS select distinct ip, ip_int FROM export;
+CREATE TEMP TABLE ips_export AS SELECT distinct ip, ip_int FROM export;
 
 DROP TABLE IF EXISTS ips_export2;
 CREATE TABLE ips_export2 as
-    select ips_export.ip, ip_int, domain, city_name, country_code
+    SELECT ips_export.ip, ip_int, domain, city_name, country_code
     FROM ips_export, ip2location_db11_ipv4, rdns
     WHERE
         BOX(POINT(ip_FROM,ip_FROM),POINT(ip_to,ip_to)) @>
@@ -128,14 +128,14 @@ where ip like '35.245.%';
 BEGIN;
     DROP TABLE IF EXISTS last_used;
     CREATE TABLE last_used as
-        select acc, max(last) AS last
+        SELECT acc, max(last) AS last
         FROM  (
-            select acc, date_trunc('day', start_ts) AS last
+            SELECT acc, date_trunc('day', start_ts) AS last
             FROM cloud_sessions
             where source='SRA'
             and acc ~ '[DES]RR[\d\.]{6,10}'
             union all
-            select run AS acc, '2018-12-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2018-12-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc;
@@ -144,7 +144,7 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS last_used_interval;
     CREATE TABLE last_used_interval as
-    select case
+    SELECT case
         when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
         then 'downloaded in last 30 days'
         when date_trunc('day', age(localtimestamp, last)) > interval '180 days'
@@ -190,7 +190,7 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS cloud_downloads;
     CREATE TABLE cloud_downloads AS
-    select source || ' -> ' || domain
+    SELECT source || ' -> ' || domain
     || ' @ ' || city_name
     || ', ' || country_code
     AS Path,
@@ -206,7 +206,7 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS download_domains;
     CREATE TABLE download_domains as
-        select domain,
+        SELECT domain,
         date_trunc('day', start_ts) AS time,
         sum(bytes) AS Bytes
         FROM sra_cloud
@@ -216,7 +216,7 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS cloud_organisms;
     CREATE TABLE cloud_organisms as
-    select initcap(acc_desc) AS Organism,
+    SELECT initcap(acc_desc) AS Organism,
     count(*) AS popularity,
     date_trunc('day', start_ts) AS time
     FROM cloud_sessions, accs
@@ -231,8 +231,8 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS acc_last_acc;
     CREATE TABLE acc_last_acc as
-    select last AS time, count(*) AS accessions FROM (
-    select max(last) AS last
+    SELECT last AS time, count(*) AS accessions FROM (
+    SELECT max(last) AS last
     FROM sra_last_used
     group by acc) AS roll
     group by last
@@ -301,6 +301,16 @@ BEGIN;
         WHERE metric='never downloaded';
 COMMIT;
 
+BEGIN;
+    DROP TABLE IF EXISTS OBJECT_SIZES;
+    CREATE TABLE OBJECT_SIZES AS
+        SELECT lower(SOURCE) || '://' || BUCKET AS LOCATION,
+        SUM(BYTECOUNT) AS BYTES
+        FROM CLOUD_OBJECTS
+        WHERE LOAD_TIME=(SELECT MAX(LOAD_TIME) FROM CLOUD_OBJECTS)
+        GROUP BY LOCATION
+        ORDER BY LOCATION;
+COMMIT;
 
 HERE
 
