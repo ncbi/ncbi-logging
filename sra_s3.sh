@@ -27,14 +27,19 @@ for x in $(seq 7); do
     echo "Processed  $LOG_BUCKET"
     rm -rf "$DEST"
     echo "Removed $DEST"
+
+    mkdir -p "$LOGDIR/s3_prod/objects"
+    "$HOME/strides/s3_lister.py" "sra-pub-run-$x" | \
+        gzip -9 -c > \
+        "$LOGDIR/s3_prod/objects/$DATE.objects-$x.gz"
 done
 
 time "$HOME/strides/s3tojson" < \
     "$LOGDIR/s3_prod/$YESTERDAY.combine" | \
-    gzip -9 -v -c > "$LOGDIR/s3_prod/$YESTERDAY.jsonl.gz" \
+    gzip -9 -c > "$LOGDIR/s3_prod/$YESTERDAY.jsonl.gz" \
     2> "$LOGDIR/s3_prod/$YESTERDAY.err"
 
-time gzip -9 -v "$LOGDIR/s3_prod/$YESTERDAY.combine"
+time gzip -9 "$LOGDIR/s3_prod/$YESTERDAY.combine"
 
 #    ./s3_agent.py "$LOG_BUCKET" 'SRA@S3'
 
@@ -43,7 +48,7 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 gsutil -m rsync -r "$LOGDIR/s3_prod/" gs://strides_analytics/s3_prod/
-cp -n -v "$LOGDIR/s3_prod/*gz" $PANFS/s3_prod/
+cp -n -v "$LOGDIR/s3_prod/"*gz $PANFS/s3_prod/
 
 echo "Done"
 date

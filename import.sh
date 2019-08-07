@@ -229,7 +229,7 @@ BEGIN;
     DROP TABLE IF EXISTS last_used_cost;
     CREATE TABLE last_used_cost AS
     SELECT
-    SUM(CAST (size_mb AS INTEGER))/1024 as gb,
+    SUM(CAST (size_mb AS INTEGER))/1024.0 as gb,
     case
         when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
         then 'downloaded in last 30 days'

@@ -20,7 +20,7 @@ done
 
 gunzip -d -c $LOGDIR/sra_prod/"$YESTERDAY"/*gz | \
     time "$HOME/strides/nginxtojson" 2> "$LOGDIR/sra_prod/$YESTERDAY.err" | \
-    gzip -9 -v -c > "$LOGDIR/sra_prod/$YESTERDAY.jsonl.gz"
+    gzip -9 -c > "$LOGDIR/sra_prod/$YESTERDAY.jsonl.gz"
 
 
 

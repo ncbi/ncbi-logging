@@ -25,7 +25,7 @@ for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
         fi
         if [ ! -e "$DT/$OBJ.gz" ]; then
             cp -n -v "$OBJ" "$DT"
-            gzip -9 -v "$DT/$OBJ"
+            gzip -9 "$DT/$OBJ"
         fi
 
     done
