@@ -357,7 +357,7 @@ BEGIN;
 
     DROP TABLE IF EXISTS mean_latency;
     CREATE TABLE mean_latency AS
-    SELECT AVG(delay) from mean_time_use where delay > '0 days';
+    SELECT AVG(delay) as mean_delay from mean_time_use where delay > '0 days';
 COMMIT;
 
 HERE
