@@ -7,7 +7,7 @@ cd "$PANFS/export" || exit
 
 psql -h localhost -d grafana -X << HERE
     DROP TABLE IF EXISTS export;
-    CREATE TABLE export (
+    CREATE UNLOGGED TABLE export (
     status text,
     ip text,
     host text,
@@ -21,6 +21,9 @@ psql -h localhost -d grafana -X << HERE
     source text,
     ip_int double precision
 );
+
+    DROP TABLE IF EXISTS export_objects;
+    CREATE UNLOGGED TABLE export_objects (data jsonb);
 HERE
 
 # NOTE: Not profitable to do this in parallel, some kind of contention
@@ -30,10 +33,41 @@ for x in export."$DATE".*.gz; do
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-echo "Loaded export"
+for x in "$PANFS/s3_prod/objects/$DATE."*gz; do
+    echo "Loading $x"
+    psql -h localhost -d grafana -c \
+        "\\copy export_objects FROM program 'gunzip -d -c $x';"
+done
+
+echo "Loaded exports"
 
 time psql -h localhost -d grafana << HERE
 select count(*) AS export_count FROM export;
+select count(*) AS export_objects FROM export_objects;
+
+
+CREATE TABLE IF NOT EXISTS cloud_objects (
+    acc text,
+    load_time timestamp,
+    etag text,
+    bytecount bigint,
+    bucket text,
+    source text,
+    last_modified timestamp,
+    storage_class text);
+
+INSERT INTO CLOUD_OBJECTS SELECT
+    data->>'Key' AS acc,
+    to_date(data->>'Now','YYYY-MM-DD HH24:MI:SS') AS load_time,
+    data->>'ETag' AS etag,
+    cast(data->>'Size' AS bigint) AS bytecount,
+    data->>'Bucket' AS bucket,
+    data->>'Source' AS source,
+    to_date(data->>'LastModified','YYYY-MM-DD HH24:MI:SS') AS last_modified,
+    data->>'StorageClass' AS storage_class
+    from export_objects;
+
+DROP TABLE export_objects;
 
 
 CREATE TEMP TABLE ips_export AS select distinct ip, ip_int FROM export;
@@ -218,7 +252,7 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS sra_agents;
     CREATE TABLE sra_agents AS
-    SELECT source, substr(agent,0,40) as agent, sum(bytecount) as bytes
+    SELECT source, substr(agent,0,40) AS agent, sum(bytecount) AS bytes
     FROM cloud_sessions
     GROUP BY source, agent
     ORDER BY bytes DESC
@@ -229,7 +263,7 @@ BEGIN;
     DROP TABLE IF EXISTS last_used_cost;
     CREATE TABLE last_used_cost AS
     SELECT
-    SUM(CAST (size_mb AS INTEGER))/1024.0 as gb,
+    SUM(CAST (size_mb AS INTEGER))/1024.0 AS gb,
     case
         when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
         then 'downloaded in last 30 days'
@@ -247,19 +281,19 @@ BEGIN;
     DROP TABLE IF EXISTS storage_cost;
     CREATE TABLE storage_cost (class text, savings double precision);
     INSERT INTO storage_cost
-        SELECT 'Nearline/Infrequent' as class,
+        SELECT 'Nearline/Infrequent' AS class,
         gb*2.5
         FROM last_used_cost
         WHERE metric='never downloaded';
 
     INSERT INTO storage_cost
-        SELECT 'Coldline/Glacier' as class,
+        SELECT 'Coldline/Glacier' AS class,
         gb*3.6
         FROM last_used_cost
         WHERE metric='never downloaded';
 
     INSERT INTO storage_cost
-        SELECT 'Coldline/Glacier Deep' as class,
+        SELECT 'Coldline/Glacier Deep' AS class,
         gb*3.91
         FROM last_used_cost
         WHERE metric='never downloaded';
