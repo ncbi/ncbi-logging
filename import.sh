@@ -48,6 +48,7 @@ select count(*) AS export_objects FROM export_objects;
 
 CREATE TABLE IF NOT EXISTS cloud_objects (
     acc text,
+    export_time timestamp,
     load_time timestamp,
     etag text,
     bytecount bigint,
@@ -58,12 +59,13 @@ CREATE TABLE IF NOT EXISTS cloud_objects (
 
 INSERT INTO CLOUD_OBJECTS SELECT
     data->>'Key' AS acc,
-    to_date(data->>'Now','YYYY-MM-DD HH24:MI:SS') AS load_time,
+    TO_TIMESTAMP(data->>'Now','YYYY-MM-DD HH24:MI:SS') AS export_time,
+    now() as load_time,
     data->>'ETag' AS etag,
     cast(data->>'Size' AS bigint) AS bytecount,
     data->>'Bucket' AS bucket,
     data->>'Source' AS source,
-    to_date(data->>'LastModified','YYYY-MM-DD HH24:MI:SS') AS last_modified,
+    TO_TIMESTAMP(data->>'LastModified','YYYY-MM-DD HH24:MI:SS') AS last_modified,
     data->>'StorageClass' AS storage_class
     from export_objects;
 
@@ -274,7 +276,7 @@ BEGIN;
     FROM LAST_USED, PUBLIC
     WHERE
     LAST_USED.ACC=PUBLIC.RUN
-    AND TO_DATE(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') <
+    AND TO_TIMESTAMP(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') <
     CURRENT_DATE - INTERVAL '180 DAYS'
     GROUP BY METRIC;
 
