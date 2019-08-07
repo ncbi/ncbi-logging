@@ -216,16 +216,16 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS cloud_organisms;
     CREATE TABLE cloud_organisms as
-    SELECT initcap(acc_desc) AS Organism,
-    count(*) AS popularity,
-    date_trunc('day', start_ts) AS time
-    FROM cloud_sessions, accs
-    where
-    ( cmds like '%GET%' or cmds like '%HEAD%' )
-    AND cloud_sessions.acc=accs.acc
-    group by time, acc_desc
-    order by popularity desc
-    limit 500;
+        SELECT initcap(scientificname) as Organism,
+        count(*) AS popularity,
+        date_trunc('day', start_ts) AS time
+        FROM cloud_sessions, public
+        where
+        ( cmds like '%GET%' or cmds like '%HEAD%' )
+        AND cloud_sessions.acc=run
+        group by time, Organism
+        order by popularity desc
+        limit 500;
 COMMIT;
 
 BEGIN;
