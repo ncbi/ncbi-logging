@@ -330,9 +330,24 @@ BEGIN;
     FROM PUBLIC
     WHERE releasedate > '2019-01-01';
 
+    CREATE TEMP TABLE last_download as
+        SELECT acc, max(last) AS last
+        FROM  (
+            SELECT acc, date_trunc('day', start_ts) AS last
+            FROM cloud_sessions
+            where source='SRA'
+            and acc ~ '[DES]RR[\d\.]{6,10}'
+            and city_name not in
+            ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
+            union all
+            SELECT run AS acc, '2018-12-01 00:00:00'::timestamp AS last
+            FROM public
+        ) AS roll2
+        group by acc;
+
     CREATE TEMP TABLE last_dt AS SELECT
     substring(acc from '[DES]RR\w+') as acc, last
-    from last_used
+    from last_download
     where acc ~ '[DES]RR\w+';
 
     CREATE TEMP TABLE mean_time_use AS
