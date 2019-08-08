@@ -1,0 +1,2 @@
+130.14.28.32 - - [12/Jul/2019:12:18:39 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /traces/era9/ERR/ERR022/ERR022446 HTTP/1.1" 200 34911053 0.956 "-" "Python-urllib/2.7" "-" port=80 rl=170
+130.14.28.11 - - [12/Jul/2019:04:10:06 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /srapub/ERR022446 HTTP/1.1" 200 34242165 15.385 "-" "Python-urllib/2.7" "-" port=443 rl=154

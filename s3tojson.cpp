@@ -42,6 +42,7 @@ struct sess {
     size_t e = line.find ( c, s );
     if ( e == string::npos ) {
         cerr << "can't find '" << c << "' in '" << line << "'\n";
+        exit ( 0 );
     }
     return e;
 }
@@ -79,7 +80,7 @@ int main ( int argc, char *argv[] )
     }
 
     unordered_map<string, struct sess> sessions;
-    sessions.reserve ( 20000000 );
+    //    sessions.reserve ( 20000000 );
 
     // https://docs.aws.amazon.com/AmazonS3/latest/dev/LogFormat.html
     /*
@@ -133,6 +134,14 @@ int main ( int argc, char *argv[] )
     string sesskey;
     while ( nullptr != fgets ( buf, sizeof ( buf ), stdin ) ) {
         line.assign ( buf );
+        bool utf8 = true;
+        for ( const auto c : line ) {
+            if ( isascii ( c ) == 0 ) {
+                cerr << "Non ascii in line\n";
+                utf8 = false;
+            }
+        }
+        if ( !utf8 ) { continue; }
 
         ++linecount;
         if ( line.size () < 10 ) {
@@ -355,7 +364,12 @@ int main ( int argc, char *argv[] )
         sess.bytecount = bytecount;
         sess.cnt = 1;
         sess.start = static_cast<double> ( ltm );
-        sess.end = sess.start + stol ( total_time ) / 1000.0;
+        try {
+            sess.end = sess.start + stol ( total_time ) / 1000.0;
+        } catch ( const invalid_argument &a ) {
+            cerr << "Not a number: " << total_time << "\n";
+            sess.end = 0;
+        }
 
         if constexpr ( debug ) { cout << "end is:" << sess.end << "\n"; }
 

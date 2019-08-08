@@ -66,9 +66,8 @@ const char *sse_memchr_r ( const char *cur, const char *end )
 {
     size_t e = line.find ( c, s );
     if ( e == string::npos ) {
-        cerr << "can't find '" << c << "' in '"
-             << line.substr ( s, string::npos ) << "'\n";
-        cerr << "line was:'" << line << "\n";
+        cerr << "can't find '" << c << "' in '" << line << "'\n";
+        exit ( 0 );
     }
     return e;
 }
@@ -106,7 +105,7 @@ int main ( int argc, char *argv[] )
     }
 
     unordered_map<string, struct sess> sessions;
-    sessions.reserve ( 20000000 );
+    //    sessions.reserve ( 20000000 );
 
     size_t linecount = 0;
     const bool debug = false;
@@ -118,6 +117,16 @@ int main ( int argc, char *argv[] )
     string sesskey;
     while ( fgets ( buf, sizeof ( buf ), stdin ) != nullptr ) {
         line.assign ( buf );
+
+        bool utf8 = true;
+        for ( const auto c : line ) {
+            if ( isascii ( c ) == 0 ) {
+                cerr << "Non ascii in line\n";
+                utf8 = false;
+            }
+        }
+        if ( !utf8 ) { continue; }
+
 
         ++linecount;
         if ( line.size () < 10 ) {
@@ -311,7 +320,12 @@ int main ( int argc, char *argv[] )
         sess.bytecount = bytecount;
         sess.cnt = 1;
         sess.start = static_cast<double> ( ltm );
-        sess.end = sess.start + stod ( total_time );
+        try {
+            sess.end = sess.start + stod ( total_time );
+        } catch ( const invalid_argument &a ) {
+            cerr << "Not a number: " << total_time << "\n";
+            sess.end = sess.start;
+        }
 
         if constexpr ( debug ) { cout << "end is:" << sess.end << "\n"; }
 

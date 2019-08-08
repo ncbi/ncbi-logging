@@ -1,0 +1,2 @@
+130.14.28.7 - - [12/Jul/2019:15:07:51 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /srapub/ERR022446.vdbcache HTTP/1.1" 301 162 0.000 "-" "Python-urllib/2.7" "-" port=80 rl=163
+130.14.28.7 - - [12/Jul/2019:17:51:52 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /MLST/1637.listeria.wgmlst.schema.1 HTTP/1.1" 301 162 0.000 "-" "Python-urllib/2.7" "-" port=80 rl=172

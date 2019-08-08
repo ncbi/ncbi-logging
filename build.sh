@@ -75,3 +75,14 @@ scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/ \
  s3tojson.cpp
 
+unset ASAN_OPTIONS
+export AFL_SKIP_CPUFREQ=1
+export AFL_HARDEN=1
+CC="$HOME/bin/afl-gcc"
+CXX="$HOME/bin/afl-g++"
+afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o s3tojson s3tojson.cpp
+afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o nginxtojson nginxtojson.cpp
+afl-fuzz -i fuzz_s3 -o findings_s3 -- ./s3tojson
+afl-fuzz -i fuzz_nginx -o findings_nginx -- ./nginxtojson
+
+
