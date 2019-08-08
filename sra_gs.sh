@@ -35,6 +35,18 @@ for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
     echo "Processed  $LOG_BUCKET"
 done
 
+export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/requester-pays-key.json
+export CLOUDSDK_CORE_PROJECT="research-sra-cloud-pipeline"
+gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+
+for x in $(seq 7); do
+    mkdir -p "$LOGDIR/gs_prod/objects"
+    "$HOME/strides/gs_lister.py" "sra-pub-run-$x" | \
+        gzip -9 -c > \
+        "$LOGDIR/gs_prod/objects/$DATE.objects-$x.gz"
+done
+
+
 export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab431a.json
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
