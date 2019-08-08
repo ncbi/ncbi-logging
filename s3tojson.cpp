@@ -16,6 +16,7 @@ using std::cout;
 using std::invalid_argument;
 using std::max;
 using std::min;
+using std::out_of_range;
 using std::set;
 using std::string;
 using std::unordered_map;
@@ -348,6 +349,9 @@ int main ( int argc, char *argv[] )
         } catch ( const invalid_argument &a ) {
             cerr << "Not a number: " << bytes_sent << "\n";
             bytecount = 0;
+        } catch ( const out_of_range &a ) {
+            cerr << "out_of_range : " << bytes_sent << "\n";
+            bytecount = 0;
         }
 
         // VDB-3822
@@ -368,6 +372,9 @@ int main ( int argc, char *argv[] )
             sess.end = sess.start + stol ( total_time ) / 1000.0;
         } catch ( const invalid_argument &a ) {
             cerr << "Not a number: " << total_time << "\n";
+            sess.end = 0;
+        } catch ( const out_of_range &a ) {
+            cerr << "out_of_range: " << total_time << "\n";
             sess.end = 0;
         }
 

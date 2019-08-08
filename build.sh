@@ -17,19 +17,23 @@ g++ --std=c++17 -O3 -march=native \
  nginxtojson.cpp
 
 gunzip -d -c /tmp/mike_logs/s3_prod/20190731.combine.gz | head -n 10000 | \
-    ./s3tojson > s3test.result 2>&1
+    ./s3tojson 2>&1 | sort > s3test.result
 
-gunzip -d -c /tmp/mike_logs/gs_prod/20190731/sra-pub-src-1_usage_2019_07_31_22_00_00_00929704ade74e4bb8_v0.gz | head -n 10000 | \
-    ./nginxtojson > nginxtest.result 2>&1
+gunzip -d -c \
+    /tmp/mike_logs/sra_prod/20190731/panfspan1.be-md.ncbi.nlm.nih.govapplog_db_tmpdatabaselogarchiveftp.httplocal_archive20190731srafiles34access.log_20190731.logbuff11.gz \
+    | head -n 10000 | \
+    ./nginxtojson 2>&1 | sort > nginxtest.result
 
 if ! diff nginxtest.result nginxtest.expected
 then
     echo "nginx diff failed"
+    exit 1
 fi
 
 if ! diff s3test.result s3test.expected
 then
     echo "s3 diff failed"
+    exit 1
 fi
 
 g++ --std=c++17 -O3 -march=native \
@@ -78,6 +82,8 @@ scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
 unset ASAN_OPTIONS
 export AFL_SKIP_CPUFREQ=1
 export AFL_HARDEN=1
+export AFL_PATH="$HOME/AFL"
+export AFL_NO_AFFINITY=1
 CC="$HOME/bin/afl-gcc"
 CXX="$HOME/bin/afl-g++"
 afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o s3tojson s3tojson.cpp
@@ -85,4 +91,8 @@ afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o nginxtojson ng
 afl-fuzz -i fuzz_s3 -o findings_s3 -- ./s3tojson
 afl-fuzz -i fuzz_nginx -o findings_nginx -- ./nginxtojson
 
-
+# Parallel fuzzing
+afl-fuzz -M fuzzer00    -i fuzz_s3 -o findings_s3 -- ./s3tojson
+for x in $(seq 20); do
+afl-fuzz -S "fuzzer0$x" -i fuzz_s3 -o findings_s3 -- ./s3tojson > /dev/null 2>&1 &
+done
