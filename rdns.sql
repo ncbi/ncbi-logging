@@ -189,7 +189,7 @@ where ip like '128.85.%' or ip like '129.85.%';
 update rdns set domain='usf.edu (University of South Florida)'
 where ip like '131.247.%';
 update rdns set domain='Celgene Corporation'
-where ip like '38.99.110.%';
+where ip like '38.99.110.%' or ip like '173.227.5.%';
 
 update rdns set domain='unam.mx (Universidad Nacional Autonoma de Mexico)'
 where ip like '132.247.%';
