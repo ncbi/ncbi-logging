@@ -48,7 +48,7 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 gsutil -m rsync -r "$LOGDIR/s3_prod/" gs://strides_analytics/s3_prod/
-cp -n -v -r "$LOGDIR/s3_prod" "$PANFS/s3_prod"
+cp -n -v -r "$LOGDIR/s3_prod/"* "$PANFS/s3_prod"
 
 echo "Done"
 date
