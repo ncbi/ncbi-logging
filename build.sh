@@ -84,15 +84,16 @@ export AFL_SKIP_CPUFREQ=1
 export AFL_HARDEN=1
 export AFL_PATH="$HOME/AFL"
 export AFL_NO_AFFINITY=1
-CC="$HOME/bin/afl-gcc"
-CXX="$HOME/bin/afl-g++"
+export CC="$HOME/bin/afl-gcc"
+export CXX="$HOME/bin/afl-g++"
 afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o s3tojson s3tojson.cpp
 afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o nginxtojson nginxtojson.cpp
 afl-fuzz -i fuzz_s3 -o findings_s3 -- ./s3tojson
 afl-fuzz -i fuzz_nginx -o findings_nginx -- ./nginxtojson
 
 # Parallel fuzzing
-afl-fuzz -M fuzzer00    -i fuzz_s3 -o findings_s3 -- ./s3tojson
+cd "$TMP" || exit
+afl-fuzz -M fuzzer00    -i ~/strides/fuzz_s3 -o findings_s3 -- ~/strides/s3tojson
 for x in $(seq 20); do
-afl-fuzz -S "fuzzer0$x" -i fuzz_s3 -o findings_s3 -- ./s3tojson > /dev/null 2>&1 &
+afl-fuzz -S "fuzzer0$x" -i ~/strides/fuzz_s3 -o findings_s3 -- ~/strides/s3tojson > "fuzz.$x.log" 2>&1 &
 done
