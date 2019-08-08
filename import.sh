@@ -360,6 +360,16 @@ BEGIN;
     SELECT AVG(delay) as mean_delay from mean_time_use where delay > '0 days';
 COMMIT;
 
+BEGIN;
+    DROP TABLE IF EXISTS blast_and_strides;
+    CREATE TABLE blast_and_strides as
+    SELECT domain, city_name, country_code, COUNT(*) as downloads
+    FROM cloud_sessions
+    WHERE ip in (SELECT DISTINCT ip FROM blast_sessions )
+    GROUP BY domain, city_name, country_code
+    ORDER by downloads desc;
+COMMIT;
+
 HERE
 
 date

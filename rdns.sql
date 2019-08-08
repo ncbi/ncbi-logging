@@ -191,6 +191,15 @@ where ip like '131.247.%';
 update rdns set domain='Celgene Corporation'
 where ip like '38.99.110.%';
 
+update rdns set domain='unam.mx (Universidad Nacional Autonoma de Mexico)'
+where ip like '132.247.%';
+
+update rdns set domain='si.edu (Smithsonian Institution)'
+where ip like '160.111.%';
+
+
+
+
 update rdns set domain='googleusercontent.com (GCP)'
 where domain='unknown' and ( ip like '66.249.%' or ip like '35.2%');
 update rdns set domain='googleusercontent.com (GCP)'
