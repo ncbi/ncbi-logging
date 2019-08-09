@@ -6,7 +6,7 @@ set -o pipefail
 shopt -s nullglob globstar
 
 export PGVER="postgresql-11.4"
-export GRAFANAVER="grafana-6.2.5" # Update conf/grafana.ini too
+export GRAFANAVER="grafana-6.3.2" # Update conf/grafana.ini too
 export PORT=3389
 export PGDATA="$HOME/pgdata"
 export PGHOST="localhost"

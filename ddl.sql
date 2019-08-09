@@ -506,7 +506,6 @@ CREATE TABLE export (
     --PRIMARY KEY (ip, acc, agent, source, domain, "start")
 );
 
-\COPY export FROM program 'gunzip -d -c /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/export/export.20190717.000000000017.csv.gz' FORCE NOT NULL acc CSV HEADER;
 CREATE index export_start on export (start);
 CREATE index export_source on export (source);
 CLUSTER export using export_start;
