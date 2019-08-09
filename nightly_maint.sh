@@ -39,7 +39,7 @@ psql -h localhost -d grafana -c 'analyze'
 pg_dump -h localhost -d grafana | \
      xz -T 20 -c > "$PANFS/pg_dumps/pg_dump.$DATE.xz" &
 
-e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
+#e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
 
 date
 

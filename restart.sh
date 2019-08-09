@@ -39,5 +39,5 @@ fi
 
 # Attempt to pin DB to RAM
 #tar -cf - ~/pgdata/ > /dev/null 2>&1
-find ~/pgdata/ -type f -exec cat {} \; > /dev/null 2>&1
+#find ~/pgdata/ -type f -exec cat {} \; > /dev/null 2>&1
 
