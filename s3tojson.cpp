@@ -66,7 +66,11 @@ struct sess {
                     && ( isdigit ( str[start + d + 1] ) != 0 ) ) {
                     d += 2;
                 }
-                return str.substr ( start, d );
+                if ( d > 6 ) {
+                    return str.substr ( start, d );
+                } 
+                    return "";
+                
             }
         }
     }

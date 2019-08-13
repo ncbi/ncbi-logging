@@ -68,7 +68,7 @@ const char *sse_memchr_r ( const char *cur, const char *end )
     size_t e = line.find ( c, s );
     if ( e == string::npos ) {
         cerr << "can't find '" << c << "' in '" << line << "'\n";
-        exit ( 0 );
+        // exit ( 0 );
     }
     return e;
 }
@@ -91,7 +91,11 @@ const char *sse_memchr_r ( const char *cur, const char *end )
                     && ( isdigit ( str[start + d + 1] ) != 0 ) ) {
                     d += 2;
                 }
-                return str.substr ( start, d );
+                if ( d > 6 ) {
+                    return str.substr ( start, d );
+                } 
+                    return "";
+                
             }
         }
     }
@@ -106,7 +110,7 @@ int main ( int argc, char *argv[] )
     }
 
     unordered_map<string, struct sess> sessions;
-    //    sessions.reserve ( 20000000 );
+    sessions.reserve ( 20000000 );
 
     size_t linecount = 0;
     const bool debug = false;
