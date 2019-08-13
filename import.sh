@@ -178,7 +178,7 @@ BEGIN;
         date_trunc('day', start_ts) AS time,
         source,
         sum(bytecount) AS bytes,
-        sum(cnt) AS downloads
+        count(*) AS downloads
     FROM
     cloud_sessions
     WHERE
@@ -194,7 +194,7 @@ BEGIN;
     || ' @ ' || city_name
     || ', ' || country_code
     AS Path,
-    sum(cnt) AS Downloads, sum(bytecount) AS Bytes,
+    count(*) AS Downloads, sum(bytecount) AS Bytes,
     date_trunc('day', start_ts) AS time
     FROM cloud_sessions
     where
@@ -245,7 +245,7 @@ BEGIN;
     SELECT
         date_trunc('day', start_ts) AS time,
         sum(bytes) AS bytes,
-        sum(cnt) AS downloads
+        count(*) AS downloads
     FROM
         sra_cloud
     GROUP BY "time";
