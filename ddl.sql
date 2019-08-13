@@ -251,7 +251,7 @@ CREATE TABLE blast_accesses(
   start_ts TIMESTAMP,
   end_ts TIMESTAMP,
   bytes DOUBLE PRECISION,
-  cnt INT,
+  cnt BIGINT,
   PRIMARY KEY (start_ts, acc_id, ip_id, agent_id, res)
 );
 ALTER TABLE blast_accesses ALTER ip_id SET STATISTICS 1000;
@@ -272,7 +272,7 @@ CREATE TABLE sra_sessions(
   start_ts TIMESTAMP,
   end_ts TIMESTAMP,
   bytes DOUBLE PRECISION NOT NULL,
-  cnt INT NOT NULL,
+  cnt BIGINT NOT NULL,
   CREATED TIMESTAMP NOT NULL,
   UPDATED TIMESTAMP NOT NULL,
   PRIMARY KEY (start_ts, acc_id, ip_id, agent_id, res)
@@ -294,7 +294,7 @@ CREATE TABLE sessions(
   agent_id INTEGER REFERENCES agents,
   domain_id INTEGER REFERENCES domains NOT NULL,
   res INT NOT NULL,
-  cnt INT NOT NULL,
+  cnt BIGINT NOT NULL,
   CREATED TIMESTAMP NOT NULL,
   UPDATED TIMESTAMP NOT NULL,
   source TEXT REFERENCES sources,
@@ -498,7 +498,7 @@ CREATE TABLE export (
     cmds text,
     bytecount bigint,
     agent text,
-    cnt int,
+    cnt bigint,
     acc text,
     start timestamp,
     "end" timestamp,

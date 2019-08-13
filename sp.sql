@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION add_session(in_ip text,
                                      in_start_ts timestamp,
                                      in_end_ts timestamp,
                                      in_bytes bigint,
-                                     in_cnt int,
+                                     in_cnt bigint,
                                      in_source text)
 RETURNS VOID AS
 $$

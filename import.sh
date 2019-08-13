@@ -14,7 +14,7 @@ psql -h localhost -d grafana -X << HERE
     cmds text,
     bytecount bigint,
     agent text,
-    cnt int,
+    cnt bigint,
     acc text,
     start_ts timestamp,
     end_ts timestamp,
