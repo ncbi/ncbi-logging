@@ -135,7 +135,7 @@ BEGIN;
             where source='SRA'
             and acc ~ '[DES]RR[\d\.]{6,10}'
             union all
-            SELECT run AS acc, '2018-12-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc;
@@ -328,7 +328,7 @@ BEGIN;
         run,
         TO_TIMESTAMP(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') as released
     FROM PUBLIC
-    WHERE releasedate > '2019-01-01';
+    WHERE releasedate > '2018-06-01';
 
     CREATE TEMP TABLE last_download as
         SELECT acc, max(last) AS last
@@ -340,7 +340,7 @@ BEGIN;
             and city_name not in
             ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
             union all
-            SELECT run AS acc, '2018-12-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc;
