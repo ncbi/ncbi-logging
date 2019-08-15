@@ -110,7 +110,7 @@ int main ( int argc, char *argv[] )
     }
 
     unordered_map<string, struct sess> sessions;
-    sessions.reserve ( 20000000 );
+    sessions.reserve ( 1000000 ); // Most are < 200,000, max 513,000
 
     size_t linecount = 0;
     const bool debug = false;
