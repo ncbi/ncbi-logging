@@ -1,4 +1,4 @@
-#!/opt/python-all/bin/python3.7
+#!/usr/bin/env python3.7
 import csv
 import datetime
 import dbm
