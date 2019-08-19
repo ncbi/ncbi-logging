@@ -5,7 +5,7 @@ set -o nounset # same as -u
 set -o pipefail
 shopt -s nullglob globstar
 
-export PGVER="postgresql-11.4"
+export PGVER="postgresql-11.5"
 export GRAFANAVER="grafana-6.3.2" # Update conf/grafana.ini too
 export PORT=3389
 export PGDATA="$HOME/pgdata"
