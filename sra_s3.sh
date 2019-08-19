@@ -10,19 +10,19 @@
 
 rm -f "$LOGDIR/s3_prod/$YESTERDAY.combine"
 
-for x in $(seq 7); do
-    LOG_BUCKET="sra-pub-run-$x-logs"
-    DEST="$RAMDISK/S3-$LOG_BUCKET/$YESTERDAY"
-    mkdir -p "$DEST"
+# VDB-3892 #for x in $(seq 7); do
+LOG_BUCKET="sra-pub-run-1-logs"
+DEST="$RAMDISK/S3-$LOG_BUCKET/$YESTERDAY"
+mkdir -p "$DEST"
 
-    echo "Processing  $LOG_BUCKET into $DEST"
-    time aws s3 ls "s3://$LOG_BUCKET/$YESTERDAY_DASH" | cut -c 32- | \
-        xargs -I % -P 24 aws s3 cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
+echo "Processing  $LOG_BUCKET into $DEST"
+time aws s3 ls "s3://$LOG_BUCKET/$YESTERDAY_DASH" | cut -c 32- | \
+    xargs -I % -P 24 aws s3 cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
 
-    cd "$DEST" || exit
-    for file in ./*; do
-        cat "$file" >> "$LOGDIR/s3_prod/$YESTERDAY.combine"
-    done
+cd "$DEST" || exit
+for file in ./*; do
+    cat "$file" >> "$LOGDIR/s3_prod/$YESTERDAY.combine"
+done
     cd "$LOGDIR" || exit
     echo "Processed  $LOG_BUCKET"
     rm -rf "$DEST"
@@ -32,7 +32,6 @@ for x in $(seq 7); do
     "$HOME/strides/s3_lister.py" "sra-pub-run-$x" | \
         gzip -9 -c > \
         "$LOGDIR/s3_prod/objects/$DATE.objects-$x.gz"
-done
 
 time "$HOME/strides/s3tojson" < \
     "$LOGDIR/s3_prod/$YESTERDAY.combine" | \

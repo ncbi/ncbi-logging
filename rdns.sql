@@ -14,7 +14,7 @@ update rdns set domain='cstnet.cn' where ip like '124.16.%';
 update rdns set domain='chinanet.cn.net'
 where ip like '222.178.%' or ip like '218.9%' or ip like '59.50.85.%';
 update rdns set domain='pku.edu.cn' where ip like '162.105.%';
-update rdns set domain='cstnet.cn' where ip='159.226.67.133';
+update rdns set domain='cstnet.cn (China Science Network)' where ip like '159.226.%';
 update rdns set domain='crg.edu' where ip='84.88.66.194';
 update rdns set domain='cityu.edu.hk' where ip like '144.214.37.%';
 update rdns set domain='ChinaNetCenter' where ip like '220.243.135.%';
@@ -64,6 +64,9 @@ update rdns set domain='sdstate.edu (South Dakota State University)'
 update rdns set domain='clemson.edu' where ip like '205.186.62.%';
 update rdns set domain='harvard.edu (Longwood Medical)'
 where ip like '134.174.%';
+
+update rdns set domain='harvard.edu (Harvard University)'
+where ip like '140.247.%';
 
 update rdns set domain='poznan.pl' where ip like '150.%';
 update rdns set domain='ucsd.edu (UCSD) ' where ip like '169.228.%';
@@ -197,7 +200,48 @@ where ip like '132.247.%';
 update rdns set domain='si.edu (Smithsonian Institution)'
 where ip like '160.111.%';
 
+update rdns set domain='uky.edu (University of Kentucky)'
+where ip like '128.163.%';
 
+update rdns set domain='utoronto.ca (University of Toronto)'
+where ip like '142.1.%';
+
+update rdns set domain='usc.edu (University of Southern California)'
+where ip like '128.125.%';
+
+update rdns set domain='uw.edu (University of Washington)'
+where ip like '128.208.%';
+
+update rdns set domain='sdsu.edu (San Diego State University)'
+where ip like '130.191.%';
+
+update rdns set domain='net.edu.cn (Central South University (Changsha)'
+where ip like '122.207.8%';
+
+update rdns set domain='University of Geneva'
+where ip like '129.194.%';
+
+update rdns set domain='illinois.edu (University of Illinois)'
+where ip like '128.174.%';
+
+update rdns set
+     domain='cchmc.org (Childrens Hospital Medical Center Cincinnati)'
+where ip like '205.142.19%';
+
+update rdns set domain='nd.edu (University of Notre Dame)'
+where ip like '129.74.%';
+
+update rdns set domain='uq.edu.au (University of Queensland)'
+where ip like '130.102.%';
+
+update rdns set domain='nkn.in (Dayalbagh Educational Institute)'
+where ip like '14.139.57.%';
+
+update rdns set domain='uni-bielefeld.de (Universitaet Bielefeld)'
+where ip like '129.70.%';
+
+update rdns set domain='um.edu.mo (University of Macau)'
+where ip like '161.64.%';
 
 
 update rdns set domain='googleusercontent.com (GCP)'
