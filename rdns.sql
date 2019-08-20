@@ -1,283 +1,688 @@
-update rdns set domain='lrz.de' where ip='129.187.44.107';
-update rdns set domain='sdjnptt.net.cn' where ip='119.188.52.171';
-update rdns set domain='guangzhou.gd.cn' where ip='218.19.145.19';
-update rdns set domain='osaka-u.ac.jp' where ip='133.1.63.238';
-update rdns set domain='u-tokyo.ac.jp' where ip like '202.175.1%';
-update rdns set domain='cdc.gov' where ip like '158.111.%';
-update rdns set domain='Uni-Bielefeld.DE' where ip like '129.70.51.%';
-update rdns set domain='net.edu.cn' where ip='202.120.44.184';
-update rdns set domain='net.edu.cn' where ip='202.120.45.162';
-update rdns set domain='zi.uzh.ch' where ip='130.60.102.70';
-update rdns set domain='umab.umd.edu' where ip like '134.192.%';
-update rdns set domain='cstnet.cn' where ip='202.127.20.232';
-update rdns set domain='cstnet.cn' where ip like '124.16.%';
-update rdns set domain='chinanet.cn.net'
-where ip like '222.178.%' or ip like '218.9%' or ip like '59.50.85.%';
-update rdns set domain='pku.edu.cn' where ip like '162.105.%';
-update rdns set domain='cstnet.cn (China Science Network)' where ip like '159.226.%';
-update rdns set domain='crg.edu' where ip='84.88.66.194';
-update rdns set domain='cityu.edu.hk' where ip like '144.214.37.%';
-update rdns set domain='ChinaNetCenter' where ip like '220.243.135.%';
-update rdns set domain='ChinaNetCenter' where ip like '220.243.136.%';
-update rdns set domain='mdc-berlin.de' where ip like '141.80.%';
-update rdns set domain='yale.edu' where ip like '192.31.2.%';
-update rdns set domain='duke.edu' where ip like '152.16.%';
-update rdns set domain='utexas.edu' where ip like '206.76.%' or
-    ip like'206.77.%';
-update rdns set domain='Chinamobile.com' where ip like '120.221.%';
-update rdns set domain='Chinamobile.com' where ip like '36.1%';
-update rdns set domain='China Unicom' where ip like '119.188.52.%'
-    or ip like '14.204.%' or ip like '14.205.%'
-    or ip like '60.12.%';
-update rdns set domain='cshl.edu' where ip like '143.48.%';
-update rdns set domain='jlu.edu.cn (Norman Berthune University of Medical Sciences)' where ip like '202.198.%';
-update rdns set domain='einstein.yu.edu' where ip like '47.19.%';
-update rdns set domain='jhu.edu (Johns Hopkins Medical Institutions)'
-    where ip like '162.129.%';
-update rdns set domain='Chung-ang University' where ip like '165.194.%';
-update rdns set domain='China Telecom' where ip like '183.63.%';
-update rdns set domain='China Telecom' where ip like '171.2%';
-update rdns set domain='Oklahoma State University' where ip like '192.31.83.%';
-update rdns set domain='China Telecom' where ip like '119.138.%';
-update rdns set domain='fhcrc.org (Fred Hutchinson Cancer Research Center)'
-    where ip like '140.107.%';
-update rdns set domain='nus.edu.sg (National University of Singapore)'
-    where ip like '137.132.%';
-update rdns set domain='modares.acir (Tarbiat-Modares University'
-    where domain='unknown' and ip like '194.225.1%';
-update rdns set domain='mitre.org (MITRE)' where domain='unknown'
-    and ip like '192.80.55.%';
-update rdns set domain='chop.edu (Children''s Hospital of Philadelphia)'
-    where ip like '159.14.%';
-
-update rdns set domain='unibas.ch (Universitaet Basel)'
-    where ip like '131.152.%';
-update rdns set domain='umass.edu (University of Massachusetts Amherst)'
-    where ip like '205.172.16%';
-update rdns set domain='uga.edu (University of Georgia)'
-    where ip like '128.192.%';
-update rdns set domain='net.edu.cn (Shanghai Jiaotong University)'
-    where ip like '202.120.4%';
-update rdns set domain='sdstate.edu (South Dakota State University)'
-    where ip like '137.216.%';
-
-update rdns set domain='clemson.edu' where ip like '205.186.62.%';
-update rdns set domain='harvard.edu (Longwood Medical)'
-where ip like '134.174.%';
-
-update rdns set domain='harvard.edu (Harvard University)'
-where ip like '140.247.%';
-
-update rdns set domain='poznan.pl' where ip like '150.%';
-update rdns set domain='ucsd.edu (UCSD) ' where ip like '169.228.%';
-
-update rdns set domain='georgetown.edu (Georgetown University)'
-where domain like '%georgetown.edu%';
-update rdns set domain='msu.edu (Michigan State University)'
-where domain like '%msu.edu%';
-
-update rdns set domain='dtu.dk (Technical University of Denmark)'
-where domain like '%dtu.dk%';
-
-update rdns set domain='nig.ac.jp (Japan National Institute of Genetics)'
-where ip like '133.39.%';
-
-update rdns set domain='br.kr (Korea Telecom)'
-where ip like '218.15%';
-
-update rdns set domain='Fundacio Privada Centre de Regulacio Genomica'
-where ip like '84.88.66.%';
-
-update rdns set domain='Paris VII Denis Diderot University'
-where ip like '81.194.28.%';
-
-update rdns set domain='uconn.edu (Connecticut Education Network)'
-where ip like '162.221.11.%';
-
-update rdns set domain='psu.edu (Penn State University)'
-where ip like '128.118.%';
-
-update rdns set domain='Marine Biological Laboratory'
-where ip like '192.152.118.%';
-
-update rdns set domain='Seoul National University'
-where ip like '147.47.%';
-
-update rdns set domain='Wuhan Hua Zhong Augulture University'
-where ip like '211.69.141.%';
-
-update rdns set domain='ucdavis.edu (University of California, Davis)'
-where ip like '128.120.%';
-
-update rdns set domain='uchicago.edu (University of Chicago)'
-where ip like '128.135.%';
-update rdns set domain='hawaii.edu (University of Hawaii)'
-where ip like '168.105.%';
-
-update rdns set domain='nazu.edu (Northern Arizona University)'
-where ip like '134.114.%';
-
-update rdns set domain='georgetown.edu (Georgetown University)'
-where ip like '141.161.13.%';
-
-update rdns set domain='gsk.com (GlaxoSmithKline)'
-where ip like '152.51.%';
-
-update rdns set domain='dartmouth.edu (Dartmouth College)'
-where ip like '129.170.%';
-
-update rdns set domain='roche.com (Hoffmann LaRoche)'
-where ip like '196.3.5%';
-
-update rdns set domain='psc.edu (Pittsburgh Supercomputing Center)'
-where ip like '128.182.%';
-
-update rdns set domain='mit.edu (MIT)'
-where ip like '18.4%';
-
-update rdns set domain='cnnic.ch (Nongkeyuan Science & Technology Information)'
-where ip like '210.73.154.%';
-
-update rdns set
-domain='njhelath.org (National Jewish Medical and Research Center Corporation)'
-where ip like '205.143.248.%';
-
-update rdns set domain='ucalgary.ca (University of Calgary)'
-where ip like '136.159.%';
-
-update rdns set domain='cannantv.tv (Cable Of The Carolinas Inc)'
-where ip like '72.46.72.%';
-
-update rdns set domain='bostongene.com (BostonGene)' where ip = '104.130.59.32';
-
-update rdns set domain='Helmholtz Zentrum Muenchen' where ip like '146.107.%';
-
-update rdns set domain='nlm.nih.gov (NLM)' where domain='unknown' and
-    ip like '10.10.8%' or
-    ip like '130.14.%';
-update rdns set domain='nih.gov (NIH)' where domain='unknown' and
-    ip like '128.231.%' or
-    ip like '156.40.2%';
-update rdns set domain='xlate.ufl.edu (University of Florida)' where domain='unknown' and
-    ip like '128.227.%';
-update rdns set domain='verizonbusiness.com (Verizon Business)'
-where ip like '65.196.%';
-
-update rdns set domain='level3.com (Level 3 Communications)'
-where ip like '4.16.%';
-
-update rdns set domain='rcn.net (RCN Corporation)'
-where ip like '207.237.188.%';
-
-update rdns set domain='IANA Reserved' where
-    ip like '0.%' or
-    ip like '10.%' or
-    ip like '127.%' or
-    ip like '169.254.%' or
-    ip like '172.16.%' or
-    ip like '192.0.%' or
-    ip like '192.168.%';
+UPDATE RDNS
+SET DOMAIN = 'lrz.de'
+WHERE IP = '129.187.44.107';
 
 
-update rdns set domain='sursara.nl (Science Park Watergraafsmeer)'
-where ip like '145.100.4%';
-update rdns set domain='Baylor College of Medicine'
-where ip like '128.249.%';
-update rdns set domain='Rothamsted Research Institute'
-where ip like '149.155.2%';
-update rdns set domain='meiji.acp.jp (Meiji University)'
-where ip like '133.26.%';
-update rdns set domain='rockefeller.edu (The Rockefeller University)'
-where ip like '128.85.%' or ip like '129.85.%';
-update rdns set domain='usf.edu (University of South Florida)'
-where ip like '131.247.%';
-update rdns set domain='Celgene Corporation'
-where ip like '38.99.110.%' or ip like '173.227.5.%';
-
-update rdns set domain='unam.mx (Universidad Nacional Autonoma de Mexico)'
-where ip like '132.247.%';
-
-update rdns set domain='si.edu (Smithsonian Institution)'
-where ip like '160.111.%';
-
-update rdns set domain='uky.edu (University of Kentucky)'
-where ip like '128.163.%';
-
-update rdns set domain='utoronto.ca (University of Toronto)'
-where ip like '142.1.%';
-
-update rdns set domain='usc.edu (University of Southern California)'
-where ip like '128.125.%';
-
-update rdns set domain='uw.edu (University of Washington)'
-where ip like '128.208.%';
-
-update rdns set domain='sdsu.edu (San Diego State University)'
-where ip like '130.191.%';
-
-update rdns set domain='net.edu.cn (Central South University (Changsha)'
-where ip like '122.207.8%';
-
-update rdns set domain='University of Geneva'
-where ip like '129.194.%';
-
-update rdns set domain='illinois.edu (University of Illinois)'
-where ip like '128.174.%';
-
-update rdns set
-     domain='cchmc.org (Childrens Hospital Medical Center Cincinnati)'
-where ip like '205.142.19%';
-
-update rdns set domain='nd.edu (University of Notre Dame)'
-where ip like '129.74.%';
-
-update rdns set domain='uq.edu.au (University of Queensland)'
-where ip like '130.102.%';
-
-update rdns set domain='nkn.in (Dayalbagh Educational Institute)'
-where ip like '14.139.57.%';
-
-update rdns set domain='uni-bielefeld.de (Universitaet Bielefeld)'
-where ip like '129.70.%';
-
-update rdns set domain='um.edu.mo (University of Macau)'
-where ip like '161.64.%';
+UPDATE RDNS
+SET DOMAIN = 'sdjnptt.net.cn'
+WHERE IP = '119.188.52.171';
 
 
-update rdns set domain='googleusercontent.com (GCP)'
-where domain='unknown' and ( ip like '66.249.%' or ip like '35.2%');
-update rdns set domain='googleusercontent.com (GCP)'
-where domain='bc.googleusercontent.com (GCP)' or
-    domain='bc.googleusercontent.com';
-
-update rdns set domain='Hackathon - Known Virus Team (GCP)' where ip='35.231.190.137';
-update rdns set domain='Hackathon - Novel Virus Team (GCP)' where ip='34.73.156.113';
-update rdns set domain='Hackathon - Novel Virus Team (GCP)' where ip='35.231.230.192';
-update rdns set domain='Hackathon - Novel Virus Team (GCP)' where ip='35.243.208.79';
-update rdns set domain='Hackathon - Novel Virus Team (GCP)' where ip='34.73.133.228';
-update rdns set domain='Hackathon - Novel Virus Team (GCP)' where ip='34.73.180.208';
-update rdns set domain='Hackathon - Project Testing Team (GCP)' where ip='34.73.135.146';
-update rdns set domain='Hackathon - Computational Scaling and Indexing Team (GCP)' where ip in ('35.237.148.23', '35.196.81.205');
-update rdns set domain='Hackathon - Machine Learning Team (GCP)' where ip='35.245.82.131';
-
-update rdns set domain='Hackathon - aa-rnaseq-clustering' where ip='35.196.70.3';
-update rdns set domain='Hackathon - aa-rnaseq-metadata' where ip='35.190.160.141';
-update rdns set domain='Hackathon - aa-rnaseq-splice-variant' where ip='35.196.107.66';
-update rdns set domain='Hackathon - aa-rnaseq-sre-and-var' where ip='35.196.72.10';
-update rdns set domain='Hackathon - aa-rnaseq-visualization' where ip='35.196.10.168';
-update rdns set domain='Hackathon - aa-rnaseq-test' where ip='35.212.2.36';
-update rdns set domain='Hackathon - aa-rnaseq-gan-gpu' where ip='35.196.150.8';
-update rdns set domain='Hackathon - aa-pangenome-data-upload' where ip='35.235.88.60';
-update rdns set domain='Hackathon - aa-pangenome-data-upload' where ip='35.227.101.5';
-update rdns set domain='Hackathon - vkt-mongodb02' where ip='33.245.126.160';
-update rdns set domain='Hackathon - vkt-mongodb02' where ip='35.245.126.160';
+UPDATE RDNS
+SET DOMAIN = 'guangzhou.gd.cn'
+WHERE IP = '218.19.145.19';
 
 
+UPDATE RDNS
+SET DOMAIN = 'osaka-u.ac.jp'
+WHERE IP = '133.1.63.238';
 
-select ip as unknown_ip, sum(bytes)
-    from sra_sessions
-    where domain='unknown'
-    group by unknown_ip
-    order by sum(bytes) desc
-    limit 10;
+
+UPDATE RDNS
+SET DOMAIN = 'u-tokyo.ac.jp'
+WHERE IP LIKE '202.175.1%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cdc.gov'
+WHERE IP LIKE '158.111.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Uni-Bielefeld.DE'
+WHERE IP LIKE '129.70.51.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'net.edu.cn'
+WHERE IP = '202.120.44.184';
+
+
+UPDATE RDNS
+SET DOMAIN = 'net.edu.cn'
+WHERE IP = '202.120.45.162';
+
+
+UPDATE RDNS
+SET DOMAIN = 'zi.uzh.ch'
+WHERE IP = '130.60.102.70';
+
+
+UPDATE RDNS
+SET DOMAIN = 'umab.umd.edu'
+WHERE IP LIKE '134.192.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cstnet.cn'
+WHERE IP = '202.127.20.232';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cstnet.cn'
+WHERE IP LIKE '124.16.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'chinanet.cn.net'
+WHERE IP LIKE '222.178.%'
+  OR IP LIKE '218.9%'
+  OR IP LIKE '59.50.85.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'pku.edu.cn'
+WHERE IP LIKE '162.105.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cstnet.cn (China Science Network)'
+WHERE IP LIKE '159.226.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'crg.edu'
+WHERE IP = '84.88.66.194';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cityu.edu.hk'
+WHERE IP LIKE '144.214.37.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'ChinaNetCenter'
+WHERE IP LIKE '220.243.135.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'ChinaNetCenter'
+WHERE IP LIKE '220.243.136.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'mdc-berlin.de'
+WHERE IP LIKE '141.80.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'yale.edu'
+WHERE IP LIKE '192.31.2.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'duke.edu'
+WHERE IP LIKE '152.16.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'utexas.edu'
+WHERE IP LIKE '206.76.%'
+  OR IP LIKE'206.77.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Chinamobile.com'
+WHERE IP LIKE '120.221.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Chinamobile.com'
+WHERE IP LIKE '36.1%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'China Unicom'
+WHERE IP LIKE '119.188.52.%'
+  OR IP LIKE '14.204.%'
+  OR IP LIKE '14.205.%'
+  OR IP LIKE '60.12.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cshl.edu'
+WHERE IP LIKE '143.48.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'jlu.edu.cn (Norman Berthune University of Medical Sciences)'
+WHERE IP LIKE '202.198.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'einstein.yu.edu'
+WHERE IP LIKE '47.19.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'jhu.edu (Johns Hopkins Medical Institutions)'
+WHERE IP LIKE '162.129.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Chung-ang University'
+WHERE IP LIKE '165.194.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'China Telecom'
+WHERE IP LIKE '183.63.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'China Telecom'
+WHERE IP LIKE '171.2%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Oklahoma State University'
+WHERE IP LIKE '192.31.83.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'China Telecom'
+WHERE IP LIKE '119.138.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'fhcrc.org (Fred Hutchinson Cancer Research Center)'
+WHERE IP LIKE '140.107.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'nus.edu.sg (National University of Singapore)'
+WHERE IP LIKE '137.132.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'modares.acir (Tarbiat-Modares University'
+WHERE DOMAIN = 'unknown'
+  AND IP LIKE '194.225.1%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'mitre.org (MITRE)'
+WHERE DOMAIN = 'unknown'
+  AND IP LIKE '192.80.55.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'chop.edu (Children''s Hospital of Philadelphia)'
+WHERE IP LIKE '159.14.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'unibas.ch (Universitaet Basel)'
+WHERE IP LIKE '131.152.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'umass.edu (University of Massachusetts Amherst)'
+WHERE IP LIKE '205.172.16%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'uga.edu (University of Georgia)'
+WHERE IP LIKE '128.192.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'net.edu.cn (Shanghai Jiaotong University)'
+WHERE IP LIKE '202.120.4%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'sdstate.edu (South Dakota State University)'
+WHERE IP LIKE '137.216.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'clemson.edu'
+WHERE IP LIKE '205.186.62.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'harvard.edu (Longwood Medical)'
+WHERE IP LIKE '134.174.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'harvard.edu (Harvard University)'
+WHERE IP LIKE '140.247.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'poznan.pl'
+WHERE IP LIKE '150.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'ucsd.edu (UCSD) '
+WHERE IP LIKE '169.228.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'georgetown.edu (Georgetown University)'
+WHERE DOMAIN LIKE '%georgetown.edu%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'msu.edu (Michigan State University)'
+WHERE DOMAIN LIKE '%msu.edu%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'dtu.dk (Technical University of Denmark)'
+WHERE DOMAIN LIKE '%dtu.dk%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'nig.ac.jp (Japan National Institute of Genetics)'
+WHERE IP LIKE '133.39.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'br.kr (Korea Telecom)'
+WHERE IP LIKE '218.15%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Fundacio Privada Centre de Regulacio Genomica'
+WHERE IP LIKE '84.88.66.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Paris VII Denis Diderot University'
+WHERE IP LIKE '81.194.28.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'uconn.edu (Connecticut Education Network)'
+WHERE IP LIKE '162.221.11.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'psu.edu (Penn State University)'
+WHERE IP LIKE '128.118.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Marine Biological Laboratory'
+WHERE IP LIKE '192.152.118.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Seoul National University'
+WHERE IP LIKE '147.47.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Wuhan Hua Zhong Augulture University'
+WHERE IP LIKE '211.69.141.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'ucdavis.edu (University of California, Davis)'
+WHERE IP LIKE '128.120.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'uchicago.edu (University of Chicago)'
+WHERE IP LIKE '128.135.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'hawaii.edu (University of Hawaii)'
+WHERE IP LIKE '168.105.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'nazu.edu (Northern Arizona University)'
+WHERE IP LIKE '134.114.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'georgetown.edu (Georgetown University)'
+WHERE IP LIKE '141.161.13.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'gsk.com (GlaxoSmithKline)'
+WHERE IP LIKE '152.51.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'dartmouth.edu (Dartmouth College)'
+WHERE IP LIKE '129.170.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'roche.com (Hoffmann LaRoche)'
+WHERE IP LIKE '196.3.5%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'psc.edu (Pittsburgh Supercomputing Center)'
+WHERE IP LIKE '128.182.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'mit.edu (MIT)'
+WHERE IP LIKE '18.4%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cnnic.ch (Nongkeyuan Science & Technology Information)'
+WHERE IP LIKE '210.73.154.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'njhelath.org (National Jewish Medical and Research Center Corporation)'
+WHERE IP LIKE '205.143.248.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'ucalgary.ca (University of Calgary)'
+WHERE IP LIKE '136.159.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cannantv.tv (Cable Of The Carolinas Inc)'
+WHERE IP LIKE '72.46.72.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'bostongene.com (BostonGene)'
+WHERE IP = '104.130.59.32';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Helmholtz Zentrum Muenchen'
+WHERE IP LIKE '146.107.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'nlm.nih.gov (NLM)'
+WHERE DOMAIN = 'unknown'
+  AND IP LIKE '10.10.8%'
+  OR IP LIKE '130.14.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'nih.gov (NIH)'
+WHERE DOMAIN = 'unknown'
+  AND IP LIKE '128.231.%'
+  OR IP LIKE '156.40.2%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'xlate.ufl.edu (University of Florida)'
+WHERE DOMAIN = 'unknown'
+  AND IP LIKE '128.227.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
+WHERE IP LIKE '65.196.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'level3.com (Level 3 Communications)'
+WHERE IP LIKE '4.16.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'rcn.net (RCN Corporation)'
+WHERE IP LIKE '207.237.188.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'IANA Reserved'
+WHERE IP LIKE '0.%'
+  OR IP LIKE '10.%'
+  OR IP LIKE '127.%'
+  OR IP LIKE '169.254.%'
+  OR IP LIKE '172.16.%'
+  OR IP LIKE '192.0.%'
+  OR IP LIKE '192.168.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'sursara.nl (Science Park Watergraafsmeer)'
+WHERE IP LIKE '145.100.4%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Baylor College of Medicine'
+WHERE IP LIKE '128.249.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Rothamsted Research Institute'
+WHERE IP LIKE '149.155.2%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'meiji.acp.jp (Meiji University)'
+WHERE IP LIKE '133.26.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'rockefeller.edu (The Rockefeller University)'
+WHERE IP LIKE '128.85.%'
+  OR IP LIKE '129.85.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'usf.edu (University of South Florida)'
+WHERE IP LIKE '131.247.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Celgene Corporation'
+WHERE IP LIKE '38.99.110.%'
+  OR IP LIKE '173.227.5.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'unam.mx (Universidad Nacional Autonoma de Mexico)'
+WHERE IP LIKE '132.247.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'si.edu (Smithsonian Institution)'
+WHERE IP LIKE '160.111.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'uky.edu (University of Kentucky)'
+WHERE IP LIKE '128.163.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'utoronto.ca (University of Toronto)'
+WHERE IP LIKE '142.1.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'usc.edu (University of Southern California)'
+WHERE IP LIKE '128.125.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'uw.edu (University of Washington)'
+WHERE IP LIKE '128.208.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'sdsu.edu (San Diego State University)'
+WHERE IP LIKE '130.191.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'net.edu.cn (Central South University (Changsha)'
+WHERE IP LIKE '122.207.8%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'University of Geneva'
+WHERE IP LIKE '129.194.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'illinois.edu (University of Illinois)'
+WHERE IP LIKE '128.174.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'cchmc.org (Childrens Hospital Medical Center Cincinnati)'
+WHERE IP LIKE '205.142.19%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'nd.edu (University of Notre Dame)'
+WHERE IP LIKE '129.74.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'uq.edu.au (University of Queensland)'
+WHERE IP LIKE '130.102.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'nkn.in (Dayalbagh Educational Institute)'
+WHERE IP LIKE '14.139.57.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'uni-bielefeld.de (Universitaet Bielefeld)'
+WHERE IP LIKE '129.70.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'um.edu.mo (University of Macau)'
+WHERE IP LIKE '161.64.%';
+
+
+UPDATE RDNS
+SET DOMAIN = 'googleusercontent.com (GCP)'
+WHERE DOMAIN = 'unknown'
+  AND (IP LIKE '66.249.%'
+       OR IP LIKE '35.2%');
+
+
+UPDATE RDNS
+SET DOMAIN = 'googleusercontent.com (GCP)'
+WHERE DOMAIN = 'bc.googleusercontent.com (GCP)'
+  OR DOMAIN = 'bc.googleusercontent.com';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Known Virus Team (GCP)'
+WHERE IP = '35.231.190.137';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+WHERE IP = '34.73.156.113';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+WHERE IP = '35.231.230.192';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+WHERE IP = '35.243.208.79';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+WHERE IP = '34.73.133.228';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+WHERE IP = '34.73.180.208';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Project Testing Team (GCP)'
+WHERE IP = '34.73.135.146';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Computational Scaling and Indexing Team (GCP)'
+WHERE IP IN ('35.237.148.23',
+             '35.196.81.205');
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - Machine Learning Team (GCP)'
+WHERE IP = '35.245.82.131';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-rnaseq-clustering'
+WHERE IP = '35.196.70.3';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-rnaseq-metadata'
+WHERE IP = '35.190.160.141';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-rnaseq-splice-variant'
+WHERE IP = '35.196.107.66';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-rnaseq-sre-and-var'
+WHERE IP = '35.196.72.10';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-rnaseq-visualization'
+WHERE IP = '35.196.10.168';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-rnaseq-test'
+WHERE IP = '35.212.2.36';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-rnaseq-gan-gpu'
+WHERE IP = '35.196.150.8';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-pangenome-data-upload'
+WHERE IP = '35.235.88.60';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - aa-pangenome-data-upload'
+WHERE IP = '35.227.101.5';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - vkt-mongodb02'
+WHERE IP = '33.245.126.160';
+
+
+UPDATE RDNS
+SET DOMAIN = 'Hackathon - vkt-mongodb02'
+WHERE IP = '35.245.126.160';
+
+
+SELECT IP AS UNKNOWN_IP,
+       SUM(BYTES)
+FROM SRA_SESSIONS
+WHERE DOMAIN = 'unknown'
+GROUP BY UNKNOWN_IP
+ORDER BY SUM(BYTES) DESC
+LIMIT 10;
 

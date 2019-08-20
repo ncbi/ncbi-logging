@@ -1,0 +1,15 @@
+BEGIN;
+DROP TABLE IF EXISTS daily_downloads;
+CREATE TABLE daily_downloads AS
+SELECT date_trunc('day',
+                  start_ts) AS TIME,
+       SOURCE,
+       sum(bytecount) AS bytes,
+       count(*) AS downloads
+  FROM cloud_sessions
+ WHERE (cmds LIKE '%GET%'
+       OR cmds LIKE '%HEAD%')
+ GROUP BY "time",
+          SOURCE
+ ORDER BY "time";
+COMMIT;

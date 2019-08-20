@@ -1,0 +1,15 @@
+BEGIN;
+DROP TABLE IF EXISTS downloads_by_ip;
+CREATE TABLE downloads_by_ip AS
+SELECT date_trunc('day',
+                  start_ts) AS TIME,
+       SOURCE,
+       count(DISTINCT ip) AS unique_users
+  FROM cloud_sessions
+ WHERE (cmds LIKE '%GET%'
+       OR cmds LIKE '%HEAD%')
+   AND SOURCE != 'SRA'
+ GROUP BY TIME,
+          SOURCE
+ ORDER BY TIME;
+COMMIT;

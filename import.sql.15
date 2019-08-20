@@ -1,0 +1,45 @@
+BEGIN;
+CREATE TEMP TABLE public_dt AS
+SELECT run,
+       to_timestamp(public.releasedate,
+                    'YYYY-MM-DD HH24:MI:SS') AS released
+  FROM PUBLIC
+ WHERE releasedate > '2018-06-01';
+CREATE TEMP TABLE last_download AS
+SELECT acc,
+       max(LAST) AS LAST
+  FROM
+        (SELECT acc,
+               date_trunc('day', start_ts) AS LAST
+          FROM cloud_sessions
+         WHERE SOURCE = 'SRA'
+           AND acc ~ '[DES]RR[\d\.]{6,10}'
+           AND city_name NOT IN ('Ashburn',
+                           'Bethesda',
+                           'Mountain View',
+                           'Rockville')
+     UNION ALL SELECT run AS acc,
+               '2018-06-01 00:00:00'::TIMESTAMP AS LAST
+          FROM PUBLIC
+       ) AS roll2
+ GROUP BY acc;
+CREATE TEMP TABLE last_dt AS
+SELECT substring(acc
+                 FROM '[DES]RR\w+') AS acc,
+       LAST
+  FROM last_download
+ WHERE acc ~ '[DES]RR\w+';
+CREATE TEMP TABLE mean_time_use AS
+SELECT last_dt.acc AS acc,
+       LAST,
+       released,
+       LAST - released AS delay
+  FROM public_dt,
+       last_dt
+ WHERE public_dt.run = last_dt.acc;
+DROP TABLE IF EXISTS mean_latency;
+CREATE TABLE mean_latency AS
+SELECT avg(delay) AS mean_delay
+  FROM mean_time_use
+ WHERE delay > '0 days';
+COMMIT;

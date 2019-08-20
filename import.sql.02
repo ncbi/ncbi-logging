@@ -1,0 +1,17 @@
+BEGIN;
+DROP TABLE IF EXISTS last_used;
+CREATE TABLE last_used AS
+SELECT acc,
+       max(LAST) AS LAST
+  FROM
+        (SELECT acc,
+               date_trunc('day', start_ts) AS LAST
+          FROM cloud_sessions
+         WHERE SOURCE = 'SRA'
+           AND acc ~ '[DES]RR[\d\.]{6,10}'
+     UNION ALL SELECT run AS acc,
+               '2018-06-01 00:00:00'::TIMESTAMP AS LAST
+          FROM PUBLIC
+       ) AS roll2
+ GROUP BY acc;
+COMMIT;

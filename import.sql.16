@@ -1,0 +1,17 @@
+BEGIN;
+DROP TABLE IF EXISTS blast_and_strides;
+CREATE TABLE blast_and_strides AS
+SELECT DOMAIN,
+       city_name,
+       country_code,
+       count(*) AS downloads
+  FROM cloud_sessions
+ WHERE ip IN
+        (SELECT DISTINCT ip
+          FROM blast_sessions
+       )
+ GROUP BY DOMAIN,
+          city_name,
+          country_code
+ ORDER BY downloads DESC;
+COMMIT;

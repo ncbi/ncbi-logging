@@ -1,0 +1,17 @@
+BEGIN;-- Closest thing to an atomic swap of table
+ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
+ALTER TABLE export_joined RENAME TO cloud_sessions;
+COMMIT;
+DROP TABLE IF EXISTS cloud_sessions_bak;
+SELECT count(*) AS cloud_sessions_count
+  FROM cloud_sessions;
+DROP INDEX cloud_sessions_start;
+DROP INDEX cloud_sessions_source;
+CREATE INDEX cloud_sessions_start
+    ON cloud_sessions (start_ts);
+CREATE INDEX cloud_sessions_source
+    ON cloud_sessions (SOURCE);-- Fix: IP2LOCATION gets this very wrong
+UPDATE cloud_sessions
+   SET city_name = 'Mountain View',
+       country_code = 'US'
+ WHERE ip LIKE '35.245.%';-- Create materialized views, AS tables in case we need to index them

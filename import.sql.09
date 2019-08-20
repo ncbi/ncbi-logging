@@ -1,0 +1,13 @@
+BEGIN;
+DROP TABLE IF EXISTS acc_last_acc;
+CREATE TABLE acc_last_acc AS
+SELECT LAST AS TIME,
+       count(*) AS accessions
+  FROM
+        (SELECT max(LAST) AS LAST
+          FROM sra_last_used
+         GROUP BY acc
+       ) AS roll
+ GROUP BY LAST
+ ORDER BY LAST;
+COMMIT;

@@ -1,0 +1,12 @@
+BEGIN;
+DROP TABLE IF EXISTS last_used_interval;
+CREATE TABLE last_used_interval AS
+SELECT CASE
+           WHEN date_trunc('day', age(LOCALTIMESTAMP, LAST)) < interval '30 days'  THEN 'downloaded in last 30 days'
+            WHEN date_trunc('day', age(LOCALTIMESTAMP, LAST)) > interval '180 days' THEN 'never downloaded'
+            ELSE 'downloaded 30..180 days ago'
+             END AS metric,
+       count(*) AS value
+  FROM last_used
+ GROUP BY metric;
+COMMIT;

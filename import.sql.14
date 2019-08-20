@@ -1,0 +1,11 @@
+BEGIN;
+DROP TABLE IF EXISTS object_load;
+CREATE TABLE object_load AS
+SELECT date_trunc('day',
+                  last_modified) AS TIME,
+       count(*) AS num_accessions,
+       sum(bytecount) AS bytes_uploaded
+  FROM cloud_objects
+ GROUP BY TIME
+ ORDER BY TIME;
+COMMIT;

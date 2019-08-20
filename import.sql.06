@@ -1,0 +1,15 @@
+BEGIN;
+DROP TABLE IF EXISTS cloud_downloads;
+CREATE TABLE cloud_downloads AS
+SELECT SOURCE || ' -> ' || DOMAIN || ' @ ' || city_name || ', ' || country_code AS PATH,
+       count(*) AS downloads,
+       sum(bytecount) AS bytes,
+       date_trunc('day',
+                                                start_ts) AS TIME
+  FROM cloud_sessions
+ WHERE (cmds LIKE '%GET%'
+       OR cmds LIKE '%HEAD%')
+   AND SOURCE != 'SRA'
+ GROUP BY TIME,
+          PATH;
+COMMIT;
