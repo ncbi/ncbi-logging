@@ -1,0 +1,75 @@
+SELECT count(*) AS export_count FROM export;
+SELECT count(*) AS export_objects FROM export_objects;
+
+CREATE TABLE IF NOT EXISTS cloud_objects (acc text,
+                                          export_time TIMESTAMP,
+                                          load_time TIMESTAMP,
+                                          etag text,
+                                          bytecount bigint,
+                                          bucket text,
+                                          SOURCE text,
+                                          last_modified TIMESTAMP,
+                                          storage_class text);
+INSERT INTO cloud_objects
+    SELECT DATA ->> 'Key' AS acc,
+        to_timestamp(DATA ->> 'Now', 'YYYY-MM-DD HH24:MI:SS') AS export_time,
+        now() AS load_time,
+        DATA ->> 'ETag' AS etag,
+        cast(DATA ->> 'Size' AS bigint) AS bytecount,
+        DATA ->> 'Bucket' AS bucket,
+        DATA ->> 'Source' AS SOURCE,
+        to_timestamp(DATA ->> 'LastModified', 'YYYY-MM-DD HH24:MI:SS') AS last_modified,
+        DATA ->> 'StorageClass' AS storage_class
+    FROM export_objects;
+
+DROP TABLE export_objects;
+SELECT count(*) AS cloud_objects FROM cloud_objects;
+
+CREATE TEMP TABLE ips_export AS
+SELECT DISTINCT ip, ip_int FROM export;
+
+-- TODO: Left outer join, isnull for rdns
+DROP TABLE IF EXISTS ips_export2;
+CREATE TABLE ips_export2 AS
+    SELECT ips_export.ip,
+        ip_int,
+        DOMAIN,
+        city_name,
+        country_code
+    FROM ips_export,
+        ip2location_db11_ipv4,
+        rdns
+    WHERE box(point(ip_from, ip_from),
+            point(ip_to, ip_to)) @ > box(POINT (ip_int,
+                                                ip_int), point(ip_int, ip_int))
+    AND rdns.ip = ips_export.ip ;
+
+SELECT count(*) AS ips_export2_count FROM ips_export2;
+
+CREATE INDEX ips_export2_ip ON ips_export2(ip);
+CREATE INDEX ips_export2_ipint ON ips_export2(ip_int);
+
+DROP TABLE IF EXISTS export_joined;
+CREATE TABLE export_joined AS
+    SELECT status,
+        cmds,
+        bytecount,
+        agent,
+        cnt,
+        acc,
+        start_ts,
+        end_ts,
+        SOURCE,
+        HOST,
+        city_name,
+        country_code,
+        DOMAIN,
+        export.ip,
+        export.ip_int
+    FROM export,
+        ips_export2
+    WHERE export.ip_int = ips_export2.ip_int
+    ORDER BY SOURCE, start_ts;
+
+DROP TABLE export;
+SELECT count(*) AS export_joined_count FROM export_joined;

@@ -46,8 +46,8 @@ cd "$HOME"/strides || exit
 
 for sql in import.sql.*; do
     echo "Running $sql"
-    sqlformat -o tmp -k upper -i lower -r -a -s "$sql"
-    sed '/^$/d' < tmp > "$sql"
+    #sqlformat -o tmp -k upper -i lower -r -a -s "$sql"
+    #sed '/^$/d' < tmp > "$sql"
     psql -e -h localhost -p 5433 -U postgres postgres -f "$sql"
     echo
     echo "─────────────────────"
