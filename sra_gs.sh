@@ -16,8 +16,15 @@ for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
 
     for OBJ in *usage*; do
     # sra-pub-run-1_usage_2019_06_24_03_00_00_07378a0db72e87e0b4_v0
+    # sra-pub-test-run-1_usage_2019_08_20_19_00_00_05bda8e9f03a3a158c_v0
         DT=${OBJ//_}
-        DT=${DT:18:8}
+        if [[ "$DT" =~ 20[0-9]{6} ]]; then
+            DT=${BASH_REMATCH[0]}
+        else
+            echo "Can't parse $OBJ"
+            continue
+        fi
+
         DT="/tmp/mike_logs/gs_prod/$DT"
 
         if [ ! -d "$DT" ]; then

@@ -2,6 +2,7 @@
 
 date
 SSH_ENV="$HOME/.ssh/environment.$HOSTNAME"
+# shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$SSH_ENV"
 
 if ! lsof -ti:5433
