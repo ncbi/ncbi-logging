@@ -15,17 +15,30 @@ LOG_BUCKET="sra-pub-run-1-logs"
 DEST="$RAMDISK/S3-$LOG_BUCKET/$YESTERDAY"
 mkdir -p "$DEST"
 
-echo "Processing  $LOG_BUCKET into $DEST"
+# NOTE: Much faster to use aws ls than aws cp with include/excludes
+echo "Copying $LOG_BUCKET into $DEST ..."
 time aws s3 ls "s3://$LOG_BUCKET/$YESTERDAY_DASH" | cut -c 32- | \
     xargs -I % -P 24 aws s3 cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
+date
+echo "Copied  $LOG_BUCKET  to  $DEST"
 
 cd "$DEST" || exit
-for file in ./*; do
-    cat "$file" >> "$LOGDIR/s3_prod/$YESTERDAY.combine"
+numfiles=$(find ./ -type f | wc -l)
+echo "Combining $numfiles files ..."
+declare -a combined
+for file in ./"$YESTERDAY_DASH"*; do
+    combined+=("$file")
+    if [[ "${#combined[@]}" -gt 20 ]]; then
+        cat "${combined[@]}" >> "$LOGDIR/s3_prod/$YESTERDAY.combine"
+        unset combined
+        declare -a combined
+    fi
 done
+date
+echo "Combined"
 
 cd "$LOGDIR" || exit
-echo "Processed  $LOG_BUCKET"
+echo "Processed  $LOG_BUCKET ..."
 rm -rf "$DEST"
 echo "Removed $DEST"
 
