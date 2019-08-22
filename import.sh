@@ -26,6 +26,12 @@ psql -h localhost -d grafana -X << HERE
     CREATE UNLOGGED TABLE export_objects (data jsonb);
 HERE
 
+# export.20190822.000000000024.csv.gz
+if [ ! -s export."$DATE".000000000025.csv.gz ]; then
+    echo "No exports present, aborting"
+    exit 1
+fi
+
 # NOTE: Not profitable to do this in parallel, some kind of contention
 for x in export."$DATE".*.gz; do
     echo "Loading $x"
