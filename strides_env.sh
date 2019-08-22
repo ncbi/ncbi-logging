@@ -20,10 +20,10 @@ export GF_PLUGIN_DIR="$HOME/$GRAFANAVER/plugins"
 export LD_LIBRARY_PATH=/home/vartanianmh/$PGVER/lib
 export LD_LIBRARY_PATH=$HOME/$GRAFANAVER/lib:$LD_LIBRARY_PATH
 export LOGDIR=/tmp/mike_logs
-export PANFS="/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/"
+export PANFS="/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics"
 DATE=$(date "+%Y%m%d") #_%H%M%S
 export DATE
-export "RAMDISK=/dev/shm/"
+export "RAMDISK=/dev/shm"
 YESTERDAY_DASH=$(date -d "yesterday" "+%Y-%m-%d")
 export YESTERDAY_DASH
 YESTERDAY=${YESTERDAY_DASH//-}
