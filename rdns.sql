@@ -595,6 +595,28 @@ UPDATE RDNS
 SET DOMAIN = 'bit.nl (Keygene N.V.)'
 WHERE IP LIKE '213.136.28.%';
 
+UPDATE RDNS
+SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
+WHERE IP LIKE '108.4%';
+
+UPDATE RDNS
+SET DOMAIN = 'comcast.net (Comcast Cable)'
+WHERE IP LIKE '69.140.%' or IP LIKE '69.251.%';
+
+UPDATE RDNS
+SET DOMAIN = 'toh.ca (The Ottawa Hospital)'
+WHERE IP LIKE '204.187.3%';
+
+UPDATE RDNS
+SET DOMAIN = 'technion.ac.il (Technion - Technolog Institute)'
+WHERE IP LIKE '132.68.%' or IP like '132.69.%';
+
+
+
+
+
+
+
 
 
 UPDATE RDNS
