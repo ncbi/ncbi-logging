@@ -563,6 +563,39 @@ UPDATE RDNS
 SET DOMAIN = 'um.edu.mo (University of Macau)'
 WHERE IP LIKE '161.64.%';
 
+UPDATE RDNS
+SET DOMAIN = 'bell.ca (Bell Canada)'
+WHERE IP LIKE '205.200.%';
+
+UPDATE RDNS
+SET DOMAIN = 'chinanet.cn.net'
+WHERE IP LIKE '116.6.%';
+
+UPDATE RDNS
+SET DOMAIN = 'csiro.au (Commonwealth Scientific and Industrial Research Organisation)'
+WHERE IP LIKE '152.83.%';
+
+UPDATE RDNS
+SET DOMAIN = 'brown.edu (Brown University)'
+WHERE IP LIKE '138.16.%';
+
+UPDATE RDNS
+SET DOMAIN = 'ut.ee (University of Tartu, Estonia)'
+WHERE IP LIKE '193.40.12.%';
+
+UPDATE RDNS
+SET DOMAIN = 'nevada.edu (Nevada System of Higher Education)'
+WHERE IP LIKE '131.216.%';
+
+UPDATE RDNS
+SET DOMAIN = 'IRON (Idaho Regional Optical Network)'
+WHERE IP LIKE '74.118.2%';
+
+UPDATE RDNS
+SET DOMAIN = 'bit.nl (Keygene N.V.)'
+WHERE IP LIKE '213.136.28.%';
+
+
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
