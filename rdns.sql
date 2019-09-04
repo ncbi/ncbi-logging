@@ -607,9 +607,34 @@ UPDATE RDNS
 SET DOMAIN = 'toh.ca (The Ottawa Hospital)'
 WHERE IP LIKE '204.187.3%';
 
+
 UPDATE RDNS
 SET DOMAIN = 'technion.ac.il (Technion - Technolog Institute)'
 WHERE IP LIKE '132.68.%' or IP like '132.69.%';
+
+UPDATE RDNS
+SET DOMAIN = 'nchc.org.tw (Taiwan National Center for High-performance computing)'
+WHERE IP LIKE '140.110.%';
+
+UPDATE RDNS
+SET DOMAIN = 'nscc.sg (Singapore National Supercomputing Centre)'
+WHERE IP LIKE '103.72.192.%';
+
+UPDATE RDNS
+SET DOMAIN = 'net.edu.cn (University of Science and Technology of China)'
+WHERE IP LIKE '211.86.1%';
+
+UPDATE RDNS
+SET DOMAIN = 'cuhk.edu.hk (The Chinese University of Hong Kong)'
+WHERE IP LIKE '137.189.%';
+
+UPDATE RDNS
+SET DOMAIN = 'ccf.org (Cleveland Clinic)'
+WHERE IP LIKE '139.137.%';
+
+
+
+
 
 
 
