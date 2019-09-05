@@ -35,12 +35,7 @@ WHERE IP LIKE '129.70.51.%';
 
 UPDATE RDNS
 SET DOMAIN = 'net.edu.cn'
-WHERE IP = '202.120.44.184';
-
-
-UPDATE RDNS
-SET DOMAIN = 'net.edu.cn'
-WHERE IP = '202.120.45.162';
+WHERE IP = '202.120.44.184' OR IP = '202.120.45.162';
 
 
 UPDATE RDNS
@@ -51,16 +46,6 @@ WHERE IP = '130.60.102.70';
 UPDATE RDNS
 SET DOMAIN = 'umab.umd.edu'
 WHERE IP LIKE '134.192.%';
-
-
-UPDATE RDNS
-SET DOMAIN = 'cstnet.cn'
-WHERE IP = '202.127.20.232';
-
-
-UPDATE RDNS
-SET DOMAIN = 'cstnet.cn'
-WHERE IP LIKE '124.16.%';
 
 
 UPDATE RDNS
@@ -77,7 +62,8 @@ WHERE IP LIKE '162.105.%';
 
 UPDATE RDNS
 SET DOMAIN = 'cstnet.cn (China Science Network)'
-WHERE IP LIKE '159.226.%';
+WHERE IP LIKE '159.226.%' OR IP LIKE '162.105.%' OR
+IP LIKE '202.127.2%' OR IP LIKE '124.16.%' or IP LIKE '124.17.%';
 
 
 UPDATE RDNS
@@ -632,8 +618,21 @@ UPDATE RDNS
 SET DOMAIN = 'ccf.org (Cleveland Clinic)'
 WHERE IP LIKE '139.137.%';
 
+UPDATE RDNS
+SET DOMAIN = 'kreonet.net (Korea Research Environment Open Network)'
+WHERE IP LIKE '134.75.%';
 
+UPDATE RDNS
+SET DOMAIN = 'unab.cl (Universidad Nacional Andres Bello)'
+WHERE IP LIKE '200.27.72.%';
 
+UPDATE RDNS
+SET DOMAIN = 'net.edu.cn (Huazhong Agricultural University)'
+WHERE IP LIKE '218.199.68.%';
+
+UPDATE RDNS
+SET DOMAIN = 'sickkids.ca (The Hospital for Sick Children)'
+WHERE IP LIKE '192.75.158.%';
 
 
 
