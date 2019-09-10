@@ -34,8 +34,8 @@ WHERE IP LIKE '129.70.51.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'net.edu.cn'
-WHERE IP = '202.120.44.184' OR IP = '202.120.45.162';
+SET DOMAIN = 'net.edu.cn (Shanghai Jiaotong University)'
+WHERE IP like '202.120.%';
 
 
 UPDATE RDNS
@@ -177,8 +177,7 @@ WHERE IP LIKE '140.107.%';
 
 UPDATE RDNS
 SET DOMAIN = 'nus.edu.sg (National University of Singapore)'
-WHERE IP LIKE '137.132.%';
-
+WHERE IP LIKE '137.132.%' or ip like '155.69.%';
 
 UPDATE RDNS
 SET DOMAIN = 'modares.acir (Tarbiat-Modares University'
@@ -633,6 +632,11 @@ WHERE IP LIKE '218.199.68.%';
 UPDATE RDNS
 SET DOMAIN = 'sickkids.ca (The Hospital for Sick Children)'
 WHERE IP LIKE '192.75.158.%';
+
+UPDATE RDNS
+SET DOMAIN = 'dfn.de (Max-Planck-Institut fuer Pflanzenzuechtungsforschung)'
+WHERE IP LIKE '195.37.46.%';
+
 
 
 
