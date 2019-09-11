@@ -1,0 +1,85 @@
+BEGIN;
+
+
+DROP TABLE IF EXISTS to_clouds;
+
+
+CREATE TABLE to_clouds AS
+SELECT date_trunc('day',
+                  start_ts) AS TIME,
+       SOURCE,
+       CASE
+           WHEN (DOMAIN LIKE '%(GCP)%'
+                 OR DOMAIN LIKE '%(AWS Amazon)%') THEN sum(bytecount)
+           ELSE 0
+       END AS cloudbytes,
+       sum(bytecount) AS allbytes
+FROM cloud_sessions
+WHERE (cmds LIKE '%GET%'
+       OR cmds LIKE '%HEAD%')
+  AND (cmds NOT LIKE '%POST%'
+       AND cmds NOT LIKE '%PUT%')
+  AND bytecount > 0
+  AND (agent NOT LIKE 'aws-cli%'
+       AND agent NOT LIKE 'apitools gsutil%')
+GROUP BY TIME,
+         SOURCE,
+         DOMAIN
+ORDER BY TIME,
+         SOURCE;
+
+
+DROP TABLE IF EXISTS to_clouds_pct;
+
+
+CREATE TABLE to_clouds_pct AS
+SELECT TIME,
+       100.0 * sum(cloudbytes) / sum(allbytes) AS percent
+FROM to_clouds
+GROUP BY TIME
+ORDER BY TIME;
+
+
+DROP TABLE IF EXISTS to_clouds_users;
+
+
+CREATE TABLE to_clouds_users AS
+SELECT date_trunc('day',
+                  start_ts) AS TIME,
+       count(DISTINCT ip) AS unique_users,
+       CASE
+           WHEN DOMAIN LIKE '%(GCP)%' THEN count(DISTINCT ip)
+           ELSE 0
+       END AS gcp_count,
+       CASE
+           WHEN DOMAIN LIKE '%(AWS Amazon)%' THEN count(DISTINCT ip)
+           ELSE 0
+       END AS aws_count
+FROM cloud_sessions
+WHERE (cmds LIKE '%GET%'
+       OR cmds LIKE '%HEAD%')
+  AND (cmds NOT LIKE '%POST%'
+       AND cmds NOT LIKE '%PUT%')
+  AND bytecount > 0
+  AND (agent NOT LIKE 'aws-cli%'
+       AND agent NOT LIKE 'apitools gsutil%')
+GROUP BY TIME,
+         DOMAIN
+ORDER BY TIME;
+
+
+DROP TABLE IF EXISTS to_clouds_users_sum;
+
+
+CREATE TABLE to_clouds_users_sum AS
+SELECT TIME,
+       sum(unique_users) as total,
+       sum(gcp_count) as gcp,
+       sum(aws_count) as aws
+FROM to_clouds_users
+GROUP BY TIME
+ORDER BY TIME;
+
+
+COMMIT;
+
