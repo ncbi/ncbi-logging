@@ -637,6 +637,30 @@ UPDATE RDNS
 SET DOMAIN = 'dfn.de (Max-Planck-Institut fuer Pflanzenzuechtungsforschung)'
 WHERE IP LIKE '195.37.46.%';
 
+UPDATE RDNS
+SET DOMAIN = 'gwu.edu (The George Washington University)'
+WHERE IP LIKE '161.253.%';
+
+UPDATE RDNS
+SET DOMAIN = 'embl.org (European Molecular Biology Laboratory)'
+WHERE IP LIKE '194.94.4%';
+
+UPDATE RDNS
+SET DOMAIN = 'kaust.edu.sa (King Abdullah University of Science and Technology)'
+WHERE IP LIKE '109.171.137.%';
+
+UPDATE RDNS
+SET DOMAIN = 'hanyang.ac.kr (Hanyang Univeristy)'
+WHERE IP LIKE '166.104.%';
+
+UPDATE RDNS
+SET DOMAIN = 'IDbyDNA.com (IDbyDNA Inc.)'
+WHERE IP LIKE '38.142.232.%' or IP LIKE '65.126.68.%';
+
+--UPDATE RDNS
+--SET DOMAIN = 'utah.edu (University of Utah)'
+--WHERE IP LIKE '2604:c340:%';
+
 
 
 

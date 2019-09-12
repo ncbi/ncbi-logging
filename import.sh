@@ -78,7 +78,9 @@ INSERT INTO CLOUD_OBJECTS SELECT
 DROP TABLE export_objects;
 SELECT COUNT(*) AS Cloud_Objects from cloud_objects;
 
-CREATE TEMP TABLE ips_export AS SELECT distinct ip, ip_int FROM export;
+CREATE TEMP TABLE ips_export AS SELECT distinct ip, ip_int 
+    FROM export
+    WHERE ip_int > 0;
 
 DROP TABLE IF EXISTS ips_export2;
 CREATE TABLE ips_export2 as
