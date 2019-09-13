@@ -1,0 +1,16 @@
+BEGIN;
+
+DROP TABLE IF EXISTS etag_delta;
+
+CREATE TABLE etag_delta as
+select distinct acc, etag, bytecount, last_modified
+from cloud_objects where acc in (
+    select acc
+    from cloud_objects
+    where acc not like '%.vdbcache.%'
+    group by acc
+    having count(distinct etag) > 1 )
+order by acc, last_modified desc;
+
+COMMIT;
+
