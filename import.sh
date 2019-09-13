@@ -39,7 +39,7 @@ for x in export."$DATE".*.gz; do
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-for x in "$PANFS/s3_prod/objects/$DATE."*gz; do
+for x in "$PANFS/gs_prod/objects/$DATE."*gz "$PANFS/s3_prod/objects/$DATE."*gz  ; do
     echo "Loading $x"
     psql -h localhost -d grafana -c \
         "\\copy export_objects FROM program 'gunzip -d -c $x';"
