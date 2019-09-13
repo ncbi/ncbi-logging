@@ -661,6 +661,25 @@ WHERE IP LIKE '38.142.232.%' or IP LIKE '65.126.68.%';
 --SET DOMAIN = 'utah.edu (University of Utah)'
 --WHERE IP LIKE '2604:c340:%';
 
+UPDATE RDNS
+SET DOMAIN = 'ohsu.edu (Oregon Health & Science University)'
+WHERE IP LIKE '137.53.%';
+
+UPDATE RDNS
+SET DOMAIN = 'cox.com (Cox Communications Inc.)'
+WHERE IP LIKE '98.17%' OR IP LIKE '98.18%';
+
+UPDATE RDNS
+SET DOMAIN = 'icr.ac.uk (Institute of Cancer Research)'
+WHERE IP LIKE '194.80.195.%';
+
+UPDATE RDNS
+SET DOMAIN = 'nic.or.kr (Koeran National Infomation Society Agency)'
+WHERE IP LIKE '103.22.220.%' or IP LIKE '103.22.221.%' or
+        IP LIKE '103.22.222.%' or IP LIKE '103.22.223.%';
+
+
+
 
 
 

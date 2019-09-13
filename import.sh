@@ -262,11 +262,14 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS sra_agents;
     CREATE TABLE sra_agents AS
-    SELECT source, substr(agent,0,40) AS agent, sum(bytecount) AS bytes
+    SELECT
+    source,
+    date_trunc('day', start_ts) AS time,
+    substr(agent,0,40) AS agent,
+    sum(bytecount) AS bytes
     FROM cloud_sessions
-    GROUP BY source, agent
-    ORDER BY bytes DESC
-    LIMIT 100;
+    GROUP BY source, time, agent
+    ORDER BY time, source, agent;
 COMMIT;
 
 BEGIN;
