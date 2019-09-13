@@ -44,7 +44,7 @@ def main():
         md5 = log_file.md5_hash
         d["now"] = now
         d["bucket"] = bucket_name
-        d["source"] = "S3"
+        d["source"] = "GS"
         d["key"] = key
         d["lastmodified"] = lastmodified
         d["etag"] = etag

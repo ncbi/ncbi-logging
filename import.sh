@@ -61,18 +61,20 @@ CREATE TABLE IF NOT EXISTS cloud_objects (
     bucket text,
     source text,
     last_modified timestamp,
-    storage_class text);
+    storage_class text,
+    md5 text);
 
 INSERT INTO CLOUD_OBJECTS SELECT
-    data->>'Key' AS acc,
-    TO_TIMESTAMP(data->>'Now','YYYY-MM-DD HH24:MI:SS') AS export_time,
+    data->>'key' AS acc,
+    TO_TIMESTAMP(data->>'now','YYYY-MM-DD HH24:MI:SS') AS export_time,
     now() as load_time,
-    data->>'ETag' AS etag,
-    cast(data->>'Size' AS bigint) AS bytecount,
-    data->>'Bucket' AS bucket,
-    data->>'Source' AS source,
-    TO_TIMESTAMP(data->>'LastModified','YYYY-MM-DD HH24:MI:SS') AS last_modified,
-    data->>'StorageClass' AS storage_class
+    data->>'etag' AS etag,
+    cast(data->>'size' AS bigint) AS bytecount,
+    data->>'bucket' AS bucket,
+    data->>'source' AS source,
+    TO_TIMESTAMP(data->>'lastmodified','YYYY-MM-DD HH24:MI:SS') AS last_modified,
+    data->>'storageclass' AS storage_class,
+    data->>'md5' as md5
     from export_objects;
 
 DROP TABLE export_objects;

@@ -38,14 +38,15 @@ def main():
             Size = obj["Size"]
             StorageClass = obj["StorageClass"]
             d = {}
-            d["Now"] = now
-            d["Bucket"] = bucket_name
-            d["Source"] = "S3"
-            d["Key"] = key
-            d["LastModified"] = LastModified
-            d["ETag"] = ETag
-            d["Size"] = Size
-            d["StorageClass"] = StorageClass
+            d["now"] = now
+            d["bucket"] = bucket_name
+            d["source"] = "S3"
+            d["key"] = key
+            d["lastmodified"] = LastModified
+            d["etag"] = ETag
+            d["size"] = Size
+            d["storageclass"] = StorageClass
+            d["md5"] = Etag
             #            print (obj)
             print(json.dumps(d))
             # 'Key': 'DRR000871/DRR000871.1', 'LastModified': datetime.datetime(2019, 4, 7, 14, 42, 5, tzinfo=tzutc()), 'ETag': '"c148c3c12ff4ff3353f4d1908cf9a0d6-697"', 'Size': 5846499276, 'StorageClass': 'STANDARD'
