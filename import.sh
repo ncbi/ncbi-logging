@@ -392,7 +392,7 @@ BEGIN;
         where acc not like '%.vdbcache.%'
         group by acc
         having count(distinct etag) > 1 )
-    order by acc, last_modified desc;
+    order by acc asc, last_modified desc;
 COMMIT;
 
 
