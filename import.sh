@@ -404,8 +404,10 @@ BEGIN;
 
     CREATE TABLE moving_downloads as
     select time, source, avg(downloads)
-    over(order by time rows between 29 preceding and current row) as mv30
-    from daily_downloads;
+    over(partition by source
+         order by time rows between 29 preceding and current row) as mv30
+    from daily_downloads
+    order by time, source;
 COMMIT;
 
 HERE
