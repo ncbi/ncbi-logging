@@ -9,6 +9,8 @@ SELECT date_trunc('day',
   FROM cloud_sessions
  WHERE (cmds LIKE '%GET%'
        OR cmds LIKE '%HEAD%')
+    AND city_name not in
+    ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
  GROUP BY "time",
           SOURCE
  ORDER BY "time";

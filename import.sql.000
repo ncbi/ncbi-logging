@@ -1,27 +1,32 @@
 SELECT count(*) AS export_count FROM export;
 SELECT count(*) AS export_objects FROM export_objects;
 
-CREATE TABLE IF NOT EXISTS cloud_objects (acc text,
-                                          export_time TIMESTAMP,
-                                          load_time TIMESTAMP,
-                                          etag text,
-                                          bytecount bigint,
-                                          bucket text,
-                                          SOURCE text,
-                                          last_modified TIMESTAMP,
-                                          storage_class text);
-INSERT INTO cloud_objects
-    SELECT DATA ->> 'Key' AS acc,
-        to_timestamp(DATA ->> 'Now', 'YYYY-MM-DD HH24:MI:SS') AS export_time,
-        now() AS load_time,
-        DATA ->> 'ETag' AS etag,
-        cast(DATA ->> 'Size' AS bigint) AS bytecount,
-        DATA ->> 'Bucket' AS bucket,
-        DATA ->> 'Source' AS SOURCE,
-        to_timestamp(DATA ->> 'LastModified', 'YYYY-MM-DD HH24:MI:SS') AS last_modified,
-        DATA ->> 'StorageClass' AS storage_class
-    FROM export_objects;
+CREATE TABLE IF NOT EXISTS cloud_objects (
+    acc text,
+    export_time timestamp,
+    load_time timestamp,
+    etag text,
+    bytecount bigint,
+    bucket text,
+    source text,
+    last_modified timestamp,
+    storage_class text,
+    md5 text);
+
+INSERT INTO CLOUD_OBJECTS SELECT
+    data->>'key' AS acc,
+    TO_TIMESTAMP(data->>'now','YYYY-MM-DD HH24:MI:SS') AS export_time,
+    now() as load_time,
+    data->>'etag' AS etag,
+    cast(data->>'size' AS bigint) AS bytecount,
+    data->>'bucket' AS bucket,
+    data->>'source' AS source,
+    TO_TIMESTAMP(data->>'lastmodified','YYYY-MM-DD HH24:MI:SS') AS last_modified,
+    data->>'storageclass' AS storage_class,
+    data->>'md5' as md5
+    from export_objects;
 
 DROP TABLE export_objects;
+
 SELECT count(*) AS cloud_objects FROM cloud_objects;
 

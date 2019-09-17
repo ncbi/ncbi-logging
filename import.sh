@@ -193,6 +193,8 @@ BEGIN;
     cloud_sessions
     WHERE
     ( cmds like '%GET%' or cmds like '%HEAD%' )
+    and city_name not in
+    ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
     GROUP BY "time", source
     ORDER BY "time";
 COMMIT;
@@ -397,7 +399,14 @@ BEGIN;
     order by acc asc, last_modified desc;
 COMMIT;
 
+BEGIN;
+    DROP TABLE IF EXISTS moving_downloads;
 
+    CREATE TABLE moving_downloads as
+    select time, source, avg(downloads)
+    over(order by time rows between 29 preceding and current row) as mv30
+    from daily_downloads;
+COMMIT;
 
 HERE
 
