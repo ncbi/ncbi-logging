@@ -9,8 +9,8 @@ WHERE IP = '119.188.52.171';
 
 
 UPDATE RDNS
-SET DOMAIN = 'guangzhou.gd.cn'
-WHERE IP = '218.19.145.19';
+SET DOMAIN = 'guangzhou.gd.cn (Guangzhou Beidian Network)'
+WHERE IP LIKE '218.19.145.%';
 
 
 UPDATE RDNS
@@ -52,7 +52,9 @@ UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net'
 WHERE IP LIKE '222.178.%'
   OR IP LIKE '218.9%'
-  OR IP LIKE '59.50.85.%';
+  OR IP LIKE '59.50.85.%'
+  OR IP LIKE '119.78.%'
+  OR IP LIKE '119.79.%';
 
 
 UPDATE RDNS
@@ -104,7 +106,8 @@ WHERE IP LIKE '152.16.%';
 UPDATE RDNS
 SET DOMAIN = 'utexas.edu'
 WHERE IP LIKE '206.76.%'
-  OR IP LIKE'206.77.%';
+  OR IP LIKE'206.77.%'
+OR IP LIKE '129.112.%';
 
 
 UPDATE RDNS
@@ -678,7 +681,25 @@ SET DOMAIN = 'nic.or.kr (Koeran National Infomation Society Agency)'
 WHERE IP LIKE '103.22.220.%' or IP LIKE '103.22.221.%' or
         IP LIKE '103.22.222.%' or IP LIKE '103.22.223.%';
 
+UPDATE RDNS
+SET DOMAIN='umich.edu (University of Michigan)'
+WHERE IP like '141.214.%';
 
+UPDATE RDNS
+SET DOMAIN='uc.edu (University of Cincinnati)'
+WHERE IP like '129.137.%';
+
+UPDATE RDNS
+SET DOMAIN='monash.edu (Monash University)'
+WHERE IP like '118.138.%';
+
+UPDATE RDNS
+SET DOMAIN='sdsc.edu (San Diego Supercomputer Center)'
+WHERE IP like '132.249.%';
+
+UPDATE RDNS
+SET DOMAIN='ebi.ac.uk (European Bioinformatics Institute)'
+WHERE IP like '193.62.19%';
 
 
 
