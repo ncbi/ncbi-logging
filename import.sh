@@ -51,20 +51,11 @@ time psql -h localhost -d grafana << HERE
 SELECT count(*) AS export_count FROM export;
 SELECT count(*) AS export_objects FROM export_objects;
 
+DROP TABLE IF EXISTS objects_load;
+--CREATE TABLE objects_load ( acc text, export_time timestamp, load_time timestamp, etag text, bytecount bigint, bucket text, source text, last_modified timestamp, storage_class text, md5 text);
 
-CREATE TABLE IF NOT EXISTS cloud_objects (
-    acc text,
-    export_time timestamp,
-    load_time timestamp,
-    etag text,
-    bytecount bigint,
-    bucket text,
-    source text,
-    last_modified timestamp,
-    storage_class text,
-    md5 text);
-
-INSERT INTO CLOUD_OBJECTS SELECT
+CREATE TABLE objects_load as SELECT
+--INSERT INTO objects_load SELECT
     data->>'key' AS acc,
     TO_TIMESTAMP(data->>'now','YYYY-MM-DD HH24:MI:SS') AS export_time,
     now() as load_time,
@@ -76,11 +67,32 @@ INSERT INTO CLOUD_OBJECTS SELECT
     data->>'storageclass' AS storage_class,
     data->>'md5' as md5
     from export_objects;
-
 DROP TABLE export_objects;
+
+BEGIN;
+    ALTER TABLE cloud_objects RENAME to object_uniq;
+
+--  DROP TABLE IF EXISTS cloud_objects;
+    CREATE TABLE cloud_objects AS
+        SELECT acc, etag, bytecount, bucket, source, storage_class, md5, last_modified,
+        MIN(export_time) AS export_time,
+        MAX(load_time) AS load_time
+        FROM (
+            SELECT acc, etag, bytecount, bucket, source, storage_class, md5, last_modified,
+            export_time, load_time
+            FROM objects_load
+            UNION ALL
+            SELECT acc, etag, bytecount, bucket, source, storage_class, md5, last_modified,
+            export_time, load_time
+            FROM objects_uniq ) as f
+        GROUP by acc, etag, bytecount, bucket, source, storage_class, md5, last_modified;
+    DROP TABLE objects_load;
+    DROP TABLE object_uniq;
+END;
 SELECT COUNT(*) AS Cloud_Objects from cloud_objects;
 
-CREATE TEMP TABLE ips_export AS SELECT distinct ip, ip_int 
+
+CREATE TEMP TABLE ips_export AS SELECT distinct ip, ip_int
     FROM export
     WHERE ip_int > 0;
 
@@ -89,8 +101,8 @@ CREATE TABLE ips_export2 as
     SELECT ips_export.ip, ip_int, domain, city_name, country_code
     FROM ips_export, ip2location_db11_ipv4, rdns
     WHERE
-        BOX(POINT(ip_FROM,ip_FROM),POINT(ip_to,ip_to)) @>
-        BOX(POINT (ip_int,ip_int), POINT(ip_int,ip_int))
+        BOX(POINT(ip_FROM, ip_FROM), POINT(ip_to, ip_to)) @>
+        BOX(POINT (ip_int, ip_int), POINT(ip_int, ip_int))
         AND rdns.ip=ips_export.ip ;
 
 SELECT count(*) AS ips_export2_count FROM ips_export2;

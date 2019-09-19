@@ -702,6 +702,14 @@ SET DOMAIN='ebi.ac.uk (European Bioinformatics Institute)'
 WHERE IP like '193.62.19%';
 
 
+UPDATE RDNS
+SET DOMAIN='ufpa.br (Universidade Federal do Para)'
+WHERE IP like '200.239.%';
+
+UPDATE RDNS
+SET DOMAIN='net.edu.cn (Huazhong University Of Science And Technology)'
+WHERE IP like '211.67.3%';
+
 
 
 
