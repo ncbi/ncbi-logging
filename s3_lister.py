@@ -46,7 +46,7 @@ def main():
             d["etag"] = ETag
             d["size"] = Size
             d["storageclass"] = StorageClass
-            d["md5"] = Etag
+            d["md5"] = ETag
             #            print (obj)
             print(json.dumps(d))
             # 'Key': 'DRR000871/DRR000871.1', 'LastModified': datetime.datetime(2019, 4, 7, 14, 42, 5, tzinfo=tzutc()), 'ETag': '"c148c3c12ff4ff3353f4d1908cf9a0d6-697"', 'Size': 5846499276, 'StorageClass': 'STANDARD'

@@ -70,7 +70,8 @@ CREATE TABLE objects_load as SELECT
 DROP TABLE export_objects;
 
 BEGIN;
-    ALTER TABLE cloud_objects RENAME to object_uniq;
+    DROP TABLE IF EXISTS objects_uniq;
+    ALTER TABLE cloud_objects RENAME to objects_uniq;
 
 --  DROP TABLE IF EXISTS cloud_objects;
     CREATE TABLE cloud_objects AS
@@ -87,7 +88,7 @@ BEGIN;
             FROM objects_uniq ) as f
         GROUP by acc, etag, bytecount, bucket, source, storage_class, md5, last_modified;
     DROP TABLE objects_load;
-    DROP TABLE object_uniq;
+    DROP TABLE objects_uniq;
 END;
 SELECT COUNT(*) AS Cloud_Objects from cloud_objects;
 
