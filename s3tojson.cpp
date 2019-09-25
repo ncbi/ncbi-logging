@@ -43,7 +43,7 @@ struct sess {
     size_t e = line.find ( c, s );
     if ( e == string::npos ) {
         cerr << "can't find '" << c << "' in '" << line << "'\n";
-        exit ( 0 );
+        //exit ( 0 );
     }
     return e;
 }
@@ -171,16 +171,22 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string bucket = line.substr ( s, e - s );
         if constexpr ( debug ) { cout << "bucket is:" << bucket << ".\n"; }
         s = e + 1;
 
         e = linefind ( line, ']', s );
+        if ( e == string::npos ) { continue;
+}
         string time = line.substr ( s + 1, e - s );
         if constexpr ( debug ) { cout << "time is:" << time << ".\n"; }
         s = e + 2;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string remote_ip = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "remote_ip is:" << remote_ip << ".\n";
@@ -188,6 +194,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string requester = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "requester is:" << requester << ".\n";
@@ -195,6 +203,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string request_id = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "request_id is:" << request_id << ".\n";
@@ -202,6 +212,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string operation = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "operation is:" << operation << ".\n";
@@ -209,11 +221,15 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string key = line.substr ( s, e - s );
         if constexpr ( debug ) { cout << "key is:" << key << ".\n"; }
         s = e + 1;
 
         e = linefind ( line, '"', s + 1 );
+        if ( e == string::npos ) { continue;
+}
         string request_uri = line.substr ( s + 1, e - s - 1 );
         if constexpr ( debug ) {
             cout << "request_uri is:" << request_uri << ".\n";
@@ -221,6 +237,8 @@ int main ( int argc, char *argv[] )
         s = e + 2;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string http_status = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "http_status is:" << http_status << ".\n";
@@ -228,6 +246,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string error_code = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "error_code is:" << error_code << ".\n";
@@ -235,6 +255,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string bytes_sent = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "bytes_sent is:" << bytes_sent << ".\n";
@@ -242,6 +264,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string object_size = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "object_size is:" << object_size << ".\n";
@@ -249,6 +273,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string total_time = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "total_time is:" << total_time << ".\n";
@@ -256,6 +282,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string turn_around_time = line.substr ( s, e - s );
         if ( debug ) {
             cout << "turn_around_time is:" << turn_around_time << ".\n";
@@ -263,11 +291,15 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, '"', s + 1 );
+        if ( e == string::npos ) { continue;
+}
         string referrer = line.substr ( s + 1, e - s - 1 );
         if constexpr ( debug ) { cout << "referrer is:" << referrer << ".\n"; }
         s = e + 2;
 
         e = linefind ( line, '"', s + 1 );
+        if ( e == string::npos ) { continue;
+}
         string user_agent = line.substr ( s + 1, e - s - 1 );
         if constexpr ( debug ) {
             cout << "user_agent is:" << user_agent << ".\n";
@@ -275,6 +307,8 @@ int main ( int argc, char *argv[] )
         s = e + 2;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string version_id = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "version_id is:" << version_id << ".\n";
@@ -282,11 +316,15 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string host_id = line.substr ( s, e - s );
         if constexpr ( debug ) { cout << "host_id is:" << host_id << ".\n"; }
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string signature_version = line.substr ( s, e - s );
         if ( debug ) {
             cout << "signature_version is:" << signature_version << ".\n";
@@ -294,6 +332,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string cipher_suite = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "cipher_suite is:" << cipher_suite << ".\n";
@@ -301,6 +341,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string authentication_type = line.substr ( s, e - s );
         if ( debug ) {
             cout << "authenticaiton_type is:" << authentication_type << ".\n";
@@ -308,6 +350,8 @@ int main ( int argc, char *argv[] )
         s = e + 1;
 
         e = linefind ( line, ' ', s );
+        if ( e == string::npos ) { continue;
+}
         string host_header = line.substr ( s, e - s );
         if constexpr ( debug ) {
             cout << "host_header is:" << host_header << ".\n";

@@ -19,7 +19,8 @@ GROUP BY
   acc,
   agent,
   source,
-  domain
+  domain,
+  STARTS_WITH(cs_method, "P")
 
 CREATE OR REPLACE VIEW
   `ncbi-sandbox-blast.strides_analytics.sra_fix` AS
