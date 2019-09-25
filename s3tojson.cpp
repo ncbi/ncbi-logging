@@ -388,6 +388,12 @@ int main ( int argc, char *argv[] )
         sesskey += request_uri;
         sesskey += user_agent;
         sesskey += bucket;
+
+        // VDB-3889
+        if (cmd=="PUT" || cmd=="POST") {
+            sesskey += "PUTPOST";
+        }
+
         if ( sessions.count ( sesskey ) == 0 ) {
             sessions.emplace ( sesskey, sess );
         } else {
