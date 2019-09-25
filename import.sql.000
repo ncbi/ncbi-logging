@@ -1,19 +1,11 @@
 SELECT count(*) AS export_count FROM export;
 SELECT count(*) AS export_objects FROM export_objects;
 
-CREATE TABLE IF NOT EXISTS cloud_objects (
-    acc text,
-    export_time timestamp,
-    load_time timestamp,
-    etag text,
-    bytecount bigint,
-    bucket text,
-    source text,
-    last_modified timestamp,
-    storage_class text,
-    md5 text);
+DROP TABLE IF EXISTS objects_load;
+--CREATE TABLE objects_load ( acc text, export_time timestamp, load_time timestamp, etag text, bytecount bigint, bucket text, source text, last_modified timestamp, storage_class text, md5 text);
 
-INSERT INTO CLOUD_OBJECTS SELECT
+CREATE TABLE objects_load as SELECT
+--INSERT INTO objects_load SELECT
     data->>'key' AS acc,
     TO_TIMESTAMP(data->>'now','YYYY-MM-DD HH24:MI:SS') AS export_time,
     now() as load_time,
@@ -25,8 +17,29 @@ INSERT INTO CLOUD_OBJECTS SELECT
     data->>'storageclass' AS storage_class,
     data->>'md5' as md5
     from export_objects;
-
 DROP TABLE export_objects;
 
-SELECT count(*) AS cloud_objects FROM cloud_objects;
+BEGIN;
+    DROP TABLE IF EXISTS objects_uniq;
+    ALTER TABLE cloud_objects RENAME to objects_uniq;
+
+--  DROP TABLE IF EXISTS cloud_objects;
+    CREATE TABLE cloud_objects AS
+        SELECT acc, etag, bytecount, bucket, source, storage_class, md5, last_modified,
+        MIN(export_time) AS export_time,
+        MAX(load_time) AS load_time
+        FROM (
+            SELECT acc, etag, bytecount, bucket, source, storage_class, md5, last_modified,
+            export_time, load_time
+            FROM objects_load
+            UNION ALL
+            SELECT acc, etag, bytecount, bucket, source, storage_class, md5, last_modified,
+            export_time, load_time
+            FROM objects_uniq ) as f
+        GROUP by acc, etag, bytecount, bucket, source, storage_class, md5, last_modified;
+    DROP TABLE objects_load;
+    DROP TABLE objects_uniq;
+END;
+SELECT COUNT(*) AS Cloud_Objects from cloud_objects;
+
 

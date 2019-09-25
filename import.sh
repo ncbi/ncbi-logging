@@ -5,6 +5,9 @@
 
 cd "$PANFS/export" || exit
 
+# Attempt to pin DB to RAM
+tar -cf - $PGDATA > /dev/zero 2>&1 &
+
 psql -h localhost -d grafana -X << HERE
     DROP TABLE IF EXISTS export;
     CREATE UNLOGGED TABLE export (
