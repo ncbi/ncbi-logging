@@ -344,6 +344,14 @@ int main ( int argc, char *argv[] )
         sesskey += request_uri;
         sesskey += user_agent;
         sesskey += host_header;
+
+        // VDB-3889
+        if (cmd=="PUT" || cmd=="POST") {
+            sesskey += "PUTPOST";
+        } else if (cmd=="DELETE" || cmd=="OPTIONS") {
+            sesskey += "DELOPT";
+        }
+
         if ( sessions.count ( sesskey ) == 0 ) {
             sessions.emplace ( sesskey, sess );
         } else {

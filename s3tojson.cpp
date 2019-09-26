@@ -436,6 +436,8 @@ int main ( int argc, char *argv[] )
         // VDB-3889
         if (cmd=="PUT" || cmd=="POST") {
             sesskey += "PUTPOST";
+        } else if (cmd=="DELETE" || cmd=="OPTIONS") {
+            sesskey += "DELOPT";
         }
 
         if ( sessions.count ( sesskey ) == 0 ) {
