@@ -48,9 +48,9 @@ mkdir -p "$LOGDIR/s3_prod/objects"
     "$LOGDIR/s3_prod/objects/$DATE.objects-1.gz"
 
 time "$HOME/strides/s3tojson" < \
-    "$LOGDIR/s3_prod/$YESTERDAY.combine" | \
+    "$LOGDIR/s3_prod/$YESTERDAY.combine" \
+    2> "$LOGDIR/s3_prod/$YESTERDAY.err" | \
     gzip -9 -c > "$LOGDIR/s3_prod/$YESTERDAY.jsonl.gz" \
-    2> "$LOGDIR/s3_prod/$YESTERDAY.err"
 
 time gzip -9 "$LOGDIR/s3_prod/$YESTERDAY.combine"
 
