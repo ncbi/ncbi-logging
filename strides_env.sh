@@ -37,7 +37,7 @@ case "$HOSTNAME" in
         renice +19 -p $$ > /dev/null 2>&1
         ;;
     lmem05)
-        renice +19 -p $$ > /dev/null 2>&1
+        #renice +19 -p $$ > /dev/null 2>&1
         ;;
     *)
         ;;

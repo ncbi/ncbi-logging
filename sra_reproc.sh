@@ -41,15 +41,15 @@ for outdir in 20181109 20181221 20190101 20190213 20190220 20190228 20190301 201
 for dir in "$PANFS"/sra_prod/201?????; do
     outdir=$(echo "$dir" | pcregrep -o "20[\d]{6}" | head -1)
     echo "$outdir"
-    md5sum "$PANFS/sra_prod/$outdir/"*gz > /tmp/mike_logs/sra_prod/md5s/$outdir.md5 &
+    # md5sum "$PANFS/sra_prod/$outdir/"*gz > /tmp/mike_logs/sra_prod/md5s/$outdir.md5 &
     gunzip -d -c "$PANFS/sra_prod/$outdir/"*gz | "$HOME"/strides/nginxtojson  2> \
-        "$LOGDIR/sra_prod/$outdir.err" | \
-        gzip -9 -c > "$LOGDIR/sra_prod/$outdir.jsonl.gz" &
+        "$LOGDIR/sra_prod/$outdir.err.2" | \
+        gzip -9 -c > "$LOGDIR/sra_prod/$outdir.jsonl.gz.2" &
 
     j=$(jobs | wc -l)
-    while [ "$j" -ge 60 ]; do
+    while [ "$j" -ge 30 ]; do
         j=$(jobs | wc -l)
-        sleep 1
+        sleep 5
     done
 done
 
