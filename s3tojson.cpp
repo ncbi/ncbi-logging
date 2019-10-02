@@ -6,6 +6,7 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <re2/re2.h>
 #include <set>
 #include <sstream>
 #include <string>
@@ -70,7 +71,6 @@ struct sess {
                     return str.substr ( start, d );
                 } 
                     return "";
-                
             }
         }
     }
@@ -135,6 +135,13 @@ int main ( int argc, char *argv[] )
     // longest seen in wild is 2124 bytes
     char buf[4096];
     line.reserve ( sizeof buf );
+
+    RE2 re("([DES]RR[\\.0-9]{6,12})");
+    assert(re.ok());
+
+    string acc;
+    assert(RE2::PartialMatch("SRR1234567", re, &acc));
+
     size_t successes = 0;
     string sesskey;
     while ( nullptr != fgets ( buf, sizeof ( buf ), stdin ) ) {
@@ -387,9 +394,11 @@ int main ( int argc, char *argv[] )
 
         if constexpr ( debug ) { cerr << "request was\n " + request_uri; }
 
-        string acc = findacc ( request_uri );
-        if ( !acc.empty () ) { request_uri = acc; }
-
+        string acc;
+        if (RE2::PartialMatch(request_uri, re, &acc))
+        {
+            request_uri = acc;
+        }
 
         uint64_t bytecount = 0;
         try {

@@ -6,15 +6,23 @@ g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
  -flto \
  -fprofile-generate \
- -o s3tojson \
- s3tojson.cpp
+ -I../include/ \
+ -L../lib \
+ -o nginxtojson \
+ -lpthread \
+ nginxtojson.cpp \
+ ../lib/libre2.a
 
 g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
  -flto \
  -fprofile-generate \
- -o nginxtojson \
- nginxtojson.cpp
+ -I../include/ \
+ -L../lib \
+ -o s3tojson \
+ -lpthread \
+ s3tojson.cpp \
+ ../lib/libre2.a
 
 gunzip -d -c /tmp/mike_logs/s3_prod/20190731.combine.gz | head -n 10000 | \
     ./s3tojson 2>&1 | sort > s3test.result
@@ -40,15 +48,23 @@ g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
  -flto \
  -fprofile-use \
+ -I../include/ \
+ -L../lib \
  -o s3tojson \
- s3tojson.cpp
+ -lpthread \
+ s3tojson.cpp \
+ ../lib/libre2.a
 
 g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
  -flto \
  -fprofile-use \
+ -I../include/ \
+ -L../lib \
  -o nginxtojson \
- nginxtojson.cpp
+ -lpthread \
+ nginxtojson.cpp \
+ ../lib/libre2.a
 
 
 
@@ -58,26 +74,26 @@ exit 0
 clang-tidy -fix \
  -checks='*,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg,-hicpp-vararg,-fuchsia-default-arguments,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay' \
  s3tojson.cpp -- \
- -std=c++17 \ -I. -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
+ -std=c++17 \ -I. -I../include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/
 
 clang-tidy -fix \
  -checks='*,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg,-hicpp-vararg,-fuchsia-default-arguments,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay' \
  nginxtojson.cpp -- \
- -std=c++17 \ -I. -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
+ -std=c++17 \ -I. -I../include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/
 
 scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
  --std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic \
- -I. -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
+ -I. -I../include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/ \
- nginxtojson.cpp
+ nginxtojson.cpp ../lib/libre2.a -lpthread
 
 scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
  --std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic \
- -I. -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
+ -I. -I../include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/ \
- s3tojson.cpp
+ s3tojson.cpp ../lib/libre2.a -lpthread
 
 unset ASAN_OPTIONS
 export AFL_SKIP_CPUFREQ=1
