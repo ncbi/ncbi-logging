@@ -43,8 +43,8 @@ for dir in "$PANFS"/sra_prod/201?????; do
     echo "$outdir"
     # md5sum "$PANFS/sra_prod/$outdir/"*gz > /tmp/mike_logs/sra_prod/md5s/$outdir.md5 &
     gunzip -d -c "$PANFS/sra_prod/$outdir/"*gz | "$HOME"/strides/nginxtojson  2> \
-        "$LOGDIR/sra_prod/$outdir.err.2" | \
-        gzip -9 -c > "$LOGDIR/sra_prod/$outdir.jsonl.gz.2" &
+        "$LOGDIR/sra_prod/$outdir.err" | \
+        gzip -9 -c > "$LOGDIR/sra_prod/$outdir.jsonl.gz" &
 
     j=$(jobs | wc -l)
     while [ "$j" -ge 30 ]; do

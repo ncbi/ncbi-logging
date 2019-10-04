@@ -394,10 +394,16 @@ int main ( int argc, char *argv[] )
 
         if constexpr ( debug ) { cerr << "request was\n " + request_uri; }
 
-        string acc;
-        if (RE2::PartialMatch(request_uri, re, &acc))
+        size_t ls=request_uri.find_last_of('/');
+        if (ls!=string::npos)
         {
-            request_uri = acc;
+            string uri=request_uri.substr(ls);
+            if (RE2::PartialMatch(uri, re, &acc))
+            {
+                request_uri = acc;
+                if (request_uri[request_uri.size()-1]=='.') { request_uri.pop_back();
+}
+            }
         }
 
         uint64_t bytecount = 0;

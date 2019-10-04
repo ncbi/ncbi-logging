@@ -9,9 +9,8 @@ g++ --std=c++17 -O3 -march=native \
  -I../include/ \
  -L../lib \
  -o nginxtojson \
- -lpthread \
- nginxtojson.cpp \
- ../lib/libre2.a
+ -lpthread  -lcurl \
+ nginxtojson.cpp 
 
 g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
@@ -20,10 +19,10 @@ g++ --std=c++17 -O3 -march=native \
  -I../include/ \
  -L../lib \
  -o s3tojson \
- -lpthread \
- s3tojson.cpp \
- ../lib/libre2.a
+ -lpthread  -lcurl \
+ s3tojson.cpp 
 
+export LD_LIBRARY_PATH="$HOME/lib:$LD_LIBRARY_PATH"
 gunzip -d -c /tmp/mike_logs/s3_prod/20190731.combine.gz | head -n 10000 | \
     ./s3tojson 2>&1 | sort > s3test.result
 
@@ -51,9 +50,8 @@ g++ --std=c++17 -O3 -march=native \
  -I../include/ \
  -L../lib \
  -o s3tojson \
- -lpthread \
- s3tojson.cpp \
- ../lib/libre2.a
+ -lpthread  -lcurl \
+ s3tojson.cpp
 
 g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
@@ -62,9 +60,8 @@ g++ --std=c++17 -O3 -march=native \
  -I../include/ \
  -L../lib \
  -o nginxtojson \
- -lpthread \
- nginxtojson.cpp \
- ../lib/libre2.a
+ -lpthread -lcurl \
+ nginxtojson.cpp
 
 
 
@@ -87,13 +84,13 @@ scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
  --std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic \
  -I. -I../include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/ \
- nginxtojson.cpp ../lib/libre2.a -lpthread
+ nginxtojson.cpp -L../lib -lpthread -lcurl
 
 scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
  --std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic \
  -I. -I../include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/ \
- s3tojson.cpp ../lib/libre2.a -lpthread
+ s3tojson.cpp -L../lib -lpthread -lcurl
 
 unset ASAN_OPTIONS
 export AFL_SKIP_CPUFREQ=1
@@ -102,14 +99,14 @@ export AFL_PATH="$HOME/AFL"
 export AFL_NO_AFFINITY=1
 export CC="$HOME/bin/afl-gcc"
 export CXX="$HOME/bin/afl-g++"
-afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o s3tojson s3tojson.cpp
-afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o nginxtojson nginxtojson.cpp
-afl-fuzz -i fuzz_s3 -o findings_s3 -- ./s3tojson
-afl-fuzz -i fuzz_nginx -o findings_nginx -- ./nginxtojson
+afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o s3tojson_fuzz s3tojson.cpp -I../include/ -L../lib  -lpthread  -lcurl
+afl-g++ --std=c++17 -g -march=native -Wall -Wextra -Wpedantic  -o nginxtojson_fuzz nginxtojson.cpp -I../include -L../lib -lpthread -lcurl
+afl-fuzz -i fuzz_s3 -o findings_s3 -- ./s3tojson_fuzz
+afl-fuzz -i fuzz_nginx -o findings_nginx -- ./nginxtojson_fuzz
 
 # Parallel fuzzing
 cd "$TMP" || exit
-afl-fuzz -M fuzzer00    -i ~/strides/fuzz_s3 -o findings_s3 -- ~/strides/s3tojson
+afl-fuzz -M fuzzer00    -i ~/strides/fuzz_s3 -o findings_s3 -- ~/strides/s3tojson_fuzz
 for x in $(seq 20); do
-afl-fuzz -S "fuzzer0$x" -i ~/strides/fuzz_s3 -o findings_s3 -- ~/strides/s3tojson > "fuzz.$x.log" 2>&1 &
+afl-fuzz -S "fuzzer0$x" -i ~/strides/fuzz_s3 -o findings_s3 -- ~/strides/s3tojson_fuzz > "fuzz.$x.log" 2>&1 &
 done

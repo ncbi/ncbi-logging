@@ -4,10 +4,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <curl/curl.h>
 #include <fstream>
 #include <immintrin.h>
 #include <iostream>
-#include <re2/re2.h>
+//#include <re2/re2.h>
 #include <set>
 #include <sstream>
 #include <string>
@@ -30,6 +31,9 @@ struct sess {
     string agent;
     string domain;
     string acc;
+    string version;
+    string sessid;
+    string phid;
     set<string> cmds;
     set<string> status;
     uint64_t bytecount = 0;
@@ -74,32 +78,60 @@ const char *sse_memchr_r ( const char *cur, const char *end )
     return e;
 }
 
-[[nodiscard]] string findacc ( const string &str )
+[[nodiscard]] bool parse_url ( const string &request_uri, string &acc,
+    string &version, string &sessid, string &phid )
 {
-    size_t sz = str.size ();
-    if ( sz < 8 ) { return ""; }
-    const char *s = str.data ();
+    CURLUcode rc;
+    CURLU *url = curl_url ();
+    acc = "";
+    version = "";
+    sessid = "";
+    phid = "";
+    string spath;
+    string squery;
 
-    const char *r = static_cast<const char *> (
-        memchr ( static_cast<const char *> ( s + 1 ), 'R', sz - 6 ) );
-    if ( r != nullptr ) {
-        size_t start = r - s - 1;
-        if ( str[start + 2] == 'R' ) {
-            if ( str[start] == 'S' || str[start] == 'D' || str[start] == 'E' ) {
-                size_t d = 3;
-                while ( isdigit ( str[start + d] ) != 0 ) { ++d; }
-                if ( str[start + d] == '.'
-                    && ( isdigit ( str[start + d + 1] ) != 0 ) ) {
-                    d += 2;
-                }
-                if ( d > 6 ) {
-                    return str.substr ( start, d );
-                }
-                    return "";
+    // TODO handle %00 nulls in CURL API
+    rc = curl_url_set ( url, CURLUPART_URL, request_uri.data (), 0 );
+    if ( rc == 0u ) {
+        char *path = nullptr;
+        rc = curl_url_get ( url, CURLUPART_PATH, &path, CURLU_URLDECODE );
+        if ( rc == 0u ) {
+            char *query = nullptr;
+            spath = path;
+            rc = curl_url_get ( url, CURLUPART_QUERY, &query, CURLU_URLDECODE );
+            if ( rc == 0u ) {
+                squery = query;
+                curl_free ( query );
             }
+            curl_free ( path );
+        } else {
+            cerr << "curl parse error " << rc << ":" << request_uri << "\n";
+            curl_url_cleanup ( url );
+            return false;
+        }
+    } else {
+        cerr << "curl set error " << rc << ":" << request_uri << "\n";
+        curl_url_cleanup ( url );
+        return false;
+    }
+    curl_url_cleanup ( url );
+
+    size_t ls = spath.find_last_of ( '/' );
+    if ( ls != string::npos ) {
+        acc = spath.substr ( ls + 1 );
+        if ( ( acc[0] == 'D' || acc[0] == 'E' || acc[0] == 'S' )
+            && acc[1] == 'R' && acc[2] == 'R' ) {
+            size_t d = 3;
+            while ( d < acc.size () && ( isdigit ( acc[d] ) != 0 ) ) { ++d; }
+            if ( d + 1 < acc.size () && acc[d] == '.'
+                && ( isdigit ( acc[d + 1] ) != 0 ) ) {
+                version = acc.substr ( d + 1 );
+            }
+            acc = acc.substr ( 0, d );
         }
     }
-    return "";
+
+    return true;
 }
 
 int main ( int argc, char *argv[] )
@@ -110,7 +142,7 @@ int main ( int argc, char *argv[] )
     }
 
     unordered_map<string, struct sess> sessions;
-    sessions.reserve ( 1000000 ); // Most are < 200,000, max 513,000
+    //sessions.reserve ( 1000000 ); // Most are < 200,000, max 513,000
 
     size_t linecount = 0;
     const bool debug = false;
@@ -120,15 +152,13 @@ int main ( int argc, char *argv[] )
     line.reserve ( sizeof buf );
 
 
-    RE2 re("([DES]RR[\\.0-9]{6,12})");
-    assert(re.ok());
+    //    RE2 re("([DES]RR[\\.0-9]{6,12})");
+    //    assert(re.ok());
 
-    string acc;
-    assert(RE2::PartialMatch("SRR1234567", re, &acc));
-    //cerr << "acc is " << acc << "\n";
+    //    assert(RE2::PartialMatch("SRR1234567", re, &acc));
+    // cerr << "acc is " << acc << "\n";
 
     size_t successes = 0;
-    string sesskey;
     while ( fgets ( buf, sizeof ( buf ), stdin ) != nullptr ) {
         line.assign ( buf );
 
@@ -283,40 +313,17 @@ int main ( int argc, char *argv[] )
         string cmd = request_uri.substr ( 0, s );
         if ( s != string::npos ) { request_uri = request_uri.substr ( s + 1 ); }
 
+        size_t sp = request_uri.find ( ' ' ); // Remove optional _HTTP/1...
+        if ( sp != string::npos ) { request_uri.resize ( sp ); }
+
         if constexpr ( debug ) { cerr << "request was\n " + request_uri; }
 
-#if 0
-        size_t sz = request_uri.size ();
-        if ( sz > 8 ) {
-            const char *uri = request_uri.data ();
+        string version, sessid, phid, acc;
 
-            const char *p = static_cast<char *> (
-                memchr ( const_cast<char *> ( uri + 1 ), 'R', sz - 6 ) );
-            if ( p != nullptr ) {
-                --p;
-                std::string m ( p, 15 );
-                //                cerr << "fast matching:" << m << " : ";
-                if ( p[2] == 'R' ) {
-                    if ( p[0] == 'S' || p[0] == 'D' || p[0] == 'E' ) {
-                        //                        cerr << " likely ";
-                        int d = 3;
-                        while ( isdigit ( p[d] ) != 0 ) { ++d; }
-                        if ( p[d] == '.' && ( isdigit ( p[d + 1] ) != 0 ) ) {
-                            d += 2;
-                        }
-                        //                        cerr << "found " << d;
-                    }
-                }
-                //                cerr << "\n";
-            }
-        }
-#endif
-
-        string acc;
-        if (RE2::PartialMatch(request_uri, re, &acc))
-        {
-            request_uri = acc;
-        }
+        string url = "https://";
+        url += host_header;
+        url += request_uri;
+        if ( !parse_url ( url, acc, version, sessid, phid ) ) { continue; }
 
         uint64_t bytecount = 0;
         try {
@@ -329,15 +336,17 @@ int main ( int argc, char *argv[] )
             bytecount = 0;
         }
 
-
         struct sess sess;
         sess.ip = remote_ip;
         sess.agent = user_agent.substr ( 0, 64 );
         sess.domain = host_header;
-        sess.acc = request_uri;
+        sess.acc = acc;
         sess.status.emplace ( http_status );
         sess.cmds.emplace ( cmd );
         sess.bytecount = bytecount;
+        sess.version = version;
+        sess.sessid = sessid;
+        sess.phid = phid;
         sess.cnt = 1;
         sess.start = static_cast<double> ( ltm );
         try {
@@ -352,15 +361,18 @@ int main ( int argc, char *argv[] )
 
         if constexpr ( debug ) { cout << "end is:" << sess.end << "\n"; }
 
-        sesskey = remote_ip;
-        sesskey += request_uri;
+        string sesskey = remote_ip;
+        sesskey += acc;
         sesskey += user_agent;
         sesskey += host_header;
+        sesskey += version;
+        sesskey += sessid;
+        sesskey += phid;
 
         // VDB-3889
-        if (cmd=="PUT" || cmd=="POST") {
+        if ( cmd == "PUT" || cmd == "POST" ) {
             sesskey += "PUTPOST";
-        } else if (cmd=="DELETE" || cmd=="OPTIONS") {
+        } else if ( cmd == "DELETE" || cmd == "OPTIONS" ) {
             sesskey += "DELOPT";
         }
 
@@ -399,6 +411,9 @@ int main ( int argc, char *argv[] )
         j["cnt"] = sess.cnt;
         j["start"] = sess.start;
         j["end"] = sess.end;
+        j["version"] = sess.version;
+        j["sessid"] = sess.sessid;
+        j["phid"] = sess.phid;
 
         string statuses;
         for ( const auto &stat : sess.status ) { statuses += stat + " "; }
