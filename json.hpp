@@ -3186,6 +3186,11 @@ namespace nlohmann
 {
 namespace detail
 {
+template<typename string_type>
+void int_to_string( string_type& target, int value )
+{
+    target = std::to_string(value);
+}
 template <typename IteratorType> class iteration_proxy_value
 {
   public:
@@ -3194,6 +3199,7 @@ template <typename IteratorType> class iteration_proxy_value
     using pointer = value_type * ;
     using reference = value_type & ;
     using iterator_category = std::input_iterator_tag;
+    using string_type = typename std::remove_cv< typename std::remove_reference<decltype( std::declval<IteratorType>().key() ) >::type >::type;
 
   private:
     /// the iterator
@@ -3203,9 +3209,9 @@ template <typename IteratorType> class iteration_proxy_value
     /// last stringified array index
     mutable std::size_t array_index_last = 0;
     /// a string representation of the array index
-    mutable std::string array_index_str = "0";
+    mutable string_type array_index_str = "0";
     /// an empty string (to return a reference for primitive values)
-    const std::string empty_str = "";
+    const string_type empty_str = "";
 
   public:
     explicit iteration_proxy_value(IteratorType it) noexcept : anchor(it) {}
@@ -3238,7 +3244,7 @@ template <typename IteratorType> class iteration_proxy_value
     }
 
     /// return key of the iterator
-    const std::string& key() const
+    const string_type& key() const
     {
         assert(anchor.m_object != nullptr);
 
@@ -3249,7 +3255,7 @@ template <typename IteratorType> class iteration_proxy_value
             {
                 if (array_index != array_index_last)
                 {
-                    array_index_str = std::to_string(array_index);
+                    int_to_string( array_index_str, array_index );
                     array_index_last = array_index;
                 }
                 return array_index_str;
@@ -3489,7 +3495,10 @@ struct external_constructor<value_t::array>
         j.m_type = value_t::array;
         j.m_value = value_t::array;
         j.m_value.array->resize(arr.size());
-        std::copy(std::begin(arr), std::end(arr), j.m_value.array->begin());
+        if (arr.size() > 0)
+        {
+            std::copy(std::begin(arr), std::end(arr), j.m_value.array->begin());
+        }
         j.assert_invariant();
     }
 };
@@ -3882,9 +3891,8 @@ class input_stream_adapter : public input_adapter_protocol
 class input_buffer_adapter : public input_adapter_protocol
 {
   public:
-    JSON_HEDLEY_NON_NULL(2)
     input_buffer_adapter(const char* b, const std::size_t l) noexcept
-        : cursor(b), limit(b + l)
+        : cursor(b), limit(b == nullptr ? nullptr : (b + l))
     {}
 
     // delete because of pointer members
@@ -3898,6 +3906,7 @@ class input_buffer_adapter : public input_adapter_protocol
     {
         if (JSON_HEDLEY_LIKELY(cursor < limit))
         {
+            assert(cursor != nullptr and limit != nullptr);
             return std::char_traits<char>::to_int_type(*(cursor++));
         }
 
@@ -5675,7 +5684,7 @@ class binary_reader
                     const int exp = (half >> 10u) & 0x1Fu;
                     const unsigned int mant = half & 0x3FFu;
                     assert(0 <= exp and exp <= 32);
-                    assert(0 <= mant and mant <= 1024);
+                    assert(mant <= 1024);
                     switch (exp)
                     {
                         case 0:
@@ -10229,7 +10238,7 @@ class json_pointer
 
     @since version 3.6.0
     */
-    const std::string& back()
+    const std::string& back() const
     {
         if (JSON_HEDLEY_UNLIKELY(empty()))
         {
@@ -12041,13 +12050,12 @@ class binary_writer
     */
     static std::size_t calc_bson_array_size(const typename BasicJsonType::array_t& value)
     {
-        std::size_t embedded_document_size = 0ul;
         std::size_t array_index = 0ul;
 
-        for (const auto& el : value)
+        const std::size_t embedded_document_size = std::accumulate(std::begin(value), std::end(value), 0ul, [&array_index](std::size_t result, const typename BasicJsonType::array_t::value_type & el)
         {
-            embedded_document_size += calc_bson_element_size(std::to_string(array_index++), el);
-        }
+            return result + calc_bson_element_size(std::to_string(array_index++), el);
+        });
 
         return sizeof(std::int32_t) + embedded_document_size + 1ul;
     }
@@ -14264,7 +14272,7 @@ class serializer
         if (is_negative)
         {
             *buffer_ptr = '-';
-            abs_value = static_cast<number_unsigned_t>(std::abs(static_cast<std::intmax_t>(x)));
+            abs_value = remove_sign(x);
 
             // account one more byte for the minus sign
             n_chars = 1 + count_digits(abs_value);
@@ -14443,6 +14451,32 @@ class serializer
 
         state = utf8d[256u + state * 16u + type];
         return state;
+    }
+
+    /*
+     * Overload to make the compiler happy while it is instantiating
+     * dump_integer for number_unsigned_t.
+     * Must never be called.
+     */
+    number_unsigned_t remove_sign(number_unsigned_t x)
+    {
+        assert(false); // LCOV_EXCL_LINE
+        return x; // LCOV_EXCL_LINE
+    }
+
+    /*
+     * Helper function for dump_integer
+     *
+     * This function takes a negative signed integer and returns its absolute
+     * value as unsigned integer. The plus/minus shuffling is necessary as we can
+     * not directly remove the sign of an arbitrary signed integer as the
+     * absolute values of INT_MIN and INT_MAX are usually not the same. See
+     * #1708 for details.
+     */
+    inline number_unsigned_t remove_sign(number_integer_t x) noexcept
+    {
+        assert(x < 0 and x < (std::numeric_limits<number_integer_t>::max)());
+        return static_cast<number_unsigned_t>(-(x + 1)) + 1;
     }
 
   private:
@@ -18416,7 +18450,7 @@ class basic_json
     @since version 3.6.0
     */
     template<typename KeyT, typename std::enable_if<
-                 not std::is_same<KeyT, json_pointer>::value, int>::type = 0>
+                 not std::is_same<typename std::decay<KeyT>::type, json_pointer>::value, int>::type = 0>
     bool contains(KeyT && key) const
     {
         return is_object() and m_value.object->find(std::forward<KeyT>(key)) != m_value.object->end();

@@ -90,7 +90,7 @@ const char *sse_memchr_r ( const char *cur, const char *end )
     string spath;
     string squery;
 
-    // TODO handle %00 nulls in CURL API
+    // TODO(vartanianmh): mike handle %00 nulls in CURL API
     rc = curl_url_set ( url, CURLUPART_URL, request_uri.data (), 0 );
     if ( rc == 0u ) {
         char *path = nullptr;
@@ -142,7 +142,7 @@ int main ( int argc, char *argv[] )
     }
 
     unordered_map<string, struct sess> sessions;
-    //sessions.reserve ( 1000000 ); // Most are < 200,000, max 513,000
+    // sessions.reserve ( 1000000 ); // Most are < 200,000, max 513,000
 
     size_t linecount = 0;
     const bool debug = false;
@@ -402,29 +402,33 @@ int main ( int argc, char *argv[] )
     for ( const auto &s : sessions ) {
         string key = s.first;
         struct sess sess = s.second;
-        json j;
-        j["ip"] = sess.ip;
-        j["agent"] = sess.agent;
-        j["domain"] = sess.domain;
-        j["acc"] = sess.acc;
-        j["bytecount"] = sess.bytecount;
-        j["cnt"] = sess.cnt;
-        j["start"] = sess.start;
-        j["end"] = sess.end;
-        j["version"] = sess.version;
-        j["sessid"] = sess.sessid;
-        j["phid"] = sess.phid;
+        try {
+            json j;
+            j["ip"] = sess.ip;
+            j["agent"] = sess.agent;
+            j["domain"] = sess.domain;
+            j["acc"] = sess.acc;
+            j["bytecount"] = sess.bytecount;
+            j["cnt"] = sess.cnt;
+            j["start"] = sess.start;
+            j["end"] = sess.end;
+            j["version"] = sess.version;
+            j["sessid"] = sess.sessid;
+            j["phid"] = sess.phid;
 
-        string statuses;
-        for ( const auto &stat : sess.status ) { statuses += stat + " "; }
-        statuses.erase ( statuses.find_last_not_of ( ' ' ) + 1 );
-        j["status"] = statuses;
+            string statuses;
+            for ( const auto &stat : sess.status ) { statuses += stat + " "; }
+            statuses.erase ( statuses.find_last_not_of ( ' ' ) + 1 );
+            j["status"] = statuses;
 
-        string cmds;
-        for ( const auto &cmd : sess.cmds ) { cmds += cmd + " "; }
-        cmds.erase ( cmds.find_last_not_of ( ' ' ) + 1 );
-        j["cmds"] = cmds;
+            string cmds;
+            for ( const auto &cmd : sess.cmds ) { cmds += cmd + " "; }
+            cmds.erase ( cmds.find_last_not_of ( ' ' ) + 1 );
+            j["cmds"] = cmds;
 
-        cout << j << "\n";
+            cout << j << "\n";
+        } catch ( json::type_error &e ) {
+            cerr << "type error:" << sess.ip << "\n";
+        }
     }
 }
