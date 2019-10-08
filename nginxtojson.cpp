@@ -364,7 +364,8 @@ int main ( int argc, char *argv[] )
         string sesskey = remote_ip;
         sesskey += acc;
         sesskey += user_agent;
-        sesskey += host_header;
+        // Combine requests that were load-balanced to different servers
+        //sesskey += host_header;
         sesskey += version;
         sesskey += sessid;
         sesskey += phid;
