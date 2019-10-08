@@ -5,17 +5,19 @@
 
 cd $LOGDIR/s3_prod || exit
 
-for x in *.out.gz; do
+for x in *.combine.gz; do
     d=${x:0:8}
-    gunzip -d -c "$d.out.gz" |  \
-        "$HOME/strides/s3tojson" | \
-        gzip -9 -c > "$LOGDIR/s3_prod/$d.jsonl.gz" &
+    echo $d
+
+    gunzip -d -c $d.combine.gz | \
+    "$HOME/strides/s3tojson" 2> "$LOGDIR/s3_prod/$d.err" | \
+    gzip -9 -c > "$LOGDIR/s3_prod/$d.jsonl.gz" &
 
     j=$(jobs | wc -l)
 
-    while [ "$j" -ge 60 ]; do
+    while [ "$j" -ge 10 ]; do
         j=$(jobs | wc -l)
-        sleep 1
+        sleep 5
     done
 done
 
