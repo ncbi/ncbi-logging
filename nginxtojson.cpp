@@ -116,6 +116,20 @@ const char *sse_memchr_r ( const char *cur, const char *end )
     }
     curl_url_cleanup ( url );
 
+    for ( const auto c : squery) {
+        if ( isascii ( c ) == 0 ) {
+            cerr << "Non ascii in squery:" << squery << "\n";
+            return false;
+        }
+    }
+
+    for ( const auto c : spath ) {
+        if ( isascii ( c ) == 0 ) {
+            cerr << "Non ascii in spath:" << spath << "\n";
+            return false;
+        }
+    }
+
     size_t ls = spath.find_last_of ( '/' );
     if ( ls != string::npos ) {
         acc = spath.substr ( ls + 1 );
@@ -403,6 +417,8 @@ int main ( int argc, char *argv[] )
     for ( const auto &s : sessions ) {
         string key = s.first;
         struct sess sess = s.second;
+        string cmds;
+        string statuses;
         try {
             json j;
             j["ip"] = sess.ip;
@@ -417,12 +433,10 @@ int main ( int argc, char *argv[] )
             j["sessid"] = sess.sessid;
             j["phid"] = sess.phid;
 
-            string statuses;
             for ( const auto &stat : sess.status ) { statuses += stat + " "; }
             statuses.erase ( statuses.find_last_not_of ( ' ' ) + 1 );
             j["status"] = statuses;
 
-            string cmds;
             for ( const auto &cmd : sess.cmds ) { cmds += cmd + " "; }
             cmds.erase ( cmds.find_last_not_of ( ' ' ) + 1 );
             j["cmds"] = cmds;
@@ -430,6 +444,19 @@ int main ( int argc, char *argv[] )
             cout << j << "\n";
         } catch ( json::type_error &e ) {
             cerr << "type error:" << sess.ip << "\n";
+            cerr << sess.ip << "\n";
+            cerr << sess.agent << "\n";
+            cerr << sess.domain << "\n";
+            cerr << sess.acc << "\n";
+            cerr << sess.bytecount << "\n";
+            cerr << sess.cnt << "\n";
+            cerr << sess.start << "\n";
+            cerr << sess.end << "\n";
+            cerr << sess.version << "\n";
+            cerr << sess.sessid << "\n";
+            cerr << sess.phid << "\n";
+            cerr << statuses << "\n";
+            cerr << cmds << "\n";
         }
     }
 }

@@ -91,6 +91,20 @@ struct sess {
     }
     curl_url_cleanup ( url );
 
+    for ( const auto c : squery) {
+        if ( isascii ( c ) == 0 ) {
+            cerr << "Non ascii in squery:" << squery << "\n";
+            return false;
+        }
+    }
+
+    for ( const auto c : spath ) {
+        if ( isascii ( c ) == 0 ) {
+            cerr << "Non ascii in spath:" << spath << "\n";
+            return false;
+        }
+    }
+
     size_t ls = spath.find_last_of ( '/' );
     if ( ls != string::npos ) {
         acc = spath.substr ( ls + 1 );
