@@ -1,11 +1,11 @@
 BEGIN;
-DROP TABLE IF EXISTS download_domains;
-CREATE TABLE download_domains AS
-SELECT DOMAIN,
-       date_trunc('day',
-                  start_ts) AS TIME,
-       sum(bytes) AS bytes
-  FROM sra_cloud
- GROUP BY DOMAIN,
-          TIME;
+    DROP TABLE IF EXISTS download_domains;
+    CREATE TABLE download_domains AS
+    SELECT DOMAIN,
+        date_trunc('day',
+                    start_ts) AS TIME,
+        sum(bytes) AS bytes
+    FROM sra_cloud
+    GROUP BY DOMAIN, TIME;
 COMMIT;
+

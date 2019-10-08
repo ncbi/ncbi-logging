@@ -206,11 +206,11 @@ BEGIN;
         sum(bytecount) AS bytes,
         count(*) AS downloads
     FROM
-    cloud_sessions
+        cloud_sessions
     WHERE
-    ( cmds like '%GET%' or cmds like '%HEAD%' )
+        ( cmds like '%GET%' or cmds like '%HEAD%' )
     and city_name not in
-    ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
+        ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
     GROUP BY "time", source
     ORDER BY "time";
 COMMIT;
@@ -232,13 +232,33 @@ BEGIN;
 COMMIT;
 
 BEGIN;
+    DROP VIEW IF EXISTS sra_cloud;
+    CREATE VIEW sra_cloud AS
+    SELECT * from cloud_sessions
+    WHERE source='SRA';
+COMMIT;
+
+BEGIN;
     DROP TABLE IF EXISTS download_domains;
-    CREATE TABLE download_domains as
-        SELECT domain,
+    CREATE TABLE download_domains AS
+    SELECT DOMAIN,
+        date_trunc('day',
+                    start_ts) AS TIME,
+        sum(bytecount) AS Bytes
+    FROM sra_cloud
+    GROUP BY DOMAIN, TIME;
+COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS sra_cloud_downloads;
+    CREATE TABLE sra_cloud_downloads as
+    SELECT
         date_trunc('day', start_ts) AS time,
-        sum(bytes) AS Bytes
-        FROM sra_cloud
-        group by domain, time;
+        sum(bytecount) AS bytes,
+        count(*) AS downloads
+    FROM
+        sra_cloud
+    GROUP BY "time";
 COMMIT;
 
 BEGIN;
@@ -265,18 +285,6 @@ BEGIN;
     group by acc) AS roll
     group by last
     order by last;
-COMMIT;
-
-BEGIN;
-    DROP TABLE IF EXISTS sra_cloud_downloads;
-    CREATE TABLE sra_cloud_downloads as
-    SELECT
-        date_trunc('day', start_ts) AS time,
-        sum(bytes) AS bytes,
-        count(*) AS downloads
-    FROM
-        sra_cloud
-    GROUP BY "time";
 COMMIT;
 
 BEGIN;
@@ -416,6 +424,30 @@ BEGIN;
 COMMIT;
 
 BEGIN;
+    DROP TABLE IF EXISTS egress;
+
+    CREATE TABLE egress AS
+    SELECT date_trunc('day', start_ts) AS TIME,
+        SOURCE,
+        DOMAIN,
+        sum(bytecount) AS bytes
+    FROM cloud_sessions
+    WHERE (cmds LIKE '%GET%'
+        OR cmds LIKE '%HEAD%')
+    AND (cmds NOT LIKE '%POST%'
+        AND cmds NOT LIKE '%PUT%')
+    AND SOURCE IN ('GS',
+                    'S3')
+    AND ((SOURCE='S3'
+            AND DOMAIN NOT LIKE '%(AWS Amazon)%')
+        OR (SOURCE='GS'
+            AND DOMAIN NOT LIKE '%(GCP)%'))
+    AND domain not like '%nih.gov%'
+    GROUP BY TIME, SOURCE, DOMAIN
+    ORDER BY TIME;
+COMMIT;
+
+BEGIN;
     DROP TABLE IF EXISTS moving_downloads;
 
     CREATE TABLE moving_downloads as
@@ -425,6 +457,89 @@ BEGIN;
     from daily_downloads
     order by time, source;
 COMMIT;
+
+BEGIN;
+    DROP TABLE IF EXISTS to_clouds;
+
+
+    CREATE TABLE to_clouds AS
+    SELECT date_trunc('day',
+                    start_ts) AS TIME,
+        SOURCE,
+        CASE
+            WHEN (DOMAIN LIKE '%(GCP)%'
+                    OR DOMAIN LIKE '%(AWS Amazon)%') THEN sum(bytecount)
+            ELSE 0
+        END AS cloudbytes,
+        sum(bytecount) AS allbytes
+    FROM cloud_sessions
+    WHERE (cmds LIKE '%GET%'
+        OR cmds LIKE '%HEAD%')
+    AND (cmds NOT LIKE '%POST%'
+        AND cmds NOT LIKE '%PUT%')
+    AND bytecount > 0
+    AND (agent NOT LIKE 'aws-cli%'
+        AND agent NOT LIKE 'apitools gsutil%')
+    GROUP BY TIME,
+            SOURCE,
+            DOMAIN
+    ORDER BY TIME,
+            SOURCE;
+
+
+    DROP TABLE IF EXISTS to_clouds_pct;
+
+
+    CREATE TABLE to_clouds_pct AS
+    SELECT TIME,
+        100.0 * sum(cloudbytes) / sum(allbytes) AS percent
+    FROM to_clouds
+    GROUP BY TIME
+    ORDER BY TIME;
+
+
+    DROP TABLE IF EXISTS to_clouds_users;
+
+
+    CREATE TABLE to_clouds_users AS
+    SELECT date_trunc('day',
+                    start_ts) AS TIME,
+        count(DISTINCT ip) AS unique_users,
+        CASE
+            WHEN DOMAIN LIKE '%(GCP)%' THEN count(DISTINCT ip)
+            ELSE 0
+        END AS gcp_count,
+        CASE
+            WHEN DOMAIN LIKE '%(AWS Amazon)%' THEN count(DISTINCT ip)
+            ELSE 0
+        END AS aws_count
+    FROM cloud_sessions
+    WHERE (cmds LIKE '%GET%'
+        OR cmds LIKE '%HEAD%')
+    AND (cmds NOT LIKE '%POST%'
+        AND cmds NOT LIKE '%PUT%')
+    AND bytecount > 0
+    AND (agent NOT LIKE 'aws-cli%'
+        AND agent NOT LIKE 'apitools gsutil%')
+    GROUP BY TIME,
+            DOMAIN
+    ORDER BY TIME;
+
+
+    DROP TABLE IF EXISTS to_clouds_users_sum;
+
+
+    CREATE TABLE to_clouds_users_sum AS
+    SELECT TIME,
+        sum(unique_users) as total,
+        sum(gcp_count) as gcp,
+        sum(aws_count) as aws
+    FROM to_clouds_users
+    GROUP BY TIME
+    ORDER BY TIME;
+COMMIT;
+
+
 
 HERE
 
