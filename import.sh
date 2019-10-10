@@ -30,7 +30,7 @@ psql -h localhost -d grafana -X << HERE
 HERE
 
 # export.20190822.000000000024.csv.gz
-if [ ! -s export."$DATE".000000000025.csv.gz ]; then
+if [ ! -s export."$DATE".000000000015.csv.gz ]; then
     echo "No exports present, aborting"
     exit 1
 fi
@@ -209,8 +209,7 @@ BEGIN;
         cloud_sessions
     WHERE
         ( cmds like '%GET%' or cmds like '%HEAD%' )
-    and city_name not in
-        ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
+    AND domain not like '%nih.gov%'
     GROUP BY "time", source
     ORDER BY "time";
 COMMIT;
@@ -376,9 +375,8 @@ BEGIN;
             FROM cloud_sessions
             where source='SRA'
             and acc ~ '[DES]RR[\d\.]{6,10}'
-            and city_name not in
-            ('Ashburn', 'Bethesda', 'Mountain View', 'Rockville')
-            union all
+            AND domain not like '%nih.gov%'
+        UNION ALL
             SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
