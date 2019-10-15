@@ -7,8 +7,7 @@ cd "$PANFS/export" || exit
 
 # Attempt to pin DB to RAM
 tar -cf - $PGDATA > /dev/zero 2>&1 &
-
-psql -h localhost -d grafana -X << HERE
+psql -X strides_analytics sa_prod_write << HERE
     DROP TABLE IF EXISTS export;
     CREATE UNLOGGED TABLE export (
     status text,
@@ -38,19 +37,19 @@ fi
 # NOTE: Not profitable to do this in parallel, some kind of contention
 for x in export."$DATE".*.gz; do
     echo "Loading $x"
-    psql -h localhost -d grafana -c \
+    psql -d strides_analytics -U sa_prod_write -c \
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
 for x in "$PANFS/gs_prod/objects/$DATE."*gz "$PANFS/s3_prod/objects/$DATE."*gz  ; do
     echo "Loading $x"
-    psql -h localhost -d grafana -c \
+    psql -d strides_analytics -U sa_prod_write -c \
         "\\copy export_objects FROM program 'gunzip -d -c $x';"
 done
 
 echo "Loaded exports"
 
-time psql -h localhost -d grafana << HERE
+time psql -d strides_analytics  -U sa_prod_write << HERE
 SELECT count(*) AS export_count FROM export;
 SELECT count(*) AS export_objects FROM export_objects;
 
@@ -280,7 +279,7 @@ BEGIN;
     CREATE TABLE acc_last_acc as
     SELECT last AS time, count(*) AS accessions FROM (
     SELECT max(last) AS last
-    FROM sra_last_used
+    FROM last_used
     group by acc) AS roll
     group by last
     order by last;
@@ -555,6 +554,28 @@ BEGIN;
     group by source, time
     order by time, source;
 COMMIT;
+
+GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
+GRANT SELECT ON TABLE sra_cloud TO PUBLIC;
+GRANT SELECT ON TABLE rdns TO PUBLIC;
+GRANT SELECT ON TABLE public TO PUBLIC;
+GRANT SELECT ON TABLE cloud_objects TO PUBLIC;
+GRANT SELECT ON TABLE ip2location_db11_ipv4 TO PUBLIC;
+GRANT SELECT ON TABLE last_used TO PUBLIC;
+GRANT SELECT ON TABLE ips_export2 TO PUBLIC;
+GRANT SELECT ON TABLE download_domains TO PUBLIC;
+GRANT SELECT ON TABLE sra_agents TO PUBLIC;
+GRANT SELECT ON TABLE to_clouds_users TO PUBLIC;
+GRANT SELECT ON TABLE to_clouds TO PUBLIC;
+GRANT SELECT ON TABLE cloud_downloads TO PUBLIC;
+GRANT SELECT ON TABLE daily_downloads TO PUBLIC;
+GRANT SELECT ON TABLE moving_downloads TO PUBLIC;
+GRANT SELECT ON TABLE toolkit_downloads TO PUBLIC;
+GRANT SELECT ON TABLE to_clouds_users_sum TO PUBLIC;
+GRANT SELECT ON TABLE cloud_organisms TO PUBLIC;
+GRANT SELECT ON TABLE to_clouds_pct TO PUBLIC;
+GRANT SELECT ON TABLE sra_cloud_downloads TO PUBLIC;
+
 
 HERE
 

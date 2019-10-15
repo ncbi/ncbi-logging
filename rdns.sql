@@ -710,6 +710,35 @@ UPDATE RDNS
 SET DOMAIN='net.edu.cn (Huazhong University Of Science And Technology)'
 WHERE IP like '211.67.3%';
 
+UPDATE RDNS
+SET DOMAIN='UPenn.edu (University of Pennsylvania)'
+WHERE IP like '128.91.%';
+
+UPDATE RDNS
+SET DOMAIN='mcgill.ca (McGill University)'
+where IP like '132.216.%';
+
+UPDATE RDNS
+SET DOMAIN='uni-koeln.de (University of Cologne)'
+where IP like '134.95.%';
+
+UPDATE RDNS
+SET DOMAIN='pitt.edu (University of Pittsburgh)'
+where IP like '130.49.%';
+
+UPDATE RDNS
+SET DOMAIN='tohoku.ac.jp (Tohoku University)'
+where IP like '130.34.%';
+
+UPDATE RDNS
+SET DOMAIN='uni-bonn.de (University of Bonn)'
+where IP like '131.220.%';
+
+UPDATE RDNS
+SET DOMAIN='unil.ch (University of Lausanne)'
+where IP like '130.223.%';
+
+
 
 
 
