@@ -44,7 +44,9 @@ default_text_search_config = 'pg_catalog.english'
 EOF
 
 # Into pg_hba.conf:
-# host    strides_analytics all             130.14.24.69/32 scram-sha-256
+# host    strides_analytics all             130.14.24.69/32   scram-sha-256
+# host    strides_analytics all             130.14.24.158/32  scram-sha-256
+# host    strides_analytics sa_prod_read    130.14.191.100/32 scram-sha-256 # Grafana
 # host    grafana vartanianmh samehost trust
 
 pg_ctl -l "$HOME/$PGVER/logs/logfile" start
