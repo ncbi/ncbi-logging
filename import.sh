@@ -280,7 +280,7 @@ BEGIN;
     CREATE TABLE acc_last_acc as
     SELECT last AS time, count(*) AS accessions FROM (
     SELECT max(last) AS last
-    FROM sra_last_used
+    FROM last_used
     group by acc) AS roll
     group by last
     order by last;
