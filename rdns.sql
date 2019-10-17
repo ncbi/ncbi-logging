@@ -762,104 +762,118 @@ WHERE DOMAIN = 'bc.googleusercontent.com (GCP)'
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Known Virus Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Known Virus Team (GCP)'
 WHERE IP = '35.231.190.137';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '34.73.156.113';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '35.231.230.192';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '35.243.208.79';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '34.73.133.228';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Novel Virus Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '34.73.180.208';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Project Testing Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Project Testing Team (GCP)'
 WHERE IP = '34.73.135.146';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Computational Scaling and Indexing Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Computational Scaling and Indexing Team (GCP)'
 WHERE IP IN ('35.237.148.23',
              '35.196.81.205');
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - Machine Learning Team (GCP)'
+SET DOMAIN = 'Hackathon (nih.gov)  - Machine Learning Team (GCP)'
 WHERE IP = '35.245.82.131';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-rnaseq-clustering'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-clustering'
 WHERE IP = '35.196.70.3';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-rnaseq-metadata'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-metadata'
 WHERE IP = '35.190.160.141';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-rnaseq-splice-variant'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-splice-variant'
 WHERE IP = '35.196.107.66';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-rnaseq-sre-and-var'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-sre-and-var'
 WHERE IP = '35.196.72.10';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-rnaseq-visualization'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-visualization'
 WHERE IP = '35.196.10.168';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-rnaseq-test'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-test'
 WHERE IP = '35.212.2.36';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-rnaseq-gan-gpu'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-gan-gpu'
 WHERE IP = '35.196.150.8';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-pangenome-data-upload'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-pangenome-data-upload'
 WHERE IP = '35.235.88.60';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - aa-pangenome-data-upload'
+SET DOMAIN = 'Hackathon (nih.gov)  - aa-pangenome-data-upload'
 WHERE IP = '35.227.101.5';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - vkt-mongodb02'
+SET DOMAIN = 'Hackathon (nih.gov)  - vkt-mongodb02'
 WHERE IP = '33.245.126.160';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon - vkt-mongodb02'
+SET DOMAIN = 'Hackathon (nih.gov)  - vkt-mongodb02'
 WHERE IP = '35.245.126.160';
+
+update RDNS
+SET DOMAIN = 'googleusercontent.com (GCP) (nih.gov)'
+where IP in (
+'34.83.135.126',
+'35.186.177.152',
+'35.230.169.204',
+'35.230.183.178',
+'35.237.94.203',
+'35.245.18.255',
+'35.245.189.18',
+'35.245.245.236',
+'35.245.83.107'
+);
 
 
 SELECT IP AS UNKNOWN_IP,

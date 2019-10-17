@@ -556,6 +556,8 @@ BEGIN;
     order by time, source;
 COMMIT;
 
+ANALYZE;
+
 HERE
 
 date

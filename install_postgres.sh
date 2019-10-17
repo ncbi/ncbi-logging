@@ -43,11 +43,16 @@ lc_time = 'en_US.UTF-8'
 default_text_search_config = 'pg_catalog.english'
 EOF
 
-# Into pg_hba.conf:
-# host    strides_analytics all             130.14.24.69/32   scram-sha-256
-# host    strides_analytics all             130.14.24.158/32  scram-sha-256
-# host    strides_analytics sa_prod_read    130.14.191.100/32 scram-sha-256 # Grafana
-# host    grafana vartanianmh samehost trust
+cat <<-EOF2 >> "$PGDATA/pg_hba.conf"
+    local   all               all                               trust
+    host    all               all             samehost          trust
+    host    strides_analytics all             130.14.24.69/32   scram-sha-256
+    host    strides_analytics all             130.14.24.158/32  scram-sha-256
+    host    strides_analytics sa_prod_read    130.14.191.100/32 scram-sha-256 # Grafana
+    host    strides_analytics sa_prod_read    130.14.191.23/32  scram-sha-256 # Grafana
+    host    strides_analytics sa_prod_read    130.14.191.25/32  scram-sha-256 # Grafana
+    host    grafana vartanianmh samehost trust
+EOF2
 
 pg_ctl -l "$HOME/$PGVER/logs/logfile" start
 createdb -h /tmp/ grafana

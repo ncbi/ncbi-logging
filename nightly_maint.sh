@@ -33,11 +33,13 @@ psql << USAGE
 USAGE
 
 ./import.sh >> ~/import.log 2>&1
-
-psql -h localhost -d grafana -c 'analyze'
+./import_write.sh >> ~/import_write.log 2>&1
 
 pg_dump -h localhost -d grafana | \
      xz -T 20 -c > "$PANFS/pg_dumps/pg_dump.$DATE.xz" &
+
+#pg_dump -h intprod11 -p 5432 -U sa_prod_read -d strides_analytics | \
+#     xz -T 20 -c > "$PANFS/pg_dumps/pg_dump_sa.$DATE.xz" &
 
 #e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
 

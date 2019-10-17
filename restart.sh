@@ -30,7 +30,7 @@ pgrep -l gunicorn
 if [ "$?" -eq 1 ]; then
     echo "Starting Gunicorn"
     cd ~/strides || exit
-    gunicorn -b "0.0.0.0:$GUNIPORT" --timeout 1800 -D -w 8 --reload \
+    gunicorn -b "0.0.0.0:$GUNIPORT" --timeout 1800 -D -w 2 --reload \
         --capture-output \
         --access-logfile ~/gunicorn-access.log \
         --error-logfile  ~/gunicorn-error.log \

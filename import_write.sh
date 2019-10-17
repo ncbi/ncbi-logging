@@ -5,8 +5,6 @@
 
 cd "$PANFS/export" || exit
 
-# Attempt to pin DB to RAM
-tar -cf - $PGDATA > /dev/zero 2>&1 &
 psql -X strides_analytics sa_prod_write << HERE
     DROP TABLE IF EXISTS export;
     CREATE UNLOGGED TABLE export (
@@ -56,18 +54,18 @@ SELECT count(*) AS export_objects FROM export_objects;
 DROP TABLE IF EXISTS objects_load;
 --CREATE TABLE objects_load ( acc text, export_time timestamp, load_time timestamp, etag text, bytecount bigint, bucket text, source text, last_modified timestamp, storage_class text, md5 text);
 
-CREATE TABLE objects_load as SELECT
+CREATE TABLE objects_load AS SELECT
 --INSERT INTO objects_load SELECT
     data->>'key' AS acc,
     TO_TIMESTAMP(data->>'now','YYYY-MM-DD HH24:MI:SS') AS export_time,
-    now() as load_time,
+    now() AS load_time,
     data->>'etag' AS etag,
     cast(data->>'size' AS bigint) AS bytecount,
     data->>'bucket' AS bucket,
     data->>'source' AS source,
     TO_TIMESTAMP(data->>'lastmodified','YYYY-MM-DD HH24:MI:SS') AS last_modified,
     data->>'storageclass' AS storage_class,
-    data->>'md5' as md5
+    data->>'md5' AS md5
     from export_objects;
 DROP TABLE export_objects;
 
@@ -87,7 +85,7 @@ BEGIN;
             UNION ALL
             SELECT acc, etag, bytecount, bucket, source, storage_class, md5, last_modified,
             export_time, load_time
-            FROM objects_uniq ) as f
+            FROM objects_uniq ) AS f
         GROUP by acc, etag, bytecount, bucket, source, storage_class, md5, last_modified;
     DROP TABLE objects_load;
     DROP TABLE objects_uniq;
@@ -262,7 +260,7 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS cloud_organisms;
     CREATE TABLE cloud_organisms as
-        SELECT initcap(scientificname) as Organism,
+        SELECT initcap(scientificname) AS Organism,
         count(*) AS popularity,
         date_trunc('day', start_ts) AS time
         FROM cloud_sessions, public
@@ -352,9 +350,9 @@ COMMIT;
 BEGIN;
     DROP TABLE IF EXISTS OBJECT_LOAD;
     CREATE TABLE OBJECT_LOAD AS
-        SELECT date_trunc('day', last_modified) as time,
-        count(*) as num_accessions,
-        sum(bytecount) as bytes_uploaded
+        SELECT date_trunc('day', last_modified) AS time,
+        count(*) AS num_accessions,
+        sum(bytecount) AS bytes_uploaded
         from cloud_objects
         group by time
         order by time;
@@ -363,7 +361,7 @@ COMMIT;
 BEGIN;
     CREATE TEMP TABLE public_dt AS SELECT
         run,
-        TO_TIMESTAMP(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') as released
+        TO_TIMESTAMP(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') AS released
     FROM PUBLIC
     WHERE releasedate > '2018-06-01';
 
@@ -382,24 +380,24 @@ BEGIN;
         group by acc;
 
     CREATE TEMP TABLE last_dt AS SELECT
-    substring(acc from '[DES]RR\w+') as acc, last
+    substring(acc from '[DES]RR\w+') AS acc, last
     from last_download
     where acc ~ '[DES]RR\w+';
 
     CREATE TEMP TABLE mean_time_use AS
-    SELECT last_dt.acc as acc, last, released, last - released as delay
+    SELECT last_dt.acc AS acc, last, released, last - released AS delay
     FROM public_dt, last_dt
     WHERE public_dt.run=last_dt.acc;
 
     DROP TABLE IF EXISTS mean_latency;
     CREATE TABLE mean_latency AS
-    SELECT AVG(delay) as mean_delay from mean_time_use where delay > '0 days';
+    SELECT AVG(delay) AS mean_delay from mean_time_use where delay > '0 days';
 COMMIT;
 
 BEGIN;
     DROP TABLE IF EXISTS blast_and_strides;
     CREATE TABLE blast_and_strides as
-    SELECT domain, city_name, country_code, COUNT(*) as downloads
+    SELECT domain, city_name, country_code, COUNT(*) AS downloads
     FROM cloud_sessions
     WHERE ip in (SELECT DISTINCT ip FROM blast_sessions )
     GROUP BY domain, city_name, country_code
@@ -450,7 +448,7 @@ BEGIN;
     CREATE TABLE moving_downloads as
     select time, source, avg(downloads)
     over(partition by source
-         order by time rows between 29 preceding and current row) as mv30
+         order by time rows between 29 preceding and current row) AS mv30
     from daily_downloads
     order by time, source;
 COMMIT;
@@ -528,9 +526,9 @@ BEGIN;
 
     CREATE TABLE to_clouds_users_sum AS
     SELECT TIME,
-        sum(unique_users) as total,
-        sum(gcp_count) as gcp,
-        sum(aws_count) as aws
+        sum(unique_users) AS total,
+        sum(gcp_count) AS gcp,
+        sum(aws_count) AS aws
     FROM to_clouds_users
     GROUP BY TIME
     ORDER BY TIME;
@@ -555,6 +553,23 @@ BEGIN;
     order by time, source;
 COMMIT;
 
+BEGIN;
+    DROP TABLE IF EXISTS unique_cloud_users;
+    CREATE TABLE unique_cloud_users AS
+    SELECT source,
+        date_trunc('day', start_ts) AS time,
+        count(distinct ip) AS unique_ips,
+        count(distinct acc) AS unique_accs,
+        sum(cnt) AS downloads,
+        sum(bytecount) AS bytes
+    FROM cloud_sessions
+    where
+    ( cmds like '%GET%' or cmds like '%HEAD%' )
+    AND domain not like '%nih.gov%'
+    group by time, source
+    order by time, source;
+COMMIT;
+
 GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
 GRANT SELECT ON TABLE sra_cloud TO PUBLIC;
 GRANT SELECT ON TABLE rdns TO PUBLIC;
@@ -575,7 +590,9 @@ GRANT SELECT ON TABLE to_clouds_users_sum TO PUBLIC;
 GRANT SELECT ON TABLE cloud_organisms TO PUBLIC;
 GRANT SELECT ON TABLE to_clouds_pct TO PUBLIC;
 GRANT SELECT ON TABLE sra_cloud_downloads TO PUBLIC;
+GRANT SELECT ON TABLE unique_cloud_users to PUBLIC;
 
+ANALYZE;
 
 HERE
 
