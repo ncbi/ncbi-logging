@@ -155,8 +155,10 @@ BEGIN;
         FROM  (
             SELECT acc, date_trunc('day', start_ts) AS last
             FROM cloud_sessions
-            where source='SRA'
-            and acc ~ '[DES]RR[\d\.]{6,10}'
+            where
+            ( cmds like '%GET%' or cmds like '%HEAD%' ) and
+            domain not like '%nih.gov%' and
+            acc ~ '[DES]RR[\d\.]{6,10}'
             union all
             SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
             FROM public
@@ -189,7 +191,7 @@ BEGIN;
         cloud_sessions
         WHERE
         ( cmds like '%GET%' or cmds like '%HEAD%' )
-        AND source != 'SRA'
+        -- AND source != 'SRA'
         GROUP BY time, source
         ORDER BY time;
 COMMIT;
@@ -370,8 +372,8 @@ BEGIN;
         FROM  (
             SELECT acc, date_trunc('day', start_ts) AS last
             FROM cloud_sessions
-            where source='SRA'
-            and acc ~ '[DES]RR[\d\.]{6,10}'
+            where -- source='SRA' and 
+            acc ~ '[DES]RR[\d\.]{6,10}'
             AND domain not like '%nih.gov%'
         UNION ALL
             SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
@@ -394,6 +396,7 @@ BEGIN;
     SELECT AVG(delay) AS mean_delay from mean_time_use where delay > '0 days';
 COMMIT;
 
+/*
 BEGIN;
     DROP TABLE IF EXISTS blast_and_strides;
     CREATE TABLE blast_and_strides as
@@ -403,6 +406,7 @@ BEGIN;
     GROUP BY domain, city_name, country_code
     ORDER by downloads desc;
 COMMIT;
+*/
 
 BEGIN;
     DROP TABLE IF EXISTS etag_delta;
@@ -431,8 +435,7 @@ BEGIN;
         OR cmds LIKE '%HEAD%')
     AND (cmds NOT LIKE '%POST%'
         AND cmds NOT LIKE '%PUT%')
-    AND SOURCE IN ('GS',
-                    'S3')
+    AND SOURCE IN ('GS', 'S3')
     AND ((SOURCE='S3'
             AND DOMAIN NOT LIKE '%(AWS Amazon)%')
         OR (SOURCE='GS'
@@ -577,11 +580,15 @@ GRANT SELECT ON TABLE public TO PUBLIC;
 GRANT SELECT ON TABLE cloud_objects TO PUBLIC;
 GRANT SELECT ON TABLE ip2location_db11_ipv4 TO PUBLIC;
 GRANT SELECT ON TABLE last_used TO PUBLIC;
+GRANT SELECT ON TABLE last_used_interval TO PUBLIC;
+GRANT SELECT ON TABLE mean_latency TO PUBLIC;
 GRANT SELECT ON TABLE ips_export2 TO PUBLIC;
 GRANT SELECT ON TABLE download_domains TO PUBLIC;
 GRANT SELECT ON TABLE sra_agents TO PUBLIC;
 GRANT SELECT ON TABLE to_clouds_users TO PUBLIC;
 GRANT SELECT ON TABLE to_clouds TO PUBLIC;
+GRANT SELECT ON TABLE object_load TO PUBLIC;
+GRANT SELECT ON TABLE object_sizes TO PUBLIC;
 GRANT SELECT ON TABLE cloud_downloads TO PUBLIC;
 GRANT SELECT ON TABLE daily_downloads TO PUBLIC;
 GRANT SELECT ON TABLE moving_downloads TO PUBLIC;
@@ -591,6 +598,13 @@ GRANT SELECT ON TABLE cloud_organisms TO PUBLIC;
 GRANT SELECT ON TABLE to_clouds_pct TO PUBLIC;
 GRANT SELECT ON TABLE sra_cloud_downloads TO PUBLIC;
 GRANT SELECT ON TABLE unique_cloud_users to PUBLIC;
+GRANT SELECT ON TABLE storage_cost to PUBLIC;
+--GRANT SELECT ON TABLE blast_and_strides to PUBLIC;
+GRANT SELECT ON TABLE etag_delta to PUBLIC;
+GRANT SELECT ON TABLE downloads_by_ip to PUBLIC;
+GRANT SELECT ON TABLE egress to PUBLIC;
+GRANT SELECT ON TABLE sra_agents to PUBLIC;
+GRANT SELECT ON TABLE cloud_organisms to PUBLIC;
 
 ANALYZE;
 
