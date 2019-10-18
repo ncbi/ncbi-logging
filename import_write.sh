@@ -135,6 +135,9 @@ BEGIN;
 COMMIT;
 DROP TABLE IF EXISTS cloud_sessions_bak;
 
+-- TODO FIX: VDB-3989
+UPDATE cloud_sessions set source='NCBI' where source='SRA';
+
 --SELECT count(*) AS cloud_sessions_count FROM cloud_sessions;
     SELECT SOURCE,
     count(*) as recs, sum(cnt) as sumcnt, count(distinct ip) as distips
@@ -231,7 +234,7 @@ BEGIN;
     FROM cloud_sessions
     where
     ( cmds like '%GET%' or cmds like '%HEAD%' )
-    AND source!='SRA'
+    AND source!='NCBI'
     group by time, path;
 COMMIT;
 
@@ -239,7 +242,7 @@ BEGIN;
     DROP TABLE IF EXISTS sra_cloud;
     CREATE TABLE sra_cloud AS
     SELECT * from cloud_sessions
-    WHERE source='SRA';
+    WHERE source='NCBI';
 COMMIT;
 
 BEGIN;
@@ -378,7 +381,7 @@ BEGIN;
         FROM  (
             SELECT acc, date_trunc('day', start_ts) AS last
             FROM cloud_sessions
-            where -- source='SRA' and
+            where -- source='NCBI' and
             acc ~ '[DES]RR[\d\.]{6,10}'
             AND domain not like '%nih.gov%'
         UNION ALL
