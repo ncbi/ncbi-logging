@@ -585,19 +585,19 @@ BEGIN;
     SELECT
         date_trunc('day', start_ts) AS time,
         source,
-        count(distinct ip) as unique_users,
-        sum(bytecount) as bytes,
         case
             when domain like '%(AWS Amazon)%' then source || ' to AWS'
             when domain like '%(GCP)%' then source || ' to GCP'
             else source || ' to elsewhere'
-        end as destination
+        end as destination,
+        count(distinct ip) as unique_users,
+        sum(bytecount) as bytes
         from cloud_sessions
         where
         ( cmds like '%GET%' or cmds like '%HEAD%' )
-        and source!='SRA'
+        -- and source!='SRA'
         and domain not like '%nih.gov%'
-        group by time, source, domain
+        group by time, source, destination
         order by time, source;
 COMMIT;
 

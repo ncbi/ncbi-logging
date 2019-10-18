@@ -746,6 +746,35 @@ UPDATE RDNS
 SET DOMAIN='moxnetworks (nantworks.com)'
 where IP like '185.130.23%';
 
+UPDATE RDNS
+SET DOMAIN='Scripps Research Institute (scipps.edu)'
+where IP like '192.26.252.%';
+
+UPDATE RDNS
+SET DOMAIN='Cornell University (cornell.edu)'
+where IP like '132.236.%';
+
+UPDATE RDNS
+SET DOMAIN='University of British Columbia (bc.net)'
+where IP like '142.103.%';
+
+UPDATE RDNS
+SET DOMAIN='University of Alabama at Birmingham (uab.edu)'
+where IP like '164.111.%';
+
+UPDATE RDNS
+SET DOMAIN='University of Sheffield (sheffield.ac.uk)'
+where IP like '143.167.%';
+
+UPDATE RDNS
+SET DOMAIN='Tsinghua University (net.edu.cn)'
+where IP like '58.206.%';
+
+
+
+
+
+
 
 
 
