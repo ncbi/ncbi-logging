@@ -770,6 +770,18 @@ UPDATE RDNS
 SET DOMAIN='Tsinghua University (net.edu.cn)'
 where IP like '58.206.%';
 
+UPDATE RDNS
+SET DOMAIN='St. Jude Childrens Research Hospital (stjude.org)'
+WHERE IP LIKE '192.55.208.%';
+
+UPDATE RDNS
+SET DOMAIN='Boston University (bu.edu)'
+WHERE IP LIKE '192.12.187.%';
+
+UPDATE RDNS
+SET DOMAIN='Alibaba Cloud (alibaba.com)'
+WHERE IP LIKE '47.25%';
+
 
 
 
