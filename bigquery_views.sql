@@ -37,7 +37,7 @@ SELECT
   substr(acc,0,100) as acc,
   TIMESTAMP_MILLIS(CAST(`start`*1000 AS int64)) AS `start`,
   TIMESTAMP_MILLIS(CAST(`end`*1000 AS int64)) AS `end`,
-  'SRA' AS source
+  'NCBI' AS source
 FROM
   `ncbi-sandbox-blast.strides_analytics.sra_prod`
 
