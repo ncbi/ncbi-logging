@@ -190,8 +190,8 @@ BEGIN;
     group by metric;
 COMMIT;
 
+DROP TABLE IF EXISTS downloads_by_ip;
 BEGIN;
-    DROP TABLE IF EXISTS downloads_by_ip;
     CREATE TABLE downloads_by_ip as
         SELECT date_trunc('day', start_ts) AS time,
         source,
@@ -601,7 +601,7 @@ BEGIN;
         -- and source!='SRA'
         and domain not like '%nih.gov%'
         group by time, source, destination
-        order by time, source;
+        order by time, source, destination desc;
 COMMIT;
 
 GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
