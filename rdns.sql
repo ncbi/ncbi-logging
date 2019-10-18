@@ -738,7 +738,13 @@ UPDATE RDNS
 SET DOMAIN='unil.ch (University of Lausanne)'
 where IP like '130.223.%';
 
+UPDATE RDNS
+SET DOMAIN='NC Biolabs (frontiernet.net)'
+where IP like '50.55.%';
 
+UPDATE RDNS
+SET DOMAIN='moxnetworks (nantworks.com)'
+where IP like '185.130.23%';
 
 
 

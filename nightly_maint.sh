@@ -30,6 +30,11 @@ psql << USAGE
         AND nspname !~ '^pg_toast'
     ORDER BY pg_total_relation_size(C.oid) DESC
     LIMIT 20;
+
+    select source,
+    count(*) as recs, sum(cnt) as sumcnt, count(distinct ip) as distips
+    from cloud_sessions
+    group by source;
 USAGE
 
 ./import.sh >> ~/import.log 2>&1
@@ -38,8 +43,8 @@ USAGE
 pg_dump -h localhost -d grafana | \
      xz -T 20 -c > "$PANFS/pg_dumps/pg_dump.$DATE.xz" &
 
-#pg_dump -h intprod11 -p 5432 -U sa_prod_read -d strides_analytics | \
-#     xz -T 20 -c > "$PANFS/pg_dumps/pg_dump_sa.$DATE.xz" &
+pg_dump -U sa_prod_write -d strides_analytics | \
+     xz -T 20 -c > "$PANFS/pg_dumps/pg_dump_sa.$DATE.xz" &
 
 #e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
 

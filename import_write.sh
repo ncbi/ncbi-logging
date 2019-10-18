@@ -135,7 +135,13 @@ BEGIN;
 COMMIT;
 DROP TABLE IF EXISTS cloud_sessions_bak;
 
-SELECT count(*) AS cloud_sessions_count FROM cloud_sessions;
+--SELECT count(*) AS cloud_sessions_count FROM cloud_sessions;
+    SELECT SOURCE,
+    count(*) as recs, sum(cnt) as sumcnt, count(distinct ip) as distips
+    FROM CLOUD_SESSIONS
+    WHERE START_TS > NOW() - INTERVAL '2 DAY'
+    GROUP BY SOURCE;
+
 
 DROP index cloud_sessions_start;
 DROP index cloud_sessions_source;
@@ -148,8 +154,8 @@ where ip like '35.245.%';
 
 
 -- Create materialized views, AS tables in case we need to index them
+DROP TABLE IF EXISTS last_used;
 BEGIN;
-    DROP TABLE IF EXISTS last_used;
     CREATE TABLE last_used as
         SELECT acc, max(last) AS last
         FROM  (
@@ -166,8 +172,8 @@ BEGIN;
         group by acc;
 COMMIT;
 
+DROP TABLE IF EXISTS last_used_interval;
 BEGIN;
-    DROP TABLE IF EXISTS last_used_interval;
     CREATE TABLE last_used_interval as
     SELECT case
         when date_trunc('day', age(localtimestamp, last)) < interval '30 days'
@@ -372,7 +378,7 @@ BEGIN;
         FROM  (
             SELECT acc, date_trunc('day', start_ts) AS last
             FROM cloud_sessions
-            where -- source='SRA' and 
+            where -- source='SRA' and
             acc ~ '[DES]RR[\d\.]{6,10}'
             AND domain not like '%nih.gov%'
         UNION ALL
@@ -573,6 +579,28 @@ BEGIN;
     order by time, source;
 COMMIT;
 
+DROP TABLE IF EXISTS cloud_destinations;
+BEGIN;
+    CREATE TABLE cloud_destinations AS
+    SELECT
+        date_trunc('day', start_ts) AS time,
+        source,
+        count(distinct ip) as unique_users,
+        sum(bytecount) as bytes,
+        case
+            when domain like '%(AWS Amazon)%' then source || ' to AWS'
+            when domain like '%(GCP)%' then source || ' to GCP'
+            else source || ' to elsewhere'
+        end as destination
+        from cloud_sessions
+        where
+        ( cmds like '%GET%' or cmds like '%HEAD%' )
+        and source!='SRA'
+        and domain not like '%nih.gov%'
+        group by time, source, domain
+        order by time, source;
+COMMIT;
+
 GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
 GRANT SELECT ON TABLE sra_cloud TO PUBLIC;
 GRANT SELECT ON TABLE rdns TO PUBLIC;
@@ -605,6 +633,7 @@ GRANT SELECT ON TABLE downloads_by_ip to PUBLIC;
 GRANT SELECT ON TABLE egress to PUBLIC;
 GRANT SELECT ON TABLE sra_agents to PUBLIC;
 GRANT SELECT ON TABLE cloud_organisms to PUBLIC;
+GRANT SELECT ON TABLE cloud_destinations to PUBLIC;
 
 ANALYZE;
 
