@@ -136,7 +136,7 @@ COMMIT;
 DROP TABLE IF EXISTS cloud_sessions_bak;
 
 -- TODO FIX: VDB-3989
-UPDATE cloud_sessions set source='NCBI' where source='SRA';
+--UPDATE cloud_sessions set source='NCBI' where source='SRA';
 
 --SELECT count(*) AS cloud_sessions_count FROM cloud_sessions;
     SELECT SOURCE,

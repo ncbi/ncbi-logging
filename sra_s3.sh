@@ -43,9 +43,11 @@ rm -rf "$DEST"
 echo "Removed $DEST"
 
 mkdir -p "$LOGDIR/s3_prod/objects"
-"$HOME/strides/s3_lister.py" "sra-pub-run-1" | \
-    gzip -9 -c > \
-    "$LOGDIR/s3_prod/objects/$DATE.objects-1.gz"
+for x in $(seq 7); do
+    "$HOME/strides/s3_lister.py" "sra-pub-run-$x" | \
+        gzip -9 -c > \
+        "$LOGDIR/s3_prod/objects/$DATE.objects-$x.gz"
+done
 
 time "$HOME/strides/s3tojson" < \
     "$LOGDIR/s3_prod/$YESTERDAY.combine" \
