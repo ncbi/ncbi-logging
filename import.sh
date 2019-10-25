@@ -30,19 +30,19 @@ psql -h localhost -d grafana -X << HERE
 HERE
 
 # export.20190822.000000000024.csv.gz
-if [ ! -s export."$DATE".000000000015.csv.gz ]; then
+if [ ! -s export."$YESTERDAY".000000000015.csv.gz ]; then
     echo "No exports present, aborting"
     exit 1
 fi
 
 # NOTE: Not profitable to do this in parallel, some kind of contention
-for x in export."$DATE".*.gz; do
+for x in export."$YESTERDAY".*.gz; do
     echo "Loading $x"
     psql -h localhost -d grafana -c \
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-for x in "$PANFS/gs_prod/objects/$DATE."*gz "$PANFS/s3_prod/objects/$DATE."*gz  ; do
+for x in "$PANFS/gs_prod/objects/$YESTERDAY."*gz "$PANFS/s3_prod/objects/$YESTERDAY."*gz  ; do
     echo "Loading $x"
     psql -h localhost -d grafana -c \
         "\\copy export_objects FROM program 'gunzip -d -c $x';"

@@ -444,13 +444,19 @@ int main ( int argc, char *argv[] )
         //if (acc.empty()) cerr << "Empty: " << request_uri << "\n";
         uint64_t bytecount = 0;
         try {
-            if ( bytes_sent != "-" ) { bytecount = stol ( bytes_sent ); }
+            if ( bytes_sent != "-" ) { bytecount = stoull ( bytes_sent ); }
         } catch ( const invalid_argument &a ) {
             cerr << "Not a number: " << bytes_sent << "\n";
             bytecount = 0;
         } catch ( const out_of_range &a ) {
             cerr << "out_of_range : " << bytes_sent << "\n";
             bytecount = 0;
+        }
+
+        if (bytecount > 1000000000000)
+        {
+            cerr << "bytecount too large: " << bytecount << "\n";
+            continue;
         }
 
         // VDB-3822

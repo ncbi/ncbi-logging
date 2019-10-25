@@ -7,13 +7,14 @@ mkdir -p /tmp/mike_logs/sra_prod
 
 for file in /panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/*/access.log_????????.*.gz;
 do
+    ls -l "$file"
     outfile=$(echo "$file" | tr -d '/')
     outdate=$(echo "$outfile" | pcregrep -o "20[\d]{6}" | head -1)
 
     mkdir -p "$PANFS/sra_prod/$outdate"
-    cp -n -v "$file" "$PANFS/sra_prod/$outdate/$outfile"
+    cp -v "$file" "$PANFS/sra_prod/$outdate/$outfile"
     mkdir -p "$LOGDIR/sra_prod/$outdate"
-    cp -n -v "$file" "$LOGDIR/sra_prod/$outdate/$outfile"
+    cp -v "$file" "$LOGDIR/sra_prod/$outdate/$outfile"
 done
 
 gunzip -d -c $LOGDIR/sra_prod/"$YESTERDAY"/*gz | \

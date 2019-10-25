@@ -27,19 +27,19 @@ psql -X strides_analytics sa_prod_write << HERE
 HERE
 
 # export.20190822.000000000024.csv.gz
-if [ ! -s export."$DATE".000000000015.csv.gz ]; then
+if [ ! -s export."$YESTERDAY".000000000015.csv.gz ]; then
     echo "No exports present, aborting"
     exit 1
 fi
 
 # NOTE: Not profitable to do this in parallel, some kind of contention
-for x in export."$DATE".*.gz; do
+for x in export."$YESTERDAY".*.gz; do
     echo "Loading $x"
     psql -d strides_analytics -U sa_prod_write -c \
         "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-for x in "$PANFS/gs_prod/objects/$DATE."*gz "$PANFS/s3_prod/objects/$DATE."*gz  ; do
+for x in "$PANFS/gs_prod/objects/$YESTERDAY."*gz "$PANFS/s3_prod/objects/$YESTERDAY."*gz  ; do
     echo "Loading $x"
     psql -d strides_analytics -U sa_prod_write -c \
         "\\copy export_objects FROM program 'gunzip -d -c $x';"
@@ -133,6 +133,7 @@ BEGIN;
     ALTER TABLE cloud_sessions RENAME TO cloud_sessions_bak;
     ALTER TABLE export_joined RENAME TO cloud_sessions;
 COMMIT;
+GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
 DROP TABLE IF EXISTS cloud_sessions_bak;
 
 -- TODO FIX: VDB-3989
@@ -174,6 +175,7 @@ BEGIN;
         ) AS roll2
         group by acc;
 COMMIT;
+GRANT SELECT ON TABLE last_used TO PUBLIC;
 
 DROP TABLE IF EXISTS last_used_interval;
 BEGIN;
@@ -189,6 +191,7 @@ BEGIN;
     FROM last_used
     group by metric;
 COMMIT;
+GRANT SELECT ON TABLE last_used_interval TO PUBLIC;
 
 DROP TABLE IF EXISTS downloads_by_ip;
 BEGIN;
@@ -346,6 +349,7 @@ BEGIN;
         FROM last_used_cost
         WHERE metric='never downloaded';
 COMMIT;
+GRANT SELECT ON TABLE storage_cost to PUBLIC;
 
 BEGIN;
     DROP TABLE IF EXISTS OBJECT_SIZES;
@@ -421,11 +425,12 @@ BEGIN;
     DROP TABLE IF EXISTS etag_delta;
 
     CREATE TABLE etag_delta as
-    select distinct acc, etag, bytecount, last_modified
+    select distinct acc, source, etag, bytecount, last_modified
     from cloud_objects where acc in (
         select acc
         from cloud_objects
-        where acc not like '%.vdbcache.%'
+        where
+            acc not like '%vdbcache%' --and version not like '%vdbcache%'
         group by acc
         having count(distinct etag) > 1 )
     order by acc asc, last_modified desc;
@@ -581,6 +586,7 @@ BEGIN;
     group by time, source
     order by time, source;
 COMMIT;
+GRANT SELECT ON TABLE unique_cloud_users to PUBLIC;
 
 DROP TABLE IF EXISTS cloud_destinations;
 BEGIN;

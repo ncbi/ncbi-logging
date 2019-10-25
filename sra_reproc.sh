@@ -42,7 +42,8 @@ for dir in "$PANFS"/sra_prod/201?????; do
     outdir=$(echo "$dir" | pcregrep -o "20[\d]{6}" | head -1)
     echo "$outdir"
     # md5sum "$PANFS/sra_prod/$outdir/"*gz > /tmp/mike_logs/sra_prod/md5s/$outdir.md5 &
-    gunzip -d -c "$PANFS/sra_prod/$outdir/"*gz | "$HOME"/strides/nginxtojson  2> \
+    gunzip -d -c "$PANFS/sra_prod/$outdir/"*gz | \
+        "$HOME"/strides/nginxtojson  2> \
         "$LOGDIR/sra_prod/$outdir.err" | \
         gzip -9 -c > "$LOGDIR/sra_prod/$outdir.jsonl.gz" &
 

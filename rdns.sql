@@ -24,7 +24,7 @@ WHERE IP LIKE '202.175.1%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'cdc.gov'
+SET DOMAIN = 'cdc.gov (Centers for Disease Control and Prevention)'
 WHERE IP LIKE '158.111.%';
 
 
@@ -54,6 +54,9 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '218.9%'
   OR IP LIKE '59.50.85.%'
   OR IP LIKE '119.78.%'
+  OR IP LIKE '219.138.%'
+  OR IP LIKE '219.139.%'
+  OR IP LIKE '219.140.%'
   OR IP LIKE '119.79.%';
 
 
@@ -125,6 +128,10 @@ SET DOMAIN = 'China Unicom'
 WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '14.204.%'
   OR IP LIKE '14.205.%'
+  OR IP LIKE '119.4.%'
+  OR IP LIKE '119.5.%'
+  OR IP LIKE '119.6.%'
+  OR IP LIKE '119.7.%'
   OR IP LIKE '60.12.%';
 
 
@@ -286,7 +293,8 @@ WHERE IP LIKE '81.194.28.%';
 
 UPDATE RDNS
 SET DOMAIN = 'uconn.edu (Connecticut Education Network)'
-WHERE IP LIKE '162.221.11.%';
+WHERE IP LIKE '162.221.11.%'
+OR IP LIKE '155.37.%';
 
 
 UPDATE RDNS
@@ -316,7 +324,8 @@ WHERE IP LIKE '128.120.%';
 
 UPDATE RDNS
 SET DOMAIN = 'uchicago.edu (University of Chicago)'
-WHERE IP LIKE '128.135.%';
+WHERE IP LIKE '128.135.%'
+OR IP LIKE '192.170.%';
 
 
 UPDATE RDNS
@@ -395,11 +404,13 @@ WHERE IP LIKE '10.10.8%' OR IP LIKE '130.14.%';
 
 UPDATE RDNS
 SET DOMAIN = 'ncbi.nlm.nih.gov (NCBI)'
-WHERE IP='52.54.203.43' OR IP='35.245.245.236';
+WHERE IP='52.54.203.43' OR IP='35.245.245.236' or IP='35.245.169.105'
+or IP='35.245.47.214';
 
 UPDATE RDNS
 SET DOMAIN = 'nih.gov (NIH)'
-WHERE IP LIKE '128.231.%' OR IP LIKE '156.40.2%';
+WHERE IP LIKE '128.231.%' OR IP LIKE '156.40.2%'
+OR IP LIKE '165.112.%';
 
 
 UPDATE RDNS
@@ -436,7 +447,8 @@ WHERE IP LIKE '0.%'
 
 UPDATE RDNS
 SET DOMAIN = 'sursara.nl (Science Park Watergraafsmeer)'
-WHERE IP LIKE '145.100.4%';
+WHERE IP LIKE '145.100.4%'
+OR IP LIKE '145.101.3';
 
 
 UPDATE RDNS
@@ -662,6 +674,9 @@ WHERE IP LIKE '38.142.232.%' or IP LIKE '65.126.68.%';
 --UPDATE RDNS
 --SET DOMAIN = 'utah.edu (University of Utah)'
 --WHERE IP LIKE '2604:c340:%';
+UPDATE RDNS
+SET DOMAIN = 'utah.edu (University of Utah)'
+where IP LIKE '155.101.%';
 
 UPDATE RDNS
 SET DOMAIN = 'ohsu.edu (Oregon Health & Science University)'
@@ -767,7 +782,8 @@ where IP like '143.167.%';
 
 UPDATE RDNS
 SET DOMAIN='Tsinghua University (net.edu.cn)'
-where IP like '58.206.%';
+where IP like '58.206.%' OR
+IP LIKE '219.246.7%';
 
 UPDATE RDNS
 SET DOMAIN='St. Jude Childrens Research Hospital (stjude.org)'
@@ -781,7 +797,31 @@ UPDATE RDNS
 SET DOMAIN='Alibaba Cloud (alibaba.com)'
 WHERE IP LIKE '47.25%';
 
+UPDATE RDNS
+SET DOMAIN='KU Leuven (kuleuven.be)'
+WHERE IP LIKE '134.58.%';
 
+UPDATE RDNS
+SET DOMAIN='University of Hamburg (uni-hamburg.de)'
+WHERE IP LIKE '134.100.%';
+
+UPDATE RDNS
+SET DOMAIN='Helmholtz Centre for Environmental Research (ufz.de)'
+WHERE IP LIKE '141.65.%';
+
+UPDATE RDNS
+SET DOMAIN='Edinburgh University (ed.ac.uk)'
+WHERE
+IP LIKE '192.41.103%' OR
+IP LIKE '192.41.104%' OR
+IP LIKE '192.41.105%' OR
+IP LIKE '192.41.11%' OR
+IP LIKE '192.41.12%' OR
+IP LIKE '192.41.131.%';
+
+UPDATE RDNS
+SET DOMAIN = 'net.edu.cn (Zhejiang University)'
+WHERE IP LIKE '222.205.%';
 
 
 
