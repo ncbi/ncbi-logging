@@ -467,7 +467,7 @@ int main ( int argc, char *argv[] )
         // VDB-3961
         size_t phloc=user_agent.find("(phid=");
         if ( phloc != string::npos ) {
-            phid=user_agent.substr(phloc+5,10);
+            phid=user_agent.substr(phloc+6,10);
         }
 
         struct sess sess;
