@@ -79,14 +79,12 @@ const char *sse_memchr_r ( const char *cur, const char *end )
 }
 
 [[nodiscard]] bool parse_url ( const string &request_uri, string &acc,
-    string &version, string &sessid, string &phid )
+    string &version )
 {
     CURLUcode rc;
     CURLU *url = curl_url ();
     acc = "";
     version = "";
-    sessid = "";
-    phid = "";
     string spath;
     string squery;
 
@@ -337,7 +335,7 @@ int main ( int argc, char *argv[] )
         string url = "https://";
         url += host_header;
         url += request_uri;
-        if ( !parse_url ( url, acc, version, sessid, phid ) ) { continue; }
+        if ( !parse_url ( url, acc, version ) ) { continue; }
 
         uint64_t bytecount = 0;
         try {
@@ -352,9 +350,16 @@ int main ( int argc, char *argv[] )
 
         if (bytecount > 1000000000000)
         {
-            cerr << "bytecount too large: " << bytecount << "\n";
+            cerr << "bytecount too large: " << bytecount << ":" << bytes_sent << "\n";
             continue;
         }
+
+        // VDB-3961
+        size_t phloc=user_agent.find("(phid=");
+        if ( phloc != string::npos ) {
+            phid=user_agent.substr(phloc+5,10);
+        }
+
 
         struct sess sess;
         sess.ip = remote_ip;
@@ -386,9 +391,9 @@ int main ( int argc, char *argv[] )
         sesskey += user_agent;
         // Combine requests that were load-balanced to different servers
         //sesskey += host_header;
-        sesskey += version;
-        sesskey += sessid;
-        sesskey += phid;
+        //sesskey += version;
+        //sesskey += sessid;
+        //sesskey += phid;
 
         // VDB-3889
         if ( cmd == "PUT" || cmd == "POST" ) {

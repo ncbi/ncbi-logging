@@ -54,14 +54,12 @@ struct sess {
 
 
 [[nodiscard]] bool parse_url ( const string &request_uri, string &acc,
-    string &version, string &sessid, string &phid )
+    string &version )
 {
     CURLUcode rc;
     CURLU *url = curl_url ();
     acc = "";
     version = "";
-    sessid = "";
-    phid = "";
     string spath;
     string squery;
 
@@ -439,7 +437,7 @@ int main ( int argc, char *argv[] )
         string url = "https://";
         url += host_header;
         url += request_uri;
-        if ( !parse_url ( url, acc, version, sessid, phid ) ) { continue; }
+        if ( !parse_url ( url, acc, version ) ) { continue; }
 
         //if (acc.empty()) cerr << "Empty: " << request_uri << "\n";
         uint64_t bytecount = 0;
@@ -466,6 +464,12 @@ int main ( int argc, char *argv[] )
             user_agent.resize(user_agent.size()-5);
         }
 
+        // VDB-3961
+        size_t phloc=user_agent.find("(phid=");
+        if ( phloc != string::npos ) {
+            phid=user_agent.substr(phloc+5,10);
+        }
+
         struct sess sess;
         sess.ip = remote_ip;
         sess.agent = user_agent.substr ( 0, 64 );
@@ -473,7 +477,6 @@ int main ( int argc, char *argv[] )
         sess.acc = acc;
         sess.status.emplace ( http_status );
         sess.cmds.emplace ( cmd );
-        sess.bytecount = bytecount;
         sess.bytecount = bytecount;
         sess.version = version;
         sess.sessid = sessid;
