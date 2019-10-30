@@ -20,11 +20,11 @@ for file in /panfs/traces01.be-md.ncbi.nlm.nih.gov/sra_review/scratch/yaschenk/F
        cp -n -v "$file" "$outdir/$outfile" &
     fi
 
-#    gunzip -d -c "$dir"/*gz |
+#    zcat "$dir"/*gz |
 #        "$HOME/strides/nginxtojson" 2> "$dir.err" | \
 #        gzip -9 -c > "$LOGDIR/sra_prod/$dir.jsonl.gz" &
 #
-#    gunzip -d -c $LOGDIR/sra_prod/"$YESTERDAY"/*gz | \
+#    zcat $LOGDIR/sra_prod/"$YESTERDAY"/*gz | \
 #    time "$HOME/strides/nginxtojson" 2> "$LOGDIR/sra_prod/$YESTERDAY.err" | \
 #    gzip -9 -c > "$LOGDIR/sra_prod/$YESTERDAY.jsonl.gz"
 
@@ -42,7 +42,7 @@ for dir in "$PANFS"/sra_prod/201?????; do
     outdir=$(echo "$dir" | pcregrep -o "20[\d]{6}" | head -1)
     echo "$outdir"
     # md5sum "$PANFS/sra_prod/$outdir/"*gz > /tmp/mike_logs/sra_prod/md5s/$outdir.md5 &
-    gunzip -d -c "$PANFS/sra_prod/$outdir/"*gz | \
+    zcat "$PANFS/sra_prod/$outdir/"*gz | \
         "$HOME"/strides/nginxtojson  2> \
         "$LOGDIR/sra_prod/$outdir.err" | \
         gzip -9 -c > "$LOGDIR/sra_prod/$outdir.jsonl.gz" &

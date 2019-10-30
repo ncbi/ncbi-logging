@@ -23,10 +23,10 @@ g++ --std=c++17 -O3 -march=native \
  s3tojson.cpp 
 
 export LD_LIBRARY_PATH="$HOME/lib:$LD_LIBRARY_PATH"
-gunzip -d -c /tmp/mike_logs/s3_prod/20190731.combine.gz | head -n 10000 | \
+zcat /tmp/mike_logs/s3_prod/20190731.combine.gz | head -n 10000 | \
     ./s3tojson 2>&1 | sort > s3test.result
 
-gunzip -d -c \
+zcat \
     /tmp/mike_logs/sra_prod/20190731/panfspan1.be-md.ncbi.nlm.nih.govapplog_db_tmpdatabaselogarchiveftp.httplocal_archive20190731srafiles34access.log_20190731.logbuff11.gz \
     | head -n 10000 | \
     ./nginxtojson 2>&1 | sort > nginxtest.result

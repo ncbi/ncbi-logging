@@ -36,13 +36,13 @@ fi
 for x in export."$YESTERDAY".*.gz; do
     echo "Loading $x"
     psql -d strides_analytics -U sa_prod_write -c \
-        "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
+        "\\copy export FROM program 'zcat $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
 for x in "$PANFS/gs_prod/objects/$YESTERDAY."*gz "$PANFS/s3_prod/objects/$YESTERDAY."*gz  ; do
     echo "Loading $x"
     psql -d strides_analytics -U sa_prod_write -c \
-        "\\copy export_objects FROM program 'gunzip -d -c $x';"
+        "\\copy export_objects FROM program 'zcat $x';"
 done
 
 echo "Loaded exports"

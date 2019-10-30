@@ -9,7 +9,7 @@ for x in *.combine.gz; do
     d=${x:0:8}
     echo $d
 
-    gunzip -d -c $d.combine.gz | \
+    zcat $d.combine.gz | \
     "$HOME/strides/s3tojson" 2> "$LOGDIR/s3_prod/$d.err" | \
     gzip -9 -c > "$LOGDIR/s3_prod/$d.jsonl.gz" &
 

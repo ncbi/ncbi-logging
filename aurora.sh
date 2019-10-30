@@ -36,13 +36,13 @@ fi
 for x in export."$DATE".*.gz; do
     echo "Loading $x"
     psql -h localhost -p 5433 -U postgres postgres -c \
-        "\\copy export FROM program 'gunzip -d -c $x' FORCE NOT NULL acc CSV HEADER;"
+        "\\copy export FROM program 'zcat $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
 for x in "$PANFS/gs_prod/objects/$DATE."*gz "$PANFS/s3_prod/objects/$DATE."*gz  ; do
     echo "Loading $x"
     psql -h localhost -p 5433 -U postgres postgres -c \
-        "\\copy export_objects FROM program 'gunzip -d -c $x';"
+        "\\copy export_objects FROM program 'zcat $x';"
 done
 
 echo "Loaded exports"
