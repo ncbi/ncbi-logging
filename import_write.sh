@@ -168,14 +168,39 @@ BEGIN;
             where
             ( cmds like '%GET%' or cmds like '%HEAD%' ) and
             domain not like '%nih.gov%' and
-            acc ~ '[DES]RR[\d\.]{6,10}'
+            domain not like '%IANA Reserved%' and
+            acc ~ '^[DES]RR[\d\.]{6,10}'
             union all
             SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
-        group by acc;
+        group by acc
+        order by acc;
 COMMIT;
 GRANT SELECT ON TABLE last_used TO PUBLIC;
+
+-- Create materialized views, AS tables in case we need to index them
+DROP TABLE IF EXISTS last_used_cold;
+BEGIN;
+    CREATE TABLE last_used_cold as
+        SELECT acc, max(last) AS last
+        FROM  (
+            SELECT acc, date_trunc('day', start_ts) AS last
+            FROM cloud_sessions
+            where
+            ( cmds like '%GET%' or cmds like '%HEAD%' ) and
+            domain not like '%nih.gov%' and
+            domain not like '%IANA Reserved%' and
+            acc ~ '^[DES]RR[\d\.]{6,10}'
+            and source='NCBI'
+            union all
+            SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
+            FROM public
+        ) AS roll2
+        group by acc
+        order by acc;
+COMMIT;
+GRANT SELECT ON TABLE last_used_cold TO PUBLIC;
 
 DROP TABLE IF EXISTS last_used_interval;
 BEGIN;
@@ -203,7 +228,7 @@ BEGIN;
         cloud_sessions
         WHERE
         ( cmds like '%GET%' or cmds like '%HEAD%' )
-        -- AND source != 'SRA'
+        -- AND source != 'NCBI'
         GROUP BY time, source
         ORDER BY time;
 COMMIT;
@@ -220,7 +245,8 @@ BEGIN;
         cloud_sessions
     WHERE
         ( cmds like '%GET%' or cmds like '%HEAD%' )
-    AND domain not like '%nih.gov%'
+    AND domain not like '%nih.gov%' and
+    domain not like '%IANA Reserved%'
     GROUP BY "time", source
     ORDER BY "time";
 COMMIT;
@@ -388,6 +414,7 @@ BEGIN;
             where -- source='NCBI' and
             acc ~ '[DES]RR[\d\.]{6,10}'
             AND domain not like '%nih.gov%'
+            and domain not like '%IANA Reserved%'
         UNION ALL
             SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
             FROM public
@@ -455,6 +482,7 @@ BEGIN;
         OR (SOURCE='GS'
             AND DOMAIN NOT LIKE '%(GCP)%'))
     AND domain not like '%nih.gov%'
+    AND domain not like '%IANA Reserved%'
     GROUP BY TIME, SOURCE, DOMAIN
     ORDER BY TIME;
 COMMIT;
@@ -566,6 +594,7 @@ BEGIN;
     ( cmds like '%GET%' or cmds like '%HEAD%' )
     AND (agent like '%sra-toolkit%' or agent like '%ncbi-vdb%')
     AND domain not like '%nih.gov%'
+    AND domain not like '%IANA Reserved%'
     group by source, time
     order by time, source;
 COMMIT;
@@ -583,6 +612,7 @@ BEGIN;
     where
     ( cmds like '%GET%' or cmds like '%HEAD%' )
     AND domain not like '%nih.gov%'
+    AND domain not like '%IANA Reserved%'
     group by time, source
     order by time, source;
 COMMIT;
@@ -604,8 +634,9 @@ BEGIN;
         from cloud_sessions
         where
         ( cmds like '%GET%' or cmds like '%HEAD%' )
-        -- and source!='SRA'
+        -- and source!='NCBI'
         and domain not like '%nih.gov%'
+        AND domain not like '%IANA Reserved%'
         group by time, source, destination
         order by time, source, destination desc;
 COMMIT;
