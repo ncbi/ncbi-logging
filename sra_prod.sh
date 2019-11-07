@@ -13,11 +13,11 @@ do
 
     mkdir -p "$PANFS/sra_prod/$outdate"
     cp -v "$file" "$PANFS/sra_prod/$outdate/$outfile"
-    mkdir -p "$LOGDIR/sra_prod/$outdate"
+#    mkdir -p "$LOGDIR/sra_prod/$outdate"
 #    cp -v "$file" "$LOGDIR/sra_prod/$outdate/$outfile"
 done
 
-rm -f "$LOGDIR"/sra_prod/"$YESTERDAY"/*old*gz
+#rm -f "$LOGDIR"/sra_prod/"$YESTERDAY"/*old*gz
 
 zcat "$PANFS"/sra_prod/"$YESTERDAY"/*gz | \
     time "$HOME/strides/nginxtojson" 2> "$LOGDIR/sra_prod/$YESTERDAY.err" | \
@@ -32,9 +32,9 @@ export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 gsutil -m rsync -r "$LOGDIR"/sra_prod gs://strides_analytics/sra_prod
 
-chmod g+rx "$LOGDIR"
-chmod g+r "$LOGDIR/*"
-chmod -R o-rwx "$LOGDIR"
+#chmod g+rx "$LOGDIR"
+#chmod g+r "$LOGDIR/*"
+#chmod -R o-rwx "$LOGDIR"
 
 df -HT "$LOGDIR"
 
