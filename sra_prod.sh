@@ -3,7 +3,7 @@
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
 
-mkdir -p /tmp/mike_logs/sra_prod
+mkdir -p "$LOGDIR"/sra_prod
 
 for file in /panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/*/access.log_????????.*.gz;
 do
@@ -14,12 +14,12 @@ do
     mkdir -p "$PANFS/sra_prod/$outdate"
     cp -v "$file" "$PANFS/sra_prod/$outdate/$outfile"
     mkdir -p "$LOGDIR/sra_prod/$outdate"
-    cp -v "$file" "$LOGDIR/sra_prod/$outdate/$outfile"
+#    cp -v "$file" "$LOGDIR/sra_prod/$outdate/$outfile"
 done
 
-rm -f $LOGDIR/sra_prod/"$YESTERDAY"/*old*gz
+rm -f "$LOGDIR"/sra_prod/"$YESTERDAY"/*old*gz
 
-zcat $LOGDIR/sra_prod/"$YESTERDAY"/*gz | \
+zcat "$PANFS"/sra_prod/"$YESTERDAY"/*gz | \
     time "$HOME/strides/nginxtojson" 2> "$LOGDIR/sra_prod/$YESTERDAY.err" | \
     gzip -9 -c > "$LOGDIR/sra_prod/$YESTERDAY.jsonl.gz"
 
@@ -30,12 +30,12 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 
-gsutil -m rsync -r /tmp/mike_logs/sra_prod gs://strides_analytics/sra_prod
+gsutil -m rsync -r "$LOGDIR"/sra_prod gs://strides_analytics/sra_prod
 
-chmod g+rx /tmp/mike_logs
-chmod g+r /tmp/mike_logs/*
-chmod -R o-rwx /tmp/mike_logs
+chmod g+rx "$LOGDIR"
+chmod g+r "$LOGDIR/*"
+chmod -R o-rwx "$LOGDIR"
 
-df -HT /tmp/mike_logs
+df -HT "$LOGDIR"
 
 date

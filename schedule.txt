@@ -1,0 +1,16 @@
+ 7:03  intprod11 nightly_maint
+ 7:03  intprod11   ips.new 
+ 9:15  intprod11   rdns
+ 9:25  intprod11   import
+ 9:25  intprod11   import_write
+ 9:53  intprod11   pg_dumps
+ 7:20  intprod11 sra_meta
+16:30  iebdev11  strides_agent
+16:30  iebdev11    blast_dev
+16:32  iebdev11    blast_hackathon
+17:19  iebdev11    sra_gs
+19:40  iebdev11    sra_s3
+19:40  iebdev11    sra_prod
+~21:50 iebdev11    bigquery_export
+
+

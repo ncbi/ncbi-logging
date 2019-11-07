@@ -18,3 +18,4 @@ MAILTO=""
 # Needs to occur after strides_agent's bigquery_export completes (~5:40),
 # and after Wolfgang's imports start at 5:30
 3 7 * * * /home/vartanianmh/strides/nightly_maint.sh >> /home/vartanianmh/nightly_maint.log 2>&1
+30 16 * * *   /home/vartanianmh/strides/strides_agent.sh >> /home/vartanianmh/strides_agent.log 2>&1

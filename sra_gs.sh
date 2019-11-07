@@ -9,10 +9,10 @@ gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
     echo "Processing $LOG_BUCKET"
-    mkdir -p "/tmp/mike_logs/$LOG_BUCKET"
-    gsutil -m rsync -r "gs://$LOG_BUCKET" "/tmp/mike_logs/$LOG_BUCKET"
+    mkdir -p "$LOGDIR/$LOG_BUCKET"
+    gsutil -m rsync -r "gs://$LOG_BUCKET" "$LOGDIR/$LOG_BUCKET"
 
-    cd "/tmp/mike_logs/$LOG_BUCKET" || exit
+    cd "$LOGDIR/$LOG_BUCKET" || exit
 
     for OBJ in *usage*; do
     # sra-pub-run-1_usage_2019_06_24_03_00_00_07378a0db72e87e0b4_v0
@@ -25,7 +25,7 @@ for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
             continue
         fi
 
-        DT="/tmp/mike_logs/gs_prod/$DT"
+        DT="$LOGDIR/gs_prod/$DT"
 
         if [ ! -d "$DT" ]; then
             mkdir -p "$DT"
@@ -59,10 +59,10 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 
-gsutil -m rsync -r /tmp/mike_logs/gs_prod \
+gsutil -m rsync -r "$LOGDIR"/gs_prod \
     gs://strides_analytics/gs_prod
 
-rsync -av /tmp/mike_logs/gs_prod/ "$PANFS/gs_prod/"
+rsync -av "$LOGDIR"/gs_prod/ "$PANFS/gs_prod/"
 
 echo "Done"
 date
