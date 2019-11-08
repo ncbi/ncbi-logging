@@ -3,7 +3,7 @@
 # shellcheck source=/home/vartanianmh/strides/strides_env.sh
 . "$HOME/strides/strides_env.sh"
 
-pip3.7 list --outdated
+echo "Starting"
 
 psql -h localhost -d grafana -t -X -c 'select ips.ip  from ips left join rdns on ips.ip=rdns.ip where rdns.ip is null' > ips.new
 
@@ -18,8 +18,9 @@ cp ips.tsv "ips.tsv.$DATE"
 psql -h localhost -d grafana -c "\\copy rdns FROM ips.new.tsv WITH DELIMITER E'\t'"
 
 psql -h localhost -d grafana -f rdns.sql > /dev/null 2>&1
-psql -d strides_analytics -U sa_prod_write -f rdns.sql > /dev/null 2>&1
 psql -h localhost -d grafana -f accs.sql > /dev/null 2>&1
+
+psql -d strides_analytics -U sa_prod_write -f rdns.sql > /dev/null 2>&1
 
 psql << USAGE
     SELECT nspname || '.' || relname AS "relation",
@@ -38,6 +39,17 @@ psql << USAGE
     group by source;
 USAGE
 
+#e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
+
+./blast_dev.sh >> "$LOGDIR"/blast_dev.log 2>&1
+./sra_hackathon.sh >> "$LOGDIR"/sra_hackathon.log 2>&1
+./blast_hackathon.sh >> "$LOGDIR"/blast_hackathon.log 2>&1
+./sra_gs.sh >> "$LOGDIR"/sra_gs.log 2>&1
+./sra_s3.sh >> "$LOGDIR"/sra_s3.log 2>&1
+./sra_prod.sh >> "$LOGDIR"/sra_prod.log 2>&1
+
+./bigquery_export.sh >> "$LOGDIR"/bigquery_export.log 2>&1
+
 ./import.sh >> ~/import.log 2>&1
 ./import_write.sh >> ~/import_write.log 2>&1
 
@@ -47,7 +59,6 @@ pg_dump -h localhost -d grafana | \
 pg_dump -U sa_prod_write -d strides_analytics | \
      xz -T 20 -c > "$PANFS/pg_dumps/pg_dump_sa.$DATE.xz" &
 
-#e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
+pip3.7 list --outdated
 
 date
-

@@ -156,6 +156,11 @@ CREATE index cloud_sessions_source on cloud_sessions (source);
 update cloud_sessions set city_name='Mountain View', country_code='US'
 where ip like '35.245.%';
 
+BEGIN;
+    delete from public;
+    \copy public FROM public_fix.csv WITH CSV HEADER QUOTE AS '"'
+COMMIT;
+-- GRANT SELECT ON TABLE public TO PUBLIC;
 
 -- Create materialized views, AS tables in case we need to index them
 DROP TABLE IF EXISTS last_used;
@@ -171,7 +176,7 @@ BEGIN;
             domain not like '%IANA Reserved%' and
             acc ~ '^[DES]RR[\d\.]{6,10}'
             union all
-            SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2016-10-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc
@@ -194,7 +199,7 @@ BEGIN;
             acc ~ '^[DES]RR[\d\.]{6,10}'
             and source='NCBI'
             union all
-            SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2016-10-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc
@@ -404,7 +409,7 @@ BEGIN;
         run,
         TO_TIMESTAMP(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') AS released
     FROM PUBLIC
-    WHERE releasedate > '2018-06-01';
+    WHERE releasedate > '2016-10-01';
 
     CREATE TEMP TABLE last_download as
         SELECT acc, max(last) AS last
@@ -416,7 +421,7 @@ BEGIN;
             AND domain not like '%nih.gov%'
             and domain not like '%IANA Reserved%'
         UNION ALL
-            SELECT run AS acc, '2018-06-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2016-10-01 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc;
