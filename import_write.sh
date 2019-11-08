@@ -27,19 +27,19 @@ psql -X strides_analytics sa_prod_write << HERE
 HERE
 
 # export.20190822.000000000024.csv.gz
-if [ ! -s export."$YESTERDAY".000000000015.csv.gz ]; then
+if [ ! -s export."$DATE".000000000015.csv.gz ]; then
     echo "No exports present, aborting"
     exit 1
 fi
 
 # NOTE: Not profitable to do this in parallel, some kind of contention
-for x in export."$YESTERDAY".*.gz; do
+for x in export."$DATE".*.gz; do
     echo "Loading $x"
     psql -d strides_analytics -U sa_prod_write -c \
         "\\copy export FROM program 'zcat $x' FORCE NOT NULL acc CSV HEADER;"
 done
 
-for x in "$PANFS/gs_prod/objects/$YESTERDAY."*gz "$PANFS/s3_prod/objects/$YESTERDAY."*gz  ; do
+for x in "$PANFS/gs_prod/objects/$DATE."*gz "$PANFS/s3_prod/objects/$DATE."*gz  ; do
     echo "Loading $x"
     psql -d strides_analytics -U sa_prod_write -c \
         "\\copy export_objects FROM program 'zcat $x';"
