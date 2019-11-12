@@ -512,6 +512,10 @@ UPDATE RDNS
 SET DOMAIN = 'uw.edu (University of Washington)'
 WHERE IP LIKE '128.208.%';
 
+UPDATE RDNS
+SET DOMAIN='wustl.edu (Washington University)'
+WHERE IP LIKE '128.252.%';
+
 
 UPDATE RDNS
 SET DOMAIN = 'sdsu.edu (San Diego State University)'
@@ -783,7 +787,8 @@ where IP like '143.167.%';
 UPDATE RDNS
 SET DOMAIN='Tsinghua University (net.edu.cn)'
 where IP like '58.206.%' OR
-IP LIKE '219.246.7%';
+IP LIKE '219.246.7%'
+OR IP LIKE '166.111.%';
 
 UPDATE RDNS
 SET DOMAIN='St. Jude Childrens Research Hospital (stjude.org)'
@@ -823,9 +828,18 @@ UPDATE RDNS
 SET DOMAIN = 'net.edu.cn (Zhejiang University)'
 WHERE IP LIKE '222.205.%';
 
+UPDATE RDNS
+SET DOMAIN=
+'a-star.edu.sg (Singapore Agency For Science, Technology And Research)'
+WHERE IP LIKE '103.37.196%';
 
+UPDATE RDNS
+SET DOMAIN='net.edu.cn (Shandong Agricultural University)'
+WHERE IP LIKE '202.194.13%';
 
-
+UPDATE RDNS
+SET DOMAIN='ucsf.edu (University of California San Francisco)'
+WHERE IP LIKE '169.230.%';
 
 
 
@@ -966,12 +980,4 @@ SET DOMAIN = 'Cloud (nih.gov)'
 where IP in (
     '10.50.0.101', '10.50.120.37', '10.50.120.38', '10.50.120.39', '10.50.120.41', '10.50.120.42', '10.50.120.43', '10.50.120.45', '10.50.120.46', '10.50.120.47', '10.50.120.48', '10.50.120.54', '10.50.120.57', '10.50.120.58', '10.50.120.60', '10.50.120.61', '10.50.120.90', '10.50.3.94', '10.65.8.12', '10.65.8.16', '10.65.8.17', '10.65.8.18', '10.65.8.23', '10.65.8.29', '10.65.8.3', '10.65.8.37', '10.65.8.4', '10.65.8.42', '10.65.8.43', '10.65.8.49', '10.65.8.51', '10.65.8.52', '10.65.8.60', '10.65.8.65', '10.65.8.66', '10.65.8.70', '10.65.8.9', '10.70.120.12', '10.70.120.14', '10.70.120.16', '10.70.120.18', '10.70.120.19', '10.70.120.22', '10.70.120.27', '10.70.120.29', '10.70.120.74', '10.70.120.77', '10.70.120.79', '10.70.120.90', '10.70.126.101', '10.70.126.11', '10.70.126.12', '10.70.126.13', '10.70.126.14', '10.70.126.6', '10.70.127.129', '10.70.2.199', '10.70.2.240', '10.70.2.41', '10.70.2.83', '10.70.5.53' );
 
-
-SELECT IP AS UNKNOWN_IP,
-       SUM(BYTES)
-FROM SRA_SESSIONS
-WHERE DOMAIN = 'unknown'
-GROUP BY UNKNOWN_IP
-ORDER BY SUM(BYTES) DESC
-LIMIT 10;
 

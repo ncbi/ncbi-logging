@@ -24,6 +24,22 @@ gsutil -m rm -f "gs://strides_analytics/export/export.$DATE.*"
 
 bq rm -f strides_analytics.export
 
+bq show --schema strides_analytics.combined
+bq show --view strides_analytics.combined
+
+bq show --schema strides_analytics.gs_fix
+bq show --view strides_analytics.gs_fix
+
+bq show --schema strides_analytics.s3_fix
+bq show --view strides_analytics.s3_fix
+
+bq show --schema strides_analytics.sra_fix
+bq show --view strides_analytics.sra_fix
+
+bq show --schema strides_analytics.gs_prod
+bq show --schema strides_analytics.s3_prod
+bq show --schema strides_analytics.sra_prod
+
 bq query \
     --destination_table strides_analytics.export \
     --use_legacy_sql=false \
