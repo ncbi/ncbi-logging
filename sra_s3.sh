@@ -8,12 +8,14 @@
 #   huge numbers of objects
 # * We copy to ramdisk to avoid seeks, since we have thousands of small files
 
-rm -f "$LOGDIR/s3_prod/$YESTERDAY.combine"
+rm -f "$LOGDIR/s3_prod/$YESTERDAY.combine*"
 
 # VDB-3892 #for x in $(seq 7); do
 LOG_BUCKET="sra-pub-run-1-logs"
 DEST="$RAMDISK/S3-$LOG_BUCKET/$YESTERDAY"
 mkdir -p "$DEST"
+
+type -a aws
 
 # NOTE: Much faster to use aws ls than aws cp with include/excludes
 echo "Copying $LOG_BUCKET into $DEST ..."
@@ -54,7 +56,7 @@ time "$HOME/strides/s3tojson" < \
     2> "$LOGDIR/s3_prod/$YESTERDAY.err" | \
     gzip -9 -c > "$LOGDIR/s3_prod/$YESTERDAY.jsonl.gz" \
 
-time gzip -9 "$LOGDIR/s3_prod/$YESTERDAY.combine"
+time gzip -f -9 "$LOGDIR/s3_prod/$YESTERDAY.combine"
 
 #    ./s3_agent.py "$LOG_BUCKET" 'SRA@S3'
 
