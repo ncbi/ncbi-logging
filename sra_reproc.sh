@@ -66,6 +66,36 @@ for dir in "$PANFS"/sra_prod/201?????; do
     done
 done
 
+
+cd /panfs/pan1.be-md.ncbi.nlm.nih.gov/recoverlogs
+for days in $(seq 815); do
+    dayslash=$(date -d "2016-09-30 +$days days" +"%Y/%m/%d")
+    day=$(date -d "2016-09-30 +$days days" +"%Y%m%d")
+    echo $day
+#    ls -hl applog*/*/*/$dayslash/*/*access*gz
+
+    if [ ! -f "$TMPDIR/$day.jsonl.gz" ]; then
+        zcat applog*/*/*/$dayslash/*/*access*gz | \
+            "$HOME"/strides/nginxtojson  2> \
+            "$TMPDIR/$day.err" | \
+            gzip -9 -c > "$TMPDIR/$day.jsonl.gz" &
+    else
+        echo "Skipping $day"
+    fi
+
+    j=$(jobs | wc -l)
+    while [ "$j" -ge 90 ]; do
+        j=$(jobs | wc -l)
+        sleep 5
+    done
+
+done
+# ./applog3/ftp.http_archive/raw/2017/03/25/faspgap11/access_20170325.gz
+# ./applog4/ftp.http_archive/raw/2019/02/03/ftp21/access_20190203.gz
+
+
 wait
+
+
 
 

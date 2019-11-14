@@ -1,4 +1,5 @@
 #include "json.hpp"
+#include <algorithm>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -72,7 +73,7 @@ const char *sse_memchr_r ( const char *cur, const char *end )
 {
     size_t e = line.find ( c, s );
     if ( e == string::npos ) {
-        cerr << "can't find '" << c << "' in '" << line << "'\n";
+        cerr << "can't find '" << c << "' in '" << line << "'" << "after " << s << "\n";
         // exit ( 0 );
     }
     return e;
@@ -201,13 +202,43 @@ int main ( int argc, char *argv[] )
          * "gap-download.be-md.ncbi.nlm.nih.gov"
          * "GET
          * /sragap/A032F554-501A-428B-B7C0-0427AE242198/SRR1406330?tic=75D2D46C-AACE-457D-B02C-4AD6D4A17447
-         * HTTP/1.1" 206 131072 0.000
-         * "-"
+         * HTTP/1.1"
+         * 206 131072 0.000 "-"
          * "linux64 sra-toolkit fastq-dump.2.8"
          * "-"
          * port=443
          * rl=358
          */
+
+        /* 132.249.107.67
+         * -
+         * -
+         * [23/Mar/2017:08:52:14 -0400]
+         * sra-download.ncbi.nlm.nih.gov:443
+         * "GET
+         * /srapub/SRR1609033
+         * HTTP/1.1"
+         * 206 2986 "-"
+         * "linux64 sra-toolkit fastq-dump.2.8"
+         * xff="-"
+         * rt=0.000
+         * rl=276
+         */
+
+        /*
+         * 130.14.24.58
+         * -
+         * -
+         * [23/Mar/2017:00:00:04 -0400]
+         * sra-download.ncbi.nlm.nih.gov:443
+         * "HEAD /srapub/DRR034175 HTTP/1.1"
+         * 200 0 "-"
+         * "Python-urllib/2.7"
+         * xff="-"
+         * rt=0.000
+         * rl=133
+         */
+
 
         e = linefind ( line, ' ', s );
         if ( e == string::npos ) { continue; }
@@ -233,15 +264,16 @@ int main ( int argc, char *argv[] )
         if ( e == string::npos ) { continue; }
         string time = line.substr ( s + 1, e - s - 1 );
         if constexpr ( debug ) { cout << "time is:" << time << ".\n"; }
-        s = e + 3;
+        s = e + 2;
 
-        e = linefind ( line, '"', s );
+        e = linefind ( line, ' ', s );
         if ( e == string::npos ) { continue; }
-        string host_header = line.substr ( s, e - s );
+        string host_header = line.substr ( s, e - s  );
+        host_header.erase(std::remove(host_header.begin(), host_header.end(), '"'), host_header.end());
         if constexpr ( debug ) {
             cout << "host_header is:" << host_header << ".\n";
         }
-        s = e + 2;
+        s = e + 1;
 
         e = linefind ( line, '"', s + 1 );
         if ( e == string::npos ) { continue; }
@@ -283,12 +315,14 @@ int main ( int argc, char *argv[] )
         }
         s = e + 1;
 
-        e = linefind ( line, '"', s + 1 );
+        e = linefind ( line, '"', s + 1);
+        string user_agent;
         if ( e == string::npos ) { continue; }
-        string user_agent = line.substr ( s + 1, e - s - 1 );
+        user_agent = line.substr ( s + 1, e - s - 1 );
         if constexpr ( debug ) {
             cout << "user_agent is:" << user_agent << ".\n";
         }
+/*
         s = e + 2;
 
         e = linefind ( line, '"', s + 1 );
@@ -307,7 +341,7 @@ int main ( int argc, char *argv[] )
         if constexpr ( debug ) { cout << "rl is:" << rl << ".\n"; }
         // s = e + 1;
 
-
+*/
         struct tm tm {
         };
         if ( strptime ( time.data (), "%d/%b/%Y:%H:%M:%S %z", &tm )
@@ -316,9 +350,9 @@ int main ( int argc, char *argv[] )
             continue;
         }
         time_t ltm = timegm ( &tm );
-        if constexpr ( debug ) { cout << "time is: " << ltm << "\n"; }
+        if constexpr ( debug ) { cout << "time is now: " << ltm << "\n"; }
 
-        if ( total_time == "-" ) { total_time = "0"; }
+        if ( total_time == "-" || total_time == "\"-\"" ) { total_time = "0"; }
 
 
         s = request_uri.find ( ' ' );
@@ -328,20 +362,28 @@ int main ( int argc, char *argv[] )
         size_t sp = request_uri.find ( ' ' ); // Remove optional _HTTP/1...
         if ( sp != string::npos ) { request_uri.resize ( sp ); }
 
-        if constexpr ( debug ) { cerr << "request was\n " + request_uri; }
+        if constexpr ( debug ) { cerr << "request was '" + request_uri + "'\n"; }
 
         string version, sessid, phid, acc;
 
-        string url = "https://";
-        url += host_header;
-        url += request_uri;
+        string url;
+        if (request_uri.rfind("http",0)==0)
+        {
+            url=request_uri;
+        } else
+        {
+            url="https://";
+            url+= host_header ;
+            url+= request_uri;
+        }
+
         if ( !parse_url ( url, acc, version ) ) { continue; }
 
         uint64_t bytecount = 0;
         try {
             if ( bytes_sent != "-" ) { bytecount = stoull ( bytes_sent ); }
         } catch ( const invalid_argument &a ) {
-            cerr << "Not a number: " << bytes_sent << "\n";
+            cerr << "bytes_sent not a number: " << bytes_sent << "\n";
             bytecount = 0;
         } catch ( const out_of_range &a ) {
             cerr << "out_of_range : " << bytes_sent << "\n";
@@ -377,7 +419,7 @@ int main ( int argc, char *argv[] )
         try {
             sess.end = sess.start + stod ( total_time );
         } catch ( const invalid_argument &a ) {
-            cerr << "Not a number: " << total_time << "\n";
+            //cerr << "total_time not a number: " << total_time << "\n";
             sess.end = sess.start;
         } catch ( const out_of_range &a ) {
             cerr << "out_of_range: " << total_time << "\n";

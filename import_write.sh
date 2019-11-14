@@ -176,7 +176,7 @@ BEGIN;
             domain not like '%IANA Reserved%' and
             acc ~ '^[DES]RR[\d\.]{6,10}'
             union all
-            SELECT run AS acc, '2016-10-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2016-09-30 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc
@@ -199,7 +199,7 @@ BEGIN;
             acc ~ '^[DES]RR[\d\.]{6,10}'
             and source='NCBI'
             union all
-            SELECT run AS acc, '2016-10-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2016-09-30 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc
@@ -409,7 +409,7 @@ BEGIN;
         run,
         TO_TIMESTAMP(PUBLIC.RELEASEDATE,'YYYY-MM-DD HH24:MI:SS') AS released
     FROM PUBLIC
-    WHERE releasedate > '2016-10-01';
+    WHERE releasedate > '2016-09-30';
 
     CREATE TEMP TABLE last_download as
         SELECT acc, max(last) AS last
@@ -421,7 +421,7 @@ BEGIN;
             AND domain not like '%nih.gov%'
             and domain not like '%IANA Reserved%'
         UNION ALL
-            SELECT run AS acc, '2016-10-01 00:00:00'::timestamp AS last
+            SELECT run AS acc, '2016-09-30 00:00:00'::timestamp AS last
             FROM public
         ) AS roll2
         group by acc;
