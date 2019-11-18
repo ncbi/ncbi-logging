@@ -47,6 +47,8 @@ done
 
 echo "Loaded exports"
 
+cd $HOME/strides
+
 time psql -d strides_analytics  -U sa_prod_write << HERE
 SELECT count(*) AS export_count FROM export;
 SELECT count(*) AS export_objects FROM export_objects;
