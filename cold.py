@@ -22,19 +22,26 @@ hits = 0
 recs = 0
 warm = 0
 prevday = ""
+ipmisses = set()
 for line in sys.stdin:
     recs += 1
     warm += 1
     if warm == 1000000:
         hits = 0
         recs = 0
+        thawbytes = 0
+        storebytedays = 0
+        ipmisses=set()
 
-    line = line.strip()
-    (acc, start_ts, bytecount) = line.split(",")
-    bytecount = int(bytecount)
+    try:
+        line = line.strip()
+        (acc, ip, start_ts, bytecount) = line.split(",")
+        bytecount = int(bytecount)
     # print (acc, start_ts, bytecount)
     # start=date.fromisoformat(start_ts)
-    start = datetime.datetime.strptime(start_ts, "%Y-%m-%d %H:%M:%S")
+        start = datetime.datetime.strptime(start_ts, "%Y-%m-%d %H:%M:%S")
+    except Exception as e:
+        print("Bad line", line)
     # print (start)
 
     expired = False
@@ -58,6 +65,7 @@ for line in sys.stdin:
         bytecount = accsize.get(acc, bytecount)
         thawbytes += bytecount
         storebytedays += bytecount * duration
+        ipmisses.add(ip)
 
 #    if start != prevday:
 #        prevday = start
@@ -65,4 +73,5 @@ for line in sys.stdin:
 #        hits = 0
 #        recs = 0
 
-print("%d, %f, %d, %d" % (duration, hits / recs, thawbytes, storebytedays))
+print("%d, %f, %d, %d, %d" % (duration, hits / recs, thawbytes, storebytedays,
+    len(ipmisses)))
