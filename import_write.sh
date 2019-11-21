@@ -187,9 +187,9 @@ COMMIT;
 GRANT SELECT ON TABLE last_used TO PUBLIC;
 
 -- Create materialized views, AS tables in case we need to index them
-DROP TABLE IF EXISTS last_used_cold;
+DROP TABLE IF EXISTS last_used_ncbi;
 BEGIN;
-    CREATE TABLE last_used_cold as
+    CREATE TABLE last_used_ncbi as
         SELECT acc, max(last) AS last
         FROM  (
             SELECT acc, date_trunc('day', start_ts) AS last
@@ -207,7 +207,7 @@ BEGIN;
         group by acc
         order by acc;
 COMMIT;
-GRANT SELECT ON TABLE last_used_cold TO PUBLIC;
+GRANT SELECT ON TABLE last_used_ncbi TO PUBLIC;
 
 DROP TABLE IF EXISTS last_used_interval;
 BEGIN;
