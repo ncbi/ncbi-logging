@@ -61,7 +61,8 @@ bq query \
     NET.IPV4_TO_INT64(NET.SAFE_IP_FROM_STRING(ip)) ) AS ipint
   FROM
   `ncbi-sandbox-blast.strides_analytics.combined`
-  WHERE regexp_contains(acc, "[DES]RR[\\.0-9]{6,13}") '
+  WHERE regexp_contains(acc, "[DES]RR[\\.0-9]{6,13}")
+  AND start > "2016-01-01" '
 
 
 bq extract \
