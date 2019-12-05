@@ -21,6 +21,9 @@ storebytedays = 0
 hits = 0
 recs = 0
 warm = 0
+capmiss = 0
+compmiss = 0
+missacc = 0
 prevday = ""
 ipmisses = set()
 for line in sys.stdin:
@@ -31,14 +34,16 @@ for line in sys.stdin:
         recs = 0
         thawbytes = 0
         storebytedays = 0
-        ipmisses=set()
+        capmiss = 0
+        compmiss = 0
+        ipmisses = set()
 
     try:
         line = line.strip()
         (acc, ip, start_ts, bytecount) = line.split(",")
         bytecount = int(bytecount)
-    # print (acc, start_ts, bytecount)
-    # start=date.fromisoformat(start_ts)
+        # print (acc, start_ts, bytecount)
+        # start=date.fromisoformat(start_ts)
         start = datetime.datetime.strptime(start_ts, "%Y-%m-%d %H:%M:%S")
     except Exception as e:
         print("Bad line", line)
@@ -47,6 +52,7 @@ for line in sys.stdin:
     expired = False
     if acc not in expire:
         expired = True
+        compmiss += 1
         # print(acc, "never")
     else:
         diff = start - expire[acc]
@@ -54,6 +60,7 @@ for line in sys.stdin:
         # print (diff)
         if diff.total_seconds() > duration * 86400:
             expired = True
+            capmiss += 1
             # print(acc, "expired")
         else:
             hits += 1
@@ -62,6 +69,9 @@ for line in sys.stdin:
         expire[acc] = start
         #        if acc not in accsize:
         #            print("bad acc", acc, file=sys.stderr)
+        if acc not in accsize:
+            missacc += 1
+
         bytecount = accsize.get(acc, bytecount)
         thawbytes += bytecount
         storebytedays += bytecount * duration
@@ -73,5 +83,17 @@ for line in sys.stdin:
 #        hits = 0
 #        recs = 0
 
-print("%d, %f, %d, %d, %d" % (duration, hits / recs, thawbytes, storebytedays,
-    len(ipmisses)))
+out = (
+    str(duration),
+    str(hits),
+    str(recs),
+    str(hits / recs),
+    str(thawbytes),
+    str(storebytedays),
+    str(capmiss),
+    str(compmiss),
+    str(missacc),
+    str(len(ipmisses)),
+    str(len(expire)),
+)
+print(",".join(out))
