@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
 
 # gunicorn3 -t 120 -b 127.0.0.1:8000 --reload myapp:app
 

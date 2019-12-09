@@ -27,6 +27,7 @@ echo "Copied  $LOG_BUCKET  to  $DEST"
 cd "$DEST" || exit
 numfiles=$(find ./ -type f | wc -l)
 echo "Combining $numfiles files ..."
+unset combined
 declare -a combined
 for file in ./"$YESTERDAY_DASH"*; do
     combined+=("$file")

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
 import sys
 import urllib
 import datetime
@@ -10,7 +10,6 @@ from google.cloud import storage
 # export CLOUDSDK_CORE_PROJECT="research-sra-cloud-pipeline"
 # gsutil ls gs://sra-pub-src-1/
 # gsutil -u research-sra-cloud-pipeline ls -l gs://sra-pub-src-1/
-#!/usr/bin/env python3.7
 
 
 def main():
