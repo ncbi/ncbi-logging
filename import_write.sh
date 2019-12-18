@@ -101,7 +101,7 @@ CREATE TEMP TABLE ips_export AS SELECT distinct ip, ip_int
 
 DROP TABLE IF EXISTS ips_export2;
 CREATE TABLE ips_export2 as
-    SELECT ips_export.ip, ip_int, domain, city_name, country_code
+    SELECT ips_export.ip, ip_int, domain, city_name, country_code, region_name
     FROM ips_export, ip2location_db11_ipv4, rdns
     WHERE
         BOX(POINT(ip_FROM, ip_FROM), POINT(ip_to, ip_to)) @>
@@ -119,7 +119,7 @@ CREATE TABLE export_joined as
     SELECT status, cmds, bytecount,
         agent, cnt, acc, start_ts, end_ts, source,
         host,
-        city_name, country_code, domain,
+        city_name, country_code, region_name, domain,
         export.ip, export.ip_int
     FROM export, ips_export2
     WHERE
@@ -262,7 +262,7 @@ BEGIN;
     DROP TABLE IF EXISTS cloud_downloads;
     CREATE TABLE cloud_downloads AS
     SELECT source || ' -> ' || domain
-    || ' @ ' || city_name
+    || ' @ ' || city_name || ' ' || region_name
     || ', ' || country_code
     AS Path,
     count(*) AS Downloads, sum(bytecount) AS Bytes,
