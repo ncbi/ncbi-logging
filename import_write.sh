@@ -272,6 +272,9 @@ BEGIN;
     ( cmds like '%GET%' or cmds like '%HEAD%' )
     AND source!='NCBI'
     group by time, path;
+
+    UPDATE cloud_downloads SET path=REPLACE(path, ', US', '');
+
 COMMIT;
 
 BEGIN;
