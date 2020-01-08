@@ -23,7 +23,11 @@ zcat "$PANFS"/sra_prod/"$YESTERDAY"/*gz | \
     time "$HOME/strides/nginxtojson" 2> "$LOGDIR/sra_prod/$YESTERDAY.err" | \
     gzip -9 -c > "$LOGDIR/sra_prod/$YESTERDAY.jsonl.gz"
 
+lines=$(zcat "$LOGDIR/sra_prod/$YESTERDAY.jsonl.gz" | wc -l)
 
+if [[ "$lines" -lt 50000 ]]; then
+    mailx -s "sra_prod.sh: low linecount: $lines" vartanianmh@ncbi.nlm.nih.gov
+fi
 
 export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab431a.json
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
