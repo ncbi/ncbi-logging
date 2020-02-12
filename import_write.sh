@@ -49,7 +49,7 @@ echo "Loaded exports"
 
 cd $HOME/strides
 
-time psql -d strides_analytics  -U sa_prod_write << HERE
+time psql -e -d strides_analytics  -U sa_prod_write << HERE
 SELECT count(*) AS export_count FROM export;
 SELECT count(*) AS export_objects FROM export_objects;
 
@@ -443,7 +443,8 @@ BEGIN;
 
     DROP TABLE IF EXISTS mean_latency;
     CREATE TABLE mean_latency AS
-    SELECT AVG(delay) AS mean_delay from mean_time_use where delay > '0 days';
+    SELECT round(AVG(extract(day from delay))) AS mean_delay
+    FROM mean_time_use WHERE delay > '0 days';
 COMMIT;
 
 /*
