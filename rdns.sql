@@ -10,7 +10,7 @@ WHERE IP = '119.188.52.171';
 
 UPDATE RDNS
 SET DOMAIN = 'guangzhou.gd.cn (Guangzhou Beidian Network)'
-WHERE IP LIKE '218.19.145.%';
+WHERE IP LIKE '218.19.145.%' OR IP LIKE '218.17%';
 
 
 UPDATE RDNS
@@ -162,22 +162,14 @@ WHERE IP LIKE '165.194.%';
 
 UPDATE RDNS
 SET DOMAIN = 'China Telecom'
-WHERE IP LIKE '183.63.%';
+WHERE IP LIKE '183.63.%' OR IP LIKE '171.2%' OR IP LIKE '119.138.%'
+OR IP LIKE '101.110.119.%';
 
-
-UPDATE RDNS
-SET DOMAIN = 'China Telecom'
-WHERE IP LIKE '171.2%';
 
 
 UPDATE RDNS
 SET DOMAIN = 'Oklahoma State University'
 WHERE IP LIKE '192.31.83.%';
-
-
-UPDATE RDNS
-SET DOMAIN = 'China Telecom'
-WHERE IP LIKE '119.138.%';
 
 
 UPDATE RDNS
@@ -426,7 +418,7 @@ WHERE IP LIKE '65.196.%';
 
 UPDATE RDNS
 SET DOMAIN = 'level3.com (Level 3 Communications)'
-WHERE IP LIKE '4.16.%';
+WHERE IP LIKE '4.16.%' or IP LIKE '8.29.8%';
 
 
 UPDATE RDNS
@@ -841,6 +833,9 @@ UPDATE RDNS
 SET DOMAIN='ucsf.edu (University of California San Francisco)'
 WHERE IP LIKE '169.230.%';
 
+UPDATE RDNS
+SET DOMAIN='shmtu.edu.cn (Shanghai Maritime University)'
+WHERE IP LIKE '58.246.161.1%';
 
 
 
