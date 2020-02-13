@@ -239,6 +239,10 @@ int main ( int argc, char *argv[] )
          * rl=133
          */
 
+        /*
+          $remote_addr - $remote_user [$time_local] "$server_name" "$request" $status $body_bytes_sent $request_time "$http_referer" "$http_user_agent" "$http_x_forwarded_for" port=$server_port rl=$request_length
+         */
+
 
         e = linefind ( line, ' ', s );
         if ( e == string::npos ) { continue; }

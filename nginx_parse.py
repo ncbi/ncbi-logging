@@ -43,6 +43,7 @@ pattern1 = r"""
     \s (?P<content>[\S]+)
 """
 prog1 = re.compile(pattern1, re.VERBOSE)
+# $remote_addr - $remote_user [$time_local] "$server_name" "$request" $status $body_bytes_sent $request_time "$http_referer" "$http_user_agent" "$http_x_forwarded_for" port=$server_port rl=$request_length
 
 # 193.62.122.61 - - [21/Aug/2018:00:18:10 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /traces/era4/ERR/ERR260/ERR260173 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.1" "-" port=443 rl=293
 # 14.204.63.15 - - [11/Dec/2018:00:19:17 -0500] "sra-download.ncbi.nlm.nih.gov" "GET /traces/sra8/SRR/000730/SRR747964 HTTP/1.1" 206 1757757162 10245.774 "-" "" "-" port=443 rl=186

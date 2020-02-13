@@ -38,16 +38,17 @@ for line in sys.stdin:
         compmiss = 0
         ipmisses = set()
 
+    line = line.strip()
     try:
-        line = line.strip()
         (acc, ip, start_ts, bytecount) = line.split(",")
         bytecount = int(bytecount)
         # print (acc, start_ts, bytecount)
         # start=date.fromisoformat(start_ts)
-        start = datetime.datetime.strptime(start_ts, "%Y-%m-%d %H:%M:%S")
     except Exception as e:
         print("Bad line", line)
+        continue
     # print (start)
+    start = datetime.datetime.strptime(start_ts, "%Y-%m-%d %H:%M:%S")
 
     expired = False
     if acc not in expire:
