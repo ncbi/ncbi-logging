@@ -9,7 +9,7 @@ SELECT
   MIN(TIMESTAMP_MILLIS(CAST(time_micros/1000 AS int64))) AS `start`,
   MAX(TIMESTAMP_MILLIS(CAST((time_micros+time_taken_micros)/ 1000 AS int64))) AS `end`,
   REPLACE(
-    REPLACE(SUBSTR(cs_user_agent, 0, 64),",gzip(gfe)",""),
+    REPLACE(SUBSTR(cs_user_agent, 0, 70),",gzip(gfe)",""),
     "-head", "") AS agent,
   COUNT(*) AS cnt,
   REGEXP_EXTRACT(cs_uri, r"[DES]RR[0-9]{6,8}") AS acc,

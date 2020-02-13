@@ -394,6 +394,7 @@ int main ( int argc, char *argv[] )
             bytecount = 0;
         }
 
+        // TODO: Check largest accession
         if (bytecount > 1000000000000)
         {
             cerr << "bytecount too large: " << bytecount << ":" << bytes_sent << "\n";
@@ -401,6 +402,7 @@ int main ( int argc, char *argv[] )
         }
 
         // VDB-3961
+        // TODO: Fix parsing
         size_t phloc=user_agent.find("(phid=");
         if ( phloc != string::npos ) {
             phid=user_agent.substr(phloc+6,10);
@@ -409,7 +411,7 @@ int main ( int argc, char *argv[] )
 
         struct sess sess;
         sess.ip = remote_ip;
-        sess.agent = user_agent.substr ( 0, 64 );
+        sess.agent = user_agent.substr ( 0, 70 );
         sess.domain = host_header;
         sess.acc = acc;
         sess.status.emplace ( http_status );

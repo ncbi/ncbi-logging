@@ -472,7 +472,7 @@ int main ( int argc, char *argv[] )
 
         struct sess sess;
         sess.ip = remote_ip;
-        sess.agent = user_agent.substr ( 0, 64 );
+        sess.agent = user_agent.substr ( 0, 70 );
         sess.domain = host_header;
         sess.acc = acc;
         sess.status.emplace ( http_status );
