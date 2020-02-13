@@ -28,5 +28,6 @@ if [ "$LC" -lt 5000000 ]; then
     echo "Short file: $LC"
     cp "public_fix.csv.bak"  public_fix.csv
 fi
+gzip -9 public_fix.csv.bak &
 
 date
