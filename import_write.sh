@@ -52,6 +52,7 @@ cd $HOME/strides
 time psql -e -d strides_analytics  -U sa_prod_write << HERE
 SELECT count(*) AS export_count FROM export;
 SELECT count(*) AS export_objects FROM export_objects;
+SELECT min(start_ts) as min_date, max(start_ts) AS max_date from export;
 
 DROP TABLE IF EXISTS objects_load;
 --CREATE TABLE objects_load ( acc text, export_time timestamp, load_time timestamp, etag text, bytecount bigint, bucket text, source text, last_modified timestamp, storage_class text, md5 text);
@@ -94,6 +95,15 @@ BEGIN;
 END;
 SELECT COUNT(*) AS Cloud_Objects from cloud_objects;
 
+
+DROP TABLE IF EXISTS missing_ips;
+CREATE TABLE missing_ips AS
+    SELECT distinct export.ip
+    FROM export
+    LEFT JOIN rdns ON export.ip=rdns.ip
+    where rdns.ip IS NULL;
+
+INSERT INTO RDNS (ip, domain) SELECT ip, 'unknown' FROM missing_ips ;
 
 CREATE TEMP TABLE ips_export AS SELECT distinct ip, ip_int
     FROM export
