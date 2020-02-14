@@ -39,6 +39,13 @@ psql << USAGE
     count(*) as recs, sum(cnt) as sumcnt, count(distinct ip) as distips
     from cloud_sessions
     group by source;
+
+    select ip, sum(bytecount) as bytes
+    from cloud_sessions
+    where domain like '%known%'
+    group by ip
+    order by bytes desc
+    limit 10;
 USAGE
 
 #e4defrag -v ~/pgdata/ >> ~/defrag.log 2>&1 &
@@ -62,5 +69,8 @@ pg_dump -U sa_prod_write -d strides_analytics | \
      xz -T 20 -c > "$PANFS/pg_dumps/pg_dump_sa.$DATE.xz" &
 
 pip3.7 list --outdated
+
+du -shc $PANFS/ | sort -h > $PANFS/dus &
+du -shc $LOGDIR/ | sort -h > $LOGDIR/dus &
 
 date

@@ -12,7 +12,7 @@ SELECT
     REPLACE(SUBSTR(cs_user_agent, 0, 70),",gzip(gfe)",""),
     "-head", "") AS agent,
   COUNT(*) AS cnt,
-  REGEXP_EXTRACT(cs_uri, r"[DES]RR[0-9]{6,8}") AS acc,
+  REGEXP_EXTRACT(cs_uri, r"[DES]RR[0-9]{5,10}") AS acc,
   'GS' AS source
 FROM
   `ncbi-sandbox-blast.strides_analytics.gs_prod`

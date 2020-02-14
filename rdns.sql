@@ -128,6 +128,7 @@ SET DOMAIN = 'China Unicom'
 WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '14.204.%'
   OR IP LIKE '14.205.%'
+  OR IP LIKE '14.23.%'
   OR IP LIKE '119.4.%'
   OR IP LIKE '119.5.%'
   OR IP LIKE '119.6.%'
@@ -162,8 +163,11 @@ WHERE IP LIKE '165.194.%';
 
 UPDATE RDNS
 SET DOMAIN = 'China Telecom'
-WHERE IP LIKE '183.63.%' OR IP LIKE '171.2%' OR IP LIKE '119.138.%'
-OR IP LIKE '101.110.119.%';
+WHERE IP LIKE '183.63.%'
+OR IP LIKE '171.2%'
+OR IP LIKE '119.138.%'
+OR IP LIKE '101.110.119.%'
+OR IP LIKE '180.16%';
 
 
 
@@ -837,8 +841,13 @@ UPDATE RDNS
 SET DOMAIN='shmtu.edu.cn (Shanghai Maritime University)'
 WHERE IP LIKE '58.246.161.1%';
 
+UPDATE RDNS
+SET DOMAIN='tu-dresden.de (Dresden University of Technology)'
+WHERE IP LIKE '141.30.%';
 
-
+UPDATE RDNS
+SET DOMAIN='memphis.edu'
+WHERE IP LIKE '141.22%';
 
 
 

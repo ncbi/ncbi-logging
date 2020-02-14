@@ -287,8 +287,8 @@ BEGIN;
 
 COMMIT;
 
+DROP VIEW IF EXISTS sra_cloud;
 BEGIN;
-    DROP VIEW IF EXISTS sra_cloud;
     CREATE VIEW sra_cloud AS
     SELECT * from cloud_sessions
     WHERE source='NCBI';
@@ -663,7 +663,7 @@ BEGIN;
 COMMIT;
 
 GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
-GRANT SELECT ON VIEW  sra_cloud TO PUBLIC;
+GRANT SELECT ON       sra_cloud TO PUBLIC;
 GRANT SELECT ON TABLE rdns TO PUBLIC;
 GRANT SELECT ON TABLE public TO PUBLIC;
 GRANT SELECT ON TABLE cloud_objects TO PUBLIC;
