@@ -70,7 +70,7 @@ pg_dump -U sa_prod_write -d strides_analytics | \
 
 pip3.7 list --outdated
 
-du -shc $PANFS/ | sort -h > $PANFS/dus &
-du -shc $LOGDIR/ | sort -h > $LOGDIR/dus &
+du -shc $PANFS/* | sort -hr | head > $PANFS/dus &
+du -shc $LOGDIR/* | sort -hr | head > $LOGDIR/dus &
 
 date

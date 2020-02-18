@@ -849,6 +849,23 @@ UPDATE RDNS
 SET DOMAIN='memphis.edu'
 WHERE IP LIKE '141.22%';
 
+UPDATE RDNS
+SET DOMAIN='rr.com (Charter Communications)'
+WHERE IP LIKE '76.8%' OR
+IP LIKE '76.9%';
+
+UPDATE RDNS
+SET DOMAIN='kumc.edu (University of Kansas Medical Center)'
+WHERE IP LIKE '169.147.%';
+
+UPDATE RDNS
+SET DOMAIN='lanl.gov (Los Alamos National Laboratory)'
+WHERE IP LIKE '192.12.184.%';
+
+UPDATE RDNS
+SET DOMAIN='cnnic.cn (Beijing Zhongbangyatong Telecom Technology)'
+WHERE IP LIKE '124.207.%';
+
 
 
 
@@ -856,6 +873,7 @@ UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'unknown'
   AND (IP LIKE '66.249.%'
+       OR IP LIKE '34.94.%'
        OR IP LIKE '35.2%');
 
 
