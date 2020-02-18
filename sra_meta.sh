@@ -28,6 +28,7 @@ if [ "$LC" -lt 5000000 ]; then
     echo "Short file: $LC"
     cp "public_fix.csv.bak"  public_fix.csv
 fi
-gzip -9 public_fix.csv.bak &
+rm -f public_fix.csv.bak.gz rna-seq.csv.gz metagenomes.csv.gz carb.csv.gz foodborne.csv.gz
+gzip -9 public_fix.csv.bak rna-seq.csv metagenomes.csv carb.csv foodborne.csv.gz &
 
 date
