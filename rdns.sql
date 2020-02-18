@@ -866,6 +866,18 @@ UPDATE RDNS
 SET DOMAIN='cnnic.cn (Beijing Zhongbangyatong Telecom Technology)'
 WHERE IP LIKE '124.207.%';
 
+UPDATE RDNS
+SET DOMAIN='uohyd.ac.in (University of Hyderabad)'
+WHERE IP LIKE '14.139.69.%';
+
+UPDATE RDNS
+SET DOMAIN='nebraska.edu (University of Nebraska-Lincoln)'
+WHERE IP LIKE '129.93.%';
+
+UPDATE RDNS
+SET DOMAIN='lrz.ed (Leibniz Supercomputing Center)'
+WHERE IP LIKE '129.187.%';
+
 
 
 
