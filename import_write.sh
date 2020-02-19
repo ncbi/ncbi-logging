@@ -47,7 +47,7 @@ done
 
 echo "Loaded exports"
 
-cd $HOME/strides
+cd "$HOME/strides" || exit
 
 time psql -e -d strides_analytics  -U sa_prod_write << HERE
 SELECT count(*) AS export_count FROM export;
@@ -290,7 +290,7 @@ COMMIT;
 DROP VIEW IF EXISTS sra_cloud;
 BEGIN;
     CREATE VIEW sra_cloud AS
-    SELECT * from cloud_sessions
+    SELECT domain, start_ts, bytecount from cloud_sessions
     WHERE source='NCBI';
 COMMIT;
 
