@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import json
 import os
 import psycopg2
@@ -25,6 +26,32 @@ def editdist(str1, str2):
         distances = distances_
     return distances[-1]
 
+def strtodt(str1):
+    try:
+        start = datetime.datetime.strptime(str1, "%Y-%m-%d %H:%M:%S.%f%z")
+        return start
+    except ValueError:
+        pass
+
+    try:
+        start = datetime.datetime.strptime(str1, "%Y-%m-%d %H:%M:%S.%z")
+        return start
+    except ValueError:
+        pass
+
+    try:
+        start = datetime.datetime.strptime(str1, "%Y-%m-%d %H:%M:%S.%f")
+        return start
+    except ValueError:
+        pass
+
+    try:
+        start = datetime.datetime.strptime(str1, "%Y-%m-%d %H:%M:%S")
+        return start
+    except ValueError:
+        pass
+
+    return None
 
 def pctdiff(str1, str2):
     if str1 == str2:
@@ -32,6 +59,8 @@ def pctdiff(str1, str2):
 
     str1 = str(str1)
     str2 = str(str2)
+    dt1=strtodt(str1)
+    dt2=strtodt(str2)
     if str1.isnumeric() and str2.isnumeric():
         l1 = int(str1)
         l2 = int(str2)
@@ -40,6 +69,11 @@ def pctdiff(str1, str2):
         diff = (max(l1, l2) - min(l1, l2)) / avg
         pct = diff * 100.0
         return pct
+    #elif dt1 is not None and dt2 is not None:
+    elif dt1 and dt2:
+        td=dt2-dt1
+        #print(f"{str1} is {dt1}, delta is {td}")
+        return float(td.days) # Return pct as days
     else:
         pct = editdist(str1, str2)
         if pct <= 3:
@@ -58,7 +92,8 @@ with open(sys.argv[1]) as fin:
 with open(sys.argv[2]) as fin:
     new = json.loads(fin.read())
 
-print("tables not in both:" + str(set(old).difference(set(new))))
+if len(old)!=len(new):
+    print("tables not in both:" + str(set(old).difference(set(new))))
 
 tables = set(new).intersection(set(old))
 for table in tables:
@@ -71,16 +106,20 @@ for table in tables:
         newmax = new[table][col]["max"]
 
         countpct = pctdiff(oldcount, newcount)
-        if countpct > PCT_THRESHOLD:
-            print(f"{table}.{col}.count\t{oldcount} != {newcount}\t{countpct:6.4}%")
-
         minpct = pctdiff(oldmin, newmin)
-        if minpct > PCT_THRESHOLD:
-            print(f"{table}.{col}.min\t{oldmin} != {newmin}\t{minpct:6.4}%")
-
         maxpct = pctdiff(oldmax, newmax)
-        if maxpct > PCT_THRESHOLD:
-            print(f"{table}.{col}.max\t{oldmax} != {newmax}\t{maxpct:6.4}%")
+        rpt=None
+        if countpct > PCT_THRESHOLD:
+            rpt=f"{table}.{col}.count\t{oldcount} != {newcount}\t{countpct:6.4}%"
+        elif minpct > PCT_THRESHOLD:
+            rpt=f"{table}.{col}.min\t{oldmin} != {newmin}\t{minpct:6.4}%"
+
+        elif maxpct > PCT_THRESHOLD:
+            rpt=f"{table}.{col}.max\t{oldmax} != {newmax}\t{maxpct:6.4}%"
+
+        if rpt:
+            flds=rpt.split('\t')
+            print(f"{flds[2]:8} {flds[0]:30} {flds[1]:20}")
 
 
 # print(str(old))
