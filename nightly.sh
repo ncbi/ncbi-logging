@@ -40,11 +40,11 @@ psql << USAGE
     from cloud_sessions
     group by source;
 
-    select ip, sum(bytecount) as bytes
+    select ip, sum(bytecount) as unknown_bytes
     from cloud_sessions
     where domain like '%known%'
     group by ip
-    order by bytes desc
+    order by unknown_bytes desc
     limit 10;
 USAGE
 
