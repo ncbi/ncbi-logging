@@ -145,4 +145,3 @@ GRANT EXECUTE ON FUNCTION inet_to_bigint(inet) TO public;
 -- 3::bigint,4,'t'::text);
 
 -- select add_sra(ips.ip, ips.ipint, accs.acc, agents.agent, domains.domain, res, start_ts, end_ts, bytes, cnt) from sra_bak, ips, accs, agents, domains where sra_bak.ip_id=ips.ip_id and sra_bak.acc_id=accs.acc_id and sra_bak.agent_id=agents.agent_id and sra_bak.domain=domains.domain_id;
-

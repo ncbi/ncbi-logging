@@ -152,7 +152,7 @@ for fname in sys.argv[1:]:
     for x in range(5000):
         print("Inserting %d rows # %d" % (rowcount, x))
         curs.executemany(
-            """INSERT INTO access 
+            """INSERT INTO access
 	(source    , ip        , identd    , userid    , finishtime, site      , request   , status    , size      , content   )
 	VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
             rows,

@@ -528,4 +528,3 @@ from export, ips, rdns, ip2location_db11
 where
     box(point(ip_from,ip_from),point(ip_to,ip_to)) @>
     box(point (ipint,ipint), point(ipint,ipint))
-

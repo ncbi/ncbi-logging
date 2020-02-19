@@ -49,4 +49,3 @@ UPDATE accs set acc_desc='Blast DB Manifest' where acc='blastdb-manifest';
 UPDATE accs set acc_desc='Blast DB Metadata' where acc like 'fuse%';
 UPDATE accs set acc_desc='Blast DB Latest' where acc like 'latest-dir%';
 UPDATE accs set acc_desc='Conserved Domain Database' where acc like 'cdd%';
-

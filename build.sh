@@ -10,7 +10,7 @@ g++ --std=c++17 -O3 -march=native \
  -L../lib \
  -o nginxtojson \
  -lpthread  -lcurl \
- nginxtojson.cpp 
+ nginxtojson.cpp
 
 g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
@@ -20,7 +20,7 @@ g++ --std=c++17 -O3 -march=native \
  -L../lib \
  -o s3tojson \
  -lpthread  -lcurl \
- s3tojson.cpp 
+ s3tojson.cpp
 
 export LD_LIBRARY_PATH="$HOME/lib:$LD_LIBRARY_PATH"
 zcat "$PANFS"/s3_prod/20190731.combine.gz | head -n 10000 | \

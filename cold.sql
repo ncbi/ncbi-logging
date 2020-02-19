@@ -248,5 +248,3 @@ for days in $(seq 180); do
     cat $TMP/cold.csv | ./cold.py $days >> cold.csv &
     sleep 2
 done
-
-
