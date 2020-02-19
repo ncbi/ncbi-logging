@@ -49,7 +49,7 @@ WHERE IP LIKE '134.192.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'chinanet.cn.net'
+SET DOMAIN = 'chinanet.cn.net (ChinaNEtCenter)'
 WHERE IP LIKE '222.178.%'
   OR IP LIKE '218.9%'
   OR IP LIKE '59.50.85.%'
@@ -57,7 +57,11 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '219.138.%'
   OR IP LIKE '219.139.%'
   OR IP LIKE '219.140.%'
-  OR IP LIKE '119.79.%';
+  OR IP LIKE '119.79.%'
+  OR IP LIKE '180.160.%'
+  OR IP LIKE '180.161.%'
+  OR IP LIKE '220.243.135.%'
+  OR IP LIKE '14.23.%';
 
 
 UPDATE RDNS
@@ -81,14 +85,6 @@ SET DOMAIN = 'cityu.edu.hk'
 WHERE IP LIKE '144.214.37.%';
 
 
-UPDATE RDNS
-SET DOMAIN = 'ChinaNetCenter'
-WHERE IP LIKE '220.243.135.%';
-
-
-UPDATE RDNS
-SET DOMAIN = 'ChinaNetCenter'
-WHERE IP LIKE '220.243.136.%';
 
 
 UPDATE RDNS
@@ -187,14 +183,12 @@ WHERE IP LIKE '137.132.%' or ip like '155.69.%';
 
 UPDATE RDNS
 SET DOMAIN = 'modares.acir (Tarbiat-Modares University'
-WHERE DOMAIN = 'unknown'
-  AND IP LIKE '194.225.1%';
+WHERE IP LIKE '194.225.1%';
 
 
 UPDATE RDNS
 SET DOMAIN = 'mitre.org (MITRE)'
-WHERE DOMAIN = 'unknown'
-  AND IP LIKE '192.80.55.%';
+WHERE IP LIKE '192.80.55.%';
 
 
 UPDATE RDNS
@@ -411,8 +405,7 @@ OR IP LIKE '165.112.%';
 
 UPDATE RDNS
 SET DOMAIN = 'xlate.ufl.edu (University of Florida)'
-WHERE DOMAIN = 'unknown'
-  AND IP LIKE '128.227.%';
+WHERE IP LIKE '128.227.%';
 
 
 UPDATE RDNS
@@ -878,6 +871,9 @@ UPDATE RDNS
 SET DOMAIN='lrz.ed (Leibniz Supercomputing Center)'
 WHERE IP LIKE '129.187.%';
 
+UPDATE RDNS
+SET DOMAIN='ucla.edu'
+where IP LIKE '164.67.%';
 
 
 

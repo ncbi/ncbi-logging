@@ -6,7 +6,7 @@
 echo "Starting"
 
 psql -h localhost -d grafana -t -X -c 'select ips.ip  from ips left join rdns on ips.ip=rdns.ip where rdns.ip is null' > ips.new
-psql -d strides_analytics -U sa_prod_write -t -X -c "select * from missing_ips where ip like '%.%.%.%'" > ips.missing
+psql -d strides_analytics -U sa_prod_write -t -X -c "select ip from missing_ips where ip like '%.%.%.%'" > ips.missing
 
 
 # insert into rdns (ip, domain) select ips.ip, 'unknown' from ips left join rdns on ips.ip=rdns.ip where rdns.ip is null
