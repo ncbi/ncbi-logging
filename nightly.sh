@@ -63,8 +63,7 @@ USAGE
 ./import_write.sh >> ~/import_write.log 2>&1
 
 ./table_stats.py > "$LOGDIR/table_stats.$DATE" 2>/dev/null
-./stats_compare.py "$LOGDIR/table_stats.$YESTERDAY" "$LOGDIR/table_stats.$DATE"
-> "$LOGDIR/stats_compare.$DATE"
+./stats_compare.py "$LOGDIR/table_stats.$YESTERDAY" "$LOGDIR/table_stats.$DATE" > "$LOGDIR/stats_compare.$DATE"
 
 pg_dump -h localhost -d grafana | \
      xz -T 20 -c > "$PANFS/pg_dumps/pg_dump.$DATE.xz" &
@@ -74,7 +73,7 @@ pg_dump -U sa_prod_write -d strides_analytics | \
 
 pip3.7 list --outdated
 
-du -shc $PANFS/* | sort -hr | head > $PANFS/dus &
-du -shc $LOGDIR/* | sort -hr | head > $LOGDIR/dus &
+du -shc "$PANFS"/* | sort -hr | head > "$PANFS/dus" &
+du -shc "$LOGDIR"/* | sort -hr | head > "$LOGDIR/dus" &
 
 date
