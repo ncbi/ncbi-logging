@@ -49,7 +49,7 @@ WHERE IP LIKE '134.192.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'chinanet.cn.net (ChinaNEtCenter)'
+SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
   OR IP LIKE '218.9%'
   OR IP LIKE '59.50.85.%'
@@ -60,6 +60,7 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '119.79.%'
   OR IP LIKE '180.160.%'
   OR IP LIKE '180.161.%'
+  OR IP LIKE '101.81.%'
   OR IP LIKE '220.243.135.%'
   OR IP LIKE '14.23.%';
 
@@ -263,7 +264,7 @@ WHERE DOMAIN LIKE '%dtu.dk%';
 
 UPDATE RDNS
 SET DOMAIN = 'nig.ac.jp (Japan National Institute of Genetics)'
-WHERE IP LIKE '133.39.%';
+WHERE IP LIKE '133.39.%' OR IP LIKE '133.103.%';
 
 
 UPDATE RDNS
@@ -669,7 +670,7 @@ WHERE IP LIKE '38.142.232.%' or IP LIKE '65.126.68.%';
 --WHERE IP LIKE '2604:c340:%';
 UPDATE RDNS
 SET DOMAIN = 'utah.edu (University of Utah)'
-where IP LIKE '155.101.%';
+where IP LIKE '155.101.%' OR IP LIKE '204.99.128.%';
 
 UPDATE RDNS
 SET DOMAIN = 'ohsu.edu (Oregon Health & Science University)'
@@ -874,6 +875,15 @@ WHERE IP LIKE '129.187.%';
 UPDATE RDNS
 SET DOMAIN='ucla.edu'
 where IP LIKE '164.67.%';
+
+UPDATE RDNS
+SET DOMAIN='rochester.edu (University of Rochester)'
+WHERE IP LIKE '128.151.%';
+
+UPDATE RDNS
+SET DOMAIN='oath.com (Yahoo/Oath Holdings)'
+WHERE IP LIKE '68.180.2%';
+
 
 
 

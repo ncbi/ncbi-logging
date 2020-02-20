@@ -406,7 +406,7 @@ int main ( int argc, char *argv[] )
         }
         // s = e + 1;
         if ( tls_version.rfind ( "TLSv1" ) != 0 ) {
-            cerr << " no TLS version: " << tls_version << "\n";
+            cerr << " no TLS version: " << line << "\n";
             continue;
         }
 

@@ -146,7 +146,7 @@ BEGIN;
     ALTER TABLE export_joined RENAME TO cloud_sessions;
 COMMIT;
 GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
-DROP TABLE IF EXISTS cloud_sessions_bak;
+DROP TABLE IF EXISTS cloud_sessions_bak CASCADE;
 
 -- TODO FIX: VDB-3989
 --UPDATE cloud_sessions set source='NCBI' where source='SRA';
@@ -287,7 +287,6 @@ BEGIN;
 
 COMMIT;
 
-DROP VIEW IF EXISTS sra_cloud;
 BEGIN;
     CREATE VIEW sra_cloud AS
     SELECT domain, start_ts, bytecount from cloud_sessions
