@@ -121,7 +121,7 @@ WHERE IP LIKE '36.1%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'China Unicom'
+SET DOMAIN = 'chinaunicom.cn (China Unicom Henan Province)'
 WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '14.204.%'
   OR IP LIKE '14.205.%'
@@ -130,6 +130,7 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '119.5.%'
   OR IP LIKE '119.6.%'
   OR IP LIKE '119.7.%'
+  OR IP LIKE '61.158.%'
   OR IP LIKE '60.12.%';
 
 
@@ -290,7 +291,9 @@ OR IP LIKE '155.37.%';
 
 UPDATE RDNS
 SET DOMAIN = 'psu.edu (Penn State University)'
-WHERE IP LIKE '128.118.%';
+WHERE IP LIKE '128.118.%'
+OR IP LIKE '104.38%'
+OR IP LIKE '104.39%';
 
 
 UPDATE RDNS
@@ -884,7 +887,9 @@ UPDATE RDNS
 SET DOMAIN='oath.com (Yahoo/Oath Holdings)'
 WHERE IP LIKE '68.180.2%';
 
-
+UPDATE RDNS
+SET DOMAIN='au.dk (Aarhus University)'
+WHERE IP LIKE '130.225.3%';
 
 
 UPDATE RDNS
@@ -892,6 +897,10 @@ SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'unknown'
   AND (IP LIKE '66.249.%'
        OR IP LIKE '34.94.%'
+       OR IP LIKE '34.6%'
+       OR IP LIKE '34.7%'
+       OR IP LIKE '34.8%'
+       OR IP LIKE '34.9%'
        OR IP LIKE '35.2%');
 
 
