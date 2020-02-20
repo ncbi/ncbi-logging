@@ -405,6 +405,7 @@ int main ( int argc, char *argv[] )
             cout << "tls_version is:" << tls_version << ".\n";
         }
         // s = e + 1;
+        // Usually S3.TRANSITION_GDA.OBJECT, moving to Glacier Deep
         if ( tls_version.rfind ( "TLSv1" ) != 0 ) {
             cerr << " no TLS version: " << line << "\n";
             continue;
