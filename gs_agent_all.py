@@ -35,6 +35,18 @@ BLAST_DBS = {
     "landmark_v5.pin",
     "ref_viroids_rep_genomes_v5.nin",
     "ref_viruses_rep_genomes_v5.nin",
+    "nr.ptf",
+    "nt.ptf",
+    "pdbnt.pos",
+    "taxdb.btd",
+    "swissprot.pog",
+    "landmark.pin",
+    "GCF_000001405.38_top_level.00.nsd",
+    "GCF_000001635.24_top_level.00.nsd",
+    "pdb_v5.pos",
+    "ref_viroids_rep_genomes_v5.nin",
+    "ref_viruses_rep_genomes_v5.nin",
+    "split-cdd.00.aux",
 }
 
 
