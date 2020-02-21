@@ -277,7 +277,8 @@ BEGIN;
     where
     ( cmds like '%GET%' or cmds like '%HEAD%' )
     AND source!='NCBI'
-    group by time, path;
+    group by time, path
+    order by bytes desc;
 
     UPDATE cloud_downloads SET path=REPLACE(path, ', US', '');
 

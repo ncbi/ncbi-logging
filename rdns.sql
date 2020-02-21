@@ -239,11 +239,6 @@ WHERE IP LIKE '140.247.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'poznan.pl'
-WHERE IP LIKE '150.%';
-
-
-UPDATE RDNS
 SET DOMAIN = 'ucsd.edu (UCSD) '
 WHERE IP LIKE '169.228.%';
 
@@ -911,6 +906,22 @@ WHERE IP LIKE '128.143.%';
 UPDATE RDNS
 SET DOMAIN='anu.edu.au (Australian National University)'
 WHERE IP LIKE '203.0.19.%';
+
+UPDATE RDNS
+SET DOMAIN='ethz.ch (Swiss Federal Institute of Technology Zurich)'
+WHERE IP LIKE '82.130.8%';
+
+UPDATE RDNS
+SET DOMAIN='init7.net (Switzerland Init Seven AG)'
+WHERE IP LIKE '81.6.39.%';
+
+UPDATE RDNS
+SET DOMAIN='partners.org (Massachusetts General Hospital)'
+WHERE IP LIKE '132.183.%';
+
+UPDATE RDNS
+SET DOMAIN='merck.com (Merck and Co)'
+WHERE IP LIKE '54.4%';
 
 
 
