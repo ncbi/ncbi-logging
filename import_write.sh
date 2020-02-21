@@ -148,25 +148,21 @@ COMMIT;
 GRANT SELECT ON TABLE cloud_sessions TO PUBLIC;
 DROP TABLE IF EXISTS cloud_sessions_bak CASCADE;
 
+-- FIXUPS
 -- TODO FIX: VDB-3989
 --UPDATE cloud_sessions set source='NCBI' where source='SRA';
 
---SELECT count(*) AS cloud_sessions_count FROM cloud_sessions;
-    SELECT SOURCE,
-    count(*) as recs, sum(cnt) as sumcnt, count(distinct ip) as distips
-    FROM CLOUD_SESSIONS
-    WHERE START_TS > NOW() - INTERVAL '2 DAY'
-    GROUP BY SOURCE;
+-- Some parser chopped this
+UPDATE cloud_sessions SET agent='s' || agent WHERE agent LIKE 'ra-toolkit %';
 
+-- Fix: IP2LOCATION gets this very wrong
+update cloud_sessions set city_name='Mountain View', country_code='US'
+where ip like '35.245.%';
 
 DROP index cloud_sessions_start;
 DROP index cloud_sessions_source;
 CREATE index cloud_sessions_start on cloud_sessions (start_ts);
 CREATE index cloud_sessions_source on cloud_sessions (source);
-
--- Fix: IP2LOCATION gets this very wrong
-update cloud_sessions set city_name='Mountain View', country_code='US'
-where ip like '35.245.%';
 
 BEGIN;
     delete from public;

@@ -406,6 +406,15 @@ SET DOMAIN = 'nih.gov (NIH)'
 WHERE IP LIKE '128.231.%' OR IP LIKE '156.40.2%'
 OR IP LIKE '165.112.%';
 
+UPDATE RDNS
+SET DOMAIN = 'AWS (nih.gov)'
+WHERE IP in (
+'18.204.214.171',
+'52.54.203.43',
+'18.209.227.133'
+'54.80.162.14',
+'34.229.225.83'
+);
 
 UPDATE RDNS
 SET DOMAIN = 'xlate.ufl.edu (University of Florida)'
