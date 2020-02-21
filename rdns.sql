@@ -732,7 +732,8 @@ WHERE IP like '211.67.3%';
 
 UPDATE RDNS
 SET DOMAIN='UPenn.edu (University of Pennsylvania)'
-WHERE IP like '128.91.%';
+WHERE IP like '128.91.%'
+OR IP LIKE '130.91.%';
 
 UPDATE RDNS
 SET DOMAIN='mcgill.ca (McGill University)'
@@ -802,7 +803,10 @@ WHERE IP LIKE '192.12.187.%';
 
 UPDATE RDNS
 SET DOMAIN='Alibaba Cloud (alibaba.com)'
-WHERE IP LIKE '47.25%';
+WHERE IP LIKE '47.25%'
+OR IP LIKE '47.116.%'
+OR IP LIKE '101.132.%'
+OR IP LIKE '101.133.%';
 
 UPDATE RDNS
 SET DOMAIN='KU Leuven (kuleuven.be)'
@@ -899,6 +903,16 @@ WHERE IP LIKE '68.180.2%';
 UPDATE RDNS
 SET DOMAIN='au.dk (Aarhus University)'
 WHERE IP LIKE '130.225.3%';
+
+UPDATE RDNS
+SET DOMAIN='virginia.edu (University of Virginia)'
+WHERE IP LIKE '128.143.%';
+
+UPDATE RDNS
+SET DOMAIN='anu.edu.au (Australian National University)'
+WHERE IP LIKE '203.0.19.%';
+
+
 
 
 UPDATE RDNS
