@@ -9,10 +9,10 @@ gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
     echo "Processing $LOG_BUCKET"
-    mkdir -p "$LOGDIR/$LOG_BUCKET"
-    gsutil -m rsync -r "gs://$LOG_BUCKET" "$LOGDIR/$LOG_BUCKET"
+    mkdir -p "$PANFS/gs_prod/$LOG_BUCKET"
+    gsutil -m rsync -r "gs://$LOG_BUCKET" "$PANFS/gs_prod/$LOG_BUCKET"
 
-    cd "$LOGDIR/$LOG_BUCKET" || exit
+    cd "$PANFS/gs_prod/$LOG_BUCKET" || exit
 
     for OBJ in *usage*; do
     # sra-pub-run-1_usage_2019_06_24_03_00_00_07378a0db72e87e0b4_v0
@@ -25,7 +25,7 @@ for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
             continue
         fi
 
-        DT="$LOGDIR/gs_prod/$DT"
+        DT="$PANFS/gs_prod/$DT"
 
         if [ ! -d "$DT" ]; then
             mkdir -p "$DT"
@@ -46,11 +46,11 @@ export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/requester-pays-key.json
 export CLOUDSDK_CORE_PROJECT="research-sra-cloud-pipeline"
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
-mkdir -p "$LOGDIR/gs_prod/objects"
+mkdir -p "$PANFS/gs_prod/objects"
 for x in $(seq 7); do
     "$HOME/strides/gs_lister.py" "sra-pub-run-$x" | \
         gzip -9 -c > \
-        "$LOGDIR/gs_prod/objects/$DATE.objects-$x.gz"
+        "$PANFS/gs_prod/objects/$DATE.objects-$x.gz"
 done
 
 
@@ -59,10 +59,9 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 
-gsutil -m rsync -r "$LOGDIR"/gs_prod \
-    gs://strides_analytics/gs_prod
+gsutil -m rsync -r "$PANFS/gs_prod"  gs://strides_analytics/gs_prod
 
-rsync -av "$LOGDIR"/gs_prod/ "$PANFS/gs_prod/"
+#rsync -av "$LOGDIR"/gs_prod/ "$PANFS/gs_prod/"
 
 echo "Done"
 date
