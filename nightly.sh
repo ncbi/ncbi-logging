@@ -36,7 +36,8 @@ psql << USAGE
     LIMIT 20;
 
     select source,
-    count(*) as recs, sum(cnt) as sumcnt, count(distinct ip) as distips
+    count(*) as recs, sum(cnt) as sumcnt, count(distinct ip) as distips,
+    max(start_ts) as max_ts
     from cloud_sessions
     group by source;
 
