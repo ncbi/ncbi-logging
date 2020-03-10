@@ -307,7 +307,7 @@ WHERE IP LIKE '211.69.141.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'ucdavis.edu (University of California, Davis)'
+SET DOMAIN = 'ucdavis.edu (University of California Davis)'
 WHERE IP LIKE '128.120.%';
 
 
@@ -581,7 +581,7 @@ WHERE IP LIKE '138.16.%';
 
 UPDATE RDNS
 SET DOMAIN = 'ut.ee (University of Tartu, Estonia)'
-WHERE IP LIKE '193.40.12.%';
+WHERE IP LIKE '193.40.12.%' OR IP LIKE '193.40.23.%';
 
 UPDATE RDNS
 SET DOMAIN = 'nevada.edu (Nevada System of Higher Education)'
@@ -756,7 +756,8 @@ where IP like '130.223.%';
 
 UPDATE RDNS
 SET DOMAIN='NC Biolabs (frontiernet.net)'
-where IP like '50.55.%';
+where IP like '50.55.%'
+or IP LIKE '50.45.%';
 
 UPDATE RDNS
 SET DOMAIN='moxnetworks (nantworks.com)'
@@ -922,6 +923,15 @@ WHERE IP LIKE '132.183.%';
 UPDATE RDNS
 SET DOMAIN='merck.com (Merck and Co)'
 WHERE IP LIKE '54.4%';
+
+UPDATE RDNS
+SET DOMAIN='ucr.edu (University of California Riverside)'
+WHERE IP LIKE '138.23.%';
+
+UPDATE RDNS
+SET DOMAIN='houstonmethodist.org (The Methodist Hospital)'
+where IP LIKE '206.83.48.%'
+OR IP LIKE '206.83.5%';
 
 
 

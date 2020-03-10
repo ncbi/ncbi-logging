@@ -9,36 +9,11 @@ gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
     echo "Processing $LOG_BUCKET"
-    mkdir -p "$PANFS/gs_prod/$LOG_BUCKET"
-    gsutil -m rsync -r "gs://$LOG_BUCKET" "$PANFS/gs_prod/$LOG_BUCKET"
+    mkdir -p "$PANFS/gs_prod/$YESTERDAY"
+    cd "$PANFS/gs_prod/$YESTERDAY" || exit
+    gsutil -m cp "gs://$LOG_BUCKET/*_$YESTERDAY_UNDER*_v0" .
 
-    cd "$PANFS/gs_prod/$LOG_BUCKET" || exit
-
-    for OBJ in *usage*; do
-    # sra-pub-run-1_usage_2019_06_24_03_00_00_07378a0db72e87e0b4_v0
-    # sra-pub-test-run-1_usage_2019_08_20_19_00_00_05bda8e9f03a3a158c_v0
-        DT=${OBJ//_}
-        if [[ "$DT" =~ 20[0-9]{6} ]]; then
-            DT=${BASH_REMATCH[0]}
-        else
-            echo "Can't parse $OBJ"
-            continue
-        fi
-
-        DT="$PANFS/gs_prod/$DT"
-
-        if [ ! -d "$DT" ]; then
-            mkdir -p "$DT"
-        fi
-        if [ ! -e "$DT/$OBJ.gz" ]; then
-            cp -n -v "$OBJ" "$DT"
-            gzip -f -9 "$DT/$OBJ"
-        fi
-
-    done
-
-#    ~/strides/gs_agent_all.py "$LOG_BUCKET" "SRA@GS"
-
+    find ./ -name "*_v0" -exec gzip -9 -f {} \;
     echo "Processed  $LOG_BUCKET"
 done
 

@@ -235,7 +235,7 @@ select
     downloads
     from total_dbgap
 
-
+\a
 \o cold.csv
 \f ','
 \t on
@@ -245,6 +245,6 @@ where bytecount > 0 and start_ts > '2010-01-01' and acc ~ '^[DES]RR[\d\.]{6,10}'
 order by start_ts, acc;
 
 for days in $(seq 180); do
-    cat $TMP/cold.csv | ./cold.py $days >> cold.csv &
+    cat /tmp/cold.csv | ~/strides/cold.py $days >> ~/cold_simulation.csv &
     sleep 2
 done

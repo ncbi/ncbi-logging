@@ -29,7 +29,8 @@ YESTERDAY_DASH=$(date -d "yesterday" "+%Y-%m-%d")
 export YESTERDAY_DASH
 YESTERDAY=${YESTERDAY_DASH//-}
 export YESTERDAY
-
+YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
+export YESTERDAY_UNDER
 
 cd /home/vartanianmh/strides || exit
 

@@ -72,6 +72,7 @@ for line in sys.stdin:
         #            print("bad acc", acc, file=sys.stderr)
         if acc not in accsize:
             missacc += 1
+            bytecount = 840 * 1024 * 1024  # Average accession is 840MB
 
         bytecount = accsize.get(acc, bytecount)
         thawbytes += bytecount
