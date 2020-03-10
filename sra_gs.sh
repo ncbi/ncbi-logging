@@ -17,6 +17,8 @@ for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
     echo "Processed  $LOG_BUCKET"
 done
 
+find "$PANFS/gs_prod" -name "*gstmp*" -exec rm -f {} \;
+
 export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/requester-pays-key.json
 export CLOUDSDK_CORE_PROJECT="research-sra-cloud-pipeline"
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
@@ -35,8 +37,6 @@ export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 
 gsutil -m rsync -r "$PANFS/gs_prod"  gs://strides_analytics/gs_prod
-
-#rsync -av "$LOGDIR"/gs_prod/ "$PANFS/gs_prod/"
 
 echo "Done"
 date
