@@ -18,6 +18,7 @@ for LOG_BUCKET in "sra-pub-logs-1" "sra-ca-logs-1"; do
 done
 
 find "$PANFS/gs_prod" -name "*gstmp*" -exec rm -f {} \;
+find "$PANFS"/gs_prod/2* -name "*storage*" -exec mv {} "$PANFS/gs_prod/storage" \;
 
 export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/requester-pays-key.json
 export CLOUDSDK_CORE_PROJECT="research-sra-cloud-pipeline"
