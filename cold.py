@@ -7,11 +7,12 @@ import datetime
 duration = int(sys.argv[1])
 
 accsize = {}
-with open("accsize.csv") as f:
+# with open("accsize.csv") as f:
+with open("all_the_runs.txt") as f:
     for line in f:
         line = line.strip()
-        (acc, size_mb) = line.split(",")
-        accsize[acc] = int(size_mb) * 1024 * 1024
+        (acc, size_mb) = line.split("\t")
+        accsize[acc] = int(size_mb)
 
 print("Loaded %d sizes" % len(accsize), file=sys.stderr)
 
@@ -73,6 +74,7 @@ for line in sys.stdin:
         if acc not in accsize:
             missacc += 1
             bytecount = 840 * 1024 * 1024  # Average accession is 840MB
+            # print(f"Unknown acc:{acc}",file=sys.stderr)
 
         bytecount = accsize.get(acc, bytecount)
         thawbytes += bytecount

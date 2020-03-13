@@ -245,6 +245,6 @@ where bytecount > 0 and start_ts > '2010-01-01' and acc ~ '^[DES]RR[\d\.]{6,10}'
 order by start_ts, acc;
 
 for days in $(seq 180); do
-    cat /tmp/cold.csv | ~/strides/cold.py $days >> ~/cold_simulation.csv &
+    nohup cat /tmp/cold.csv | ~/strides/cold.py $days >> ~/cold_simulation_new.csv &
     sleep 2
 done
