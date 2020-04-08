@@ -865,6 +865,10 @@ SET DOMAIN='kumc.edu (University of Kansas Medical Center)'
 WHERE IP LIKE '169.147.%';
 
 UPDATE RDNS
+SET DOMAIN='ksu.edu (Kansas State University)'
+where IP LIKE '129.130.%';
+
+UPDATE RDNS
 SET DOMAIN='lanl.gov (Los Alamos National Laboratory)'
 WHERE IP LIKE '192.12.184.%';
 
@@ -933,7 +937,13 @@ SET DOMAIN='houstonmethodist.org (The Methodist Hospital)'
 where IP LIKE '206.83.48.%'
 OR IP LIKE '206.83.5%';
 
+UPDATE RDNS
+SET DOMAIN='oist.jp (Okinawa Institute of Science and Technology)'
+where IP LIKE '203.181.243.%';
 
+UPDATE RDNS
+SET DOMAIN='moffitt.org (H. Lee Moffitt Cancer Center & Research Institute, Inc)'
+where IP LIKE '206.81.15$';
 
 
 UPDATE RDNS

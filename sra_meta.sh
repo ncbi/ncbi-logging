@@ -22,13 +22,13 @@ wget -q -a viral.log -O - 'https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?sav
 
 #6.5M
 cp public_fix.csv "public_fix.csv.bak"
-wget -q -a public.log -O - 'https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term="public"[Access]' | grep -v "^$" | ~/strides/public_fix.py  > public_fix.csv 2>> public_fix.log
+wget -q -a public.log -O - 'https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?save=efetch&db=sra&rettype=runinfo&term="public"[Access]' | grep -v "^$" | ~/strides/public_fix.py  > public_fix.csv 2>> ~/public_fix.log
 LC=$(wc -l < public_fix.csv)
-if [ "$LC" -lt 5000000 ]; then
+if [ "$LC" -lt 7249509 ]; then
     echo "Short file: $LC"
     cp "public_fix.csv.bak"  public_fix.csv
 fi
 rm -f public_fix.csv.bak.gz rna-seq.csv.gz metagenomes.csv.gz carb.csv.gz foodborne.csv.gz
-gzip -9 public_fix.csv.bak rna-seq.csv metagenomes.csv carb.csv foodborne.csv.gz &
+gzip -f -9 public_fix.csv.bak rna-seq.csv metagenomes.csv carb.csv foodborne.csv &
 
 date
