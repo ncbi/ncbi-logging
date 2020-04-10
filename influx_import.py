@@ -18,7 +18,9 @@
 import sys
 from datetime import date
 import datetime
+import time
 
+seq = time.time()
 for line in sys.stdin:
     line = line.strip()
     line = line.replace('"', "")
@@ -34,5 +36,6 @@ for line in sys.stdin:
     measurement = "nginx"
     tags = "ip=%s,host=%s" % (ip, host)
     fields = 'cmds="%s",url="%s"' % (cmd, url)
-    print("%s,%s %s" % (measurement, tags, fields))
+    print("%s,%s %s %d" % (measurement, tags, fields, seq * 1000000000))
+    seq += 1.0
 #    print(f"{measurement},f{tags} f{fields}")
