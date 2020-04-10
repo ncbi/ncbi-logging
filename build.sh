@@ -63,6 +63,15 @@ g++ --std=c++17 -O3 -march=native \
  -lpthread -lcurl \
  nginxtojson.cpp
 
+g++ --std=c++17 -O3 -march=native \
+ -Wall -Wextra -Wpedantic \
+ -flto \
+ -fprofile-use \
+ -I../include/ \
+ -L../lib \
+ -o nginxtoinflux \
+ -lpthread -lcurl \
+ nginxtoinflux.cpp
 
 
 # -fsanitize=address \
