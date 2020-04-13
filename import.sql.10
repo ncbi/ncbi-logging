@@ -1,0 +1,10 @@
+BEGIN;
+DROP TABLE IF EXISTS sra_cloud_downloads;
+CREATE TABLE sra_cloud_downloads AS
+SELECT date_trunc('day',
+                  start_ts) AS TIME,
+       sum(bytes) AS bytes,
+       count(*) AS downloads
+  FROM sra_cloud
+ GROUP BY "time";
+COMMIT;

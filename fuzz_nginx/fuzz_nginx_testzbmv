@@ -1,0 +1,2 @@
+130.14.28.140 - - [12/Jul/2019:02:11:55 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /MLST/1637.listeria.wgmlst.schema.1 HTTP/1.1" 200 5646805 3.195 "-" "Python-urllib/2.7" "-" port=443 rl=172
+13.56.21.171 - - [12/Jul/2019:08:31:49 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /_mt/mt.cgi HTTP/1.1" 301 162 0.000 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)" "-" port=80 rl=463

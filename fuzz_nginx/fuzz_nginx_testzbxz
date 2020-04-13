@@ -1,0 +1,2 @@
+13.56.21.171 - - [12/Jul/2019:08:31:51 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /scripts/c32web.exe/GetImage?ImageName=cart32.ini%00.gif HTTP/1.1" 301 162 0.000 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)" "-" port=80 rl=393
+130.14.28.7 - - [12/Jul/2019:19:10:09 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /srapub/ERR022446.vdbcache HTTP/1.1" 200 34442871 16.109 "-" "Python-urllib/2.7" "-" port=443 rl=163

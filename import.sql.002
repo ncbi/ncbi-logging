@@ -1,0 +1,26 @@
+DROP TABLE IF EXISTS export_joined;
+CREATE TABLE export_joined AS
+    SELECT status,
+        cmds,
+        bytecount,
+        agent,
+        cnt,
+        acc,
+        start_ts,
+        end_ts,
+        SOURCE,
+        HOST,
+        city_name,
+        country_code,
+        DOMAIN,
+        export.ip,
+        export.ip_int
+    FROM export,
+        ips_export2
+    WHERE export.ip_int = ips_export2.ip_int
+    ORDER BY SOURCE, start_ts;
+
+DROP TABLE export;
+SELECT count(*) AS export_joined_count FROM export_joined;
+
+

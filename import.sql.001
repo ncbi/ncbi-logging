@@ -1,0 +1,23 @@
+CREATE TEMP TABLE ips_export AS
+SELECT DISTINCT ip, ip_int FROM export;
+
+-- TODO: Left outer join, isnull for rdns
+DROP TABLE IF EXISTS ips_export2;
+CREATE TABLE ips_export2 AS
+    SELECT ips_export.ip,
+        ip_int,
+        DOMAIN,
+        city_name,
+        country_code
+    FROM ips_export,
+        ip2location_db11_ipv4,
+        rdns
+    WHERE box(point(ip_from, ip_from),
+            point(ip_to, ip_to)) @> box(POINT (ip_int,
+                                                ip_int), point(ip_int, ip_int))
+    AND rdns.ip = ips_export.ip ;
+
+SELECT count(*) AS ips_export2_count FROM ips_export2;
+
+CREATE INDEX ips_export2_ip ON ips_export2(ip);
+CREATE INDEX ips_export2_ipint ON ips_export2(ip_int);

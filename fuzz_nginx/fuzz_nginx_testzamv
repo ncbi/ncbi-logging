@@ -1,0 +1,2 @@
+130.14.28.32 - - [12/Jul/2019:00:13:00 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /sos/sra-pub-run-2/SRR999664/SRR999664.1 HTTP/1.1" 200 34361021 21.826 "-" "Python-urllib/2.7" "-" port=443 rl=177
+130.14.28.7 - - [12/Jul/2019:04:09:56 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /MLST/1637.listeria.wgmlst.schema.1 HTTP/1.1" 200 5646805 3.488 "-" "Python-urllib/2.7" "-" port=443 rl=172

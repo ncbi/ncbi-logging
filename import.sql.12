@@ -1,0 +1,33 @@
+BEGIN;
+DROP TABLE IF EXISTS last_used_cost;
+CREATE TABLE last_used_cost AS
+SELECT sum(CAST (size_mb AS INTEGER)) / 1024.0 AS gb,
+       CASE
+           WHEN date_trunc('day', age(LOCALTIMESTAMP, LAST)) < interval '30 days'  THEN 'downloaded in last 30 days'
+            WHEN date_trunc('day', age(LOCALTIMESTAMP, LAST)) > interval '180 days' THEN 'never downloaded'
+            ELSE 'downloaded 30..180 days ago'
+             END AS metric
+  FROM last_used,
+       PUBLIC
+ WHERE last_used.acc = public.run
+   AND to_timestamp(public.releasedate,
+                   'YYYY-MM-DD HH24:MI:SS') < CURRENT_DATE - INTERVAL '180 DAYS'
+ GROUP BY metric;
+DROP TABLE IF EXISTS storage_cost;
+CREATE TABLE storage_cost (CLASS text, savings double precision);
+INSERT INTO storage_cost
+SELECT 'Nearline/Infrequent' AS CLASS,
+       gb * 2.5
+  FROM last_used_cost
+ WHERE metric = 'never downloaded';
+INSERT INTO storage_cost
+SELECT 'Coldline/Glacier' AS CLASS,
+       gb * 3.6
+  FROM last_used_cost
+ WHERE metric = 'never downloaded';
+INSERT INTO storage_cost
+SELECT 'Coldline/Glacier Deep' AS CLASS,
+       gb * 3.91
+  FROM last_used_cost
+ WHERE metric = 'never downloaded';
+COMMIT;

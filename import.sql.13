@@ -1,0 +1,16 @@
+BEGIN;
+DROP TABLE IF EXISTS object_sizes;
+CREATE TABLE object_sizes AS
+SELECT lower(SOURCE) || '://' || bucket AS
+LOCATION,
+       sum(bytecount) AS bytes
+  FROM cloud_objects
+ WHERE load_time =
+        (SELECT max(load_time)
+          FROM cloud_objects
+       )
+ GROUP BY
+LOCATION
+ ORDER BY
+LOCATION;
+COMMIT;

@@ -1,0 +1,27 @@
+BEGIN;
+
+DROP TABLE IF EXISTS egress;
+
+CREATE TABLE egress AS
+SELECT date_trunc('day', start_ts) AS TIME,
+    SOURCE,
+       DOMAIN,
+       sum(bytecount) AS bytes
+FROM cloud_sessions
+WHERE (cmds LIKE '%GET%'
+       OR cmds LIKE '%HEAD%')
+  AND (cmds NOT LIKE '%POST%'
+       AND cmds NOT LIKE '%PUT%')
+  AND SOURCE IN ('GS',
+                 'S3')
+  AND ((SOURCE='S3'
+        AND DOMAIN NOT LIKE '%(AWS Amazon)%')
+       OR (SOURCE='GS'
+           AND DOMAIN NOT LIKE '%(GCP)%'))
+  AND domain not like '%nih.gov%'
+GROUP BY TIME, SOURCE, DOMAIN
+ORDER BY TIME;
+
+
+COMMIT;
+
