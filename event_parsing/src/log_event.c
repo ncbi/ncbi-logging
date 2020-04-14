@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -121,19 +121,123 @@ static bool valid_SRA( const t_str * acc )
     return true;
 }
 
+typedef enum ev_status
+{
+    e_ip = 0,
+
+    e_t_start,
+    e_t_day,
+    e_t_slash1,
+    e_t_month,
+    e_t_slash2,
+    e_t_year,
+    e_t_colon1,
+    e_t_hour,
+    e_t_colon2,
+    e_t_minutes,
+    e_t_colon3,
+    e_t_seconds,
+    e_t_space,
+    e_t_stop,
+
+    e_dom_start,
+    e_dom1,
+    e_dom,
+
+    e_req_start,
+    e_req_space1,
+    e_req_acc,
+    e_req_delim,
+    e_req_stop,
+
+    e_res1,
+    e_res,
+
+    e_bytes1,
+    e_bytes,
+
+    e_factor1,
+    e_factor,
+
+    e_dash3,
+    e_dash3_stop,
+
+    e_agent_start,
+    e_agent1,
+    e_agent,
+
+    e_ignore,
+    e_error
+} ev_status;
+
+static void print_status( ev_status status )
+{
+    switch( status )
+    {
+        case e_ip       : fprintf( stderr, "e_ip " ); break;
+
+        case e_t_start  : fprintf( stderr, "e_t_start " ); break;
+        case e_t_day    : fprintf( stderr, "e_t_day " ); break;
+        case e_t_slash1 : fprintf( stderr, "e_t_slash1 " ); break;
+        case e_t_month  : fprintf( stderr, "e_t_month " ); break;
+        case e_t_slash2 : fprintf( stderr, "e_t_slash2 " ); break;
+        case e_t_year   : fprintf( stderr, "e_t_year " ); break;
+        case e_t_colon1 : fprintf( stderr, "e_t_colon1 " ); break;
+        case e_t_hour   : fprintf( stderr, "e_t_hour " ); break;
+        case e_t_colon2 : fprintf( stderr, "e_t_colon2 " ); break;
+        case e_t_minutes: fprintf( stderr, "e_t_minutes " ); break;
+        case e_t_colon3 : fprintf( stderr, "e_t_colon3 " ); break;
+        case e_t_seconds: fprintf( stderr, "e_t_seconds " ); break;
+        case e_t_space  : fprintf( stderr, "e_t_space " ); break;
+        case e_t_stop   : fprintf( stderr, "e_t_stop " ); break;
+
+        case e_dom_start: fprintf( stderr, "e_dom_start " ); break;
+        case e_dom1     : fprintf( stderr, "e_dom1 " ); break;
+        case e_dom      : fprintf( stderr, "e_dom " ); break;
+
+        case e_req_start: fprintf( stderr, "e_req_start " ); break;
+        case e_req_space1:fprintf( stderr, "e_req_space1 " ); break;
+        case e_req_acc  : fprintf( stderr, "e_req_acc " ); break;
+        case e_req_delim: fprintf( stderr, "e_req_delim " ); break;
+        case e_req_stop : fprintf( stderr, "e_req_stop " ); break;
+
+        case e_res1     : fprintf( stderr, "e_res1 " ); break;
+        case e_res      : fprintf( stderr, "e_res " ); break;
+
+        case e_bytes1   : fprintf( stderr, "e_bytes1 " ); break;
+        case e_bytes    : fprintf( stderr, "e_bytes " ); break;
+
+        case e_factor1  : fprintf( stderr, "e_factor1 " ); break;
+        case e_factor   : fprintf( stderr, "e_factor " ); break;
+
+        case e_dash3    : fprintf( stderr, "e_dash3 " ); break;
+        case e_dash3_stop: fprintf( stderr, "e_dash3_stop " ); break;
+
+        case e_agent_start: fprintf( stderr, "e_agent_start " ); break;
+        case e_agent1   : fprintf( stderr, "e_agent1 " ); break;
+        case e_agent    : fprintf( stderr, "e_agent " ); break;
+
+        case e_ignore   : fprintf( stderr, "e_ignore " ); break;
+        case e_error    : fprintf( stderr, "e_error " ); break;
+
+        default : fprintf( stderr, "unknown %d ", status ); break;
+    }
+}
+
 bool extract_event( struct event_extractor * self,
                     const char * buffer,
                     size_t buffer_len,
-                    t_log_event * event )
+                    t_log_event * event,
+                    bool verbose
+                  )
 {
     if ( NULL == buffer || NULL == event )
         return false;
 
     const char * p = buffer;
     const char * p_end = p + buffer_len;
-    
-    
-    unsigned int status = 0;
+
+    ev_status status = e_ip;
     t_time_ints time_ints;
 
     t_str day     = { NULL, 0 };
@@ -155,70 +259,92 @@ bool extract_event( struct event_extractor * self,
     
     while ( p < p_end )
     {
+        char c = *p;
+        if ( verbose ) print_status( status );
         switch( status )
         {
-            /* IP-address */
-            case  0 :	if ( *p != ' ' ) event -> ip . n++; else status++; break;
+            /* IP-address >139.80.16.229< */
+            case e_ip           : if ( c != ' ' ) event -> ip . n++; else status = e_t_start; break;
 
-            /* date-time */
-            case  1 :	if ( *p == '[' ) status++; break;
-            case  2 :	day . p = p; day . n = 1; status++; break;
-            case  3 :   if ( *p == '/' ) status++; else day . n++; break;
-            case  4 :	month . p = p; month . n = 1; status++; break;
-            case  5 :   if ( *p == '/' ) status++; else month.n++; break;
-            case  6 :	year . p = p; year . n = 1; status++; break;
-            case  7 :   if ( *p == ':' ) status++; else year.n++; break;
-            case  8 :	hour . p = p; hour . n = 1; status++; break;
-            case  9 :	if ( *p == ':' ) status++; else hour.n++; break;
-            case 10 :	min . p = p; min . n = 1; status++; break;
-            case 11 :	if ( *p == ':' ) status++; else min.n++; break;
-            case 12 :	sec . p = p; sec . n = 1; status++; break;
-            case 13 :	if ( *p == ' ' ) status++; else sec . n++; break;
-            case 14 :	if ( *p == ']' ) status++; break;
-            
-            /* domain */
-            case 15 :	if ( *p == '"' ) status++; break;
-            case 16 :	event -> dom . p = p; event -> dom . n = 1; status++; break;
-            case 17 :	if ( *p != '"' ) event -> dom . n++; else status++; break;
+            /* date-time > - - [01/Jan/2020:02:50:24 -0500]< */
+            case e_t_start      : if ( c == '[' ) status = e_t_day; break;
+            case e_t_day        : day . p = p; day . n = 1; status = e_t_slash1; break;
+            case e_t_slash1     : if ( c == '/' ) status = e_t_month; else day . n++; break;
+            case e_t_month      : month . p = p; month . n = 1; status = e_t_slash2; break;
+            case e_t_slash2     : if ( c == '/' ) status = e_t_year; else month . n++; break;
+            case e_t_year       : year . p = p; year . n = 1; status = e_t_colon1; break;
+            case e_t_colon1     : if ( c == ':' ) status = e_t_hour; else year . n++; break;
+            case e_t_hour       : hour . p = p; hour . n = 1; status = e_t_colon2; break;
+            case e_t_colon2     : if ( c == ':' ) status = e_t_minutes; else hour . n++; break;
+            case e_t_minutes    : min . p = p; min . n = 1; status = e_t_colon3; break;
+            case e_t_colon3     : if ( c == ':' ) status = e_t_seconds; else min . n++; break;
+            case e_t_seconds    : sec . p = p; sec . n = 1; status = e_t_space; break;
+            case e_t_space      : if ( c == ' ' ) status = e_t_stop; else sec . n++; break;
+            case e_t_stop       : if ( c == ']' ) status = e_dom_start; break;
 
-            /* url -> accession */
-            case 18 :	if ( *p == '"' ) status++; break;
-            case 19 :	if ( *p == ' ' ) status++; break;
-            case 20 :	event -> acc . p = p; event -> acc . n = 1; status++; break;
-            case 21 :	if ( *p == ' ' || *p == '?' )
-                            status = 23;
-                        else if ( *p == '/' )
-                            status = 22;
-                        else 
-                            event -> acc . n++;
-                        break;
-            case 22 :	event -> acc . p = p; event -> acc . n = 1; status = 21; break;
-            case 23 :	if ( *p == '"' ) status++; break;
-            
-            /* result-code */
-            case 24 :	if ( *p != ' ' ) { event -> res . p = p; event -> res . n = 1; status++; } break;
-            case 25 :	if ( *p == ' ' ) status++; else event -> res . n++; break;
-            
-            /* byte-count */
-            case 26 :	if ( *p != ' ' ) { cnt.p = p; cnt.n = 1; status++; } break;
-            case 27 :	if ( *p == ' ' ) status++; else cnt.n++; break;
-            
-            /* skip empty fields */
-            case 28 :	if ( *p != ' ' ) status++; break;
-            case 29 :	if ( *p == ' ' ) status++; break;
-            case 30 :	if ( *p == '"' ) status++; break;
-            case 31 :	if ( *p == '"' ) status++; break;
-            case 32 :	if ( *p == '"' ) status++; break;
-            
-            /* agent */
-            case 33 :	event -> agnt.p = p; event -> agnt.n = 1; status++; break;
-            case 34 :	if ( *p == '"' ) status++; else event -> agnt.n++; break;
-            
-            /* ignore remaining fields */
-            case 35 :	p = ( p_end - 1 ); break;
+            /* domain > "sra-download.ncbi.nlm.nih.gov"< */
+            case e_dom_start    : if ( c == '"' ) status = e_dom1; break;
+            case e_dom1         : event -> dom . p = p; event -> dom . n = 1; status = e_dom; break;
+            case e_dom          : if ( c != '"' ) event -> dom . n++; else status = e_req_start; break;
+
+            /* url -> accession > "GET /traces/sra32/SRR/005807/SRR5946882 HTTP/1.1"< */
+            case e_req_start    : if ( c == '"' ) status = e_req_space1; break;
+            case e_req_space1   : if ( c == ' ' ) status = e_req_acc; break;
+            case e_req_acc      : event -> acc . p = p; event -> acc . n = 1; status = e_req_delim; break;
+            case e_req_delim    : if ( c == ' ' || c == '?' )
+                                    status = e_req_stop;
+                                  else if ( c == '/' )
+                                    status = e_req_acc;
+                                  else 
+                                    event -> acc . n++;
+                                  break;
+            case e_req_stop     : if ( c == '"' ) status = e_res1; break;
+
+            /* result-code > 206< */
+            case e_res1         : if ( c >= '0' && c <= '9' ) {
+                                    event -> res . p = p; event -> res . n = 1; status = e_res;
+                                  } break;
+
+            case e_res          : if ( c == ' ' )
+                                    status = e_bytes1;
+                                  else if ( c >= '0' && c <= '9' )
+                                    event -> res . n++;
+                                  else
+                                    status = e_error;
+                                  break;
+
+            /* byte-count > 32768< */
+            case e_bytes1       : if ( c >= '0' && c <= '9' ) {
+                                    cnt.p = p; cnt.n = 1; status = e_bytes;
+                                  } break;
+            case e_bytes        : if ( c == ' ' )
+                                    status = e_factor1;
+                                  else if ( c >= '0' && c <= '9' )
+                                    cnt . n++;
+                                  else
+                                    status = e_error;
+                                  break;
+
+            /* factor > 0.000< */
+            case e_factor1      : if ( c != ' ' ) status = e_factor; break;
+            case e_factor       : if ( c == ' ' ) status = e_dash3; break;
+
+            /* dash #3 > "-"< */
+            case e_dash3        : if ( c == '"' ) status = e_dash3_stop; break;
+            case e_dash3_stop   : if ( c == '"' ) status = e_agent_start; break;
+
+            /* agent > "linux64 sra-toolkit fastq-dump.2.9.1"< */
+            case e_agent_start  : if ( c == '"' ) status = e_agent1; break;
+            case e_agent1       : event -> agnt . p = p; event -> agnt . n = 1; status = e_agent; break;
+            case e_agent        : if ( c == '"' ) status = e_ignore; else event -> agnt . n++; break;
+
+            /* ignore remaining fields > "-" port=443 rl=293< */
+            case e_ignore       : p = ( p_end - 1 ); break; /* this will end the loop! */
         }
         p++;
     }
+
+    if ( verbose ) fprintf( stderr, "\n" );
 
     /* filter out NULL-ptr's if a event-parts are not present */
     if ( ( event -> ip . p == NULL ) ||
@@ -226,39 +352,85 @@ bool extract_event( struct event_extractor * self,
          ( hour . p == NULL ) || ( min . p == NULL ) || ( sec . p == NULL ) ||
          ( event -> dom . p == NULL ) || ( event -> acc . p == NULL ) ||
          ( event -> res . p == NULL ) || ( cnt . p == NULL ) || ( event -> agnt . p == NULL ) )
+    {
+        if ( verbose ) fprintf(  stderr, "event-part not present\n" );
         return false;
-
+    }
+    
     /* filter out invalid lengths of event-parts */
     if ( ( event -> ip . n < 7 ) || ( day . n == 0 ) || ( month . n == 0 ) || ( year . n == 0 ) ||
          ( hour . n == 0 ) || ( min . n == 0 ) || ( sec . n == 0 ) || ( event -> dom . n == 0 ) ||
          ( event -> acc . n < 9 ) || ( event -> res . n < 3 ) || ( cnt . n < 1 ) ||
          ( event -> agnt . n < 1 ) )
+    {
+        if ( verbose ) fprintf( stderr, "invalid length of event-part\n" );
         return false;
-
+    }
+    
     /* filter accessions not starting with SRR | DRR | ERR | NC_ */
     if ( !valid_SRA( &( event -> acc ) ) )
+    {
+        if ( verbose ) fprintf( stderr, "invalid accession '%.*s'\n", event -> acc . n, event -> acc . p );
         return false;
-    
+    }
+
     time_ints . day  = str_2_uint( &day );
-    if ( time_ints . day < 1 || time_ints . day > 31 ) return false;
+    if ( time_ints . day < 1 || time_ints . day > 31 )
+    {
+        if ( verbose ) fprintf( stderr, "invalid day: %d\n", time_ints . day );
+        return false;
+    }
 
     time_ints . month = month_str_2_n( &month );
-    if ( time_ints . month < 1 || time_ints . month > 12 ) return false;
+    if ( time_ints . month < 1 || time_ints . month > 12 )
+    {
+        if ( verbose ) fprintf( stderr, "invalid month: %d\n", time_ints . month );
+        return false;
+    }
     
     time_ints . year = str_2_uint( &year );
-    if ( time_ints . year < 1900 || time_ints . year > 2035 ) return false;
+    if ( time_ints . year < 1900 || time_ints . year > 2099 )
+    {
+        if ( verbose ) fprintf( stderr, "invalid year: %d\n", time_ints . year );
+        return false;
+    }
 
     time_ints . hour = str_2_uint( &hour );
-    if ( time_ints. hour > 23 ) return false;
+    if ( time_ints. hour > 23 )
+    {
+        if ( verbose ) fprintf( stderr, "invalid hour: %d\n", time_ints . hour );
+        return false;
+    }
 
     time_ints . min  = str_2_uint( &min );
-    if ( time_ints . min > 59 ) return false;
-    
+    if ( time_ints . min > 59 )
+    {
+        if ( verbose ) fprintf( stderr, "invalid minutes: %d\n", time_ints . min );
+        return false;
+    }
+
     time_ints . sec = str_2_uint( &sec );
-    if ( time_ints . sec > 59 ) return false;
+    if ( time_ints . sec > 59 )
+    {
+        if ( verbose ) fprintf( stderr, "invalid seconds: %d\n", time_ints . sec );
+        return false;
+    }
 
     event -> unix_date = to_unix_time( self, &time_ints );
     event -> num_bytes = str_2_ulong( &cnt );
-    
+
+    if ( verbose ) fprintf( stderr, "success!\n" );
     return true;
+}
+
+void print_event( const t_log_event * event )
+{
+    printf( "%.*s\t%.*s\t%.*s\t%.*s\t%u\t%u\n",
+        event -> ip . n, event -> ip . p,
+        event -> acc . n, event -> acc . p,
+        event -> res . n, event -> res . p,
+        event -> agnt . n, event -> agnt . p,
+        event -> unix_date,
+        event -> num_bytes
+        );
 }

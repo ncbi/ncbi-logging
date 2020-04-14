@@ -20,6 +20,10 @@ void destroy_event_extractor( struct event_extractor * self );
 bool extract_event( struct event_extractor * self,
                     const char * buffer,
                     size_t buffer_len,
-                    t_log_event * event );
+                    t_log_event * event,
+                    bool verbose
+                  );
+
+void print_event( const t_log_event * event );
 
 #endif
