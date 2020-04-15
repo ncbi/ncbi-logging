@@ -18,6 +18,16 @@ g++ --std=c++17 -O3 -march=native \
  -fprofile-generate \
  -I$HOME/include/ \
  -L$HOME/lib \
+ -o nginxtoinflux \
+ -lpthread  -lcurl \
+ nginxtoinflux.cpp
+
+g++ --std=c++17 -O3 -march=native \
+ -Wall -Wextra -Wpedantic \
+ -flto \
+ -fprofile-generate \
+ -I$HOME/include/ \
+ -L$HOME/lib \
  -o s3tojson \
  -lpthread  -lcurl \
  s3tojson.cpp
@@ -31,9 +41,20 @@ zcat \
     | head -n 10000 | \
     ./nginxtojson 2>&1 | sort > nginxtest.result
 
+zcat \
+    "$PANFS"/sra_prod/20190731/panfspan1.be-md.ncbi.nlm.nih.govapplog_db_tmpdatabaselogarchiveftp.httplocal_archive20190731srafiles34access.log_20190731.logbuff11.gz \
+    | head -n 10000 | \
+    ./nginxtoinflux 2>&1 | sort > nginxinfluxtest.result
+
 if ! diff nginxtest.result nginxtest.expected
 then
     echo "nginx diff failed"
+    exit 1
+fi
+
+if ! diff nginxinfluxtest.result nginxinfluxtest.expected
+then
+    echo "nginxinflux diff failed"
     exit 1
 fi
 
@@ -42,6 +63,7 @@ then
     echo "s3 diff failed"
     exit 1
 fi
+
 
 g++ --std=c++17 -O3 -march=native \
  -Wall -Wextra -Wpedantic \
@@ -89,11 +111,23 @@ clang-tidy -fix \
  -std=c++17 \ -I. -I$HOME/include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/
 
+clang-tidy -fix \
+ -checks='*,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg,-hicpp-vararg,-fuchsia-default-arguments,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay' \
+ nginxtoinflux.cpp -- \
+ -std=c++17 \ -I. -I$HOME/include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
+ -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/
+
 scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
  --std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic \
  -I. -I$HOME/include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
  -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/ \
  nginxtojson.cpp -L$HOME/lib -lpthread -lcurl
+
+scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
+ --std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic \
+ -I. -I$HOME/include -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/ \
+ -I/opt/ncbi/gcc/7.3.0/include/c++/7.3.0/x86_64-redhat-linux-gnu/ \
+ nginxtoinflux.cpp -L$HOME/lib -lpthread -lcurl
 
 scan-build --use-analyzer /usr/local/llvm/7.0.0/bin/clang g++ \
  --std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic \

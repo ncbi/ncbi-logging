@@ -16,8 +16,6 @@
 using std::cerr;
 using std::cout;
 using std::invalid_argument;
-using std::max;
-using std::min;
 using std::out_of_range;
 using std::set;
 using std::string;
@@ -237,7 +235,7 @@ int main ( int argc, char *argv[] )
             cout << "user_agent is:" << user_agent << ".\n";
         }
 
-        // TODO: Cache strptime?
+        // TODO(vartanianmh): Cache strptime?
         struct tm tm {
         };
         if ( strptime ( time.data (), "%d/%b/%Y:%H:%M:%S %z", &tm )
@@ -286,7 +284,7 @@ int main ( int argc, char *argv[] )
             bytecount = 0;
         }
 
-        // TODO: Check largest accession
+        // TODO(vartanianmh): Check largest accession
         if (bytecount > 1000000000000)
         {
             cerr << "bytecount too large: " << bytecount << ":" << bytes_sent << "\n";
@@ -294,7 +292,7 @@ int main ( int argc, char *argv[] )
         }
 
         // VDB-3961
-        // TODO: Fix parsing
+        // TODO(vartanianmh): Fix parsing
         size_t phloc=user_agent.find("(phid=");
         if ( phloc != string::npos ) {
             phid=user_agent.substr(phloc+6,10);
@@ -345,7 +343,7 @@ int main ( int argc, char *argv[] )
         cout << "ip=\"" << sess.ip << "\",";
         cout << "agent=\"" << sess.agent << "\",";
         cout << "status=\"" << statuses << "\",";
-        cout << "cmds=\"" << cmds;
+        cout << "cmds=\"" << cmds << "\"";
         cout << " ";
         cout << "agent=\"" << sess.agent << "\",";
         cout << "acc=\"" << sess.acc << "\",";
@@ -354,9 +352,9 @@ int main ( int argc, char *argv[] )
         cout << "version=\"" << sess.version << "\",";
         cout << "sessid=\"" << sess.sessid << "\",";
         cout << "phid=\"" << sess.phid << "\",";
-        cout << "end=" << sess.end * 1000 * 1000 * 1000;
+        cout << "end=" << static_cast<uint64_t> (sess.end * 1000 * 1000 * 1000);
         cout << " ";
-        cout << (sess.start * 1000 * 1000 * 1000 + linecount);
+        cout << static_cast<uint64_t>(sess.start * 1000 * 1000 * 1000) + linecount;
         cout << "\n";
     }
 

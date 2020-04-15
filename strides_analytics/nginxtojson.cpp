@@ -394,7 +394,7 @@ int main ( int argc, char *argv[] )
             bytecount = 0;
         }
 
-        // TODO: Check largest accession
+        // TODO(vartanianmh): Check largest accession
         if (bytecount > 1000000000000)
         {
             cerr << "bytecount too large: " << bytecount << ":" << bytes_sent << "\n";
@@ -402,7 +402,7 @@ int main ( int argc, char *argv[] )
         }
 
         // VDB-3961
-        // TODO: Fix parsing
+        // TODO(vartanianmh): Fix parsing
         size_t phloc=user_agent.find("(phid=");
         if ( phloc != string::npos ) {
             phid=user_agent.substr(phloc+6,10);
