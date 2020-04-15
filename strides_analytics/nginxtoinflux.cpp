@@ -1,4 +1,3 @@
-#include "json.hpp"
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
@@ -13,7 +12,6 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <unordered_map>
 
 using std::cerr;
 using std::cout;
@@ -23,8 +21,6 @@ using std::min;
 using std::out_of_range;
 using std::set;
 using std::string;
-using std::unordered_map;
-using json = nlohmann::json;
 
 
 struct sess {
@@ -42,32 +38,6 @@ struct sess {
     double start = 0.0;
     double end = 0.0;
 };
-
-// gcc >=6 has CPUID function dispatch, so should invoke
-// AVX2 (Haswell, 256-bit) version of memchr() if supported,
-// otherwise use almost as fast SSE (128-bit) vesion
-#if 0
-const char *sse_memchr_r ( const char *cur, const char *end )
-{
-    __m128i pattern = _mm_set1_epi8 ( 'R' );
-    __m128i ld, cmp;
-
-    while ( cur < end ) {
-        ld = _mm_lddqu_si128 ( reinterpret_cast<const __m128i *> ( cur ) );
-        cmp = _mm_cmpeq_epi8 ( ld, pattern );
-        int z = _mm_movemask_epi8 ( cmp );
-        if ( z != 0 ) { // found
-            const char *r = cur + __builtin_ffs ( z ) - 1;
-            return r < end ? r : end;
-        }
-        cur += 16;
-    }
-
-    return end;
-}
-#endif
-
-// Key is ip, url, agent, domain
 
 [[nodiscard]] size_t linefind ( const string &line, char c, size_t s )
 {
@@ -154,22 +124,12 @@ int main ( int argc, char *argv[] )
         return 1;
     }
 
-    unordered_map<string, struct sess> sessions;
-    // sessions.reserve ( 1000000 ); // Most are < 200,000, max 513,000
-
     size_t linecount = 0;
     const bool debug = false;
     string line;
     // longest seen in wild is 2124 bytes
     char buf[4096];
     line.reserve ( sizeof buf );
-
-
-    //    RE2 re("([DES]RR[\\.0-9]{6,12})");
-    //    assert(re.ok());
-
-    //    assert(RE2::PartialMatch("SRR1234567", re, &acc));
-    // cerr << "acc is " << acc << "\n";
 
     size_t successes = 0;
     while ( fgets ( buf, sizeof ( buf ), stdin ) != nullptr ) {
@@ -194,56 +154,6 @@ int main ( int argc, char *argv[] )
         size_t s = 0, e = 0;
 
         if constexpr ( debug ) { cout << "line is:" << line << "\n"; }
-        /*
-         * 132.204.81.18
-         * -
-         * -
-         * [01/Mar/2019:23:59:51 -0500]
-         * "gap-download.be-md.ncbi.nlm.nih.gov"
-         * "GET
-         * /sragap/A032F554-501A-428B-B7C0-0427AE242198/SRR1406330?tic=75D2D46C-AACE-457D-B02C-4AD6D4A17447
-         * HTTP/1.1"
-         * 206 131072 0.000 "-"
-         * "linux64 sra-toolkit fastq-dump.2.8"
-         * "-"
-         * port=443
-         * rl=358
-         */
-
-        /* 132.249.107.67
-         * -
-         * -
-         * [23/Mar/2017:08:52:14 -0400]
-         * sra-download.ncbi.nlm.nih.gov:443
-         * "GET
-         * /srapub/SRR1609033
-         * HTTP/1.1"
-         * 206 2986 "-"
-         * "linux64 sra-toolkit fastq-dump.2.8"
-         * xff="-"
-         * rt=0.000
-         * rl=276
-         */
-
-        /*
-         * 130.14.24.58
-         * -
-         * -
-         * [23/Mar/2017:00:00:04 -0400]
-         * sra-download.ncbi.nlm.nih.gov:443
-         * "HEAD /srapub/DRR034175 HTTP/1.1"
-         * 200 0 "-"
-         * "Python-urllib/2.7"
-         * xff="-"
-         * rt=0.000
-         * rl=133
-         */
-
-        /*
-          $remote_addr - $remote_user [$time_local] "$server_name" "$request" $status $body_bytes_sent $request_time "$http_referer" "$http_user_agent" "$http_x_forwarded_for" port=$server_port rl=$request_length
-         */
-
-
         e = linefind ( line, ' ', s );
         if ( e == string::npos ) { continue; }
         string remote_ip = line.substr ( s, e - s );
@@ -326,26 +236,8 @@ int main ( int argc, char *argv[] )
         if constexpr ( debug ) {
             cout << "user_agent is:" << user_agent << ".\n";
         }
-/*
-        s = e + 2;
 
-        e = linefind ( line, '"', s + 1 );
-        if ( e == string::npos ) { continue; }
-        string referrer = line.substr ( s + 1, e - s - 1 );
-        if constexpr ( debug ) { cout << "referrer is:" << referrer << ".\n"; }
-        s = e + 2;
-
-        e = linefind ( line, ' ', s );
-        if ( e == string::npos ) { continue; }
-        string port = line.substr ( s, e - s );
-        if constexpr ( debug ) { cout << "port is:" << port << ".\n"; }
-        s = e + 1;
-
-        string rl = line.substr ( s, string::npos );
-        if constexpr ( debug ) { cout << "rl is:" << rl << ".\n"; }
-        // s = e + 1;
-
-*/
+        // TODO: Cache strptime?
         struct tm tm {
         };
         if ( strptime ( time.data (), "%d/%b/%Y:%H:%M:%S %z", &tm )
@@ -434,88 +326,41 @@ int main ( int argc, char *argv[] )
 
         if constexpr ( debug ) { cout << "end is:" << sess.end << "\n"; }
 
-        string sesskey = remote_ip;
-        sesskey += acc;
-        sesskey += user_agent;
-        // Combine requests that were load-balanced to different servers
-        //sesskey += host_header;
-        //sesskey += version;
-        //sesskey += sessid;
-        //sesskey += phid;
-
-        // VDB-3889
-        if ( cmd == "PUT" || cmd == "POST" ) {
-            sesskey += "PUTPOST";
-        } else if ( cmd == "DELETE" || cmd == "OPTIONS" ) {
-            sesskey += "DELOPT";
-        }
-
-        if ( sessions.count ( sesskey ) == 0 ) {
-            sessions.emplace ( sesskey, sess );
-        } else {
-            struct sess sess2 = sessions[sesskey];
-            sess2.start = min ( sess.start, sess2.start );
-            sess2.end = max ( sess2.end, sess2.end );
-            sess2.bytecount += sess.bytecount;
-            sess2.cnt += sess.cnt;
-
-            sess2.cmds.insert ( sess.cmds.begin (), sess.cmds.end () );
-            sess2.status.insert ( sess.status.begin (), sess.status.end () );
-
-            sessions.erase ( sesskey );
-            sessions.emplace ( sesskey, sess2 );
-        }
         ++successes;
+
+        string cmds;
+        string statuses;
+
+        for ( const auto &stat : sess.status ) { statuses += stat + " "; }
+        statuses.erase ( statuses.find_last_not_of ( ' ' ) + 1 );
+
+        for ( const auto &cmd : sess.cmds ) { cmds += cmd + " "; }
+        cmds.erase ( cmds.find_last_not_of ( ' ' ) + 1 );
+
+        // line protocol is: <measurement>[,<tag-key>=<tag-value>...]
+        // <field-key>=<field-value>[,<field2-key>=<field2-value>...]
+        //  [unix-nano-timestamp]
+
+        cout << "nginx,";
+        cout << "ip=\"" << sess.ip << "\",";
+        cout << "agent=\"" << sess.agent << "\",";
+        cout << "status=\"" << statuses << "\",";
+        cout << "cmds=\"" << cmds;
+        cout << " ";
+        cout << "agent=\"" << sess.agent << "\",";
+        cout << "acc=\"" << sess.acc << "\",";
+        cout << "domain=\"" << sess.domain << "\",";
+        cout << "bytecount=" << sess.bytecount << ",";
+        cout << "version=\"" << sess.version << "\",";
+        cout << "sessid=\"" << sess.sessid << "\",";
+        cout << "phid=\"" << sess.phid << "\",";
+        cout << "end=" << sess.end * 1000 * 1000 * 1000;
+        cout << " ";
+        cout << (sess.start * 1000 * 1000 * 1000 + linecount);
+        cout << "\n";
     }
 
     size_t errorcount = linecount - successes;
     cerr << "Read in " << linecount << " lines\n";
     cerr << "Had     " << errorcount << " errors\n";
-    cerr << "Have    " << sessions.size () << " sessions\n";
-
-    for ( const auto &s : sessions ) {
-        string key = s.first;
-        struct sess sess = s.second;
-        string cmds;
-        string statuses;
-        try {
-            json j;
-            j["ip"] = sess.ip;
-            j["agent"] = sess.agent;
-            j["domain"] = sess.domain;
-            j["acc"] = sess.acc;
-            j["bytecount"] = sess.bytecount;
-            j["cnt"] = sess.cnt;
-            j["start"] = sess.start;
-            j["end"] = sess.end;
-            j["version"] = sess.version;
-            j["sessid"] = sess.sessid;
-            j["phid"] = sess.phid;
-
-            for ( const auto &stat : sess.status ) { statuses += stat + " "; }
-            statuses.erase ( statuses.find_last_not_of ( ' ' ) + 1 );
-            j["status"] = statuses;
-
-            for ( const auto &cmd : sess.cmds ) { cmds += cmd + " "; }
-            cmds.erase ( cmds.find_last_not_of ( ' ' ) + 1 );
-            j["cmds"] = cmds;
-
-            cout << j << "\n";
-        } catch ( json::type_error &e ) {
-            cerr << "type error:" << sess.ip << "\n";
-            cerr << sess.ip << "\n";
-            cerr << sess.agent << "\n";
-            cerr << sess.domain << "\n";
-            cerr << sess.acc << "\n";
-            cerr << sess.bytecount << "\n";
-            cerr << sess.cnt << "\n";
-            cerr << sess.start << "\n";
-            cerr << sess.end << "\n";
-            cerr << sess.version << "\n";
-            cerr << sess.sessid << "\n";
-            cerr << sess.phid << "\n";
-            cerr << statuses << "\n";
-            cerr << cmds << "\n";
-        }
-    }
 }
