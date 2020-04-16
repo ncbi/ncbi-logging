@@ -341,7 +341,6 @@ int main ( int argc, char *argv[] )
 
         cout << "nginx,";
         cout << "ip=\"" << sess.ip << "\",";
-        cout << "agent=\"" << sess.agent << "\",";
         cout << "status=\"" << statuses << "\",";
         cout << "cmds=\"" << cmds << "\"";
         cout << " ";
