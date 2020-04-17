@@ -1,4 +1,3 @@
-
 #include "t_str.h"
 
 void clear_str( t_str * s )
@@ -7,35 +6,42 @@ void clear_str( t_str * s )
     s -> n = 0;
 }
 
-unsigned int str_2_uint( const t_str * s )
+uint64_t str_2_u64( const t_str * s, bool * ok )
 {
-	unsigned int res = 0;
+	uint64_t res = 0;
 	int i;
+    if ( NULL != ok ) *ok = true;
 	for ( i = 0; i < s -> n; ++i )
 	{
 		int c = s -> p[ i ];
-		if ( ( c < '0' ) || ( c > '9' ) ) return 0;
+		if ( ( c < '0' ) || ( c > '9' ) )
+        {
+            if ( NULL != ok ) *ok = false;
+            return 0;
+        }
 		res = ( res * 10 ) + ( c - '0' );
 	}
 	return res;
 }
 
-unsigned long str_2_ulong( const t_str * s )
+int64_t str_2_i64( const t_str * s, bool * ok )
 {
-	unsigned long res = 0;
-	int i;
-	for ( i = 0; i < s -> n; ++i )
-	{
-		int c = s -> p[ i ];
-		if ( c < '0' || c > '9' ) return 0;
-		res = ( res * 10 ) + ( c - '0' );
-	}
-	return res;
+    if ( s -> p [ 0 ] != '-' )
+        return ( int64_t )str_2_u64( s, ok );
+    else
+    {
+        uint64_t value;
+        t_str s1 = { s -> p, s -> n };
+        s1 . p ++;
+        s1 . n --;
+        value = str_2_u64( &s1, ok );
+        return ( -value );
+    }
 }
 
-unsigned int month_str_2_n( const t_str * s )
+uint8_t month_str_2_n( const t_str * s )
 {
-	unsigned int res = 0;
+	uint8_t res = 0;
 	switch( s -> p[ 0 ] )
 	{
 		case 'A' :	if ( s -> p[ 1 ] == 'P' || s -> p[ 1 ] == 'p' )
@@ -75,4 +81,16 @@ unsigned int month_str_2_n( const t_str * s )
 		case 'S' :	res = 9; break;		
 	}
 	return res;
+}
+
+bool fill_str( t_str * dst, const char * src, size_t max_len )
+{
+    size_t i = 0;
+    if ( NULL == dst ) return false;
+    if ( NULL == src ) return false;
+    if ( 0 == src[ 0 ] ) return false;
+    dst -> p = src;
+    while ( i < max_len && 0 != src[ i ] ) { i++; }
+    dst -> n = i;
+    return i < max_len;
 }

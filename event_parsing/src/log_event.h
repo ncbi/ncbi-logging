@@ -7,7 +7,7 @@
 
 typedef struct
 {
-    t_str ip, dom, acc, res, agnt;
+    t_str ip, dom, req, acc, res, agnt;
     time_t unix_date;
     unsigned int num_bytes;
 } t_log_event;
@@ -24,6 +24,8 @@ bool extract_event( struct event_extractor * self,
                     bool verbose
                   );
 
-void print_event( const t_log_event * event );
+void print_event_tsv( const t_log_event * event );
+
+void print_event_dbg( const t_log_event * event );
 
 #endif

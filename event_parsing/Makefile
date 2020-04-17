@@ -1,4 +1,4 @@
-.PHONY : clean run
+.PHONY : clean run run2
 
 PROG = parser
 SRC = $(wildcard src/*.c)
@@ -14,3 +14,6 @@ clean :
 
 run : $(PROG)
 	head -n 3 some_events.txt | ./$(PROG) --verbose > output.txt
+
+run2 : $(PROG)
+	./$(PROG)

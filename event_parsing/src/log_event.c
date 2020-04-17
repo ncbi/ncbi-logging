@@ -42,18 +42,6 @@ typedef struct
     unsigned int sec;
 } t_time_ints;
 
-/*
-static double to_julian( unsigned int day, unsigned int month, unsigned int year,
-					     unsigned int hour, unsigned int minute, unsigned int second )
-{
-	double a = floor( ( 14.0 - month ) / 12.0 );
-	double y = year + 4800.0 - a;
-	double m = month + ( 12.0 * a ) - 3.0;
-	double jdn = day + floor( ( 153 * m + 2 ) / 5 ) + 365 * y + floor( y / 4 ) - floor( y / 100 ) + floor( y / 400 ) - 32045;
-    return jdn + ( ( hour - 12.0 ) / 24.0 ) + ( minute / 1440.0 ) + ( second / 86400.0 );
-}
-*/
-
 static time_t get_unix_time( const t_time_ints * time_ints )
 {
     struct tm t;
@@ -99,26 +87,14 @@ static time_t to_unix_time( event_extractor * self, const t_time_ints * time_int
 static bool valid_SRA( const t_str * acc )
 {
     const char * p = acc -> p;
-    if ( p [ 0 ] == 'S' )
+    switch( p [ 0 ] )
     {
-        if ( ( p[ 1 ] != 'R' ) || ( p[ 2 ] != 'R' ) ) return false;
+        case 'S' : return ( ( p[ 1 ] == 'R' ) && ( p[ 2 ] == 'R' ) ); break;
+        case 'E' : return ( ( p[ 1 ] == 'R' ) && ( p[ 2 ] == 'R' ) ); break;
+        case 'D' : return ( ( p[ 1 ] == 'R' ) && ( p[ 2 ] == 'R' ) ); break;
+        case 'N' : return ( ( p[ 1 ] == 'C' ) && ( p[ 2 ] == '_' ) ); break;
     }
-    else if ( p[ 0 ] == 'D' )
-    {
-        if ( ( p[ 1 ] != 'R' ) || ( p[ 2 ] != 'R' ) ) return false;
-    }
-    else if ( p[ 0 ] == 'E' )
-    {
-        if ( ( p[ 1 ] != 'R' ) || ( p[ 2 ] != 'R' ) ) return false;
-    }
-    else if ( p[ 0 ] == 'N' )
-    {
-        if ( ( p[ 1 ] != 'C' ) || ( p[ 2 ] != '_' ) ) return false;
-    }
-    else
-        return false;
-
-    return true;
+    return false;
 }
 
 typedef enum ev_status
@@ -224,6 +200,18 @@ static void print_status( ev_status status )
     }
 }
 
+static void clear_event( t_log_event * event )
+{
+    clear_str( &( event -> ip ) );
+    clear_str( &( event -> dom ) );
+    clear_str( &( event -> acc ) );
+    clear_str( &( event -> req ) );
+    clear_str( &( event -> res ) );
+    clear_str( &( event -> agnt ) );
+    event -> unix_date = 0;
+    event -> num_bytes = 0;
+}
+
 bool extract_event( struct event_extractor * self,
                     const char * buffer,
                     size_t buffer_len,
@@ -231,8 +219,7 @@ bool extract_event( struct event_extractor * self,
                     bool verbose
                   )
 {
-    if ( NULL == buffer || NULL == event )
-        return false;
+    if ( NULL == buffer || NULL == event ) return false;
 
     const char * p = buffer;
     const char * p_end = p + buffer_len;
@@ -247,16 +234,10 @@ bool extract_event( struct event_extractor * self,
     t_str min     = { NULL, 0 };
     t_str sec     = { NULL, 0 };
     t_str cnt     = { NULL, 0 };
-    
+
+    clear_event( event );
     event -> ip . p = p;
-    event -> ip . n = 0;
-    clear_str( &( event -> dom ) );
-    clear_str( &( event -> acc ) );
-    clear_str( &( event -> res ) );
-    clear_str( &( event -> agnt ) );
-    event -> unix_date = 0;
-    event -> num_bytes = 0;
-    
+
     while ( p < p_end )
     {
         char c = *p;
@@ -282,23 +263,43 @@ bool extract_event( struct event_extractor * self,
             case e_t_space      : if ( c == ' ' ) status = e_t_stop; else sec . n++; break;
             case e_t_stop       : if ( c == ']' ) status = e_dom_start; break;
 
-            /* domain > "sra-download.ncbi.nlm.nih.gov"< */
-            case e_dom_start    : if ( c == '"' ) status = e_dom1; break;
+            /* domain > "sra-download.ncbi.nlm.nih.gov"< !!! can also be not quoted !!! */
+            case e_dom_start    : switch ( c )
+                                  {
+                                    case '"' : status = e_dom1; break;
+                                    case ' ' : break;
+                                    default  : event -> dom . p = p; event -> dom . n = 1; status = e_dom; break;
+                                  }
+                                  break;
             case e_dom1         : event -> dom . p = p; event -> dom . n = 1; status = e_dom; break;
-            case e_dom          : if ( c != '"' ) event -> dom . n++; else status = e_req_start; break;
+            case e_dom          : switch( c )
+                                  {
+                                    case ' ' : ;/* fall through intented!!! */
+                                    case '"' : status = e_req_start; break;
+                                    default  : event -> dom . n++; break;
+                                  }
+                                  break;
 
             /* url -> accession > "GET /traces/sra32/SRR/005807/SRR5946882 HTTP/1.1"< */
-            case e_req_start    : if ( c == '"' ) status = e_req_space1; break;
-            case e_req_space1   : if ( c == ' ' ) status = e_req_acc; break;
-            case e_req_acc      : event -> acc . p = p; event -> acc . n = 1; status = e_req_delim; break;
-            case e_req_delim    : if ( c == ' ' || c == '?' )
-                                    status = e_req_stop;
-                                  else if ( c == '/' )
-                                    status = e_req_acc;
-                                  else 
-                                    event -> acc . n++;
+            case e_req_start    : if ( c == '"' ) { status = e_req_space1; event -> req . p = p; } break;
+            case e_req_space1   : if ( c == ' ' ) status = e_req_acc;
+                                  event -> req . n++;
                                   break;
-            case e_req_stop     : if ( c == '"' ) status = e_res1; break;
+            case e_req_acc      : event -> acc . p = p;
+                                  event -> acc . n = 1;
+                                  event -> req . n ++;
+                                  status = e_req_delim;
+                                  break;
+            case e_req_delim    : switch( c )
+                                  {
+                                    case ' ' : ; /* fall through intented!!! */
+                                    case '?' : status = e_req_stop; break;
+                                    case '/' : status = e_req_acc; break; /* loop-back intented!!! */
+                                    default  : event -> acc . n++; break;
+                                  }
+                                  event -> req . n ++;
+                                  break;
+            case e_req_stop     : if ( c == '"' ) status = e_res1; event -> req . n ++; break;
 
             /* result-code > 206< */
             case e_res1         : if ( c >= '0' && c <= '9' ) {
@@ -374,7 +375,7 @@ bool extract_event( struct event_extractor * self,
         return false;
     }
 
-    time_ints . day  = str_2_uint( &day );
+    time_ints . day  = str_2_u64( &day, NULL );
     if ( time_ints . day < 1 || time_ints . day > 31 )
     {
         if ( verbose ) fprintf( stderr, "invalid day: %d\n", time_ints . day );
@@ -388,28 +389,28 @@ bool extract_event( struct event_extractor * self,
         return false;
     }
     
-    time_ints . year = str_2_uint( &year );
+    time_ints . year = str_2_u64( &year, NULL );
     if ( time_ints . year < 1900 || time_ints . year > 2099 )
     {
         if ( verbose ) fprintf( stderr, "invalid year: %d\n", time_ints . year );
         return false;
     }
 
-    time_ints . hour = str_2_uint( &hour );
+    time_ints . hour = str_2_u64( &hour, NULL );
     if ( time_ints. hour > 23 )
     {
         if ( verbose ) fprintf( stderr, "invalid hour: %d\n", time_ints . hour );
         return false;
     }
 
-    time_ints . min  = str_2_uint( &min );
+    time_ints . min  = str_2_u64( &min, NULL );
     if ( time_ints . min > 59 )
     {
         if ( verbose ) fprintf( stderr, "invalid minutes: %d\n", time_ints . min );
         return false;
     }
 
-    time_ints . sec = str_2_uint( &sec );
+    time_ints . sec = str_2_u64( &sec, NULL );
     if ( time_ints . sec > 59 )
     {
         if ( verbose ) fprintf( stderr, "invalid seconds: %d\n", time_ints . sec );
@@ -417,13 +418,13 @@ bool extract_event( struct event_extractor * self,
     }
 
     event -> unix_date = to_unix_time( self, &time_ints );
-    event -> num_bytes = str_2_ulong( &cnt );
+    event -> num_bytes = str_2_u64( &cnt, NULL );
 
     if ( verbose ) fprintf( stderr, "success!\n" );
     return true;
 }
 
-void print_event( const t_log_event * event )
+void print_event_tsv( const t_log_event * event )
 {
     printf( "%.*s\t%.*s\t%.*s\t%.*s\t%u\t%u\n",
         event -> ip . n, event -> ip . p,
@@ -433,4 +434,16 @@ void print_event( const t_log_event * event )
         event -> unix_date,
         event -> num_bytes
         );
+}
+
+void print_event_dbg( const t_log_event * event )
+{
+    printf( "ip:\t%.*s\n", event -> ip . n, event -> ip . p );
+    printf( "dom:\t%.*s\n", event -> dom . n, event -> dom . p );
+    printf( "req:\t%.*s\n", event -> req . n, event -> req . p );
+    printf( "acc:\t%.*s\n", event -> acc . n, event -> acc . p );
+    printf( "res:\t%.*s\n", event -> res . n, event -> res . p );
+    printf( "agnt:\t%.*s\n", event -> agnt . n, event -> agnt . p );
+    printf( "tt:\t%d\n", event -> unix_date );
+    printf( "cnt:\t%d\n\n", event -> num_bytes );
 }
