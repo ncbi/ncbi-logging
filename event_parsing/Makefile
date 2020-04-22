@@ -13,7 +13,7 @@ clean :
 	@rm -rf $(PROG)
 
 run : $(PROG)
-	head -n 3 some_events.txt | ./$(PROG) --verbose > output.txt
+	head -n 5 some_events.txt | ./$(PROG) --verbose > output.txt
 
 run2 : $(PROG)
 	./$(PROG)

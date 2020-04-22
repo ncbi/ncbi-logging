@@ -13,6 +13,32 @@ typedef struct g_parser
     int cached_month;
 } g_parser;
 
+typedef enum e_parsed_kind
+{
+    epk_err,
+    epk_str,
+    epk_uint,
+    epk_int,
+    epk_float,
+    epk_time,
+    epk_req
+} e_parsed_kind;
+
+typedef struct t_request
+{
+    t_str method, path, vers, leaf;
+} t_request;
+
+typedef struct t_parsed
+{
+    e_parsed_kind kind;
+    t_str str;
+    uint64_t u;
+    int64_t i;
+    double f;
+    t_request req;
+} t_parsed;
+
 g_parser * make_g_parser( void )
 {
     g_parser * obj = malloc( sizeof *obj );
@@ -30,6 +56,8 @@ void destroy_g_parser( g_parser * self )
     if ( NULL == self ) return;
     free( ( void * ) self );
 }
+
+static size_t g_parse( g_parser * self, const t_str * src, const char * fmt, t_parsed * dst, size_t dst_size, size_t * num_values );
 
 static void parse_word( const t_str *src, size_t *src_idx, t_parsed * res, char term )
 {
@@ -243,7 +271,28 @@ static bool parse_request( g_parser * self, const t_str *src, size_t *src_idx, t
     return true;
 }
 
-size_t g_parse( g_parser * self, const t_str * src, const char * fmt, t_parsed * dst, size_t dst_size, size_t * num_values )
+/* =========================================================
+ * src ... pointer to string to be parsed
+ * fmt ... format-string for parsing
+ * dst ... array of t_parsed structs for parse-results
+ * dst_size ... number of t_parsed structs in dst
+ * num_values ... how many values in dst have been parsed
+ * 
+ * fmt:
+ * "%s - - [%t] \"%s\" %r %n %n %f \"%s\" \"%s\" \"%s\" %s %s"
+ * 
+ * %s ... a word ( terminated by following character )
+ * %q ... optionally quoted word
+ * %t ... a time-stamp ( human-readable: [01/Jan/2020:02:53:24 -0500] )
+ * %u ... a unsigned int
+ * %i ... a signed int
+ * %f ... a float
+ * %r ... a http(s) request
+ * %% ... the '%' sign
+ * 
+ * returns the number of errors
+  ========================================================= */
+static size_t g_parse( g_parser * self, const t_str * src, const char * fmt, t_parsed * dst, size_t dst_size, size_t * num_values )
 {
     size_t errors = 0;
     t_str fmtstr;
@@ -301,6 +350,7 @@ size_t g_parse( g_parser * self, const t_str * src, const char * fmt, t_parsed *
     return errors;
 }
 
+/*
 void print_g_parsed( const t_parsed * parsed, size_t num_parsed )
 {
     if ( NULL == parsed ) return;
@@ -327,71 +377,127 @@ void print_g_parsed( const t_parsed * parsed, size_t num_parsed )
         }
     }
 }
+*/
+
+static bool g_parse_fill_log_data( t_log_data * dst, const t_parsed *src, bool with_dom )
+{
+    uint32_t idx = 0;
+
+    /* 0: ip-addr */
+    if ( src[ idx ] . kind != epk_str ) return false;
+    dst -> ip = src[ idx++ ] . str;
+
+    /* 1: date, converted to unix-t */
+    if ( src[ idx ] . kind != epk_time ) return false;
+    dst -> unix_date = src[ idx++ ] . u;
+
+    if ( with_dom )
+    {
+        /* 2: domain */
+        if ( src[ idx ] . kind != epk_str ) return false;
+        dst -> dom = src[ idx++ ] . str;
+    }
+
+    /* 2/3: request */
+    if ( src[ idx ] . kind != epk_req ) return false;
+    dst -> req = src[ idx ] . str;
+    dst -> method = src[ idx ] . req . method;
+    dst -> path = src[ idx ] . req . path;
+    dst -> vers = src[ idx ] . req . vers;
+    dst -> acc = src[ idx++ ] . req . leaf;
+
+    /* 3/4: result-code */
+    if ( src[ idx ] . kind != epk_uint ) return false;
+    dst -> res = src[ idx++ ] . u;
+
+    /* 4/5: bytes returned */
+    if ( src[ idx ] . kind != epk_uint ) return false;
+    dst -> num_bytes = src[ idx++ ] . u;
+
+    /* 5/6: factor */
+    if ( src[ idx ] . kind != epk_float ) return false;
+    dst -> factor = src[ idx++ ] . f;
+
+    /* 6/7: user-agent */
+    if ( src[ idx ] . kind != epk_str ) return false;
+    dst -> agnt = src[ idx++ ] . str;
+
+    /* 7/8: port */
+    if ( src[ idx ] . kind != epk_uint ) return false;
+    dst -> port = src[ idx ] . u;
+
+    /* 8/9: request-length */
+    if ( src[ idx ] . kind != epk_uint ) return false;
+    dst -> req_len = src[ idx ] . u;
+
+    return true;
+}
 
 /*
  example line:
  158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] "sra-download.ncbi.nlm.nih.gov" "GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.1" "-" port=443 rl=293
  */
-bool g_parse_log_data( struct g_parser * self, const char * buff, size_t buff_len, t_log_data * data )
+bool g_parse_log_data_v1( struct g_parser * self, const char * buff, size_t buff_len, t_log_data * data )
 {
     t_str src = { buff, buff_len };
-    t_parsed dst[ 12 ];
+    t_parsed tmp[ 12 ];
     size_t num_errors, num_values;
     const char * fmt = "%s - - [%t] %q \"%r\" %u %u %f \"-\" \"%s\" \"-\" port=%u rl=%u\r";
-    if ( NULL == buff ) return false;
+
+    num_errors = g_parse( self, &src, fmt, tmp, sizeof tmp / sizeof tmp[ 0 ], &num_values );
+    if ( num_errors > 0 ) return false;
+    if ( num_values != 10 ) return false;
+
+    return g_parse_fill_log_data( data, tmp, true );
+}
+
+/*
+ example line: ( domain missing )
+ 158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.1" "-" port=443 rl=293
+ */
+bool g_parse_log_data_v2( struct g_parser * self, const char * buff, size_t buff_len, t_log_data * data )
+{
+    t_str src = { buff, buff_len };
+    t_parsed tmp[ 12 ];
+    size_t num_errors, num_values;
+    const char * fmt = "%s - - [%t] \"%r\" %u %u %f \"-\" \"%s\" \"-\" port=%u rl=%u\r";
+
+    num_errors = g_parse( self, &src, fmt, tmp, sizeof tmp / sizeof tmp[ 0 ], &num_values );
+    if ( num_errors > 0 ) return false;
+    if ( num_values != 9 ) return false;
+
+    return g_parse_fill_log_data( data, tmp, false );
+}
+
+bool g_parse_log_data( struct g_parser * self, const char * buff, size_t buff_len, t_log_data * data )
+{
+    bool res;
+
     if ( NULL == data ) return false;
+
+    /* empty result-data for case of failure */
+    data -> ip . p = buff; data -> ip . n = 0;
+    data -> dom . p = buff; data -> dom . n = 0;
+    data -> req . p = buff; data -> req . n = 0;
+    data -> method . p = buff; data -> method . n = 0;
+    data -> path . p = buff; data -> path . n = 0;
+    data -> vers . p = buff; data -> vers . n = 0;
+    data -> acc . p = buff; data -> acc . n = 0;
+    data -> agnt . p = buff; data -> agnt . n = 0;
+    data -> unix_date = 0;
+    data -> res = 0;
+    data -> num_bytes = 0;
+    data -> port = 0;
+    data -> req_len = 0;
+    data -> factor = 0;
+    
+    if ( NULL == buff ) return false;
     if ( 0 == buff_len ) return false;
     if ( 0 == buff[ 0 ] ) return false;
 
-    num_errors = g_parse( self, &src, fmt, dst, sizeof dst / sizeof dst[ 0 ], &num_values );
-    if ( num_errors > 0 ) return false;
-    //if ( num_values != 10 ) return false;
-
-    /* 0: ip-addr */
-    if ( dst[ 0 ] . kind != epk_str ) return false;
-    data -> ip = dst[ 0 ] . str;
-
-    /* 1: date, converted to unix-t */
-    if ( dst[ 1 ] . kind != epk_time ) return false;
-    data -> unix_date = dst[ 1 ] . u;
-
-    /* 2: domain */
-    if ( dst[ 2 ] . kind != epk_str ) return false;
-    data -> dom = dst[ 2 ] . str;
-
-    /* 3: request */
-    if ( dst[ 3 ] . kind != epk_req ) return false;
-    data -> req = dst[ 3 ] . str;
-    data -> method = dst[ 3 ] . req . method;
-    data -> path = dst[ 3 ] . req . path;
-    data -> vers = dst[ 3 ] . req . vers;
-    data -> acc = dst[ 3 ] . req . leaf;
-
-    /* 4: result-code */
-    if ( dst[ 4 ] . kind != epk_uint ) return false;
-    data -> res = dst[ 4 ] . u;
-
-    /* 5: bytes returned */
-    if ( dst[ 5 ] . kind != epk_uint ) return false;
-    data -> num_bytes = dst[ 5 ] . u;
-
-    /* 6: factor */
-    if ( dst[ 6 ] . kind != epk_float ) return false;
-    data -> factor = dst[ 6 ] . f;
-
-    /* 7: user-agent */
-    if ( dst[ 7 ] . kind != epk_str ) return false;
-    data -> agnt = dst[ 7 ] . str;
-
-    /* 8: port */
-    if ( dst[ 8 ] . kind != epk_uint ) return false;
-    data -> port = dst[ 8 ] . u;
-
-    /* 9: request-length */
-    if ( dst[ 9 ] . kind != epk_uint ) return false;
-    data -> req_len = dst[ 9 ] . u;
-
-    return true;
+    res = g_parse_log_data_v1( self, buff, buff_len, data );
+    if ( !res ) res = g_parse_log_data_v2( self, buff, buff_len, data );
+    return res;
 }
 
 void print_data_tsv( t_log_data * data )
