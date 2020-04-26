@@ -1,13 +1,18 @@
-all : parser
+PROG = parser
 
-parser.tab.c parser.tab.h : parser.y
-	bison -t -v -d parser.y
+all: $(PROG)
 
-lex.yy.c : parser.l parser.tab.h
-	flex parser.l
+$(PROG).tab.c $(PROG).tab.h: $(PROG).y
+	bison -t -v -d $(PROG).y
 
-parser: lex.yy.c parser.tab.c parser.tab.h
-	gcc -o parser parser.tab.c lex.yy.c
+lex.yy.c: $(PROG).l $(PROG).tab.h
+	flex $(PROG).l
+
+$(PROG): lex.yy.c $(PROG).tab.c $(PROG).tab.h
+	gcc -o $(PROG) $(PROG).tab.c lex.yy.c
 
 clean:
-	rm parser parser.tab.c lex.yy.c parser.tab.h
+	rm $(PROG) $(PROG).tab.c lex.yy.c $(PROG).tab.h $(PROG).output
+
+run: $(PROG)
+	cat two_events.txt | ./$(PROG)
