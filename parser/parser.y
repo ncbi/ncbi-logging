@@ -20,9 +20,9 @@ uint8_t month_int( const char * s );
     {
         char * p;
         int n;
-	} s;
-	
-	int64_t i64;
+    } s;
+    
+    int64_t i64;
 
     struct t_timepoint
     {
@@ -48,7 +48,7 @@ uint8_t month_int( const char * s );
 %%
 
 logging:                { printf( "start\n\n" ); }
-	   | logging line
+       | logging line
 ;
 
 line: NEWLINE
@@ -88,20 +88,20 @@ time:
 
 int main()
 {
-	yyin = stdin;
+    yyin = stdin;
 
-	do
-	{
-		yyparse();
-	} while( !feof( yyin ) );
+    do
+    {
+        yyparse();
+    } while( !feof( yyin ) );
 
-	return 0;
+    return 0;
 }
 
 void yyerror( const char* s )
 {
-	fprintf( stderr, "#%d: %s at >'%s'<\n", yylineno, s, yytext );
-	exit( 1 );
+    fprintf( stderr, "#%d: %s at >'%s'<\n", yylineno, s, yytext );
+    exit( 1 );
 }
 
 uint8_t month_int( const char * s )
