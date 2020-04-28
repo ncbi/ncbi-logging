@@ -15,8 +15,8 @@ IPV4    {U8}\.{U8}\.{U8}\.{U8}
 MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
-QSTR    [ .\-\?/a-zA-Z0-9]+
-STR     [\-a-zA-Z0-9]+
+QSTR    [ \.\-\?/a-zA-Z0-9]+
+STR     [.\-a-zA-Z0-9_]+
 
 %x QUOTED
 
@@ -28,11 +28,12 @@ STR     [\-a-zA-Z0-9]+
 \.              { return DOT; }
 -               { return DASH; }
 
+"port="         { return PORT; }
+"rl="           { return RL; }
+
 \"              { BEGIN( QUOTED ); return QUOTE; }
 <QUOTED>\"      { BEGIN( INITIAL ); return QUOTE; }
 <QUOTED>{QSTR}  { yylval . s . p = yytext; yylval . s . n = yyleng; return QSTR; }
-
-STR             { yylval . s . p = yytext; yylval . s . n = yyleng; return STR; }
 
 \[              { return OB; }
 \]              { return CB; }
@@ -44,7 +45,6 @@ STR             { yylval . s . p = yytext; yylval . s . n = yyleng; return STR; 
 {I64}           { yylval . i64 = atol( yytext ); return I64; }
 {MONTH}         { yylval . s . p = yytext; yylval . s . n = yyleng; return MONTH; }
 
-"port="         { return PORT; }
-"rl="           { return RL; }
+{STR}           { yylval . s . p = yytext; yylval . s . n = yyleng; return STR; }
 
 %%

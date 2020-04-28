@@ -1,3 +1,5 @@
+%locations
+%define parse.error verbose
 
 %{
 #include <stdio.h>
@@ -10,7 +12,7 @@ extern int yylineno;
 extern char * yytext;
 extern FILE* yyin;
 
-void yyerror( const char * s );
+void yyerror( const char* msg );
 uint8_t month_int( const char * s );
 
 %}
@@ -30,7 +32,7 @@ uint8_t month_int( const char * s );
 %token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF
 
 %type<tp> time
-%type<s> quoted ip user host hostname request gzip_ratio referer agent
+%type<s> quoted ip user host request gzip_ratio referer agent
 %type<i64> result_code result_len port req_len
 
 %start logging
@@ -109,13 +111,7 @@ user
 
 host
     : quoted
-    | hostname
-    ;
-
-hostname
-    : STR
-    | hostname DOT                  { $$.p = $1.p; $$.n = $1.n + 1; }
-    | hostname STR                  { $$.p = $1.p; $$.n = $1.n + $2.n; }
+    | STR
     ;
 
 request
@@ -181,9 +177,10 @@ int main()
     return 0;
 }
 
-void yyerror( const char* s )
+void yyerror( const char* msg )
 {
-    fprintf( stderr, "#%d: %s at >'%s'<\n", yylineno, s, yytext );
+    fprintf( stderr, "#%d: %s at >'%s'<\n", yylineno, msg, yytext );
+//    fprintf( stderr, "at: %d.%d ... %d.%d\n", p->first_line, p->first_column, p->last_line, p->last_column );
     exit( 1 );
 }
 
