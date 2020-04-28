@@ -16,19 +16,23 @@ MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
 QSTR    [ .\-\?/a-zA-Z0-9]+
+STR     [\-a-zA-Z0-9]+
 
 %x QUOTED
 
 %%
 
 [ \t]           ;
-\n              { return NEWLINE; }
+\n              { return LF; }
+\r              { return CR; }
 \.              { return DOT; }
 -               { return DASH; }
 
 \"              { BEGIN( QUOTED ); return QUOTE; }
 <QUOTED>\"      { BEGIN( INITIAL ); return QUOTE; }
 <QUOTED>{QSTR}  { yylval . s . p = yytext; yylval . s . n = yyleng; return QSTR; }
+
+STR             { yylval . s . p = yytext; yylval . s . n = yyleng; return STR; }
 
 \[              { return OB; }
 \]              { return CB; }

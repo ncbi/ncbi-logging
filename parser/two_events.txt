@@ -1,2 +1,4 @@
 158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] "sra-download.ncbi.nlm.nih.gov" "GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.1" "-" port=443 rl=293
 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "sra-download.ncbi.nlm.nih.gov" "GET /traces/sra32/SRR/005807/SRR5946882 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
+139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] sra-download.ncbi.nlm.nih.gov "GET /traces/sra32/SRR/005807/SRR5946882 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
+139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR5946882 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293

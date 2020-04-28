@@ -1,5 +1,5 @@
-%{
 
+%{
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -15,74 +15,157 @@ uint8_t month_int( const char * s );
 
 %}
 
-%union {
-    struct t_str
-    {
-        char * p;
-        int n;
-    } s;
-    
-    int64_t i64;
-
-    struct t_timepoint
-    {
-        uint8_t day;
-        uint8_t month;
-        uint32_t year;
-        uint8_t hour;
-        uint8_t minute;
-        uint8_t second;
-        int32_t offset;
-    } tp;
+%code requires {
+#include "types.h"
 }
 
-%token<s> QSTR
-%token<s> MONTH
-%token<s> IPV4
-%token<s> FLOAT
-%token<i64> I64;
-%token DOT DASH SLASH COLON QUOTE OB CB PORT RL NEWLINE
+%union {
+    t_str s;
+    int64_t i64;
+    t_timepoint tp;
+}
+
+%token<s> STR QSTR MONTH IPV4 FLOAT
+%token<i64> I64
+%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF
+
+%type<tp> time
+%type<s> quoted ip user host hostname request gzip_ratio referer agent
+%type<i64> result_code result_len port req_len
 
 %start logging
 
 %%
 
-logging:                { printf( "start\n\n" ); }
-       | logging line
-;
+logging
+    : %empty                        { printf( "start\n\n" ); }
+    | logging line
+    ;
 
-line: NEWLINE
-    | log NEWLINE   { printf( "done\n\n" ); }
-;
+line
+    : newline
+    | log_v1 newline                { printf( "done ( v1 )\n\n" ); }
+    | log_v2 newline                { printf( "done ( v2 )\n\n" ); }
+    ;
 
-log: IPV4 DASH DASH time QUOTE QSTR QUOTE QUOTE QSTR QUOTE I64 I64 FLOAT QUOTE QSTR QUOTE QUOTE QSTR QUOTE QUOTE QSTR QUOTE PORT I64 RL I64
+newline
+    : CR
+    | LF
+    | CR LF
+    ;
+
+log_v1
+    : ip DASH user time host request result_code result_len gzip_ratio referer agent quoted port req_len
     {
-        printf( "ip\t=%.*s\n", $<s>1.n, $<s>1.p  );
+        printf( "ip\t=%.*s\n", $1.n, $1.p  );
+        if ( $3.n > 0 )
+            printf( "user\t=%.*s\n", $3.n, $3.p );
+        else
+            printf( "user\t=none\n" );
         printf( "t\t=[%.02u/%.02u/%.04u:%.02u:%.02u:%.02u]\n",
-                $<tp>4.day, $<tp>4.month, $<tp>4.year, $<tp>4.hour, $<tp>4.minute, $<tp>4.second );
-        printf( "dom\t=%.*s\n", $<s>6.n, $<s>6.p );
-        printf( "url\t=%.*s\n", $<s>9.n, $<s>9.p );
-        printf( "res\t=%d\n", $11 );
-        printf( "len\t=%d\n", $12 );
-        printf( "fac\t=%.*s\n", $<s>13.n, $<s>13.p );
-        printf( "agnt\t=%.*s\n", $<s>18.n, $<s>18.p );
-        printf( "port\t=%d\n", $24 );
-        printf( "rl\t=%d\n", $26 );
+                $4.day, $4.month, $4.year, $4.hour, $4.minute, $4.second );
+        printf( "host\t=%.*s\n", $5.n, $5.p );
+        printf( "url\t=%.*s\n", $6.n, $6.p );
+        printf( "res\t=%d\n", $7 );
+        printf( "len\t=%d\n", $8 );
+        printf( "gzip\t=%.*s\n", $<s>9.n, $<s>9.p );
+        printf( "ref\t=%.*s\n", $<s>10.n, $<s>10.p );
+        printf( "agnt\t=%.*s\n", $<s>11.n, $<s>11.p );
+        printf( "port\t=%d\n", $13 );
+        printf( "rl\t=%d\n", $14 );
     }
-;
+    ;
 
-time:
-    OB I64 SLASH MONTH SLASH I64 COLON I64 COLON I64 COLON I64 I64 CB
+log_v2
+    : ip DASH user time request result_code result_len gzip_ratio referer agent quoted port req_len
     {
-        $<tp>$.day = $2;
-        $<tp>$.month = month_int( $<s>4.p );
-        $<tp>$.year = $6;
-        $<tp>$.hour = $8;
-        $<tp>$.minute = $10;
-        $<tp>$.second = $12;
-        $<tp>$.offset = $13;
+        printf( "ip\t=%.*s\n", $1.n, $1.p  );
+        if ( $3.n > 0 )
+            printf( "user\t=%.*s\n", $3.n, $3.p );
+        else
+            printf( "user\t=none\n" );
+        printf( "t\t=[%.02u/%.02u/%.04u:%.02u:%.02u:%.02u]\n",
+                $4.day, $4.month, $4.year, $4.hour, $4.minute, $4.second );
+        printf( "host\t=none\n" );
+        printf( "url\t=%.*s\n", $5.n, $5.p );
+        printf( "res\t=%d\n", $6 );
+        printf( "len\t=%d\n", $7 );
+        printf( "gzip\t=%.*s\n", $<s>8.n, $<s>8.p );
+        printf( "ref\t=%.*s\n", $<s>9.n, $<s>9.p );
+        printf( "agnt\t=%.*s\n", $<s>10.n, $<s>10.p );
+        printf( "port\t=%d\n", $12 );
+        printf( "rl\t=%d\n", $13 );
     }
-;
+    ;
+
+ip
+    : IPV4
+    ;
+
+user
+    : DASH                          { $$.p = NULL; $$.n = 0;}
+    | STR                           { $$.p = $1.p; $$.n = $1.n; }
+    ;
+
+host
+    : quoted
+    | hostname
+    ;
+
+hostname
+    : STR
+    | hostname DOT                  { $$.p = $1.p; $$.n = $1.n + 1; }
+    | hostname STR                  { $$.p = $1.p; $$.n = $1.n + $2.n; }
+    ;
+
+request
+    : quoted
+    ;
+
+result_code
+    : I64
+    ;
+
+result_len
+    : I64
+    ;
+
+gzip_ratio
+    : FLOAT
+    ;
+
+referer
+    : quoted
+    ;
+
+agent
+    : quoted
+    ;
+
+port
+    : PORT I64                      { $$ = $2; }
+    ;
+
+req_len
+    : RL I64                        { $$ = $2; }
+    ;
+
+quoted
+    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
+    ;
+
+time
+    : OB I64 SLASH MONTH SLASH I64 COLON I64 COLON I64 COLON I64 I64 CB
+    {
+        $$.day = $2;
+        $$.month = month_int( $4.p );
+        $$.year = $6;
+        $$.hour = $8;
+        $$.minute = $10;
+        $$.second = $12;
+        $$.offset = $13;
+    }
+    ;
 
 %%
 
