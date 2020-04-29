@@ -15,4 +15,4 @@ clean:
 	rm $(PROG) $(PROG).tab.c lex.yy.c $(PROG).tab.h $(PROG).output
 
 run: $(PROG)
-	cat two_events.txt | ./$(PROG)
+	cat two_events.txt | ./$(PROG) > parsed.txt 2>&1

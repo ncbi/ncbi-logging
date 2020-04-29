@@ -18,4 +18,12 @@ typedef struct t_timepoint
     int32_t offset;
 } t_timepoint;
 
+typedef struct t_request
+{
+    t_str method;
+    t_str path;
+    t_str params;
+    t_str vers;
+} t_request;
+
 #endif

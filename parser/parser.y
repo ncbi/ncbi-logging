@@ -25,14 +25,16 @@ uint8_t month_int( const char * s );
     t_str s;
     int64_t i64;
     t_timepoint tp;
+    t_request req;
 }
 
-%token<s> STR QSTR MONTH IPV4 FLOAT
+%token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR
 %token<i64> I64
-%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF
+%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
 
 %type<tp> time
-%type<s> quoted ip user host request gzip_ratio referer agent
+%type<req> request
+%type<s> ip user server req_time referer agent agent_list forwarded
 %type<i64> result_code result_len port req_len
 
 %start logging
@@ -48,6 +50,7 @@ line
     : newline
     | log_v1 newline                { printf( "done ( v1 )\n\n" ); }
     | log_v2 newline                { printf( "done ( v2 )\n\n" ); }
+    | error newline                 { yyerrok; }
     ;
 
 newline
@@ -57,51 +60,62 @@ newline
     ;
 
 log_v1
-    : ip DASH user time host request result_code result_len gzip_ratio referer agent quoted port req_len
+    : ip DASH user time server request result_code result_len req_time referer agent forwarded port req_len
     {
         printf( "ip\t=%.*s\n", $1.n, $1.p  );
         if ( $3.n > 0 )
             printf( "user\t=%.*s\n", $3.n, $3.p );
         else
             printf( "user\t=none\n" );
-        printf( "t\t=[%.02u/%.02u/%.04u:%.02u:%.02u:%.02u]\n",
+        printf( "time\t=[%.02u/%.02u/%.04u:%.02u:%.02u:%.02u]\n",
                 $4.day, $4.month, $4.year, $4.hour, $4.minute, $4.second );
-        printf( "host\t=%.*s\n", $5.n, $5.p );
-        printf( "url\t=%.*s\n", $6.n, $6.p );
-        printf( "res\t=%d\n", $7 );
-        printf( "len\t=%d\n", $8 );
-        printf( "gzip\t=%.*s\n", $<s>9.n, $<s>9.p );
-        printf( "ref\t=%.*s\n", $<s>10.n, $<s>10.p );
-        printf( "agnt\t=%.*s\n", $<s>11.n, $<s>11.p );
+        printf( "server\t=%.*s\n", $5.n, $5.p );
+
+        printf( "req.method\t=%.*s\n", $6.method.n, $6.method.p );
+        printf( "req.path\t=%.*s\n", $6.path.n, $6.path.p );
+        printf( "req.params\t=%.*s\n", $6.params.n, $6.params.p );
+        printf( "req.vers\t=%.*s\n", $6.vers.n, $6.vers.p );
+
+        printf( "result\t=%d\n", $7 );
+        printf( "body-len\t=%d\n", $8 );
+        printf( "req-time\t=%.*s\n", $<s>9.n, $<s>9.p );
+        printf( "referer\t=%.*s\n", $<s>10.n, $<s>10.p );
+        printf( "agent\t=%.*s\n", $<s>11.n, $<s>11.p );
         printf( "port\t=%d\n", $13 );
-        printf( "rl\t=%d\n", $14 );
+        printf( "req-len\t=%d\n", $14 );
     }
     ;
 
 log_v2
-    : ip DASH user time request result_code result_len gzip_ratio referer agent quoted port req_len
+    : ip DASH user time request result_code result_len req_time referer agent forwarded port req_len
     {
         printf( "ip\t=%.*s\n", $1.n, $1.p  );
         if ( $3.n > 0 )
             printf( "user\t=%.*s\n", $3.n, $3.p );
         else
             printf( "user\t=none\n" );
-        printf( "t\t=[%.02u/%.02u/%.04u:%.02u:%.02u:%.02u]\n",
+        printf( "time\t=[%.02u/%.02u/%.04u:%.02u:%.02u:%.02u]\n",
                 $4.day, $4.month, $4.year, $4.hour, $4.minute, $4.second );
-        printf( "host\t=none\n" );
-        printf( "url\t=%.*s\n", $5.n, $5.p );
-        printf( "res\t=%d\n", $6 );
-        printf( "len\t=%d\n", $7 );
-        printf( "gzip\t=%.*s\n", $<s>8.n, $<s>8.p );
-        printf( "ref\t=%.*s\n", $<s>9.n, $<s>9.p );
-        printf( "agnt\t=%.*s\n", $<s>10.n, $<s>10.p );
+        printf( "server\t=none\n" );
+
+        printf( "req.method\t=%.*s\n", $5.method.n, $5.method.p );
+        printf( "req.path\t=%.*s\n", $5.path.n, $5.path.p );
+        printf( "req.params\t=%.*s\n", $5.params.n, $5.params.p );
+        printf( "req.vers\t=%.*s\n", $5.vers.n, $5.vers.p );
+
+        printf( "result\t=%d\n", $6 );
+        printf( "body-len\t=%d\n", $7 );
+        printf( "req-time\t=%.*s\n", $<s>8.n, $<s>8.p );
+        printf( "referer\t=%.*s\n", $<s>9.n, $<s>9.p );
+        printf( "agent\t=%.*s\n", $<s>10.n, $<s>10.p );
         printf( "port\t=%d\n", $12 );
-        printf( "rl\t=%d\n", $13 );
+        printf( "req-len\t=%d\n", $13 );
     }
     ;
 
 ip
     : IPV4
+    | IPV6
     ;
 
 user
@@ -109,13 +123,26 @@ user
     | STR                           { $$.p = $1.p; $$.n = $1.n; }
     ;
 
-host
-    : quoted
+server
+    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
     | STR
     ;
 
 request
-    : quoted
+    : QUOTE METHOD SPACE QSTR SPACE VERS QUOTE
+    {
+        $$.method.p = $2.p; $$.method.n = $2.n;
+        $$.path.p = $4.p; $$.path.n = $4.n;
+        $$.params.p = $4.p; $$.params.n = 0;
+        $$.vers.p = $6.p; $$.vers.n = $6.n;
+    }
+    | QUOTE METHOD SPACE QSTR QMARK QSTR SPACE VERS QUOTE
+    {
+        $$.method.p = $2.p; $$.method.n = $2.n;
+        $$.path.p = $4.p; $$.path.n = $4.n;
+        $$.params.p = $6.p; $$.params.n = $6.n;
+        $$.vers.p = $8.p; $$.vers.n = $8.n;
+    }
     ;
 
 result_code
@@ -126,16 +153,26 @@ result_len
     : I64
     ;
 
-gzip_ratio
+req_time
     : FLOAT
     ;
 
 referer
-    : quoted
+    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
     ;
 
 agent
-    : quoted
+    : QUOTE agent_list QUOTE        { $$.p = $2.p; $$.n = $2.n; }
+    ;
+
+agent_list
+    : QSTR                          { $$.p = $1.p; $$.n = $1.n; }
+    | agent_list QSTR               { $$.n += $2.n; }
+    | agent_list SPACE              { $$.n += 1; }
+    ;
+
+forwarded
+    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
     ;
 
 port
@@ -144,10 +181,6 @@ port
 
 req_len
     : RL I64                        { $$ = $2; }
-    ;
-
-quoted
-    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
     ;
 
 time
@@ -181,7 +214,6 @@ void yyerror( const char* msg )
 {
     fprintf( stderr, "#%d: %s at >'%s'<\n", yylineno, msg, yytext );
 //    fprintf( stderr, "at: %d.%d ... %d.%d\n", p->first_line, p->first_column, p->last_line, p->last_column );
-    exit( 1 );
 }
 
 uint8_t month_int( const char * s )
