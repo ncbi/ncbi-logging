@@ -1,14 +1,11 @@
-%option noyywrap
-%option yylineno
-
 %{
-#include <stdio.h>
-
-#define YY_DECL int yylex()
-
-#include "parser.tab.h"
-
+#include "log1_parser.h"
+#include "stdint.h"
 %}
+
+%option noyywrap yylineno
+%option reentrant bison-bridge
+%option prefix="log1_"
 
 IPV4SEG     (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])
 IPV4ADDR    ({IPV4SEG}\.){3,3}{IPV4SEG}
@@ -60,15 +57,15 @@ STR     [.\-a-zA-Z0-9_]+
 <QUOTED>\"          { BEGIN( INITIAL ); return QUOTE; }
 <QUOTED>{SPACE}     { return SPACE; }
 <QUOTED>{QMARK}     { return QMARK; }
-<QUOTED>{METHOD}    { yylval . s . p = yytext; yylval . s . n = yyleng; return METHOD; }
-<QUOTED>{VERS}      { yylval . s . p = yytext; yylval . s . n = yyleng; return VERS; }
-<QUOTED>{QSTR}      { yylval . s . p = yytext; yylval . s . n = yyleng; return QSTR; }
+<QUOTED>{METHOD}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return METHOD; }
+<QUOTED>{VERS}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return VERS; }
+<QUOTED>{QSTR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return QSTR; }
 
-{IPV4ADDR}      { yylval . s . p = yytext; yylval . s . n = yyleng; return IPV4; }
-{IPV6ADDR}      { yylval . s . p = yytext; yylval . s . n = yyleng; return IPV6; }
-{FLOAT}         { yylval . s . p = yytext; yylval . s . n = yyleng; return FLOAT; }
-{I64}           { yylval . i64 = atol( yytext ); return I64; }
-{MONTH}         { yylval . s . p = yytext; yylval . s . n = yyleng; return MONTH; }
-{STR}           { yylval . s . p = yytext; yylval . s . n = yyleng; return STR; }
+{IPV4ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV4; }
+{IPV6ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV6; }
+{FLOAT}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return FLOAT; }
+{I64}           { yylval -> i64 = atol( yytext ); return I64; }
+{MONTH}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return MONTH; }
+{STR}           { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR; }
 
 %%

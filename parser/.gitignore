@@ -3,4 +3,4 @@ parser
 parser.output
 parser.tab.h
 parser.tab.c
-
+*.txt

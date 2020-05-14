@@ -1,6 +1,8 @@
 #ifndef _h_types_
 #define _h_types_
 
+#include <time.h>
+
 typedef struct t_str
 {
     char * p;
@@ -25,5 +27,13 @@ typedef struct t_request
     t_str params;
     t_str vers;
 } t_request;
+
+typedef struct t_event
+{
+    t_str ip, user, server, req_time, referer, agent, forwarded;
+    t_timepoint t;
+    t_request req;
+    int64_t res_code, res_len, port, req_len;
+} t_event;
 
 #endif

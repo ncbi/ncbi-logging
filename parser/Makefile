@@ -1,18 +1,32 @@
-PROG = parser
+.PHONY: clean run
+
+CC := gcc
+CFLAGS := -g
+PREFIX := log1_
+PROG = $(PREFIX)prog
 
 all: $(PROG)
 
-$(PROG).tab.c $(PROG).tab.h: $(PROG).y
-	bison -t -v -d $(PROG).y
+OBJ = \
+	$(PREFIX)parser.o \
+	$(PREFIX)scanner.o \
+	parselib.o \
+	parser-functions.o \
+	main.o
 
-lex.yy.c: $(PROG).l $(PROG).tab.h
-	flex $(PROG).l
-
-$(PROG): lex.yy.c $(PROG).tab.c $(PROG).tab.h
-	gcc -o $(PROG) $(PROG).tab.c lex.yy.c
+$(PROG) : $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $+
 
 clean:
-	rm $(PROG) $(PROG).tab.c lex.yy.c $(PROG).tab.h $(PROG).output
+	rm -f $(PROG) $(OBJ) $(PREFIX)parser.? $(PREFIX)scanner.?
 
 run: $(PROG)
 	cat two_events.txt | ./$(PROG) > parsed.txt 2>&1
+
+$(PREFIX)parser.o: $(PREFIX)scanner.o
+
+$(PREFIX)scanner.c: parser.l
+	flex --header-file=$(PREFIX)scanner.h --outfile=$(PREFIX)scanner.c parser.l
+
+$(PREFIX)parser.c: parser.y
+	bison -d parser.y --output-file $(PREFIX)parser.c
