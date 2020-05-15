@@ -339,11 +339,13 @@ int main ( int argc, char *argv[] )
         // <field-key>=<field-value>[,<field2-key>=<field2-value>...]
         //  [unix-nano-timestamp]
 
-        cout << "nginx,";
+        cout << "nginx";
+        cout << " ";
         cout << "ip=\"" << sess.ip << "\",";
         cout << "status=\"" << statuses << "\",";
         cout << "cmds=\"" << cmds << "\"";
-        cout << " ";
+        cout << ",";
+        //cout << " ";
         cout << "agent=\"" << sess.agent << "\",";
         cout << "acc=\"" << sess.acc << "\",";
         cout << "domain=\"" << sess.domain << "\",";
