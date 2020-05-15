@@ -3,7 +3,12 @@
 
 static void on_log_event( t_event * event, void * data )
 {
-    paselib_print_ev( event );
+    parselib_print_ev( event );
+}
+
+static void on_err_event( const char * msg, void * data )
+{
+    printf( "err: >%s<\n\n", msg );
 }
 
 static int perform_parsing( parselib * lib )
@@ -11,7 +16,8 @@ static int perform_parsing( parselib * lib )
     int res = 3;
     if ( NULL != lib )
     {
-        parselib_register_callback( lib, on_log_event );
+        parselib_register_event_callback( lib, on_log_event );
+        parselib_register_error_callback( lib, on_err_event );
         res = parselib_run( lib );
         parselib_destroy( lib );
     }

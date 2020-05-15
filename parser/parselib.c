@@ -1,79 +1,94 @@
 #include "parselib.h"
-#include "types.h"
 #include "log1_parser.h"
 #include "log1_scanner.h"
 
+static void parselib_initialize( parselib * self, void * data )
+{
+    self -> data = data;
+    self -> on_event = NULL;
+    self -> on_error = NULL;
+}
+
 parselib * parselib_create_from_stdin( void * data )
 {
-    parselib * lib = (parselib *)malloc( sizeof( lib ) );
-    if ( NULL != lib )
+    parselib * self = (parselib *)malloc( sizeof( * self ) );
+    if ( NULL != self )
     {
-        lib -> src = stdin;
-        lib -> data = data;
-        lib -> on_event = NULL;
+        self -> src = stdin;
+        parselib_initialize( self, data );
     }
-    return lib;
+    return self;
 }
 
 parselib * parselib_create_from_file( const char * filename, void * data )
 {
-    parselib * lib = (parselib *)malloc( sizeof( lib ) );
-    if ( NULL != lib )
+    parselib * self = (parselib *)malloc( sizeof( * self ) );
+    if ( NULL != self )
     {
-        lib -> src = fopen( filename, "r" );
-        if ( NULL == lib -> src )
+        self -> src = fopen( filename, "r" );
+        if ( NULL == self -> src )
         {
-            free( lib );
-            lib = NULL;
+            free( self );
+            self = NULL;
         }
         else
-        {
-            lib -> data = data;
-            lib -> on_event = NULL;
-        }
+            parselib_initialize( self, data );
     }
-    return lib;
+    return self;
 }
 
-void parselib_register_callback( parselib *lib, log_event_t on_event )
+void parselib_register_event_callback( parselib * self, log_event_t on_event )
 {
-    if ( NULL != lib )
-        lib -> on_event = on_event;
+    if ( NULL != self )
+        self -> on_event = on_event;
 }
 
-void parselib_destroy( parselib * lib )
+void parselib_register_error_callback( parselib * self, err_event_t on_error )
 {
-    if ( NULL != lib )
+    if ( NULL != self )
+        self -> on_error = on_error;
+}
+
+void parselib_destroy( parselib * self )
+{
+    if ( NULL != self )
     {
-        if ( NULL != lib -> src )
-            fclose( lib -> src );
-        free( lib );
+        if ( NULL != self -> src )
+            fclose( self -> src );
+        free( self );
     }
 }
 
-int parselib_run( parselib * lib )
+int parselib_run( parselib * self )
 {
     int res = -1;
-    if ( NULL != lib )
+    if ( NULL != self )
     {
         yyscan_t sc;
 
         log1_lex_init( &sc );
-        log1_set_in( lib -> src, sc );
-        res = log1_parse( sc, lib );
+        log1_set_in( self -> src, sc );
+        res = log1_parse( sc, self );
         log1_lex_destroy( sc );
     }
     return res;
 }
 
-void parselib_event( parselib *lib, t_event * event )
+void parselib_event( parselib * self, t_event * event )
 {
-    if ( NULL != lib )
+    if ( NULL != self )
     {
-        if ( NULL != lib -> on_event )
-        {
-            lib -> on_event( event, lib -> data );
-        }
+        if ( NULL != self -> on_event )
+            self -> on_event( event, self -> data );
+    }
+}
+
+void parselib_error( parselib *self, const char * msg )
+{
+    if ( NULL != self )
+    {
+        if ( NULL != self -> on_error )
+            self -> on_error( msg, self -> data );
     }
 }
 
@@ -85,7 +100,7 @@ static void print_tstr( const char * caption, const t_str * s )
         printf( "%s\t=none\n", caption );
 }
 
-void paselib_print_ev( t_event * ev )
+void parselib_print_ev( t_event * ev )
 {
     if ( NULL != ev )
     {
@@ -106,6 +121,6 @@ void paselib_print_ev( t_event * ev )
         print_tstr( "referer", &( ev -> referer ) );
         print_tstr( "agent", &( ev -> agent ) );
         printf( "port\t=%d\n", ev -> port );
-        printf( "req-len\t=%d\n", ev -> req_len );
+        printf( "req-len\t=%d\n\n", ev -> req_len );
     }
 }

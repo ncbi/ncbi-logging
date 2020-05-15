@@ -8,10 +8,9 @@
 %name-prefix "log1_"
 
 %{
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include "parser-functions.h"
+#include "parselib.h"
 #include "log1_parser.h"
 #include "log1_scanner.h"
 
@@ -46,14 +45,14 @@ void log1_error( yyscan_t *locp, parselib *lib, const char* msg );
 %%
 
 logging
-    : %empty                        { printf( "start\n\n" ); }
+    : %empty
     | logging line
     ;
 
 line
     : newline
-    | log_v1 newline                { printf( "done ( v1 )\n\n" ); }
-    | log_v2 newline                { printf( "done ( v2 )\n\n" ); }
+    | log_v1 newline
+    | log_v2 newline
     | error newline                 { yyerrok; }
     ;
 
@@ -190,7 +189,7 @@ time
 
 %%
 
-void log1_error( yyscan_t * locp, parselib * lib, const char* msg )
+void log1_error( yyscan_t * locp, parselib * lib, const char * msg )
 {
-    fprintf( stderr, "err: %s\n", msg );
+    parselib_error( lib, msg );
 }
