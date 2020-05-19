@@ -65,7 +65,10 @@ int parselib_run( parselib * self )
     if ( NULL != self )
     {
         yyscan_t sc;
-
+        // #ifdef YYDEBUG
+        //     extern int log1_debug;
+        //     log1_debug = 1;
+        // #endif
         log1_lex_init( &sc );
         log1_set_in( self -> src, sc );
         res = log1_parse( sc, self );
@@ -110,7 +113,7 @@ void parselib_print_ev( t_event * ev )
         printf( "time\t=[%.02u/%.02u/%.04u:%.02u:%.02u:%.02u]\n",
                 ev -> t . day, ev -> t . month, ev -> t . year, ev -> t . hour, ev -> t . minute, ev -> t . second );
 
-        print_tstr( "server", &( ev -> server ) );
+        print_tstr( "server", &( ev -> req . server ) );
         print_tstr( "req.method", &( ev -> req . method ) );
         print_tstr( "req.path", &( ev -> req . path ) );
         print_tstr( "req.params", &( ev -> req . params ) );

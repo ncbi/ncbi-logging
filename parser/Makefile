@@ -29,4 +29,4 @@ $(PREFIX)scanner.c: parser.l
 	flex --header-file=$(PREFIX)scanner.h --outfile=$(PREFIX)scanner.c parser.l
 
 $(PREFIX)parser.c: parser.y
-	bison -d parser.y --output-file $(PREFIX)parser.c
+	bison --report all -d parser.y --output-file $(PREFIX)parser.c

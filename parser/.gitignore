@@ -1,6 +1,6 @@
-lex.yy.c
-parser
-parser.output
-parser.tab.h
-parser.tab.c
 *.txt
+*.o
+*.output
+log1_prog
+log1_parser.*
+log1_scanner.*

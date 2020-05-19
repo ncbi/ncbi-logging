@@ -8,6 +8,8 @@
 %name-prefix "log1_"
 
 %{
+#define YYDEBUG 1
+
 #include <stdint.h>
 #include "parser-functions.h"
 #include "parselib.h"
@@ -37,7 +39,7 @@ void log1_error( yyscan_t *locp, parselib *lib, const char* msg );
 
 %type<tp> time
 %type<req> request
-%type<s> ip user server req_time referer agent agent_list forwarded
+%type<s> ip user req_time referer agent agent_list forwarded params_opt
 %type<i64> result_code result_len port req_len
 
 %start logging
@@ -52,45 +54,21 @@ logging
 line
     : newline
     | log_v1 newline
-    | log_v2 newline
     | error newline                 { yyerrok; }
     ;
 
 newline
     : CR
     | LF
-    | CR LF
     ;
 
 log_v1
-    : ip DASH user time server request result_code result_len req_time referer agent forwarded port req_len
-    {
-        t_event ev;
-        ev . ip = $1;
-        ev . user = $3;
-        ev . t = $4;
-        ev . server = $5;
-        ev . req = $6;
-        ev . res_code = $7;
-        ev . res_len = $8;
-        ev . req_time = $9;
-        ev . referer = $10;
-        ev . agent = $11;
-        ev . forwarded = $12;
-        ev . port = $13;
-        ev . req_len = $14;
-        parselib_event( lib, &ev );
-    }
-    ;
-
-log_v2
     : ip DASH user time request result_code result_len req_time referer agent forwarded port req_len
     {
         t_event ev;
         ev . ip = $1;
         ev . user = $3;
         ev . t = $4;
-        ev . server . p = NULL; ev . server . n = 0;
         ev . req = $5;
         ev . res_code = $6;
         ev . res_len = $7;
@@ -111,28 +89,40 @@ ip
 
 user
     : DASH                          { $$.p = NULL; $$.n = 0;}
-    | STR                           { $$.p = $1.p; $$.n = $1.n; }
+    | STR                           { $$ = $1; }
     ;
 
-server
-    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
-    | STR
+params_opt
+    : QMARK QSTR    { $$ = $2; }
+    | %empty        { $$.p = NULL; $$.n = 0; }
     ;
 
-request
-    : QUOTE METHOD SPACE QSTR SPACE VERS QUOTE
+request :
+    QUOTE QSTR QUOTE QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
     {
-        $$.method.p = $2.p; $$.method.n = $2.n;
-        $$.path.p = $4.p; $$.path.n = $4.n;
-        $$.params.p = $4.p; $$.params.n = 0;
-        $$.vers.p = $6.p; $$.vers.n = $6.n;
+        $$.server = $2;
+        $$.method = $5;
+        $$.path   = $7;
+        $$.params = $8;
+        $$.vers   = $10;
     }
-    | QUOTE METHOD SPACE QSTR QMARK QSTR SPACE VERS QUOTE
+    |
+    STR QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
     {
-        $$.method.p = $2.p; $$.method.n = $2.n;
-        $$.path.p = $4.p; $$.path.n = $4.n;
-        $$.params.p = $6.p; $$.params.n = $6.n;
-        $$.vers.p = $8.p; $$.vers.n = $8.n;
+        $$.server = $1;
+        $$.method = $3;
+        $$.path   = $5;
+        $$.params = $6;
+        $$.vers   = $8;
+    }
+    |
+    QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
+    {
+        $$.server.p = NULL; $$.server.n = 0;
+        $$.method = $2;
+        $$.path   = $4;
+        $$.params = $5;
+        $$.vers   = $7;
     }
     ;
 
@@ -149,21 +139,21 @@ req_time
     ;
 
 referer
-    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
+    : QUOTE QSTR QUOTE              { $$ = $2; }
     ;
 
 agent
-    : QUOTE agent_list QUOTE        { $$.p = $2.p; $$.n = $2.n; }
+    : QUOTE agent_list QUOTE        { $$ = $2; }
     ;
 
 agent_list
-    : QSTR                          { $$.p = $1.p; $$.n = $1.n; }
+    : QSTR                          { $$ = $1; }
     | agent_list QSTR               { $$.n += $2.n; }
     | agent_list SPACE              { $$.n += 1; }
     ;
 
 forwarded
-    : QUOTE QSTR QUOTE              { $$.p = $2.p; $$.n = $2.n; }
+    : QUOTE QSTR QUOTE              { $$ = $2; }
     ;
 
 port

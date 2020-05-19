@@ -22,6 +22,7 @@ typedef struct t_timepoint
 
 typedef struct t_request
 {
+    t_str server;
     t_str method;
     t_str path;
     t_str params;
@@ -30,7 +31,7 @@ typedef struct t_request
 
 typedef struct t_event
 {
-    t_str ip, user, server, req_time, referer, agent, forwarded;
+    t_str ip, user, req_time, referer, agent, forwarded;
     t_timepoint t;
     t_request req;
     int64_t res_code, res_len, port, req_len;

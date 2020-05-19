@@ -41,6 +41,7 @@ STR     [.\-a-zA-Z0-9_]+
 %%
 
 [ \t]           ;
+\r\n            { return LF; }
 \n              { return LF; }
 \r              { return CR; }
 \.              { return DOT; }
