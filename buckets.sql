@@ -59,6 +59,8 @@ create table buckets (
 insert into buckets (cloud_provider, bucket_name, service_account, format)
     values ('S3', 'sra-pub-run-1-logs', 'strides-analytics', 'S3 log');
 
+
+
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-2');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-3');
@@ -73,15 +75,6 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-11'
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-12');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-13');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-14');
-
-update buckets
-    set owner='nim-nlm-ncbi-sra-opendata',
-    log_bucket='sra-pub-src-1-logs',
-    immutable=1,
-    scope='public',
-    storage_class='hot'
-    where bucket_name like 'sra-pub-%';
-
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-2');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-3');
@@ -91,12 +84,6 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-6')
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-7');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-8');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-9');
-update buckets
-    set format='EQL & BQS'
-    where bucket_name like 'sra-pub-run-%';
-
-update buckets
-    set storage_class = 'cold' where bucket_name not in ('sra-pub-src-1','sra-pub-src-2');
 
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-2');
@@ -129,7 +116,24 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-13')
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-14');
 
 update buckets
+    set owner='nim-nlm-ncbi-sra-opendata',
+    log_bucket='sra-pub-src-1-logs',
+    immutable=1,
+    scope='public',
+    storage_class='hot'
+    where bucket_name like 'sra-pub-%';
+
+update buckets
+    set format='EQL & BQS'
+    where bucket_name like 'sra-pub-run-%';
+
+update buckets
+    set storage_class = 'cold' where bucket_name not in ('sra-pub-src-1','sra-pub-src-2');
+
+
+update buckets
     set owner='nih-sra-datastore-protected',
+    service_account='s3_readers',
     log_bucket='sra-ca-logs', -- TODO
     immutable=1,
     scope='private',
@@ -145,5 +149,11 @@ update buckets
     where bucket_name like 'sra-ca-src-%';
 
 update buckets
-    set storage_class='cold' where bucket_name like 'sra-ca-src-%' and bucket_name!='sra-ca-src-1';
+    set storage_class='cold'
+    where bucket_name like 'sra-ca-src-%' and bucket_name!='sra-ca-src-1';
 
+.headers on
+.mode column
+.mode tabs
+--.width 20
+select * from buckets order by bucket_name, cloud_provider;
