@@ -1,6 +1,7 @@
 .PHONY: clean run
 
 CC := gcc
+CPP := g++
 CFLAGS := -g
 PREFIX := log1_
 PROG = $(PREFIX)prog
@@ -30,3 +31,19 @@ $(PREFIX)scanner.c: parser.l
 
 $(PREFIX)parser.c: parser.y
 	bison --report all -d parser.y --output-file $(PREFIX)parser.c
+
+#################################################
+# tests
+
+# assume that Googletests is installed and accessible
+
+runtest: test_flex
+	./test_flex
+
+CXXFLAGS += -I /usr/local/include
+
+TEST_OBJ = test_flex.o log1_scanner.o
+
+test_flex: $(TEST_OBJ)
+	$(CPP) $(CFLAGS) -I /usr/local/include -o $@ $+ -lgtest -lpthread
+
