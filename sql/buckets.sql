@@ -1,4 +1,5 @@
 .bail on
+pragma page_size=512; -- DB is half the size
 create table cloud_providers (
     cloud_provder text not null
 );
