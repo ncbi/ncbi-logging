@@ -1,9 +1,10 @@
+.bail on
 create table cloud_providers (
     cloud_provder text not null
 );
 insert into cloud_providers values ('S3');
 insert into cloud_providers values ('GS');
-insert into cloud_providers values ('nginx');
+insert into cloud_providers values ('NCBI');
 
 create table service_accounts (
     service_account text not null,
@@ -49,7 +50,7 @@ create table buckets (
     log_bucket text,
     service_account text references service_accounts (service_account) default 'strides-analytics',
     scope text references scopes (scope) default 'public',
-    immutable integer default 0,
+    immutable text default "false",
     format text references formats (format),
     storage_class text references storage_classes (storage_class) default 'hot',
 
@@ -75,7 +76,7 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-11'
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-12');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-13');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-14');
-insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-1'); -- only >=3 ?
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-2');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-3');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-4');
@@ -117,9 +118,9 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-14')
 
 -- https://confluence.ncbi.nlm.nih.gov/display/SRA/SRA+Environments+in+the+Cloud
 update buckets
-    set owner='nim-nlm-ncbi-sra-opendata',
+    set owner='nih-nlm-ncbi-sra',
     log_bucket='sra-pub-run-1-logs',
-    immutable=1,
+    immutable="true",
     scope='public',
     storage_class='hot'
     where bucket_name like 'sra-pub-%';
@@ -136,7 +137,7 @@ update buckets
     set owner='nih-sra-datastore-protected',
     service_account='s3_readers',
     log_bucket='sra-ca-run-logs',
-    immutable=1,
+    immutable="true",
     scope='private',
     storage_class='hot'
     where bucket_name like 'sra-ca-%';
@@ -153,8 +154,59 @@ update buckets
     set storage_class='cold'
     where bucket_name like 'sra-ca-src-%' and bucket_name!='sra-ca-src-1';
 
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+    select
+        'GS',
+        bucket_name,
+        description,
+        owner,
+        log_bucket,
+        service_account,
+        immutable,
+        format,
+        storage_class
+        from buckets
+        where cloud_provider='S3'
+        and bucket_name like 'sra-pub-%' or bucket_name like 'sra-ca-%';
+
+update buckets set log_bucket='sra-pub-logs-1',
+    format='GS log',
+    owner='nih-sra-datastore'
+    where cloud_provider='GS' and log_bucket='sra-pub-run-1-logs';
+
+update buckets set log_bucket='sra-ca-logs-1',
+    owner='nih-sra-datastore-protected',
+    format='GS log'
+    where cloud_provider='GS' and log_bucket='sra-ca-run-logs';
+
+delete from buckets where cloud_provider='S3' and bucket_name in ('sra-pub-src-1','sra-pub-src-2');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('S3', 'sra-pub-sars-cov2', 'CoViD-19', 'Efremov', 'sra-pub-run-1-logs', 's3_readers', 
+    'true', 'Original', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('S3', 'sra-pub-sars-cov2-metadata-us-east-1', 'CoViD-19', 'Efremov', 'sra-pub-run-1-logs',
+    's3_readers', 'true', 'Original', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('NCBI', 
+    'srafiles11 and friends',
+    'applog rotated',
+    'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive',
+    '',
+    'false',
+    'nginx log',
+    'hot');
+
+
 .headers on
 .mode column
 .mode tabs
 --.width 20
-select * from buckets order by bucket_name, cloud_provider;
+select * from buckets order by cloud_provider, bucket_name;
