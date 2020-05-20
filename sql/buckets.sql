@@ -75,7 +75,7 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-11'
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-12');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-13');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-14');
-insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-1');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-1'); -- only >=3 ?
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-2');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-3');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-4');
@@ -115,9 +115,10 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-12')
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-13');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-14');
 
+-- https://confluence.ncbi.nlm.nih.gov/display/SRA/SRA+Environments+in+the+Cloud
 update buckets
     set owner='nim-nlm-ncbi-sra-opendata',
-    log_bucket='sra-pub-src-1-logs',
+    log_bucket='sra-pub-run-1-logs',
     immutable=1,
     scope='public',
     storage_class='hot'
@@ -134,7 +135,7 @@ update buckets
 update buckets
     set owner='nih-sra-datastore-protected',
     service_account='s3_readers',
-    log_bucket='sra-ca-logs', -- TODO
+    log_bucket='sra-ca-run-logs',
     immutable=1,
     scope='private',
     storage_class='hot'
