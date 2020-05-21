@@ -23,11 +23,6 @@ void log1_error( yyscan_t locp, NCBI::Logging::LogLines * lib, const char* msg )
 
 uint8_t month_int( const t_str * s );
 
-string ToString( const t_str & in )
-{
-    return string( in.p == nullptr ? "" : in.p, in.n );
-}
-
 %}
 
 %code requires
@@ -59,24 +54,24 @@ using namespace NCBI::Logging;
 %%
 
 line
-    : log_v1
-    | error
+    : log_onprem
+    | log_onprem_err
     ;
 
-log_v1
+log_onprem
     : ip DASH user time request result_code result_len req_time referer agent forwarded port req_len
     {
         LogEvent ev;
-        ev.ip = ToString( $1 );
-        ev . user = ToString( $3 );
+        ev . ip = $1;
+        ev . user = $3;
         ev . time = $4;
         ev . request = $5;
         ev . res_code = $6;
         ev . res_len = $7;
-        ev . req_time = ToString( $8 );
-        ev . referer = ToString( $9 );
-        ev . agent = ToString( $10 );
-        ev . forwarded = ToString( $11 );
+        ev . req_time = $8;
+        ev . referer = $9;
+        ev . agent = $10;
+        ev . forwarded = $11;
         ev . port = $12;
         ev . req_len = $13;
 
@@ -84,6 +79,14 @@ log_v1
     }
     ;
 
+log_onprem_err
+    : ip error
+    {
+        LogEvent ev;
+        ev . ip = $1;
+        lib -> rejectLine( ev );
+    }
+    ;
 ip
     : IPV4
     | IPV6
@@ -183,8 +186,9 @@ time
 
 void log1_error( yyscan_t locp, NCBI::Logging::LogLines * lib, const char * msg )
 {
-    lib->unrecognized( string( msg ) );
-    //TODO: use locp
+    // TODO: find a way to comunicate the syntax error to the consumer...
+    // t_str msg_p = { msg, (int)strlen( msg ) };
+    // lib -> unrecognized( msg_p );
 }
 
 uint8_t month_int( const t_str * s )

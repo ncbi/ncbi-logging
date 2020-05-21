@@ -3,7 +3,7 @@
 
 typedef struct t_str
 {
-    char * p;
+    const char * p;
     int n;
 } t_str;
 

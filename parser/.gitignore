@@ -6,3 +6,5 @@ log1_parser.*
 log1_scanner.*
 test_parse
 test_flex
+log1_prog
+log2csv

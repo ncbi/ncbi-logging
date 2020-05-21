@@ -6,7 +6,7 @@ CFLAGS := -g
 CXXFLAGS += -I /usr/local/include -I . -g
 PREFIX := log1_
 
-all: liblogparse.a
+all: liblogparse.a log2csv
 
 clean:
 	rm -f *.o $(PREFIX)parser.* $(PREFIX)scanner.* liblogparse.a
@@ -33,6 +33,14 @@ liblogparse.a: $(LOGLIB_OBJ)
 	ar r $@ $+
 
 lib: liblogparse.a
+
+#################################################
+# minimal parser: stdin(any format)->parsing->stdout(csv)
+
+LOG2CSVOBJ = log2csv.o
+
+log2csv : $(LOG2CSVOBJ) liblogparse.a
+	$(CPP) $(CFLAGS) -o $@ $+
 
 #################################################
 # tests

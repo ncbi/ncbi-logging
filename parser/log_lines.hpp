@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <iostream>
 
 #include "types.h"
@@ -31,25 +30,27 @@ namespace NCBI
 
         struct LogEvent
         {
-            std::string ip;
-            std::string user;
+            t_str       ip;
+            t_str       user;
             t_timepoint time;
             t_request   request;
             int64_t     res_code;
             int64_t     res_len;
-            std::string req_time;
-            std::string referer;
-            std::string agent;
-            std::string forwarded;
+            t_str       req_time;
+            t_str       referer;
+            t_str       agent;
+            t_str       forwarded;
             int64_t     port;
             int64_t     req_len;
 
-            std::string unparsed;
+            t_str unparsed;
         };
 
         struct LogLines
         {
-            virtual int unrecognized( const std::string & text ) = 0;
+            // TODO maybe using an exception to abort if the receiver
+            // cannot handle the events ( any more ) ... 
+            virtual int unrecognized( const t_str & text ) = 0;
             virtual int acceptLine( const LogEvent & event ) = 0;
             virtual int rejectLine( const LogEvent & event ) = 0;
 
