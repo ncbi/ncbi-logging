@@ -3,47 +3,64 @@
 CC := gcc
 CPP := g++
 CFLAGS := -g
+CXXFLAGS += -I /usr/local/include -I . -g
 PREFIX := log1_
-PROG = $(PREFIX)prog
 
-all: $(PROG)
-
-OBJ = \
-	$(PREFIX)parser.o \
-	$(PREFIX)scanner.o \
-	parselib.o \
-	parser-functions.o \
-	main.o
-
-$(PROG) : $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $+
+all: liblogparse.a
 
 clean:
-	rm -f $(PROG) $(OBJ) $(PREFIX)parser.? $(PREFIX)scanner.?
-
-run: $(PROG)
-	cat two_events.txt | ./$(PROG) > parsed.txt 2>&1
+	rm -f *.o $(PREFIX)parser.* $(PREFIX)scanner.* liblogparse.a
 
 $(PREFIX)parser.o: $(PREFIX)scanner.o
 
-$(PREFIX)scanner.c: parser.l
-	flex --header-file=$(PREFIX)scanner.h --outfile=$(PREFIX)scanner.c parser.l
+$(PREFIX)scanner.cpp: parser.l
+	flex --header-file=$(PREFIX)scanner.hpp --outfile=$(PREFIX)scanner.cpp parser.l
 
-$(PREFIX)parser.c: parser.y
-	bison --report all -d parser.y --output-file $(PREFIX)parser.c
+$(PREFIX)parser.cpp: parser.y
+	bison --report all -d parser.y --output-file $(PREFIX)parser.cpp
+
+#################################################
+# C++ log parsing library
+
+log_lines.o: $(PREFIX)parser.cpp $(PREFIX)scanner.cpp
+
+LOGLIB_OBJ = \
+	$(PREFIX)parser.o \
+	$(PREFIX)scanner.o \
+	log_lines.o \
+
+liblogparse.a: $(LOGLIB_OBJ)
+	ar r $@ $+
+
+lib: liblogparse.a
 
 #################################################
 # tests
-
 # assume that Googletests is installed and accessible
 
-runtest: test_flex
+runtests: flextest parsetest
+
+#################################################
+# scanner
+
+flextest: test_flex
 	./test_flex
 
-CXXFLAGS += -I /usr/local/include
+TEST_FLEX_OBJ = test_flex.o log1_scanner.o
 
-TEST_OBJ = test_flex.o log1_scanner.o
-
-test_flex: $(TEST_OBJ)
+test_flex: $(TEST_FLEX_OBJ)
 	$(CPP) $(CFLAGS) -I /usr/local/include -o $@ $+ -lgtest -lpthread
 
+#################################################
+# parser
+
+parsetest: test_parse
+	./test_parse
+
+TEST_PARSE_OBJ = test_parse.o log_lines.o
+
+test_parse: $(TEST_PARSE_OBJ) liblogparse.a
+	$(CPP) $(CFLAGS) -I /usr/local/include -o $@ $+ -lgtest -lpthread
+
+#run: $(PROG)
+#	cat two_events.txt | ./$(PROG) > parsed.txt 2>&1

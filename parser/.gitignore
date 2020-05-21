@@ -1,6 +1,8 @@
 *.txt
 *.o
+*.a
 *.output
-log1_prog
 log1_parser.*
 log1_scanner.*
+test_parse
+test_flex

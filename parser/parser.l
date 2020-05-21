@@ -1,5 +1,5 @@
 %{
-#include "log1_parser.h"
+#include "log1_parser.hpp"
 #include "stdint.h"
 %}
 
@@ -61,6 +61,7 @@ STR     [.\-a-zA-Z0-9_]+
 <QUOTED>{METHOD}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return METHOD; }
 <QUOTED>{VERS}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return VERS; }
 <QUOTED>{QSTR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return QSTR; }
+<QUOTED>.           ;
 
 {IPV4ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV4; }
 {IPV6ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV6; }
