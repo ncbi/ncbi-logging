@@ -58,6 +58,7 @@ namespace NCBI
             }
         };
 
+        // Maybe in a separate header
         struct LogOnPremEvent : public CommonLogEvent
         {
             t_str       user;
@@ -74,6 +75,7 @@ namespace NCBI
             }
         };
 
+        // Maybe in a separate header
         struct LogAWSEvent : public CommonLogEvent
         {
             t_str       owner;
@@ -113,9 +115,12 @@ namespace NCBI
         struct LogLines
         {
             // TODO maybe using an exception to abort if the receiver
-            // cannot handle the events ( any more ) ... 
+            // cannot handle the events ( any more ) ...
+            // i.e. return void
             virtual int unrecognized( const t_str & text ) = 0;
 
+            // any t_str structures incide event will be invalidated upon return from these methods
+            // if you want to hang on to the strings, copy them inside here
             virtual int acceptLine( const CommonLogEvent & event ) = 0;
             virtual int rejectLine( const CommonLogEvent & event ) = 0;
 
@@ -128,7 +133,7 @@ namespace NCBI
             LogParser( LogLines &, std::istream & );
             LogParser( LogLines & ); // uses cin for input
 
-            bool parse();
+            bool parse(); // maybe void and rely on exceptions to communicate "big" failures
 
             void setDebug( bool on );
 

@@ -199,6 +199,8 @@ TEST_F ( TestParseFixture, Empty )
     }
 }
 
+// OnPremise
+
 TEST_F ( TestParseFixture, OnPremise_NoUser )
 {
     const char * InputLine =
@@ -291,6 +293,7 @@ TEST_F ( TestParseFixture, OnPremise_multiple_nonesense )
     }
 }
 
+// AWS
 TEST_F ( TestParseFixture, AWS )
 {
     const char * InputLine =
@@ -298,11 +301,9 @@ TEST_F ( TestParseFixture, AWS )
 
 }
 
-//TODO: what about rejected lines with partial information recognized?
-//TODO: multiple lines
-//TODO: AWS
 //TODO: GCP
 //TODO: various line endings
+//TODO: rejected lines with more than IP recognized
 
 
 extern "C"
