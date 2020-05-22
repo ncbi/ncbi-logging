@@ -16,14 +16,26 @@ struct CSVLogLines : public LogLines
         mem_os << "unrecognized" << endl;
         return 0;
     }
-    virtual int acceptLine( const LogEvent & event )
+
+    virtual int acceptLine( const LogOnPremEvent & event )
     {
         mem_os << "accepted" << endl;
         return 0;
     }
-    virtual int rejectLine( const LogEvent & event )
+
+    virtual int rejectLine( const LogOnPremEvent & event )
     {
         mem_os << "rejected" << endl;
+        return 0;
+    }
+
+    virtual int acceptLine( const LogAWSEvent & event )
+    {
+        return 0;
+    }
+
+    virtual int rejectLine( const LogAWSEvent & event )
+    {
         return 0;
     }
 

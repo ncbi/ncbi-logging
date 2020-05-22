@@ -32,7 +32,7 @@ struct SRequest
     }
 };
 
-struct SLogEvent
+struct SLogOnPremEvent
 {
     string      ip;
     string      user;
@@ -47,21 +47,59 @@ struct SLogEvent
     int64_t     port;
     int64_t     req_len;
 
-    SLogEvent& operator= ( const LogEvent &ev )
+    SLogOnPremEvent& operator= ( const LogOnPremEvent &ev )
     {
-        ip = ToString( ev . ip );
-        user = ToString( ev . user );
-        time = ev . time;
-        request = ev . request;
-        res_code = ev . res_code;
-        res_len = ev . res_len;
-        req_time = ToString( ev . req_time );
-        referer = ToString( ev . referer );
-        agent = ToString( ev . agent );
-        forwarded = ToString( ev . forwarded );
-        port = ev . port;
-        req_len = ev . req_len;
+        ip          = ToString( ev . ip );
+        user        = ToString( ev . user );
+        time        = ev . time;
+        request     = ev . request;
+        res_code    = ev . res_code;
+        res_len     = ev . res_len;
+        req_time    = ToString( ev . req_time );
+        referer     = ToString( ev . referer );
+        agent       = ToString( ev . agent );
+        forwarded   = ToString( ev . forwarded );
+        port        = ev . port;
+        req_len     = ev . req_len;
         return *this; 
+    }
+};
+
+struct SLogAWSEvent
+{
+    string      owner;
+    string      bucket;
+    t_timepoint time;
+    string      ip;
+    string      requester;
+    string      request_id;
+    string      operation;
+    string      key;
+    SRequest    request;
+    int64_t     status;
+    string      error;
+    int64_t     bytes_sent;
+    int64_t     obj_size;
+    int64_t     total_time;
+    string      referer;
+    string      agent;
+    string      version_id;
+    string      host_id;
+    string      cipher_suite;
+    string      auth_type;
+    string      host_header;
+    string      tls_version;
+
+    SLogAWSEvent& operator= ( const LogAWSEvent &ev )
+    {
+        owner       = ToString( ev . owner );
+        bucket      = ToString( ev . bucket );
+        time        = ev . time;
+        ip          = ToString( ev . ip );
+        requester   = ToString( ev . requester );
+        request_id  = ToString( ev . request_id );
+        operation   = ToString( ev . operation );
+        key         = ToString( ev . key );
     }
 };
 
@@ -72,20 +110,32 @@ struct TestLogLines : public LogLines
         m_unrecognized . push_back( ToString( text ) );
         return 0;
     }
-    virtual int acceptLine( const LogEvent & event )
+
+    virtual int acceptLine( const LogOnPremEvent & event )
     {
         lastEvent = event;
         return 0;
     }
-    virtual int rejectLine( const LogEvent & event )
+
+    virtual int rejectLine( const LogOnPremEvent & event )
     {
         lastRejected = event;
         return 0;
     }
 
+    virtual int acceptLine( const LogAWSEvent & event )
+    {
+        return 0;
+    }
+
+    virtual int rejectLine( const LogAWSEvent & event )
+    {
+        return 0;
+    }
+
     vector< string > m_unrecognized;
-    SLogEvent lastEvent;
-    SLogEvent lastRejected;
+    SLogOnPremEvent lastEvent;
+    SLogOnPremEvent lastRejected;
 };
 
 TEST ( TestParse, InitDestroy )
@@ -120,7 +170,7 @@ TEST_F ( TestParseFixture, OnPremise_NoUser )
     {
         LogParser p( m_lines, input );
         ASSERT_TRUE( p.parse() );
-        const SLogEvent & e = m_lines.lastEvent;
+        const SLogOnPremEvent & e = m_lines.lastEvent;
         ASSERT_EQ( "158.111.236.250", e.ip );
 
         ASSERT_EQ( "", e.user );
@@ -157,7 +207,7 @@ TEST_F ( TestParseFixture, OnPremise_User )
         LogParser p( m_lines, input );
         //p.setDebug(true);
         ASSERT_TRUE( p.parse() );
-        const SLogEvent & e = m_lines.lastEvent;
+        const SLogOnPremEvent & e = m_lines.lastEvent;
         ASSERT_EQ( "158.111.236.250", e.ip );
         ASSERT_EQ( "userid", e.user );
         ASSERT_EQ( 1, e.time.day );
@@ -173,7 +223,7 @@ TEST_F ( TestParseFixture, OnPremise_Request_Params )
         LogParser p( m_lines, input );
         //p.setDebug(true);
         ASSERT_TRUE( p.parse() );
-        const SLogEvent & e = m_lines.lastEvent;
+        const SLogOnPremEvent & e = m_lines.lastEvent;
         ASSERT_EQ( "param1=value", e.request.params );
     }
 }
@@ -216,6 +266,13 @@ TEST_F ( TestParseFixture, OnPremise_multiple_nonesense )
         ASSERT_EQ( "more nonesense", m_lines . m_unrecognized[ 1 ] );
         ASSERT_EQ( "even more", m_lines . m_unrecognized[ 2 ] );
     }
+}
+
+TEST_F ( TestParseFixture, AWS )
+{
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-14 [09/May/2020:22:07:21 +0000] 18.207.254.142 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-0d76b79326eb0165a B6301F55C2486C74 REST.PUT.PART SRR9612637/DRGHT.TC.307_interleaved.fq.1 \"PUT /SRR9612637/DRGHT.TC.307_interleaved.fq.1?partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw-- HTTP/1.1\" 200 - - 8388608 557 12 \"-\" \"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92\" - fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-14.s3.amazonaws.com TLSv1.2\n"
+
 }
 
 //TODO: what about rejected lines with partial information recognized?

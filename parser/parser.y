@@ -47,6 +47,8 @@ using namespace NCBI::Logging;
 %type<tp> time
 %type<req> request
 %type<s> ip user req_time referer agent agent_list forwarded params_opt
+%type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
+%type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<i64> result_code result_len port req_len
 
 %start line
@@ -56,12 +58,13 @@ using namespace NCBI::Logging;
 line
     : log_onprem
     | log_onprem_err
+    | log_aws
     ;
 
 log_onprem
     : ip DASH user time request result_code result_len req_time referer agent forwarded port req_len
     {
-        LogEvent ev;
+        LogOnPremEvent ev;
         ev . ip = $1;
         ev . user = $3;
         ev . time = $4;
@@ -75,25 +78,112 @@ log_onprem
         ev . port = $12;
         ev . req_len = $13;
 
-        lib->acceptLine(ev);
+        lib -> acceptLine( ev );
     }
     ;
 
 log_onprem_err
     : ip error
     {
-        LogEvent ev;
+        LogOnPremEvent ev;
         ev . ip = $1;
         lib -> rejectLine( ev );
     }
     ;
+
+log_aws
+    : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation aws_key request result_code
+        aws_error result_len result_len result_len referer agent aws_version_id aws_host_id aws_cipher
+        aws_auth aws_host_hdr aws_tls_vers
+    {
+        LogAWSEvent ev;
+        ev . owner = $1;
+        ev . bucket = $2;
+        ev . time = $3;
+        ev . ip = $4;
+        ev . requester = $5;
+        ev . request_id = $6;
+        ev . operation = $7;
+        ev . key = $8;
+        ev . request = $9;
+        ev . status = $10;
+        ev . error = $11;
+        ev . bytes_sent = $12;
+        ev . obj_size = $13;
+        ev . total_time = $14;
+        ev . referer = $15;
+        ev . agent = $16;
+        ev . version_id = $17;
+        ev . host_id = $18;
+        ev . cipher_suite = $19;
+        ev . auth_type = $20;
+        ev . host_header = $21;
+        ev . tls_version = $22;
+
+        lib -> acceptLine( ev );
+    }
+    ;
+
+aws_owner
+    : STR
+    ;
+
+aws_bucket
+    : STR
+    ;
+
+aws_requester
+    : STR
+    ;
+
+aws_request_id
+    : STR
+    ;
+
+aws_operation
+    : STR
+    ;
+
+aws_key
+    : STR
+    ;
+
+aws_error
+    : DASH STR DASH                 { $$ = $2; }
+    | DASH DASH                     { $$.p = NULL; $$.n = 0; }
+    ;
+
+aws_version_id
+    : STR
+    ;
+
+aws_host_id
+    : STR
+    ;
+
+aws_cipher
+    : STR
+    ;
+
+aws_auth
+    : STR
+    ;
+
+aws_host_hdr
+    : STR
+    ;
+
+aws_tls_vers
+    : STR
+    ;
+
 ip
     : IPV4
     | IPV6
     ;
 
 user
-    : DASH                          { $$.p = NULL; $$.n = 0;}
+    : DASH                          { $$.p = NULL; $$.n = 0; }
     | STR                           { $$ = $1; }
     ;
 

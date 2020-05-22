@@ -28,7 +28,7 @@ namespace NCBI
             t_str vers;
         } t_request;
 
-        struct LogEvent
+        struct LogOnPremEvent
         {
             t_str       ip;
             t_str       user;
@@ -43,7 +43,35 @@ namespace NCBI
             int64_t     port;
             int64_t     req_len;
 
-            t_str unparsed;
+            t_str       unparsed;
+        };
+
+        struct LogAWSEvent
+        {
+            t_str       owner;
+            t_str       bucket;
+            t_timepoint time;
+            t_str       ip;
+            t_str       requester;
+            t_str       request_id;
+            t_str       operation;
+            t_str       key;
+            t_request   request;
+            int64_t     status;
+            t_str       error;
+            int64_t     bytes_sent;
+            int64_t     obj_size;
+            int64_t     total_time;
+            t_str       referer;
+            t_str       agent;
+            t_str       version_id;
+            t_str       host_id;
+            t_str       cipher_suite;
+            t_str       auth_type;
+            t_str       host_header;
+            t_str       tls_version;
+
+            t_str       unparsed;
         };
 
         struct LogLines
@@ -51,8 +79,12 @@ namespace NCBI
             // TODO maybe using an exception to abort if the receiver
             // cannot handle the events ( any more ) ... 
             virtual int unrecognized( const t_str & text ) = 0;
-            virtual int acceptLine( const LogEvent & event ) = 0;
-            virtual int rejectLine( const LogEvent & event ) = 0;
+
+            virtual int acceptLine( const LogOnPremEvent & event ) = 0;
+            virtual int acceptLine( const LogAWSEvent & event ) = 0;
+
+            virtual int rejectLine( const LogOnPremEvent & event ) = 0;
+            virtual int rejectLine( const LogAWSEvent & event ) = 0;
 
             virtual ~ LogLines () noexcept {}
         };
