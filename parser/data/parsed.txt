@@ -1,0 +1,100 @@
+ip	=158.111.236.250
+user	=none
+time	=[01/01/2020:02:50:24]
+server	=sra-download.ncbi.nlm.nih.gov
+req.method	=GET
+req.path	=/traces/sra34/SRR/003923/SRR4017927
+req.params	=none
+req.vers	=HTTP/1.1
+result	=206
+body-len	=32768
+req-time	=0.000
+referer	=-
+agent	=linux64 sra-toolkit fastq-dump.2.9.1
+port	=443
+req-len	=293
+
+ip	=139.80.16.229
+user	=none
+time	=[01/01/2020:02:50:24]
+server	=sra-download.ncbi.nlm.nih.gov
+req.method	=GET
+req.path	=/traces/sra32/SRR/005807/SRR5946882
+req.params	=none
+req.vers	=HTTP/1.1
+result	=206
+body-len	=32768
+req-time	=0.000
+referer	=-
+agent	=linux64 sra-toolkit fastq-dump.2.9.3
+port	=443
+req-len	=293
+
+ip	=139.80.16.229
+user	=none
+time	=[01/01/2020:02:50:24]
+server	=sra-download.ncbi.nlm.nih.gov
+req.method	=GET
+req.path	=/traces/sra32/SRR/005807/SRR5946882
+req.params	=none
+req.vers	=HTTP/1.1
+result	=206
+body-len	=32768
+req-time	=0.000
+referer	=-
+agent	=linux64 sra-toolkit fastq-dump.2.9.3
+port	=443
+req-len	=293
+
+ip	=139.80.16.229
+user	=none
+time	=[01/01/2020:02:50:24]
+server	=none
+req.method	=GET
+req.path	=/traces/sra32/SRR/005807/SRR5946882
+req.params	=none
+req.vers	=HTTP/1.1
+result	=206
+body-len	=32768
+req-time	=0.000
+referer	=-
+agent	=linux64 sra-toolkit fastq-dump.2.9.3
+port	=443
+req-len	=293
+
+err: >syntax error, unexpected STR<
+
+ip	=139.80.16.229
+user	=none
+time	=[01/01/2020:02:50:24]
+server	=none
+req.method	=GET
+req.path	=/traces/sra32/SRR/005807/SRR000006
+req.params	=none
+req.vers	=HTTP/1.1
+result	=206
+body-len	=32768
+req-time	=0.000
+referer	=-
+agent	=linux64 sra-toolkit fastq-dump.2.9.3
+port	=443
+req-len	=293
+
+err: >syntax error, unexpected STR<
+
+ip	=139.80.16.229
+user	=none
+time	=[01/01/2020:02:50:24]
+server	=none
+req.method	=GET
+req.path	=/traces/sra32/SRR/005807/SRR00008
+req.params	=a=b
+req.vers	=HTTP/1.1
+result	=206
+body-len	=32768
+req-time	=0.000
+referer	=-
+agent	=linux64 sra-toolkit fastq-dump.2.9.3
+port	=443
+req-len	=293
+

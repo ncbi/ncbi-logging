@@ -1,10 +1,6 @@
-*.txt
-*.o
-*.a
+obj
+bin
+lib
 *.output
-log1_parser.*
 log1_scanner.*
-test_parse
-test_flex
-log1_prog
-log2csv
+log1_parser.*
