@@ -17,25 +17,15 @@ struct CSVLogLines : public LogLines
         return 0;
     }
 
-    virtual int acceptLine( const LogOnPremEvent & event )
+    virtual int acceptLine( const CommonLogEvent & event )
     {
         mem_os << "accepted" << endl;
         return 0;
     }
 
-    virtual int rejectLine( const LogOnPremEvent & event )
+    virtual int rejectLine( const CommonLogEvent & event )
     {
         mem_os << "rejected" << endl;
-        return 0;
-    }
-
-    virtual int acceptLine( const LogAWSEvent & event )
-    {
-        return 0;
-    }
-
-    virtual int rejectLine( const LogAWSEvent & event )
-    {
         return 0;
     }
 

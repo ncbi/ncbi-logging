@@ -106,9 +106,9 @@ log_aws
         ev . operation = $7;
         ev . key = $8;
         ev . request = $9;
-        ev . status = $10;
+        ev . res_code = $10;
         ev . error = $11;
-        ev . bytes_sent = $12;
+        ev . res_len = $12;
         ev . obj_size = $13;
         ev . total_time = $14;
         ev . referer = $15;
