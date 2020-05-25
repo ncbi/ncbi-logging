@@ -1,11 +1,13 @@
 %{
 #include "aws_parser.hpp"
 #include "stdint.h"
+#include "assert.h"
 %}
 
 %option noyywrap yylineno
 %option reentrant bison-bridge
 %option prefix="aws_"
+%option stack
 
 IPV4SEG     (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])
 IPV4ADDR    ({IPV4SEG}\.){3,3}{IPV4SEG}
@@ -35,8 +37,9 @@ QSTR    [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]]+
 SPACE   " "
 QMARK   \?
 STR     [.\-a-zA-Z0-9_]+
+STR1    {STR}([/:][.\-a-zA-Z0-9_]*)+
 
-%x QUOTED
+%x QUOTED TIMEFMT
 
 %%
 
@@ -46,7 +49,6 @@ STR     [.\-a-zA-Z0-9_]+
 \r              { return CR; }
 \.              { return DOT; }
 -               { return DASH; }
-\[              { return OB; }
 \]              { return CB; }
 \/              { return SLASH; }
 \:              { return COLON; }
@@ -54,8 +56,8 @@ STR     [.\-a-zA-Z0-9_]+
 "port="         { return PORT; }
 "rl="           { return RL; }
 
-\"                  { BEGIN( QUOTED ); return QUOTE; }
-<QUOTED>\"          { BEGIN( INITIAL ); return QUOTE; }
+\"                  { assert( yyscanner ); yy_push_state( QUOTED, yyscanner ); return QUOTE; }
+<QUOTED>\"          { assert( yyscanner ); yy_pop_state( yyscanner ); return QUOTE; }
 <QUOTED>{SPACE}     { return SPACE; }
 <QUOTED>{QMARK}     { return QMARK; }
 <QUOTED>{METHOD}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return METHOD; }
@@ -63,11 +65,19 @@ STR     [.\-a-zA-Z0-9_]+
 <QUOTED>{QSTR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return QSTR; }
 <QUOTED>.           ;
 
+\[                  { assert( yyscanner );  yy_push_state( TIMEFMT, yyscanner ); return OB; }
+<TIMEFMT>\]         { assert( yyscanner ); yy_pop_state( yyscanner ); return CB; }
+<TIMEFMT>{I64}      { yylval -> i64 = atol( yytext ); return I64; }
+<TIMEFMT>\:         { return COLON; }
+<TIMEFMT>\/         { return SLASH; }
+<TIMEFMT>{MONTH}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return MONTH; }
+
 {IPV4ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV4; }
 {IPV6ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV6; }
 {FLOAT}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return FLOAT; }
 {I64}           { yylval -> i64 = atol( yytext ); return I64; }
 {MONTH}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return MONTH; }
+{STR1}          { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR1; }
 {STR}           { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR; }
 
 %%

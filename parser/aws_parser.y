@@ -15,13 +15,12 @@
 #include "log_lines.hpp"
 #include "aws_parser.hpp"
 #include "aws_scanner.hpp"
+#include "helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
 
 void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* msg );
-
-uint8_t month_int( const t_str * s );
 
 %}
 
@@ -40,7 +39,7 @@ using namespace NCBI::Logging;
     t_request req;
 }
 
-%token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR
+%token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR
 %token<i64> I64
 %token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
 
@@ -57,7 +56,22 @@ using namespace NCBI::Logging;
 
 line
     :
-    | log_aws
+    | log_aws1
+    ;
+
+log_aws1
+    : aws_owner aws_bucket time ip aws_requester aws_request_id
+    {
+        LogAWSEvent ev;
+        ev . owner = $1;
+        ev . bucket = $2;
+        ev . time = $3;
+        ev . ip = $4;
+        ev . requester = $5;
+        ev . request_id = $6;
+
+        lib -> acceptLine( ev );
+    }
     ;
 
 log_aws
@@ -103,6 +117,7 @@ aws_bucket
 
 aws_requester
     : STR
+    | STR1
     ;
 
 aws_request_id

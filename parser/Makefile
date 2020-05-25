@@ -1,4 +1,4 @@
-.PHONY: clean run
+.PHONY: clean all run
 
 BINDIR = bin
 LIBDIR = lib

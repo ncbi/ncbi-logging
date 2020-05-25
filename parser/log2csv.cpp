@@ -112,8 +112,8 @@ static int parse_op( void )
 
 static int parse_aws( void )
 {
-    CSV_OP_LogLines event_receiver( cout );
-    OP_Parser p( event_receiver, cin );
+    CSV_AWS_LogLines event_receiver( cout );
+    AWS_Parser p( event_receiver, cin );
     bool res = p . parse();
 
     return res ? 0 : 3;
