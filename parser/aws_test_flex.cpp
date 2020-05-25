@@ -2,16 +2,16 @@
 
 #include <string>
 
-#include "log1_parser.hpp"
-#include "log1_scanner.hpp"
+#include "aws_parser.hpp"
+#include "aws_scanner.hpp"
 
 using namespace std;
 
 TEST ( TestFlex, InitDestroy )
 {
     yyscan_t sc;
-    ASSERT_EQ( 0, log1_lex_init( &sc ) );
-    ASSERT_EQ( 0, log1_lex_destroy( sc ) );
+    ASSERT_EQ( 0, aws_lex_init( &sc ) );
+    ASSERT_EQ( 0, aws_lex_destroy( sc ) );
 }
 
 class TestFlexFixture : public ::testing::Test
@@ -19,23 +19,23 @@ class TestFlexFixture : public ::testing::Test
 public:
     virtual void SetUp()
     {
-        log1_lex_init( &sc );
+        aws_lex_init( &sc );
     }
 
     virtual void TearDown()
     {
-        log1_lex_destroy( sc );
+        aws_lex_destroy( sc );
     }
 
     int StartScan( const char * input )
     {
-        log1__scan_string( input, sc );
-        return log1_lex( & token, sc );
+        aws__scan_string( input, sc );
+        return aws_lex( & token, sc );
     }
 
     int Scan()
     {
-        return log1_lex( & token, sc );
+        return aws_lex( & token, sc );
     }
 
     string Token() const { return string( token . s . p, token . s . n ); }

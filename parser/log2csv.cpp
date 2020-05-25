@@ -33,7 +33,7 @@ static void FormatTime(t_timepoint t, ostream& out)
         << "\"";
 }
 
-struct CSVLogLines : public LogLines
+struct CSV_OP_LogLines : public OP_LogLines
 {
     virtual int unrecognized( const t_str & text )
     {
@@ -43,48 +43,89 @@ struct CSVLogLines : public LogLines
         return 0;
     }
 
-    virtual int acceptLine( const CommonLogEvent & event )
+    virtual int acceptLine( const LogOPEvent & event )
     {
-        switch( event . m_format )
-        {
-            case e_onprem :
-            {
-                const LogOnPremEvent& e = reinterpret_cast<const LogOnPremEvent&>(event);
-                ToQuotedString ( e . ip, mem_os ); mem_os << ",";
-                FormatTime ( e.time, mem_os ); mem_os << ",";
-                ToQuotedString ( e . request.server, mem_os ); mem_os << ",";
-                ToQuotedString ( e . request.method, mem_os ); mem_os << ",";
-                ToQuotedString ( e . request.path, mem_os ); mem_os << ",";
-                ToQuotedString ( e . request.params, mem_os ); mem_os << ",";
-                ToQuotedString ( e . request.vers, mem_os ); mem_os << ",";
-                mem_os << endl;
-            }
-            break;
-
-            default : throw logic_error( "bad event format accepted" ); break;
-        }
+        ToQuotedString ( event . ip, mem_os ); mem_os << ",";
+        FormatTime ( event.time, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.server, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.method, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.path, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.params, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.vers, mem_os ); mem_os << ",";
+        mem_os << endl;
         return 0;
     }
 
-    virtual int rejectLine( const CommonLogEvent & event )
+    virtual int rejectLine( const LogOPEvent & event )
     {
         mem_os << "rejected" << endl;
         return 0;
     }
 
-    CSVLogLines( ostream &os ) : mem_os( os ) {};
+    CSV_OP_LogLines( ostream &os ) : mem_os( os ) {};
 
     ostream &mem_os;
 };
 
-extern "C"
+struct CSV_AWS_LogLines : public AWS_LogLines
 {
-    int main ( int argc, const char * argv [], const char * envp []  )
+    virtual int unrecognized( const t_str & text )
     {
-        CSVLogLines event_receiver( cout );
-        LogParser p( event_receiver, cin );
-        bool res = p . parse();
-
-        return res ? 0 : 3;
+        mem_os << "unrecognized,";
+        ToQuotedString ( text, mem_os );
+        mem_os << "," << endl;
+        return 0;
     }
+
+    virtual int acceptLine( const LogAWSEvent & event )
+    {
+        ToQuotedString ( event . ip, mem_os ); mem_os << ",";
+        FormatTime ( event.time, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.server, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.method, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.path, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.params, mem_os ); mem_os << ",";
+        ToQuotedString ( event . request.vers, mem_os ); mem_os << ",";
+        mem_os << endl;
+        return 0;
+    }
+
+    virtual int rejectLine( const LogAWSEvent & event )
+    {
+        mem_os << "rejected" << endl;
+        return 0;
+    }
+
+    CSV_AWS_LogLines( ostream &os ) : mem_os( os ) {};
+
+    ostream &mem_os;
+};
+
+static int parse_op( void )
+{
+    CSV_OP_LogLines event_receiver( cout );
+    OP_Parser p( event_receiver, cin );
+    bool res = p . parse();
+
+    return res ? 0 : 3;
+}
+
+static int parse_aws( void )
+{
+    CSV_OP_LogLines event_receiver( cout );
+    OP_Parser p( event_receiver, cin );
+    bool res = p . parse();
+
+    return res ? 0 : 3;
+}
+
+int main ( int argc, const char * argv [], const char * envp []  )
+{
+    string fmt( "op" );
+    if ( argc > 1 )
+        fmt = string( argv[ 1 ] );
+
+    if ( fmt == "aws" )
+        return parse_aws();
+    return parse_op();
 }

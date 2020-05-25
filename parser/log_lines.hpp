@@ -29,15 +29,8 @@ namespace NCBI
             t_str vers;
         } t_request;
 
-        enum e_format
-        {
-            e_onprem, e_aws, e_gcp
-        };
-
         struct CommonLogEvent
         {
-            e_format    m_format;
-
             t_str       ip;
             t_timepoint time;
             t_request   request;
@@ -48,7 +41,7 @@ namespace NCBI
 
             t_str       unparsed;
 
-            CommonLogEvent( e_format format ) : m_format( format )
+            CommonLogEvent()
             {
                 ip . n = 0;
                 referer . n = 0;
@@ -59,7 +52,7 @@ namespace NCBI
         };
 
         // Maybe in a separate header
-        struct LogOnPremEvent : public CommonLogEvent
+        struct LogOPEvent : public CommonLogEvent
         {
             t_str       user;
             t_str       req_time;
@@ -67,7 +60,7 @@ namespace NCBI
             int64_t     port;
             int64_t     req_len;
 
-            LogOnPremEvent() : CommonLogEvent( e_onprem )
+            LogOPEvent() : CommonLogEvent()
             {
                 user . n = 0;
                 req_time . n = 0;
@@ -94,7 +87,7 @@ namespace NCBI
             t_str       host_header;
             t_str       tls_version;
 
-            LogAWSEvent() : CommonLogEvent( e_aws )
+            LogAWSEvent() : CommonLogEvent()
             {
                 owner . n = 0;
                 bucket . n = 0;
@@ -112,7 +105,7 @@ namespace NCBI
             }
         };
 
-        struct LogLines
+        struct OP_LogLines
         {
             // TODO maybe using an exception to abort if the receiver
             // cannot handle the events ( any more ) ...
@@ -121,26 +114,57 @@ namespace NCBI
 
             // any t_str structures incide event will be invalidated upon return from these methods
             // if you want to hang on to the strings, copy them inside here
-            virtual int acceptLine( const CommonLogEvent & event ) = 0;
-            virtual int rejectLine( const CommonLogEvent & event ) = 0;
+            virtual int acceptLine( const LogOPEvent & event ) = 0;
+            virtual int rejectLine( const LogOPEvent & event ) = 0;
 
-            virtual ~ LogLines () noexcept {}
+            virtual ~ OP_LogLines () noexcept {}
         };
 
-        class LogParser
+        struct AWS_LogLines
+        {
+            // TODO maybe using an exception to abort if the receiver
+            // cannot handle the events ( any more ) ...
+            // i.e. return void
+            virtual int unrecognized( const t_str & text ) = 0;
+
+            // any t_str structures incide event will be invalidated upon return from these methods
+            // if you want to hang on to the strings, copy them inside here
+            virtual int acceptLine( const LogAWSEvent & event ) = 0;
+            virtual int rejectLine( const LogAWSEvent & event ) = 0;
+
+            virtual ~ AWS_LogLines () noexcept {}
+        };
+
+        class OP_Parser
         {
         public:
-            LogParser( LogLines &, std::istream & );
-            LogParser( LogLines & ); // uses cin for input
+            OP_Parser( OP_LogLines &loglines, std::istream &input );
+            OP_Parser( OP_LogLines &loglines ); // uses cin for input
 
             bool parse(); // maybe void and rely on exceptions to communicate "big" failures
 
             void setDebug( bool on );
 
         private:
-            LogLines &      m_lines;
+            OP_LogLines &   m_lines;
             std::istream &  m_input;
         };
+
+        class AWS_Parser
+        {
+        public:
+            AWS_Parser( AWS_LogLines &loglines, std::istream &input );
+            AWS_Parser( AWS_LogLines &loglines ); // uses cin for input
+
+            bool parse(); // maybe void and rely on exceptions to communicate "big" failures
+
+            void setDebug( bool on );
+
+        private:
+            AWS_LogLines &  m_lines;
+            std::istream &  m_input;
+        };
+
 
     }
 }

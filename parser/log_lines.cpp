@@ -1,46 +1,47 @@
 #include <log_lines.hpp>
 
-#include "log1_parser.hpp"
-#include "log1_scanner.hpp"
+#include "op_parser.hpp"
+#include "op_scanner.hpp"
+#include "aws_parser.hpp"
+#include "aws_scanner.hpp"
 
 #ifdef YYDEBUG
-    extern int log1_debug;
+    extern int op_debug;
+    extern int aws_debug;
 #endif
 
 using namespace std;
 using namespace NCBI::Logging;
 
-LogParser :: LogParser( LogLines & p_lines, std::istream & p_input )
+OP_Parser :: OP_Parser( OP_LogLines & p_lines, std::istream & p_input )
 : m_lines ( p_lines ), m_input ( p_input )
 {
 }
 
-LogParser :: LogParser( LogLines & p_lines )
+OP_Parser :: OP_Parser( OP_LogLines & p_lines )
 : m_lines ( p_lines ), m_input ( cin )
 {
 }
 
-void
-LogParser :: setDebug( bool on )
+void OP_Parser :: setDebug( bool on )
 {
     #ifdef YYDEBUG
-        log1_debug = (int)on;
+        op_debug = (int)on;
     #endif
 }
 
-bool
-LogParser :: parse()
+bool OP_Parser :: parse()
 {
     int res = 0;
     string line;
     yyscan_t sc;
-    log1_lex_init( &sc );
+    op_lex_init( &sc );
 
     while( 0 == res && getline( m_input, line ) )
     {
-        log1__scan_string( line.c_str(), sc );
+        op__scan_string( line.c_str(), sc );
 
-        res = log1_parse( sc, & m_lines );
+        res = op_parse( sc, & m_lines );
         // return of unrecognized 0 ... coninue, 1 ... abort
         if ( res != 0 )
         {
@@ -48,7 +49,48 @@ LogParser :: parse()
             res = m_lines . unrecognized( err_line );
         }
     }
-    log1_lex_destroy( sc );
+    op_lex_destroy( sc );
     return res == 0;
 }
 
+/* ============================================================================== */
+
+AWS_Parser :: AWS_Parser( AWS_LogLines & p_lines, std::istream & p_input )
+: m_lines ( p_lines ), m_input ( p_input )
+{
+}
+
+AWS_Parser :: AWS_Parser( AWS_LogLines & p_lines )
+: m_lines ( p_lines ), m_input ( cin )
+{
+}
+
+void AWS_Parser :: setDebug( bool on )
+{
+    #ifdef YYDEBUG
+        aws_debug = (int)on;
+    #endif
+}
+
+bool AWS_Parser :: parse()
+{
+    int res = 0;
+    string line;
+    yyscan_t sc;
+    aws_lex_init( &sc );
+
+    while( 0 == res && getline( m_input, line ) )
+    {
+        aws__scan_string( line.c_str(), sc );
+
+        res = aws_parse( sc, & m_lines );
+        // return of unrecognized 0 ... coninue, 1 ... abort
+        if ( res != 0 )
+        {
+            t_str err_line = { line . c_str(), (int)line . size() };
+            res = m_lines . unrecognized( err_line );
+        }
+    }
+    aws_lex_destroy( sc );
+    return res == 0;
+}

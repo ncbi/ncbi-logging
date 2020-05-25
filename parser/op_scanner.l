@@ -1,11 +1,11 @@
 %{
-#include "log1_parser.hpp"
+#include "op_parser.hpp"
 #include "stdint.h"
 %}
 
 %option noyywrap yylineno
 %option reentrant bison-bridge
-%option prefix="log1_"
+%option prefix="op_"
 
 IPV4SEG     (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])
 IPV4ADDR    ({IPV4SEG}\.){3,3}{IPV4SEG}

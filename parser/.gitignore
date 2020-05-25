@@ -2,5 +2,13 @@ obj
 bin
 lib
 *.output
-log1_scanner.*
-log1_parser.*
+
+#do not exclude op_scanner.* etc. that would exclude [op|aws]_scanner.[y|l] too!
+op_scanner.cpp
+op_scanner.hpp
+op_parser.cpp
+op_parser.hpp
+aws_scanner.cpp
+aws_scanner.hpp
+aws_parser.cpp
+aws_parser.hpp

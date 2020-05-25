@@ -8,12 +8,22 @@ CC := gcc
 CPP := g++
 LD := g++
 CXXFLAGS += -c -I . -g -MMD
-PREFIX := log1_
+
+PREFIX_OP := op_
+PREFIX_AWS := aws_
+PREFIX_GCP := gcp_
 
 all: log2csv_
 
+#do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
-	rm -rf *.o $(LIBDIR) $(BINDIR) $(OBJDIR) $(PREFIX)parser.* $(PREFIX)scanner.*
+	rm -rf $(LIBDIR) $(BINDIR) $(OBJDIR)
+	rm -f $(PREFIX_OP)parser.hpp $(PREFIX_OP)parser.cpp
+	rm -f $(PREFIX_OP)scanner.hpp $(PREFIX_OP)scanner.cpp
+	rm -f $(PREFIX_OP)parser.output
+	rm -f $(PREFIX_AWS)parser.hpp $(PREFIX_AWS)parser.cpp
+	rm -f $(PREFIX_AWS)scanner.hpp $(PREFIX_AWS)scanner.cpp
+	rm -f $(PREFIX_AWS)parser.output
 
 mkdir:
 	@ mkdir -p $(LIBDIR) $(BINDIR) $(OBJDIR)
@@ -21,25 +31,42 @@ mkdir:
 $(OBJDIR)/%.o: %.cpp
 	$(CPP) $(CXXFLAGS) $< -o $@
 
-$(OBJDIR)/$(PREFIX)parser.o:  $(OBJDIR)/$(PREFIX)scanner.o
+$(OBJDIR)/$(PREFIX_OP)parser.o:  $(OBJDIR)/$(PREFIX_OP)scanner.o
 
-$(PREFIX)scanner.cpp: parser.l
-	flex --header-file=$(PREFIX)scanner.hpp --outfile=$(PREFIX)scanner.cpp parser.l
+$(OBJDIR)/$(PREFIX_AWS)parser.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.o
 
-$(PREFIX)parser.cpp: parser.y
-	bison --report all -d parser.y --output-file $(PREFIX)parser.cpp
+$(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l
+	flex --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
+
+$(PREFIX_OP)parser.cpp: $(PREFIX_OP)parser.y
+	bison --report all -d $(PREFIX_OP)parser.y --output-file $(PREFIX_OP)parser.cpp
+
+$(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l
+	flex --header-file=$(PREFIX_AWS)scanner.hpp --outfile=$(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.l
+
+$(PREFIX_AWS)parser.cpp: $(PREFIX_AWS)parser.y
+	bison --report all -d $(PREFIX_AWS)parser.y --output-file $(PREFIX_AWS)parser.cpp
 
 -include $(OBJDIR)/*.d
 
 #################################################
 # C++ log parsing library
 
-log_lines.o: $(PREFIX)parser.cpp $(PREFIX)scanner.cpp
+LOG_LINES_SRC = \
+	$(PREFIX_OP)parser.cpp \
+	$(PREFIX_OP)scanner.cpp \
+	$(PREFIX_AWS)parser.cpp \
+	$(PREFIX_AWS)scanner.cpp
+
+log_lines.o: $(LOG_LINES_SRC)
 
 LOGLIB_OBJ = \
-	$(PREFIX)parser.o \
-	$(PREFIX)scanner.o \
-	log_lines.o \
+	$(PREFIX_OP)parser.o \
+	$(PREFIX_OP)scanner.o \
+	$(PREFIX_AWS)parser.o \
+	$(PREFIX_AWS)scanner.o \
+	helper.o \
+	log_lines.o
 
 $(LIBDIR)/liblogparse.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_OBJ))
 	ar r $@ $+
@@ -60,29 +87,56 @@ log2csv_: mkdir $(BINDIR)/log2csv
 # tests
 # assume that Googletests is installed and accessible
 
-runtests: flextest parsetest
+#build all test-binaries
+tests: $(PREFIX_OP)test_flex \
+	$(PREFIX_OP)test_parse \
+	$(PREFIX_AWS)test_flex \
+	$(PREFIX_AWS)test_parse 
+
+runtests:
+	$(BINDIR)/$(PREFIX_OP)test_flex
+	$(BINDIR)/$(PREFIX_OP)test_parse
+	$(BINDIR)/$(PREFIX_AWS)test_flex
+	$(BINDIR)/$(PREFIX_AWS)test_parse
 
 #################################################
-# scanner
+# scanner - tests
 
-flextest: lib test_flex
-	$(BINDIR)/test_flex
+$(PREFIX_OP)flextest: lib $(PREFIX_OP)test_flex
+	$(BINDIR)/$(PREFIX_OP)test_flex
 
-TEST_FLEX_OBJ = test_flex.o log1_scanner.o
+$(PREFIX_AWS)flextest: lib $(PREFIX_AWS)test_flex
+	$(BINDIR)/$(PREFIX_AWS)test_flex
 
-test_flex: $(addprefix  $(OBJDIR)/,$(TEST_FLEX_OBJ))
+OP_TEST_FLEX_OBJ = \
+	$(PREFIX_OP)test_flex.o \
+	$(PREFIX_OP)scanner.o
+
+AWS_TEST_FLEX_OBJ = \
+	$(PREFIX_AWS)test_flex.o \
+	$(PREFIX_AWS)scanner.o
+
+$(PREFIX_OP)test_flex: $(addprefix  $(OBJDIR)/,$(OP_TEST_FLEX_OBJ))
+	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread
+
+$(PREFIX_AWS)test_flex: $(addprefix  $(OBJDIR)/,$(AWS_TEST_FLEX_OBJ))
 	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread
 
 #################################################
-# parser
+# parser - tests
 
-parsetest: lib test_parse
-	$(BINDIR)/test_parse
+$(PREFIX_OP)parsetest: lib $(PREFIX_OP)test_parse
+	$(BINDIR)/$(PREFIX_OP)test_parse
 
-TEST_PARSE_OBJ = test_parse.o log_lines.o
+$(PREFIX_AWS)parsetest: lib $(PREFIX_AWS)test_parse
+	$(BINDIR)/$(PREFIX_AWS)test_parse
 
-test_parse: $(addprefix $(OBJDIR)/,$(TEST_PARSE_OBJ))
+OP_TEST_PARSE_OBJ = $(PREFIX_OP)test_parse.o log_lines.o
+
+AWS_TEST_PARSE_OBJ = $(PREFIX_AWS)test_parse.o log_lines.o
+
+$(PREFIX_OP)test_parse: $(addprefix $(OBJDIR)/,$(OP_TEST_PARSE_OBJ))
 	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
 
-#run: $(PROG)
-#	cat two_events.txt | ./$(PROG) > parsed.txt 2>&1
+$(PREFIX_AWS)test_parse: $(addprefix $(OBJDIR)/,$(AWS_TEST_PARSE_OBJ))
+	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
