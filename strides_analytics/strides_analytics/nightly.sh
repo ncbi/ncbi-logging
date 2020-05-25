@@ -20,7 +20,7 @@ psql -d strides_analytics -U sa_prod_write -t -X -c "select ip from missing_ips 
 #psql -h localhost -d grafana -c "\\copy rdns FROM ips.new.tsv WITH DELIMITER E'\t'"
 
 psql -h localhost -d grafana -f rdns.sql > /dev/null 2>&1
-psql -h localhost -d grafana -f accs.sql > /dev/null 2>&1
+#psql -h localhost -d grafana -f accs.sql > /dev/null 2>&1
 
 psql -d strides_analytics -U sa_prod_write -f rdns.sql > /dev/null 2>&1
 
@@ -54,9 +54,11 @@ USAGE
 ./blast_dev.sh >> "$LOGDIR"/blast_dev.log 2>&1
 ./sra_hackathon.sh >> "$LOGDIR"/sra_hackathon.log 2>&1
 ./blast_hackathon.sh >> "$LOGDIR"/blast_hackathon.log 2>&1
-./sra_gs.sh >> "$LOGDIR"/sra_gs.log 2>&1
-./sra_s3.sh >> "$LOGDIR"/sra_s3.log 2>&1
-./sra_prod.sh >> "$LOGDIR"/sra_prod.log 2>&1
+./sra_s3.sh >> "$LOGDIR"/sra_s3.log 2>&1 &
+./sra_gs.sh >> "$LOGDIR"/sra_gs.log 2>&1 &
+./sra_prod.sh >> "$LOGDIR"/sra_prod.log 2>&1 &
+
+wait
 
 ./bigquery_export.sh >> "$LOGDIR"/bigquery_export.log 2>&1
 
