@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 set -o nounset # same as -u
-#set -o errexit # same as -e
+set -o errexit # same as -e
 set -o pipefail
 shopt -s nullglob globstar
 
@@ -23,10 +23,16 @@ export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
 
+SQLCACHE="$RAMDISK/${USER}_${DATE}"
+mkdir -p "$SQLCACHE"
+if [ ! -e "$SQLCACHE/buckets.db" ]; then
+    gsutil cp gs://strides_analytics_cfg/buckets.db "$SQLCACHE/buckets.db"
+fi
+
+# Usage: results=$(sqlcmd "select foo from bar")
 sqlcmd () {
-    # TODO: Cache from GS bucket
     local query="$1"
-    sqlite3 -batch ../sql/buckets.db << EOF
+    sqlite3 -batch "${SQLCACHE}/buckets.db" << EOF
 .headers off
 .mode tabs
 .nullvalue NULL
