@@ -69,6 +69,48 @@ namespace NCBI
         };
 
         // Maybe in a separate header
+        struct LogGCPEvent
+        {
+            int64_t     time;           // in microseconds
+            t_str       ip;
+            int64_t     ip_type;        // 1..ipv4, 2..ipv6
+            t_str       ip_region;      // empty, reserved
+            t_str       method;
+            t_str       uri;
+            int64_t     status;
+            int64_t     request_bytes;
+            int64_t     result_bytes;
+            int64_t     time_taken;     // in microsenconds
+            t_str       host;
+            t_str       referrer;
+            t_str       agent;
+            t_str       request_id;
+            t_str       operation;
+            t_str       bucket;
+            t_str       object;
+
+            LogGCPEvent()
+            {
+                time = 0;
+                ip . n = 0;
+                ip_type = 0;
+                ip_region . n = 0;
+                method . n = 0;
+                uri . n = 0;
+                status = 0;
+                request_bytes = 0;
+                result_bytes = 0;
+                time_taken = 0;
+                host . n = 0;
+                referrer . n = 0;
+                agent . n = 0;
+                request_id . n = 0;
+                operation . n = 0;
+                bucket . n = 0;
+                object . n = 0;
+            }
+        };
+
         struct LogAWSEvent : public CommonLogEvent
         {
             t_str       owner;
@@ -135,6 +177,22 @@ namespace NCBI
             virtual ~ AWS_LogLines () noexcept {}
         };
 
+        struct GCP_LogLines
+        {
+            // TODO maybe using an exception to abort if the receiver
+            // cannot handle the events ( any more ) ...
+            // i.e. return void
+            virtual int unrecognized( const t_str & text ) = 0;
+
+            // any t_str structures incide event will be invalidated upon return from these methods
+            // if you want to hang on to the strings, copy them inside here
+            virtual int acceptLine( const LogGCPEvent & event ) = 0;
+            virtual int rejectLine( const LogGCPEvent & event ) = 0;
+
+            virtual ~ GCP_LogLines () noexcept {}
+        };
+
+
         class OP_Parser
         {
         public:
@@ -162,6 +220,21 @@ namespace NCBI
 
         private:
             AWS_LogLines &  m_lines;
+            std::istream &  m_input;
+        };
+
+        class GCP_Parser
+        {
+        public:
+            GCP_Parser( GCP_LogLines &loglines, std::istream &input );
+            GCP_Parser( GCP_LogLines &loglines ); // uses cin for input
+
+            bool parse(); // maybe void and rely on exceptions to communicate "big" failures
+
+            void setDebug( bool on );
+
+        private:
+            GCP_LogLines &  m_lines;
             std::istream &  m_input;
         };
 

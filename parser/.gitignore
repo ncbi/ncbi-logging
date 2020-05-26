@@ -12,3 +12,7 @@ aws_scanner.cpp
 aws_scanner.hpp
 aws_parser.cpp
 aws_parser.hpp
+gcp_scanner.cpp
+gcp_scanner.hpp
+gcp_parser.cpp
+gcp_parser.hpp
