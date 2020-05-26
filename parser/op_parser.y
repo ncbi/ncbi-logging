@@ -54,8 +54,8 @@ using namespace NCBI::Logging;
 %%
 
 line
-    : log_onprem
-    | log_onprem_err
+    : log_onprem        { return 0; }
+    | log_onprem_err    { return 0; }
     ;
 
 log_onprem

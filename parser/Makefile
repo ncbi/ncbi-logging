@@ -13,7 +13,7 @@ PREFIX_OP := op_
 PREFIX_AWS := aws_
 PREFIX_GCP := gcp_
 
-all: log2csv_ log2jsn_
+all: log2src_ log2jsn_
 
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
@@ -95,12 +95,15 @@ lib liblogparse: mkdir $(LIBDIR)/liblogparse.a
 #################################################
 # minimal parser: stdin(any format)->parsing->stdout(csv)
 
-LOG2CSVOBJ = log2csv.o
+LOG2SRCOBJ = log2src.o
 
-$(BINDIR)/log2csv: $(addprefix $(OBJDIR)/,$(LOG2CSVOBJ)) $(LIBDIR)/liblogparse.a
+$(BINDIR)/log2src: $(addprefix $(OBJDIR)/,$(LOG2SRCOBJ)) $(LIBDIR)/liblogparse.a
 	$(LD) -o $@ $^
 
-log2csv_: mkdir $(BINDIR)/log2csv
+log2src_: mkdir $(BINDIR)/log2src
+
+run2src: log2src_
+	cat data/two_events.txt | $(BINDIR)/log2src >./data/run2src.out
 
 #################################################
 # tests
