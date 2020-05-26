@@ -33,21 +33,3 @@
 "1589759904958206","35.245.231.141","1","","GET","/storage/v1/b/sra-pub-src-9/o/SRR11804402%2FBH34.1.fq.gz.1?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl","404","0","287","23000","www.googleapis.com","","apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)","AAANsUn6bkr5xNAQS1cFGJ5Z5cAEEdFc_sBJv3aD-hGfskDdKfIFxEXa5qiKeItGluD6CNBA5Cw-lht3A8mAYy3bpnU","storage.objects.get","sra-pub-src-9","SRR11804402/BH34.1.fq.gz.1"
 "1589759989434690","35.245.177.170","1","","GET","/storage/v1/b/sra-pub-src-9/o/SRR1371108%2FCGAG_2.1.fastq.gz?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl","404","0","291","27000","www.googleapis.com","","apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)","AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs","storage.objects.get","sra-pub-src-9","SRR1371108/CGAG_2.1.fastq.gz"
 "1589759999283747","35.245.231.141","1","","GET","/storage/v1/b/sra-pub-src-9/o/SRR1343173%2FCHAFRAM004240299352_NoIndex_L006_R1_007.fastq.gz?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl","404","0","353","28000","www.googleapis.com","","apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)","AAANsUmFRZiltipU2pZvpWlRzDssNpGyBDGRC5f3To3Kf2vRFE0UFmQ5NRxV6JMeGrwF3RCW14UXA5B1pKTw0H4IDIE","storage.objects.get","sra-pub-src-9","SRR1343173/CHAFRAM004240299352_NoIndex_L006_R1_007.fastq.gz"
-
-time_microsecs "1589759989434690"
-ip "35.245.177.170"
-ip_type "1" (1...ipv4, 2...ipv6)
-ip_region "" (reserved)
-method "GET"
-uri "/storage/v1/b/sra-pub-src-9/o/SRR1371108%2FCGAG_2.1.fastq.gz?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl"
-res-code "404"
-req-bytes "0"
-res-bytes "291"
-time_take_microsecs "27000"
-host "www.googleapis.com"
-referer ""
-agent "apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)"
-req-id "AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs"
-operation "storage.objects.get"
-bucket "sra-pub-src-9"
-object "SRR1371108/CGAG_2.1.fastq.gz"

@@ -123,26 +123,6 @@ TEST_F ( TestParseFixture, Empty )
 }
 
 // GCP
-/*
-time_microsecs "1589759989434690"
-ip "35.245.177.170"
-ip_type "1" (1...ipv4, 2...ipv6)
-ip_region "" (reserved)
-method "GET"
-uri "/storage/v1/b/sra-pub-src-9/o/SRR1371108%2FCGAG_2.1.fastq.gz?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl"
-status "404"
-req-bytes "0"
-res-bytes "291"
-time_take_microsecs "27000"
-host "www.googleapis.com"
-referer ""
-agent "apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)"
-req-id "AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs"
-operation "storage.objects.get"
-bucket "sra-pub-src-9"
-object "SRR1371108/CGAG_2.1.fastq.gz"
-
-*/
 TEST_F ( TestParseFixture, GCP )
 {
     const char * InputLine =

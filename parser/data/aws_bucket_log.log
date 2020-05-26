@@ -7,29 +7,3 @@
 922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-12 [09/May/2020:22:56:45 +0000] 34.239.162.127 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-08617bb1340fc231f 08B6AD3796402512 REST.PUT.PART SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1 "PUT /SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1?partNumber=24&uploadId=0XhDnT.QPE_wbLcoT_X7WsPJReaOHjgzp5V81kR32i00NSU2_FXYXYq.kGu.2.CA8IMNLek3uHIfAQMORBzUCM4YKrsKKygWnwItmwKxnmq4p.VnjtMlbOvKvMobT2f4znr9WE3fZJ_Mxzt9pcWTdg-- HTTP/1.1" 200 - - 8388608 635 45 "-" "aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92" - KBcfmMoMafj7P2kwI4heDsFLwBoAJPIDFdvKop5o3ibnJJxJa2p2Ek4NsTKXeAM86R56X4DB8ag= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-12.s3.amazonaws.com TLSv1.2
 922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-12 [09/May/2020:22:56:46 +0000] 34.239.162.127 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-08617bb1340fc231f BA8BE5EDBF0E5DC4 REST.PUT.PART SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1 "PUT /SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1?partNumber=46&uploadId=0XhDnT.QPE_wbLcoT_X7WsPJReaOHjgzp5V81kR32i00NSU2_FXYXYq.kGu.2.CA8IMNLek3uHIfAQMORBzUCM4YKrsKKygWnwItmwKxnmq4p.VnjtMlbOvKvMobT2f4znr9WE3fZJ_Mxzt9pcWTdg-- HTTP/1.1" 200 - - 8388608 616 44 "-" "aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92" - 9k7fpZ5KBfj3aURu0fvT4kIUkfM6vYgHWGcwwIpb3ZihfkVMuor3V2SE2RXABdSpwS5LpyotgqQ= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-12.s3.amazonaws.com TLSv1.2
 922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-12 [09/May/2020:22:56:47 +0000] 34.239.162.127 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-08617bb1340fc231f A652259B0C1D1260 REST.PUT.PART SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1 "PUT /SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1?partNumber=59&uploadId=0XhDnT.QPE_wbLcoT_X7WsPJReaOHjgzp5V81kR32i00NSU2_FXYXYq.kGu.2.CA8IMNLek3uHIfAQMORBzUCM4YKrsKKygWnwItmwKxnmq4p.VnjtMlbOvKvMobT2f4znr9WE3fZJ_Mxzt9pcWTdg-- HTTP/1.1" 200 - - 8388608 718 43 "-" "aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92" - ojaog/9Fft5N6jZRlhL26Oj5jDPG0hSSqlNwXGA1PJQVWHq6pAMln7edJ+lPcGtWoJt6TCoMrOQ= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-12.s3.amazonaws.com TLSv1.2
-
-owner           922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37
-bucket          sra-pub-src-12 
-time            [09/May/2020:22:56:48 +0000] 
-ip              34.239.162.127 
-requester       arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-08617bb1340fc231f
-request_id      278B0C8CDED650FA
-operation       REST.PUT.PART
-key             SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1
-request         "PUT /SRR11691263/AslQ8-2_S53_L008_R2_001.fastq.1?partNumber=77&uploadId=0XhDnT.QPE_wbLcoT_X7WsPJReaOHjgzp5V81kR32i00NSU2_FXYXYq.kGu.2.CA8IMNLek3uHIfAQMORBzUCM4YKrsKKygWnwItmwKxnmq4p.VnjtMlbOvKvMobT2f4znr9WE3fZJ_Mxzt9pcWTdg-- HTTP/1.1"
-status          200
-                -
-error           
-                -
-bytes_sent      8388608
-obj_size        743
-total_time      11
-referer         "-"
-user_agent      "aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92"
-                -
-version_id      mDSIr1FUE+dEWBex6NohjqffXbql5oAiNPWsPbwKDDoFLY3JNvqVuuT8EXCAo7uxtQ6PoNIBdpo=
-host_id         SigV4
-cipher_suite    ECDHE-RSA-AES128-GCM-SHA256
-auth_type       AuthHeader
-host_header     sra-pub-src-12.s3.amazonaws.com
-tls_version     TLSv1.2
