@@ -266,41 +266,6 @@ TEST_F ( TestParseFixture, OnPremise_multiple_nonesense )
     }
 }
 
-// AWS
-/*
-TEST_F ( TestParseFixture, AWS )
-{
-
-    const char * InputLine =
-"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-14 [09/May/2020:22:07:21 +0000] 18.207.254.142 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-0d76b79326eb0165a B6301F55C2486C74 REST.PUT.PART SRR9612637/DRGHT.TC.307_interleaved.fq.1 \"PUT /SRR9612637/DRGHT.TC.307_interleaved.fq.1?partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw-- HTTP/1.1\" 200 - - 8388608 557 12 \"-\" \"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92\" - fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-14.s3.amazonaws.com TLSv1.2\n";
-
-    const char * InputLine =
-"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-14 [09/May/2020:22:07:21 +0000] 18.207.254.142 B6301F55C2486C74\n";
-
-    const SLogAWSEvent &e = *( parse_aws( InputLine ) );
-
-    ASSERT_EQ( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37", e.owner );
-    ASSERT_EQ( "sra-pub-src-14", e.bucket );
-
-    ASSERT_EQ( 9, e.time.day );
-    ASSERT_EQ( 5, e.time.month );
-    ASSERT_EQ( 2020, e.time.year );
-    ASSERT_EQ( 22, e.time.hour );
-    ASSERT_EQ( 7, e.time.minute );
-    ASSERT_EQ( 21, e.time.second );
-    ASSERT_EQ( 0, e.time.offset );
-
-    ASSERT_EQ( "18.207.254.142", e.ip );
-
-    //ASSERT_EQ( "arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-0d76b79326eb0165a", e.requester );
-    ASSERT_EQ( "B6301F55C2486C74", e.request_id );
-}
-*/
-//TODO: GCP
-//TODO: various line endings
-//TODO: rejected lines with more than IP recognized
-
-
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

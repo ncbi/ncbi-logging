@@ -93,7 +93,7 @@ tests: $(PREFIX_OP)test_flex \
 	$(PREFIX_AWS)test_flex \
 	$(PREFIX_AWS)test_parse 
 
-runtests:
+runtests: liblogparse tests
 	$(BINDIR)/$(PREFIX_OP)test_flex
 	$(BINDIR)/$(PREFIX_OP)test_parse
 	$(BINDIR)/$(PREFIX_AWS)test_flex

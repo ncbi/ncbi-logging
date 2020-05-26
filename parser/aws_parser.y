@@ -60,7 +60,8 @@ line
     ;
 
 log_aws1
-    : aws_owner aws_bucket time ip aws_requester aws_request_id
+    : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation
+      aws_key request
     {
         LogAWSEvent ev;
         ev . owner = $1;
@@ -69,15 +70,19 @@ log_aws1
         ev . ip = $4;
         ev . requester = $5;
         ev . request_id = $6;
+        ev . operation = $7;
+        ev . key = $8;
+        ev . request = $9;
 
         lib -> acceptLine( ev );
     }
     ;
 
 log_aws
-    : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation aws_key request result_code
-        aws_error result_len result_len result_len referer agent aws_version_id aws_host_id aws_cipher
-        aws_auth aws_host_hdr aws_tls_vers
+    : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation
+      aws_key request result_code aws_error result_len result_len result_len
+      referer agent aws_version_id aws_host_id aws_cipher
+      aws_auth aws_host_hdr aws_tls_vers
     {
         LogAWSEvent ev;
         ev . owner = $1;
@@ -126,10 +131,12 @@ aws_request_id
 
 aws_operation
     : STR
+    | STR1
     ;
 
 aws_key
     : STR
+    | STR1
     ;
 
 aws_error
