@@ -39,16 +39,16 @@ using namespace NCBI::Logging;
     t_request req;
 }
 
-%token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR
+%token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR DASH
 %token<i64> I64
-%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
+%token DOT SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
 
 %type<tp> time
 %type<req> request
 %type<s> ip referer agent agent_list params_opt
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
 %type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
-%type<i64> result_code result_len
+%type<i64> result_code result_len aws_obj_size aws_total_time
 
 %start line
 
@@ -56,32 +56,13 @@ using namespace NCBI::Logging;
 
 line
     :
-    | log_aws1
-    ;
-
-log_aws1
-    : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation
-      aws_key request
-    {
-        LogAWSEvent ev;
-        ev . owner = $1;
-        ev . bucket = $2;
-        ev . time = $3;
-        ev . ip = $4;
-        ev . requester = $5;
-        ev . request_id = $6;
-        ev . operation = $7;
-        ev . key = $8;
-        ev . request = $9;
-
-        lib -> acceptLine( ev );
-    }
+    | log_aws
     ;
 
 log_aws
     : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation
-      aws_key request result_code aws_error result_len result_len result_len
-      referer agent aws_version_id aws_host_id aws_cipher
+      aws_key request result_code aws_error result_len aws_obj_size
+      aws_total_time referer agent aws_version_id aws_host_id aws_cipher
       aws_auth aws_host_hdr aws_tls_vers
     {
         LogAWSEvent ev;
@@ -107,13 +88,13 @@ log_aws
         ev . auth_type = $20;
         ev . host_header = $21;
         ev . tls_version = $22;
-
         lib -> acceptLine( ev );
     }
     ;
 
 aws_owner
     : STR
+    | STR1
     ;
 
 aws_bucket
@@ -127,6 +108,7 @@ aws_requester
 
 aws_request_id
     : STR
+    | STR1
     ;
 
 aws_operation
@@ -144,16 +126,30 @@ aws_error
     | DASH DASH                     { $$.p = NULL; $$.n = 0; }
     ;
 
+aws_obj_size
+    : I64
+    ;
+
+aws_total_time
+    : I64
+    ;
+
 aws_version_id
     : STR
+    | STR1
+    | DASH
     ;
 
 aws_host_id
     : STR
+    | STR1
     ;
 
 aws_cipher
-    : STR
+    : STR STR          { $$ = $1; $$.n += ( $2.n + 1 ); }
+    | STR1 STR         { $$ = $1; $$.n += ( $2.n + 1 ); }
+    | STR STR1         { $$ = $1; $$.n += ( $2.n + 1 ); }
+    | STR1 STR1        { $$ = $1; $$.n += ( $2.n + 1 ); }    
     ;
 
 aws_auth
@@ -162,10 +158,12 @@ aws_auth
 
 aws_host_hdr
     : STR
+    | STR1
     ;
 
 aws_tls_vers
     : STR
+    | STR1
     ;
 
 ip
