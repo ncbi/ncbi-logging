@@ -13,7 +13,7 @@ PREFIX_OP := op_
 PREFIX_AWS := aws_
 PREFIX_GCP := gcp_
 
-all: log2csv_
+all: log2csv_ log2jsn_
 
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
@@ -140,3 +140,24 @@ $(PREFIX_OP)test_parse: $(addprefix $(OBJDIR)/,$(OP_TEST_PARSE_OBJ))
 
 $(PREFIX_AWS)test_parse: $(addprefix $(OBJDIR)/,$(AWS_TEST_PARSE_OBJ))
 	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+#run: $(PROG)
+#	cat two_events.txt | ./$(PROG) > parsed.txt 2>&1
+
+
+#################################################
+# minimal parser/Json: stdin(any format)->parsing->stdout(Json)
+
+LOG2JSNOBJ = log2jsn.o
+
+# Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
+JWT_TOOL ?= ../../ncbi-vdb3/jwt-tool
+
+CXXFLAGS += -I$(JWT_TOOL)/inc
+
+$(BINDIR)/log2jsn: $(addprefix $(OBJDIR)/,$(LOG2JSNOBJ)) $(LIBDIR)/liblogparse.a
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+
+log2jsn_: mkdir $(BINDIR)/log2jsn
+
+json: log2jsn_
+	cat data/two_events.txt | $(BINDIR)/log2jsn 
