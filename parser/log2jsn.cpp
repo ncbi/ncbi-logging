@@ -9,11 +9,6 @@ using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
 
-static string ToString( const t_str & in )
-{
-    return string("\"") + string ( in.p, in.n ) + "\"";
-}
-
 static JSONValueRef ToJsonString( const t_str & in )
 {
     if ( in . n > 0 )
@@ -39,35 +34,63 @@ static String FormatTime(t_timepoint t)
     return String(ret.str());
 }
 
-struct OpToJsonLogLines : public OP_LogLines
+struct cmnLogLines
 {
-    virtual int unrecognized( const t_str & text )
+    string ToString( const t_str & in )
     {
-        JSONObjectRef j = JSON::makeObject();
-        j -> addValue( "unrecognized", ToJsonString( text ) );
+        return string("\"") + string ( in.p, in.n ) + "\"";
+    }
 
+    JSONValueRef ToJsonString( const t_str & in )
+    {
+        if ( in . n > 0 )
+        {
+            return JSON::makeString( String( in . p, in . n) );
+        }
+        else
+        {
+            return JSON::makeString( String () );
+        }
+    }
+
+    void print_json( JSONObjectRef j )
+    {
         if ( mem_readable )
             mem_os << j->readableJSON().toSTLString() << endl;
         else
             mem_os << j->toJSON().toSTLString() << endl;
+    }
+
+    int cmn_unrecognized( const t_str & text )
+    {
+        JSONObjectRef j = JSON::makeObject();
+        j -> addValue( "unrecognized", ToJsonString( text ) );
+        print_json( j );
         return 0;
+    }
+
+    cmnLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
+
+    ostream &mem_os;
+    bool mem_readable;
+};
+
+struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
+{
+    virtual int unrecognized( const t_str & text )
+    {
+        return cmn_unrecognized( text );
     }
 
     virtual int acceptLine( const LogOPEvent & e )
     {
-        if ( mem_readable )
-            mem_os << MakeJson(e, true)->readableJSON().toSTLString() << endl;
-        else
-            mem_os << MakeJson(e, true)->toJSON().toSTLString() << endl;        
+        print_json( MakeJson(e, true) );
         return 0;
     }
 
     virtual int rejectLine( const LogOPEvent & e )
     {
-        if ( mem_readable )
-            mem_os << MakeJson(e, false)->readableJSON().toSTLString() << endl;
-        else
-            mem_os << MakeJson(e, false)->toJSON().toSTLString() << endl;        
+        print_json( MakeJson(e, false) );
         return 0;
     }
 
@@ -104,44 +127,25 @@ struct OpToJsonLogLines : public OP_LogLines
         return j;
     }
 
-    OpToJsonLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
-
-    ostream &mem_os;
-    bool mem_readable;
+    OpToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
 };
 
-struct AWSToJsonLogLines : public AWS_LogLines
+struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 {
     virtual int unrecognized( const t_str & text )
     {
-        JSONObjectRef j = JSON::makeObject();
-        j -> addValue( "unrecognized", ToJsonString( text ) );
-
-        if ( mem_readable )
-            mem_os << j->readableJSON().toSTLString() << endl;
-        else
-            mem_os << j->toJSON().toSTLString() << endl;
-
-        return 0;
+        return cmn_unrecognized( text );
     }
 
     virtual int acceptLine( const LogAWSEvent & e )
     {
-        if ( mem_readable )
-            mem_os << MakeJson(e, true)->readableJSON().toSTLString() << endl;
-        else
-            mem_os << MakeJson(e, true)->toJSON().toSTLString() << endl;
-
+        print_json( MakeJson(e, true) );
         return 0;
     }
 
     virtual int rejectLine( const LogAWSEvent & e )
     {
-        if ( mem_readable )
-            mem_os << MakeJson(e, false)->readableJSON().toSTLString() << endl;
-        else
-            mem_os << MakeJson(e, false)->toJSON().toSTLString() << endl;
-
+        print_json( MakeJson(e, false) );
         return 0;
     }
 
@@ -190,44 +194,25 @@ struct AWSToJsonLogLines : public AWS_LogLines
         return j;
     }
 
-    AWSToJsonLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
-
-    ostream &mem_os;
-    bool mem_readable;
+    AWSToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
 };
 
-struct GCPToJsonLogLines : public GCP_LogLines
+struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 {
     virtual int unrecognized( const t_str & text )
     {
-        JSONObjectRef j = JSON::makeObject();
-        j -> addValue( "unrecognized", ToJsonString( text ) );
-
-        if ( mem_readable )
-            mem_os << j->readableJSON().toSTLString() << endl;
-        else
-            mem_os << j->toJSON().toSTLString() << endl;
-
-        return 0;
+        return cmn_unrecognized( text );
     }
 
     virtual int acceptLine( const LogGCPEvent & e )
     {
-        if ( mem_readable )
-            mem_os << MakeJson(e, true)->readableJSON().toSTLString() << endl;
-        else
-            mem_os << MakeJson(e, true)->toJSON().toSTLString() << endl;
-
+        print_json( MakeJson(e, true) );
         return 0;
     }
 
     virtual int rejectLine( const LogGCPEvent & e )
     {
-        if ( mem_readable )
-            mem_os << MakeJson(e, false)->readableJSON().toSTLString() << endl;
-        else
-            mem_os << MakeJson(e, false)->toJSON().toSTLString() << endl;
-
+        print_json( MakeJson(e, false) );
         return 0;
     }
 
@@ -258,10 +243,7 @@ struct GCPToJsonLogLines : public GCP_LogLines
         return j;
     }
 
-    GCPToJsonLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
-
-    ostream &mem_os;
-    bool mem_readable;
+    GCPToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
 };
 
 static int handle_on_prem( bool readable ) 
