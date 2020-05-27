@@ -23,9 +23,16 @@ export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
 
+# GCP VM shouldn't have any other competing load, helps on iebdev
+renice +19 -p $$ > /dev/null 2>&1
+
 SQLCACHE="$RAMDISK/${USER}_${DATE}"
 mkdir -p "$SQLCACHE"
 if [ ! -e "$SQLCACHE/buckets.db" ]; then
+    export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab431a.json
+    gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
+    export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
+
     gsutil cp gs://strides_analytics_cfg/buckets.db "$SQLCACHE/buckets.db"
 fi
 

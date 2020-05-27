@@ -1,0 +1,5 @@
+sudo apt-get install git sqlite3 g++ awscli bison flex make # python3-pip
+pip -q install pre-commit
+git clone https://github.com/ncbi/ncbi-logging
+cd ncbi-logging
+pre-commit run --all-files
