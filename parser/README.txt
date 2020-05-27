@@ -17,11 +17,12 @@ $cd ncbi-vdb3
 $git checkout engineering
 $cd jwt-tool
 $make
-$cd ..
+$cd ../..
 
 $$git clone https://github.com/ncbi/ncbi-logging
-$cd ncbi-logging
+$cd ncbi-logging/parser
 $git checkout VDB-4214
+
 $make
 $make runtests
 

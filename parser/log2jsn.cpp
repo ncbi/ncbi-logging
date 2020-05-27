@@ -291,7 +291,7 @@ extern "C"
         if ( format == "aws" ) return handle_aws( b_readable );
         if ( format == "gcp" ) return handle_gcp( b_readable );
 
-        cerr << "unknow format: " << format << endl;
+        cerr << "unknown format: " << format << endl;
         return 3;
     }
 }
