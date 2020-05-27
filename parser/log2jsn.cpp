@@ -1,5 +1,6 @@
 #include "log_lines.hpp"
 #include <sstream>
+#include <iostream>
 #include <string>
 
 #include <ncbi/json.hpp>
@@ -45,19 +46,28 @@ struct OpToJsonLogLines : public OP_LogLines
         JSONObjectRef j = JSON::makeObject();
         j -> addValue( "unrecognized", ToJsonString( text ) );
 
-        mem_os << j->readableJSON().toSTLString() << endl;
+        if ( mem_readable )
+            mem_os << j->readableJSON().toSTLString() << endl;
+        else
+            mem_os << j->toJSON().toSTLString() << endl;
         return 0;
     }
 
     virtual int acceptLine( const LogOPEvent & e )
     {
-        mem_os << MakeJson(e, true)->readableJSON().toSTLString() << endl;
+        if ( mem_readable )
+            mem_os << MakeJson(e, true)->readableJSON().toSTLString() << endl;
+        else
+            mem_os << MakeJson(e, true)->toJSON().toSTLString() << endl;        
         return 0;
     }
 
     virtual int rejectLine( const LogOPEvent & e )
     {
-        mem_os << MakeJson(e, false)->readableJSON().toSTLString() << endl;
+        if ( mem_readable )
+            mem_os << MakeJson(e, false)->readableJSON().toSTLString() << endl;
+        else
+            mem_os << MakeJson(e, false)->toJSON().toSTLString() << endl;        
         return 0;
     }
 
@@ -94,19 +104,212 @@ struct OpToJsonLogLines : public OP_LogLines
         return j;
     }
 
-    OpToJsonLogLines( ostream &os ) : mem_os( os ) {};
+    OpToJsonLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
 
     ostream &mem_os;
+    bool mem_readable;
 };
+
+struct AWSToJsonLogLines : public AWS_LogLines
+{
+    virtual int unrecognized( const t_str & text )
+    {
+        JSONObjectRef j = JSON::makeObject();
+        j -> addValue( "unrecognized", ToJsonString( text ) );
+
+        if ( mem_readable )
+            mem_os << j->readableJSON().toSTLString() << endl;
+        else
+            mem_os << j->toJSON().toSTLString() << endl;
+
+        return 0;
+    }
+
+    virtual int acceptLine( const LogAWSEvent & e )
+    {
+        if ( mem_readable )
+            mem_os << MakeJson(e, true)->readableJSON().toSTLString() << endl;
+        else
+            mem_os << MakeJson(e, true)->toJSON().toSTLString() << endl;
+
+        return 0;
+    }
+
+    virtual int rejectLine( const LogAWSEvent & e )
+    {
+        if ( mem_readable )
+            mem_os << MakeJson(e, false)->readableJSON().toSTLString() << endl;
+        else
+            mem_os << MakeJson(e, false)->toJSON().toSTLString() << endl;
+
+        return 0;
+    }
+
+    JSONObjectRef MakeJson( const LogAWSEvent & e, bool accepted )
+    {
+        JSONObjectRef j = JSON::makeObject();
+        j -> addValue( "accepted", JSON::makeBoolean(accepted) );
+
+        j -> addValue( "owner", ToJsonString( e.owner ) );
+        j -> addValue( "bucket", ToJsonString( e.bucket ) );
+        j -> addValue( "requester", ToJsonString( e.requester ) );
+        j -> addValue( "request_id", ToJsonString( e.request_id ) );
+        j -> addValue( "operation", ToJsonString( e.operation ) );
+        j -> addValue( "key", ToJsonString( e.key ) );
+        j -> addValue( "error", ToJsonString( e.error ) );
+
+        j -> addValue( "obj_size", JSON::makeInteger( e.obj_size ) );
+        j -> addValue( "total_time", JSON::makeInteger( e.total_time ) );
+
+        j -> addValue( "version_id", ToJsonString( e.version_id ) );
+        j -> addValue( "host_id", ToJsonString( e.host_id ) );
+        j -> addValue( "cipher_suite", ToJsonString( e.cipher_suite ) );
+        j -> addValue( "auth_type", ToJsonString( e.auth_type ) );
+        j -> addValue( "host_header", ToJsonString( e.host_header ) );
+        j -> addValue( "tls_version", ToJsonString( e.tls_version ) );
+
+        j -> addValue( "ip", ToJsonString( e.ip ) );
+        j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
+
+        {
+            JSONObjectRef req = JSON::makeObject();
+            req -> addValue("server",   ToJsonString( e.request.server ) );
+            req -> addValue("method",   ToJsonString( e.request.method ) );
+            req -> addValue("path",     ToJsonString( e.request.path ) );
+            req -> addValue("params",   ToJsonString( e.request.params ) );
+            req -> addValue("vers",     ToJsonString( e.request.vers ) );
+            JSONValueRef rv( req.release() );
+            j -> addValue( "request", rv );
+        }
+
+        j -> addValue( "res_code", JSON::makeInteger( e.res_code ) );
+        j -> addValue( "res_len", JSON::makeInteger( e.res_len ) );
+        j -> addValue( "referer", ToJsonString( e.referer ) );
+        j -> addValue( "agent", ToJsonString( e.agent ) );
+
+        return j;
+    }
+
+    AWSToJsonLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
+
+    ostream &mem_os;
+    bool mem_readable;
+};
+
+struct GCPToJsonLogLines : public GCP_LogLines
+{
+    virtual int unrecognized( const t_str & text )
+    {
+        JSONObjectRef j = JSON::makeObject();
+        j -> addValue( "unrecognized", ToJsonString( text ) );
+
+        if ( mem_readable )
+            mem_os << j->readableJSON().toSTLString() << endl;
+        else
+            mem_os << j->toJSON().toSTLString() << endl;
+
+        return 0;
+    }
+
+    virtual int acceptLine( const LogGCPEvent & e )
+    {
+        if ( mem_readable )
+            mem_os << MakeJson(e, true)->readableJSON().toSTLString() << endl;
+        else
+            mem_os << MakeJson(e, true)->toJSON().toSTLString() << endl;
+
+        return 0;
+    }
+
+    virtual int rejectLine( const LogGCPEvent & e )
+    {
+        if ( mem_readable )
+            mem_os << MakeJson(e, false)->readableJSON().toSTLString() << endl;
+        else
+            mem_os << MakeJson(e, false)->toJSON().toSTLString() << endl;
+
+        return 0;
+    }
+
+    JSONObjectRef MakeJson( const LogGCPEvent & e, bool accepted )
+    {
+        JSONObjectRef j = JSON::makeObject();
+
+        j -> addValue( "accepted", JSON::makeBoolean(accepted) );
+
+        j -> addValue( "time", JSON::makeInteger( e.time ) );
+        j -> addValue( "ip", ToJsonString( e.ip ) );
+        j -> addValue( "ip_type", JSON::makeInteger( e.ip_type ) );
+        j -> addValue( "ip_region", ToJsonString( e.ip_region ) );
+        j -> addValue( "method", ToJsonString( e.method ) );
+        j -> addValue( "uri", ToJsonString( e.uri ) );
+        j -> addValue( "status", JSON::makeInteger( e.status ) );
+        j -> addValue( "request_bytes", JSON::makeInteger( e.request_bytes ) );
+        j -> addValue( "result_bytes", JSON::makeInteger( e.result_bytes ) );
+        j -> addValue( "time_taken", JSON::makeInteger( e.time_taken ) );
+        j -> addValue( "host", ToJsonString( e.host ) );
+        j -> addValue( "referrer", ToJsonString( e.referrer ) );
+        j -> addValue( "agent", ToJsonString( e.agent ) );
+        j -> addValue( "request_id", ToJsonString( e.request_id ) );
+        j -> addValue( "operation", ToJsonString( e.operation ) );
+        j -> addValue( "bucket", ToJsonString( e.bucket ) );
+        j -> addValue( "object", ToJsonString( e.object ) );
+
+        return j;
+    }
+
+    GCPToJsonLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
+
+    ostream &mem_os;
+    bool mem_readable;
+};
+
+static int handle_on_prem( bool readable ) 
+{
+    cerr << "converting on-premise format" << endl;
+    OpToJsonLogLines event_receiver( cout, readable );
+    OP_Parser p( event_receiver, cin );
+    bool res = p . parse();
+
+    return res ? 0 : 3;
+}
+
+static int handle_aws( bool readable ) 
+{
+    cerr << "converting AWS format" << endl;
+    AWSToJsonLogLines event_receiver( cout, readable );
+    AWS_Parser p( event_receiver, cin );
+    bool res = p . parse();
+
+    return res ? 0 : 3;
+}
+
+static int handle_gcp( bool readable ) 
+{
+    cerr << "converting GCP format" << endl;
+    GCPToJsonLogLines event_receiver( cout, readable );
+    GCP_Parser p( event_receiver, cin );
+    bool res = p . parse();
+
+    return res ? 0 : 3;
+}
 
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
     {
-        OpToJsonLogLines event_receiver( cout );
-        OP_Parser p( event_receiver, cin );
-        bool res = p . parse();
+        string format( "aws" );
+        string readable( "" );
+        if ( argc > 1 ) format = argv[ 1 ];
+        if ( argc > 2 ) readable = argv[ 2 ];
 
-        return res ? 0 : 3;
+        bool b_readable = ( readable == "readable" );
+
+        if ( format == "op"  ) return handle_on_prem( b_readable );
+        if ( format == "aws" ) return handle_aws( b_readable );
+        if ( format == "gcp" ) return handle_gcp( b_readable );
+
+        cerr << "unknow format: " << format << endl;
+        return 3;
     }
 }
