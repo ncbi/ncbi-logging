@@ -56,7 +56,7 @@ using namespace NCBI::Logging;
 
 line
     :
-    | log_aws
+    | log_aws       { return 0; }
     ;
 
 log_aws

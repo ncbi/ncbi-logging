@@ -51,7 +51,7 @@ using namespace NCBI::Logging;
 
 line
     :
-    | log_gcp
+    | log_gcp       { return 0; }
     ;
 
 log_gcp
