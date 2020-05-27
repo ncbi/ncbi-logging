@@ -112,33 +112,47 @@ struct SRC_OP_LogLines : public OP_LogLines
         return 0;
     }
 
-    SRC_OP_LogLines( ostream &os, ostream &err ) 
-    : mem_os( os ) , mem_err ( err )
+    SRC_OP_LogLines( ostream &os ) 
+    : mem_os( os )
     {}
 
     ostream &mem_os;
-    ostream &mem_err;
 };
-#if 0
-struct CSV_AWS_LogLines : public AWS_LogLines
+
+struct SRC_AWS_LogLines : public AWS_LogLines
 {
     virtual int unrecognized( const t_str & text )
     {
-        mem_os << "unrecognized,";
-        ToQuotedString ( text, mem_os );
-        mem_os << "," << endl;
+        mem_os << ToString(text) <<endl;
         return 0;
     }
 
     virtual int acceptLine( const LogAWSEvent & event )
     {
-        ToQuotedString ( event . ip, mem_os ); mem_os << ",";
-        FormatTime ( event.time, mem_os ); mem_os << ",";
-        ToQuotedString ( event . request.server, mem_os ); mem_os << ",";
-        ToQuotedString ( event . request.method, mem_os ); mem_os << ",";
-        ToQuotedString ( event . request.path, mem_os ); mem_os << ",";
-        ToQuotedString ( event . request.params, mem_os ); mem_os << ",";
-        ToQuotedString ( event . request.vers, mem_os ); mem_os << ",";
+        mem_os << ToString ( event . owner ) << " ";
+        mem_os << ToString ( event . bucket ) << " ";
+        FormatTime ( event.time, mem_os ); mem_os << " ";
+        mem_os << ToString ( event . ip ) << " ";
+        mem_os << ToString ( event . requester ) << " ";
+        mem_os << ToString ( event . request_id ) << " ";
+        mem_os << ToString ( event . operation ) << " ";
+        mem_os << ToString ( event . key ) << " ";
+        FormatRequest ( event . request, mem_os );
+        mem_os << event.res_code << " ";
+        mem_os << ToString ( event . error ) << " ";
+        mem_os << event.res_len << " ";
+        mem_os << event.obj_size << " ";
+        mem_os << event.total_time << " ";
+        mem_os << "\"" << ToString ( event . referer ) << "\" ";
+        mem_os << "\"" << ToString ( event . agent ) << "\" ";
+        mem_os << ToString ( event . version_id ) << " ";
+        mem_os << ToString ( event . host_id ) << " ";
+        
+        // mem_os << ToString ( event . req_time ) << " ";
+        // mem_os << "\"" << ToString ( event . agent ) << "\" ";
+        // mem_os << "\"" << ToString ( event . forwarded ) << "\" ";
+        // mem_os << "port=" << event . port << " ";
+        // mem_os << "rl=" << event . req_len ;
         mem_os << endl;
         return 0;
     }
@@ -149,38 +163,37 @@ struct CSV_AWS_LogLines : public AWS_LogLines
         return 0;
     }
 
-    CSV_AWS_LogLines( ostream &os ) : mem_os( os ) {};
+    SRC_AWS_LogLines( ostream &os ) : mem_os( os ) {};
 
     ostream &mem_os;
 };
-#endif
 
 static int parse_op( void )
 {
-    SRC_OP_LogLines event_receiver( cout, cerr );
+    SRC_OP_LogLines event_receiver( cout );
     OP_Parser p( event_receiver, cin );
     //p.setDebug(true);
     bool res = p . parse();
 
     return res ? 0 : 3;
 }
-#if 0
+
 static int parse_aws( void )
 {
-    CSV_AWS_LogLines event_receiver( cout );
+    SRC_AWS_LogLines event_receiver( cout );
     AWS_Parser p( event_receiver, cin );
     bool res = p . parse();
 
     return res ? 0 : 3;
 }
-#endif
+
 int main ( int argc, const char * argv [], const char * envp []  )
 {
     string fmt( "op" );
     if ( argc > 1 )
         fmt = string( argv[ 1 ] );
 
-    // if ( fmt == "aws" )
-    //     return parse_aws();
+    if ( fmt == "aws" )
+       return parse_aws();
     return parse_op();
 }
