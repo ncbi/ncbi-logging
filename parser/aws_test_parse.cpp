@@ -4,14 +4,10 @@
 #include <vector>
 
 #include "log_lines.hpp"
+#include "helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
-
-static string ToString( const t_str & in )
-{
-    return string( in.p == nullptr ? "" : in.p, in.n );
-}
 
 struct SRequest
 {
@@ -172,7 +168,7 @@ TEST_F ( TestParseFixture, AWS )
     "557 "
     "12 "
     "\"-\" "
-    "\"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92\" "
+    "\"aws-cli/1.16.102 \\\"Python\\\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92\" "
     "- "
     "fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg= "
     "SigV4 ECDHE-RSA-AES128-GCM-SHA256 "
@@ -212,7 +208,7 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( 557, e.obj_size );
     ASSERT_EQ( 12, e.total_time );
     ASSERT_EQ( "-", e.referer );
-    ASSERT_EQ( "aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent );
+    ASSERT_EQ( "aws-cli/1.16.102 \"Python\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent );
     ASSERT_EQ( "-", e.version_id );
     ASSERT_EQ( "fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg=", e.host_id );
     ASSERT_EQ( "SigV4 ECDHE-RSA-AES128-GCM-SHA256", e.cipher_suite );

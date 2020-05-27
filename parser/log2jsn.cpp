@@ -5,6 +5,8 @@
 
 #include <ncbi/json.hpp>
 
+#include "helper.hpp"
+
 using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
@@ -36,11 +38,6 @@ static String FormatTime(t_timepoint t)
 
 struct cmnLogLines
 {
-    string ToString( const t_str & in )
-    {
-        return string("\"") + string ( in.p, in.n ) + "\"";
-    }
-
     JSONValueRef ToJsonString( const t_str & in )
     {
         if ( in . n > 0 )

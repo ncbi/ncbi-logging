@@ -68,6 +68,7 @@ $(PREFIX_GCP)parser.cpp: $(PREFIX_GCP)parser.y
 # C++ log parsing library
 
 LOG_LINES_SRC = \
+	helper.cpp \
 	$(PREFIX_OP)parser.cpp \
 	$(PREFIX_OP)scanner.cpp \
 	$(PREFIX_AWS)parser.cpp \
@@ -110,20 +111,34 @@ run2src: log2src_
 # assume that Googletests is installed and accessible
 
 #build all test-binaries
-tests: $(PREFIX_OP)test_flex \
+tests: \
+	test_helper \
+	$(PREFIX_OP)test_flex \
 	$(PREFIX_OP)test_parse \
 	$(PREFIX_AWS)test_flex \
 	$(PREFIX_AWS)test_parse \
 	$(PREFIX_GCP)test_flex \
 	$(PREFIX_GCP)test_parse
 
-runtests: liblogparse tests
+runtests: liblogparse run_test_helper tests 
 	$(BINDIR)/$(PREFIX_OP)test_flex
 	$(BINDIR)/$(PREFIX_OP)test_parse
 	$(BINDIR)/$(PREFIX_AWS)test_flex
 	$(BINDIR)/$(PREFIX_AWS)test_parse
 	$(BINDIR)/$(PREFIX_GCP)test_flex
 	$(BINDIR)/$(PREFIX_GCP)test_parse
+
+#################################################
+# scanner - tests
+
+run_test_helper: test_helper
+	$(BINDIR)/test_helper
+
+TEST_HELPER_OBJ = \
+	test_helper.o 
+
+test_helper: $(addprefix  $(OBJDIR)/,$(TEST_HELPER_OBJ)) $(LIBDIR)/liblogparse.a
+	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread
 
 #################################################
 # scanner - tests

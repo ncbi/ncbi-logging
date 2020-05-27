@@ -4,14 +4,10 @@
 #include <vector>
 
 #include "log_lines.hpp"
+#include "helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
-
-static string ToString( const t_str & in )
-{
-    return string( in.p == nullptr ? "" : in.p, in.n );
-}
 
 struct SRequest
 {
@@ -264,6 +260,15 @@ TEST_F ( TestParseFixture, OnPremise_multiple_nonesense )
         ASSERT_EQ( "more nonesense", m_lines . m_unrecognized[ 1 ] );
         ASSERT_EQ( "even more", m_lines . m_unrecognized[ 2 ] );
     }
+}
+
+TEST_F ( TestParseFixture, OnPremise_EscapedQuote )
+{
+    const char * InputLine =
+"158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-\\\"dump.2.9.1\\\"\" \"-\" port=443 rl=293\n";
+    const SLogOPEvent &e = *( parse_str( InputLine ) );
+
+    ASSERT_EQ( "linux64 sra-toolkit fastq-\"dump.2.9.1\"", e.agent );
 }
 
 extern "C"

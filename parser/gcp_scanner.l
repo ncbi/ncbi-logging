@@ -1,7 +1,10 @@
 %{
 #include "gcp_parser.hpp"
 #include "stdint.h"
-#include "assert.h"
+
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
+#define MAKE_STR_ESCAPED()  do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = true; }  while(false)
+
 %}
 
 %option noyywrap yylineno
@@ -28,7 +31,9 @@ IPV6_12     ({IPV6SEG}:){1,4}:{IPV4ADDR}
 IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_8}|{IPV6_9}|{IPV6_10}|{IPV6_11}|{IPV6_12}
 
 I64     [-+]?[0-9]+
-QSTR    [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?]+
+
+QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?]+
+QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?])+
 
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
@@ -44,23 +49,24 @@ STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
 \r              { return CR; }
 \.              { return DOT; }
 \,              { return COMMA; }
--               { yylval -> s . p = yytext; yylval -> s . n = yyleng; return DASH; }
+-               { MAKE_STR(); return DASH; }
 \/              { return SLASH; }
 \:              { return COLON; }
 
-\"                  { assert( yyscanner ); yy_push_state( QUOTED, yyscanner ); return QUOTE; }
-<QUOTED>\"          { assert( yyscanner ); yy_pop_state( yyscanner ); return QUOTE; }
+\"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
+<QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
 <QUOTED>{SPACE}     { return SPACE; }
 <QUOTED>{I64}       { yylval -> i64 = atol( yytext ); return I64; }
-<QUOTED>{IPV4ADDR}  { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV4; }
-<QUOTED>{IPV6ADDR}  { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV6; }
-<QUOTED>{QSTR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return QSTR; }
+<QUOTED>{IPV4ADDR}  { MAKE_STR(); return IPV4; }
+<QUOTED>{IPV6ADDR}  { MAKE_STR(); return IPV6; }
+<QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
 <QUOTED>.           ;
 
-{IPV4ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV4; }
-{IPV6ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV6; }
+{IPV4ADDR}      { MAKE_STR(); return IPV4; }
+{IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {I64}           { yylval -> i64 = atol( yytext ); return I64; }
-{STR1}          { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR1; }
-{STR}           { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR; }
+{STR1}          { MAKE_STR(); return STR1; }
+{STR}           { MAKE_STR(); return STR; }
 
 %%

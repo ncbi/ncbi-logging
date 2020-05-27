@@ -4,14 +4,10 @@
 #include <vector>
 
 #include "log_lines.hpp"
+#include "helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
-
-static string ToString( const t_str & in )
-{
-    return string( in.p == nullptr ? "" : in.p, in.n );
-}
 
 struct SLogGCPEvent
 {
@@ -138,7 +134,7 @@ TEST_F ( TestParseFixture, GCP )
     "\"27000\","
     "\"www.googleapis.com\","
     "\"\","
-    "\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\","
+    "\"apitools gsutil/4.37 Python/2.7.13 (linux2) \\\"google\\\"-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\","
     "\"AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs\","
     "\"storage.objects.get\","
     "\"sra-pub-src-9\","
@@ -159,7 +155,7 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( 27000, e . time_taken );
     ASSERT_EQ( "www.googleapis.com", e . host );
     ASSERT_EQ( "", e . referrer );
-    ASSERT_EQ( "apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)", e . agent );
+    ASSERT_EQ( "apitools gsutil/4.37 Python/2.7.13 (linux2) \"google\"-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)", e . agent );
     ASSERT_EQ( "AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs", e . request_id );
     ASSERT_EQ( "storage.objects.get", e . operation );
     ASSERT_EQ( "sra-pub-src-9", e . bucket );

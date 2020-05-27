@@ -11,7 +11,6 @@
 #define YYDEBUG 1
 
 #include <stdint.h>
-#include "parser-functions.h"
 #include "log_lines.hpp"
 #include "op_parser.hpp"
 #include "op_scanner.hpp"
@@ -21,14 +20,13 @@ using namespace NCBI::Logging;
 
 void op_error( yyscan_t locp, NCBI::Logging::OP_LogLines * lib, const char* msg );
 
-uint8_t month_int( const t_str * s );
-
 %}
 
 %code requires
 {
 #include "types.h"
 #include "log_lines.hpp"
+#include "helper.hpp"
 using namespace NCBI::Logging;
 }
 
@@ -154,8 +152,8 @@ agent
 
 agent_list
     : QSTR                          { $$ = $1; }
-    | agent_list QSTR               { $$.n += $2.n; }
-    | agent_list SPACE              { $$.n += 1; }
+    | agent_list QSTR               { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
+    | agent_list SPACE              { $$.n += 1;    $$.escaped = $1.escaped; }
     ;
 
 forwarded

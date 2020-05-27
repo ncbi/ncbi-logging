@@ -1,17 +1,9 @@
 #include "log_lines.hpp"
 #include <iostream>
+#include "helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
-
-static string ToString( const t_str & in )
-{
-    if ( in.n == 0 )
-    {
-        return string();
-    }   
-    return string ( in.p, in.n );
-}
 
 string FormatMonth (uint8_t m)
 {
@@ -72,6 +64,13 @@ static void FormatRequest(t_request r, ostream& out)
 
 struct SRC_OP_LogLines : public OP_LogLines
 {
+    string ToString( const t_str & str )
+    {
+        t_str s ( str );
+        s . escaped = false;
+        return NCBI::Logging::ToString( s );
+    }
+
     virtual int unrecognized( const t_str & text )
     {
         mem_os << ToString(text) <<endl;

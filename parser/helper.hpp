@@ -3,7 +3,16 @@
 
 #include "types.h"
 #include <cstdint>
+#include <string>
 
-uint8_t month_int( const t_str * s );
+namespace NCBI
+{
+    namespace Logging
+    {
+        uint8_t month_int( const t_str * s );
+
+        std::string ToString( const t_str & in );
+    }
+}
 
 #endif

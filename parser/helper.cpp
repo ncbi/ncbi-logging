@@ -1,6 +1,10 @@
 #include "helper.hpp"
 
-uint8_t month_int( const t_str * s )
+#include <sstream>
+
+using namespace std;
+
+uint8_t NCBI::Logging::month_int( const t_str * s )
 {
     char s0 = s -> p[ 0 ];
     char s1 = s -> p[ 1 ];
@@ -51,4 +55,56 @@ uint8_t month_int( const t_str * s )
         if ( s1 == 'e' && s2 == 'p' ) return 9;
     }
     return 0;
+}
+
+string 
+NCBI::Logging::ToString( const t_str & in )
+{
+    if ( in.n == 0 )
+    {
+        return string();
+    }   
+    if ( ! in.escaped ) 
+    {
+        return string ( in.p, in.n );
+    }
+
+    ostringstream s;
+    // this has to correspond to what is going on in the .l files
+    // at this point, only " are escaped
+    bool escaped = false;
+    for (auto i = 0; i < in.n; ++i )
+    {
+        char ch = in.p[i];
+        if ( escaped )
+        {
+            if ( ch == '"' )
+            {
+                s << ch;
+            }
+            else    // not a character we escape, so put '\' back in
+            {
+                s << "\\" << ch;
+            }
+            escaped = false;
+        }
+        else
+        {
+            if ( ch == '\\' )
+            {
+                escaped = true;
+            }
+            else
+            {
+                s << ch;
+            }
+        } 
+    }
+
+    if (escaped)
+    {   // trailing '\'
+        s << "\\";
+    }
+
+    return s.str();
 }

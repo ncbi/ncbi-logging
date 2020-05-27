@@ -67,7 +67,8 @@ TEST_F ( TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") 
 TEST_F ( TestFlexFixture, Quotes )
 {
     ASSERT_EQ( QUOTE, StartScan("\"\"") );
-    ASSERT_EQ( QUOTE, Scan() );ASSERT_EQ( 0, Scan() );
+    ASSERT_EQ( QUOTE, Scan() );
+    ASSERT_EQ( 0, Scan() );
 }
 TEST_F ( TestFlexFixture, QuotedSpace )
 {
@@ -93,6 +94,7 @@ TEST_F ( TestFlexFixture, QuotedString )
 {
     #define str ".Bl0-_~!*'();:@&=+$,/%#[]"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
+    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );
     #undef str
 }
@@ -100,6 +102,15 @@ TEST_F ( TestFlexFixture, QuotedNonAscii )
 {   // skip non-ascii characters
     #define str "и"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
+    ASSERT_EQ( QUOTE, Scan() );
+    #undef str
+}
+TEST_F ( TestFlexFixture, QuotedEscapedQuote )
+{   // skip non-ascii characters
+    ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
+    ASSERT_EQ( QSTR, Scan() ); 
+    ASSERT_TRUE ( token . s . escaped );
+    ASSERT_EQ( "\\\"", Token() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, Scan() );
     #undef str
 }

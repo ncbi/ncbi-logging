@@ -1,7 +1,10 @@
 %{
 #include "aws_parser.hpp"
 #include "stdint.h"
-#include "assert.h"
+
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
+#define MAKE_STR_ESCAPED()  do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = true; }  while(false)
+
 %}
 
 %option noyywrap yylineno
@@ -32,7 +35,8 @@ METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"
 VERS    "HTTP/"("1.0"|"1.1"|"2"|"3")
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
-QSTR    [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]]+
+QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]]+
+QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]])+
 
 SPACE   " "
 QMARK   \?
@@ -48,7 +52,7 @@ STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
 \n              { return LF; }
 \r              { return CR; }
 \.              { return DOT; }
--               { yylval -> s . p = yytext; yylval -> s . n = yyleng; return DASH; }
+-               { MAKE_STR(); return DASH; }
 \]              { return CB; }
 \/              { return SLASH; }
 \:              { return COLON; }
@@ -56,28 +60,29 @@ STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
 "port="         { return PORT; }
 "rl="           { return RL; }
 
-\"                  { assert( yyscanner ); yy_push_state( QUOTED, yyscanner ); return QUOTE; }
-<QUOTED>\"          { assert( yyscanner ); yy_pop_state( yyscanner ); return QUOTE; }
+\"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
+<QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
 <QUOTED>{SPACE}     { return SPACE; }
 <QUOTED>{QMARK}     { return QMARK; }
-<QUOTED>{METHOD}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return METHOD; }
-<QUOTED>{VERS}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return VERS; }
-<QUOTED>{QSTR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return QSTR; }
+<QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
+<QUOTED>{VERS}      { MAKE_STR(); return VERS; }
+<QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
 <QUOTED>.           ;
 
-\[                  { assert( yyscanner );  yy_push_state( TIMEFMT, yyscanner ); return OB; }
-<TIMEFMT>\]         { assert( yyscanner ); yy_pop_state( yyscanner ); return CB; }
+\[                  { yy_push_state( TIMEFMT, yyscanner ); return OB; }
+<TIMEFMT>\]         { yy_pop_state( yyscanner ); return CB; }
 <TIMEFMT>{I64}      { yylval -> i64 = atol( yytext ); return I64; }
 <TIMEFMT>\:         { return COLON; }
 <TIMEFMT>\/         { return SLASH; }
 <TIMEFMT>{MONTH}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return MONTH; }
 
-{IPV4ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV4; }
-{IPV6ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV6; }
-{FLOAT}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return FLOAT; }
+{IPV4ADDR}      { MAKE_STR(); return IPV4; }
+{IPV6ADDR}      { MAKE_STR(); return IPV6; }
+{FLOAT}         { MAKE_STR(); return FLOAT; }
 {I64}           { yylval -> i64 = atol( yytext ); return I64; }
-{MONTH}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return MONTH; }
-{STR1}          { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR1; }
-{STR}           { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR; }
+{MONTH}         { MAKE_STR(); return MONTH; }
+{STR1}          { MAKE_STR(); return STR1; }
+{STR}           { MAKE_STR(); return STR; }
 
 %%

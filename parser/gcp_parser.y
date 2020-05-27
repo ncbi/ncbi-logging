@@ -138,8 +138,8 @@ agent
 
 agent_list
     : QSTR                          { $$ = $1; }
-    | agent_list QSTR               { $$.n += $2.n; }
-    | agent_list SPACE              { $$.n += 1; }
+    | agent_list QSTR               { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
+    | agent_list SPACE              { $$.n += 1;    $$.escaped = $1.escaped; }
     ;
 
 req_id

@@ -1,11 +1,16 @@
 %{
 #include "op_parser.hpp"
 #include "stdint.h"
+
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
+#define MAKE_STR_ESCAPED()  do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = true; }  while(false)
+
 %}
 
 %option noyywrap yylineno
 %option reentrant bison-bridge
 %option prefix="op_"
+%option stack
 
 IPV4SEG     (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])
 IPV4ADDR    ({IPV4SEG}\.){3,3}{IPV4SEG}
@@ -30,7 +35,9 @@ METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"
 VERS    "HTTP/"("1.0"|"1.1"|"2"|"3")
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
-QSTR    [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]]+
+
+QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]]+
+QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]])+
 
 SPACE   " "
 QMARK   \?
@@ -54,20 +61,21 @@ STR     [.\-a-zA-Z0-9_]+
 "port="         { return PORT; }
 "rl="           { return RL; }
 
-\"                  { BEGIN( QUOTED ); return QUOTE; }
-<QUOTED>\"          { BEGIN( INITIAL ); return QUOTE; }
+\"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
+<QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
 <QUOTED>{SPACE}     { return SPACE; }
 <QUOTED>{QMARK}     { return QMARK; }
-<QUOTED>{METHOD}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return METHOD; }
-<QUOTED>{VERS}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return VERS; }
-<QUOTED>{QSTR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return QSTR; }
+<QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
+<QUOTED>{VERS}      { MAKE_STR(); return VERS; }
+<QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
 <QUOTED>.           ;
 
-{IPV4ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV4; }
-{IPV6ADDR}      { yylval -> s . p = yytext; yylval -> s . n = yyleng; return IPV6; }
-{FLOAT}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return FLOAT; }
+{IPV4ADDR}      { MAKE_STR(); return IPV4; }
+{IPV6ADDR}      { MAKE_STR(); return IPV6; }
+{FLOAT}         { MAKE_STR(); return FLOAT; }
 {I64}           { yylval -> i64 = atol( yytext ); return I64; }
-{MONTH}         { yylval -> s . p = yytext; yylval -> s . n = yyleng; return MONTH; }
-{STR}           { yylval -> s . p = yytext; yylval -> s . n = yyleng; return STR; }
+{MONTH}         { MAKE_STR(); return MONTH; }
+{STR}           { MAKE_STR(); return STR; }
 
 %%
