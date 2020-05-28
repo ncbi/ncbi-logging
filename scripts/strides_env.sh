@@ -5,6 +5,8 @@ set -o errexit # same as -e
 set -o pipefail
 shopt -s nullglob globstar
 
+export SCRIPTDIR="$PWD"
+export PREFIX="strides_analytics"
 export PGVER="postgresql-12.3"
 export PGDATA="$HOME/pgdata12"
 export PATH="$HOME/$PGVER/bin:$HOME/.local/bin:/opt/python-all/bin:$HOME/google-cloud-sdk/bin:$PATH"
@@ -22,6 +24,7 @@ YESTERDAY=${YESTERDAY_DASH//-}
 export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
+
 
 # GCP VM shouldn't have any other competing load, helps on iebdev
 renice +19 -p $$ > /dev/null 2>&1

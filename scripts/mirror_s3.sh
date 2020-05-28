@@ -16,20 +16,22 @@ for LOG_BUCKET in $buckets; do
 
     DEST="$RAMDISK/S3-$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$DEST"
+    cd "$DEST" || exit
 
 # TODO: Fetch service account for AWS --profile
     # NOTE: Much faster to use aws ls than aws cp with include/excludes
-    objects=$(aws s3 ls "s3://$LOG_BUCKET/$YESTERDAY_DASH" | cut -c 32-)
+    set +e
+    objects=$(aws s3 ls "s3://$LOG_BUCKET/$YESTERDAY_DASH" | cut -c 32- )
     wc=$(echo "$objects" | wc -l)
     echo "Copying $wc objects from $LOG_BUCKET into $DEST"
-    set +e
     echo "$objects" | xargs -I % -P 24 aws s3 cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
     set -e
     date
     echo "Copied $LOG_BUCKET to $DEST"
-    TAR="$PANFS/s3_prod/$YESTERDAY.$LOG_BUCKET.tar.gz"
+    TAR="$PANFS/s3_prod/$YESTERDAY.tar.gz"
 
-    tar -caf "$TAR" "$DEST"
+    cd "$DEST/.." || exit
+    tar -caf "$TAR" "$YESTERDAY"
 
     echo "Processed  $LOG_BUCKET ..."
     rm -rf "$DEST"
@@ -48,6 +50,7 @@ for LOG_BUCKET in $buckets; do
     fi
 
     gsutil cp "$TAR" "$DEST_BUCKET"
+    gsutil ls -l "$DEST_BUCKET"
 done
 
 echo "Done"
