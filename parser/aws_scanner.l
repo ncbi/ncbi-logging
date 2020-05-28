@@ -34,7 +34,6 @@ MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"
 VERS    "HTTP/"("1.0"|"1.1"|"2"|"3")
 I64     [-+]?[0-9]+
-FLOAT   [-+]?[0-9]+\.[0-9]+
 QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]]+
 QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]])+
 
@@ -68,15 +67,14 @@ STR1    (\/|{STR})([/:/+=][.\-a-zA-Z0-9_]*)+
 
 \[                  { yy_push_state( TIMEFMT, yyscanner ); return OB; }
 <TIMEFMT>\]         { yy_pop_state( yyscanner ); return CB; }
-<TIMEFMT>{I64}      { yylval -> i64 = atol( yytext ); return I64; }
+<TIMEFMT>{I64}      { MAKE_STR(); return I64; }
 <TIMEFMT>\:         { return COLON; }
 <TIMEFMT>\/         { return SLASH; }
-<TIMEFMT>{MONTH}    { yylval -> s . p = yytext; yylval -> s . n = yyleng; return MONTH; }
+<TIMEFMT>{MONTH}    { MAKE_STR(); return MONTH; }
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
-{FLOAT}         { MAKE_STR(); return FLOAT; }
-{I64}           { yylval -> i64 = atol( yytext ); return I64; }
+{I64}           { MAKE_STR(); return I64; }
 {MONTH}         { MAKE_STR(); return MONTH; }
 {STR1}          { MAKE_STR(); return STR1; }
 {STR}           { MAKE_STR(); return STR; }

@@ -34,13 +34,11 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
-    int64_t i64;
     t_timepoint tp;
     t_request req;
 }
 
-%token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR DASH
-%token<i64> I64
+%token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR DASH I64
 %token DOT SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
 
 %type<tp> time
@@ -48,7 +46,7 @@ using namespace NCBI::Logging;
 %type<s> ip referer agent agent_list params_opt
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
 %type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
-%type<i64> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
+%type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
 
 %start line
 
@@ -74,12 +72,12 @@ log_aws
         ev . operation = $7;
         ev . key = $8;
         ev . request = $9;
-        ev . res_code = $10;
+        ev . res_code = atoi( $10 . p );
         ev . error = $11;
-        ev . res_len = $12;
-        ev . obj_size = $13;
-        ev . total_time = $14;
-        ev . turnaround_time = $15;
+        ev . res_len = ( $12.n == 0 ) ? 0 : atol( $12 . p );
+        ev . obj_size = ( $13.n == 0 ) ? 0 : atol( $13 . p );
+        ev . total_time = ( $14.n == 0 ) ? 0 : atol( $14 . p );
+        ev . turnaround_time = ( $15.n == 0 ) ? 0 : atol( $15 . p );
         ev . referer = $16;
         ev . agent = $17;
         ev . version_id = $18;
@@ -110,6 +108,7 @@ aws_requester
 aws_request_id
     : STR
     | STR1
+    | I64
     ;
 
 aws_operation
@@ -131,22 +130,22 @@ aws_error
 
 aws_bytes_sent
     : I64
-    | DASH                          { $$ = 0; }
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_obj_size
     : I64
-    | DASH                          { $$ = 0; }
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_total_time
     : I64
-    | DASH                          { $$ = 0; }
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_turnaround_time
     : I64
-    | DASH                          { $$ = 0; }
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_version_id
@@ -246,13 +245,13 @@ agent_list
 time
     : OB I64 SLASH MONTH SLASH I64 COLON I64 COLON I64 COLON I64 I64 CB
     {
-        $$.day = $2;
+        $$.day = atoi( $2.p );
         $$.month = month_int( &($4) );
-        $$.year = $6;
-        $$.hour = $8;
-        $$.minute = $10;
-        $$.second = $12;
-        $$.offset = $13;
+        $$.year = atoi( $6.p );
+        $$.hour = atoi( $8.p );
+        $$.minute = atoi( $10.p );
+        $$.second = atoi( $12.p );
+        $$.offset = atoi( $13.p );
     }
     ;
 
