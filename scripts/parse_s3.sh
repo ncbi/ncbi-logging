@@ -17,7 +17,7 @@ for bucket in $BUCKETS; do
     gsutil cp "gs://${PREFIX}_${bucket}/$YESTERDAY.tar.gz" .
     for tgz in *.tar.gz; do
         tar -xaf "$tgz"
-#        rm -f "$tgz"
+        rm -f "$tgz"
     done
     cd "$YESTERDAY" || exit
 
@@ -33,8 +33,9 @@ for bucket in $BUCKETS; do
     done
 
     grep "{\"unrecognized\":\"" "$YESTERDAY.json" > "unrecognized.$YESTERDAY.jsonl"
-    unrecwc=$(wc -l "unrecognized.$YESTERDAY.jsonl" | cut -f1 -d' ')
     grep -v "{\"unrecognized\":\"" "$YESTERDAY.json" > "recognized.$YESTERDAY.jsonl"
+
+    unrecwc=$(wc -l "unrecognized.$YESTERDAY.jsonl" | cut -f1 -d' ')
     recwc=$(wc -l "recognized.$YESTERDAY.jsonl" | cut -f1 -d' ')
 
     printf "Recognized lines:   %8d\n" "$recwc"
@@ -43,10 +44,19 @@ for bucket in $BUCKETS; do
 
     rm -f "$YESTERDAY.json"
 
+    # Remove leading spaces and slashes and pluses
+    sed -i "s/^[ \t]*//" "unrecognized.$YESTERDAY.jsonl"
+    sed -i "s/^[+\/]*//" "unrecognized.$YESTERDAY.jsonl"
+    sed -i "s/^[ \t]*//" "recognized.$YESTERDAY.jsonl"
+    sed -i "s/^[+\/]*//" "recognized.$YESTERDAY.jsonl"
+
+    jq -e -c . < "recognized.$YESTERDAY.jsonl" > /dev/null
+    jq -e -c . < "unrecognized.$YESTERDAY.jsonl" > /dev/null
+
     gzip -9 ./*.jsonl
 
-    gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$YESTERDAY/$bucket/"
-
+    gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
+    gsutil ls "gs://${PREFIX}_logs_parsed/$bucket/"
     date
 done
 
