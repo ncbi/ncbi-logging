@@ -95,7 +95,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     {
         JSONObjectRef j = JSON::makeObject();
         j -> addValue( "accepted", JSON::makeBoolean(accepted) );
-        j -> addValue( "source", JSON::makeString("op") );
+        j -> addValue( "source", JSON::makeString("NCBI") );
         j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
 
