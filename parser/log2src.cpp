@@ -144,22 +144,16 @@ struct SRC_AWS_LogLines : public AWS_LogLines
         mem_os << ToString ( event . operation ) << " ";
         mem_os << ToString ( event . key ) << " ";
         mem_os << FormatRequest ( event . request );
-        mem_os << event.res_code << " ";
+        mem_os << ToString( event.res_code ) << " ";
         mem_os << ToString ( event . error ) << " ";
-        mem_os << event.res_len << " ";
-        mem_os << event.obj_size << " ";
-        mem_os << event.total_time << " ";
-        mem_os << event.turnaround_time << " ";
+        mem_os << ToString( event.res_len ) << " ";
+        mem_os << ToString( event.obj_size ) << " ";
+        mem_os << ToString( event.total_time ) << " ";
+        mem_os << ToString( event.turnaround_time ) << " ";
         mem_os << "\"" << ToString ( event . referer ) << "\" ";
         mem_os << "\"" << ToString ( event . agent ) << "\" ";
         mem_os << ToString ( event . version_id ) << " ";
         mem_os << ToString ( event . host_id ) << " ";
-        
-        // mem_os << ToString ( event . req_time ) << " ";
-        // mem_os << "\"" << ToString ( event . agent ) << "\" ";
-        // mem_os << "\"" << ToString ( event . forwarded ) << "\" ";
-        // mem_os << "port=" << event . port << " ";
-        // mem_os << "rl=" << event . req_len ;
         mem_os << endl;
         return 0;
     }

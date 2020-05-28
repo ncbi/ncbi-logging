@@ -46,7 +46,7 @@ STR1    (\/|{STR})([/:/+=][.\-a-zA-Z0-9_]*)+
 
 %%
 
-[ \t]           ;
+[ \t]+          { return SPACE; }
 \r\n            { return LF; }
 \n              { return LF; }
 \r              { return CR; }
@@ -70,11 +70,11 @@ STR1    (\/|{STR})([/:/+=][.\-a-zA-Z0-9_]*)+
 <TIMEFMT>{I64}      { MAKE_STR(); return I64; }
 <TIMEFMT>\:         { return COLON; }
 <TIMEFMT>\/         { return SLASH; }
+<TIMEFMT>[ \t]      { ; }
 <TIMEFMT>{MONTH}    { MAKE_STR(); return MONTH; }
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
-{I64}           { MAKE_STR(); return I64; }
 {MONTH}         { MAKE_STR(); return MONTH; }
 {STR1}          { MAKE_STR(); return STR1; }
 {STR}           { MAKE_STR(); return STR; }

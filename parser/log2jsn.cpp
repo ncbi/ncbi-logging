@@ -160,9 +160,9 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         j -> addValue( "key", ToJsonString( e.key ) );
         j -> addValue( "error", ToJsonString( e.error ) );
 
-        j -> addValue( "obj_size", JSON::makeInteger( e.obj_size ) );
-        j -> addValue( "total_time", JSON::makeInteger( e.total_time ) );
-        j -> addValue( "turnaround_time", JSON::makeInteger( e.turnaround_time ) );
+        j -> addValue( "obj_size", ToJsonString( e.obj_size ) );
+        j -> addValue( "total_time", ToJsonString( e.total_time ) );
+        j -> addValue( "turnaround_time", ToJsonString( e.turnaround_time ) );
 
         j -> addValue( "version_id", ToJsonString( e.version_id ) );
         j -> addValue( "host_id", ToJsonString( e.host_id ) );
@@ -185,8 +185,8 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
             j -> addValue( "request", rv );
         }
 
-        j -> addValue( "res_code", JSON::makeInteger( e.res_code ) );
-        j -> addValue( "res_len", JSON::makeInteger( e.res_len ) );
+        j -> addValue( "res_code", ToJsonString( e.res_code ) );
+        j -> addValue( "res_len", ToJsonString( e.res_len ) );
         j -> addValue( "referer", ToJsonString( e.referer ) );
         j -> addValue( "agent", ToJsonString( e.agent ) );
 
@@ -261,7 +261,7 @@ static int handle_aws( bool readable )
     cerr << "converting AWS format" << endl;
     AWSToJsonLogLines event_receiver( cout, readable );
     AWS_Parser p( event_receiver, cin );
-    //p . setDebug( true );
+    p . setDebug( true );
     bool res = p . parse();
 
     return res ? 0 : 3;

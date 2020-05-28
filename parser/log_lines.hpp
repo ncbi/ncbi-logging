@@ -111,18 +111,25 @@ namespace NCBI
             }
         };
 
-        struct LogAWSEvent : public CommonLogEvent
+        struct LogAWSEvent
         {
             t_str       owner;
             t_str       bucket;
+            t_timepoint time;
+            t_str       ip;
             t_str       requester;
             t_str       request_id;
             t_str       operation;
             t_str       key;
+            t_request   request;
+            t_str       res_code;
             t_str       error;
-            int64_t     obj_size;
-            int64_t     total_time;
-            int64_t     turnaround_time;
+            t_str       res_len;
+            t_str       obj_size;
+            t_str       total_time;
+            t_str       turnaround_time;
+            t_str       referer;
+            t_str       agent;
             t_str       version_id;
             t_str       host_id;
             t_str       cipher_suite;
@@ -130,21 +137,33 @@ namespace NCBI
             t_str       host_header;
             t_str       tls_version;
 
-            LogAWSEvent() : CommonLogEvent()
+            t_str       unparsed;
+
+            LogAWSEvent()
             {
                 owner . n = 0;
                 bucket . n = 0;
+                ip . n = 0;
                 requester . n = 0;
                 request_id . n = 0;
                 operation . n = 0;
                 key . n = 0;
+                res_code . n = 0;
                 error . n = 0;
+                res_len . n = 0;
+                obj_size . n = 0;
+                total_time . n = 0;
+                turnaround_time . n = 0;
+                referer . n = 0;
+                agent . n = 0;
                 version_id . n = 0;
                 host_id . n = 0;
                 cipher_suite . n = 0;
                 auth_type . n = 0;
                 host_header . n = 0;
                 tls_version . n = 0;
+
+                unparsed . n = 0;
             }
         };
 

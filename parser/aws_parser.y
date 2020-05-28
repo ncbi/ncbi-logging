@@ -57,35 +57,54 @@ line
     ;
 
 log_aws
-    : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation
-      aws_key request result_code aws_error aws_bytes_sent aws_obj_size
-      aws_total_time aws_turnaround_time referer agent aws_version_id
-      aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
+    : aws_owner SPACE
+      aws_bucket SPACE
+      time SPACE
+      ip SPACE
+      aws_requester SPACE
+      aws_request_id SPACE
+      aws_operation SPACE
+      aws_key SPACE
+      request SPACE
+      result_code SPACE
+      aws_error SPACE
+      aws_bytes_sent SPACE
+      aws_obj_size SPACE
+      aws_total_time SPACE
+      aws_turnaround_time SPACE
+      referer SPACE
+      agent SPACE
+      aws_version_id SPACE
+      aws_host_id SPACE
+      aws_cipher SPACE
+      aws_auth SPACE
+      aws_host_hdr SPACE
+      aws_tls_vers
     {
         LogAWSEvent ev;
         ev . owner = $1;
-        ev . bucket = $2;
-        ev . time = $3;
-        ev . ip = $4;
-        ev . requester = $5;
-        ev . request_id = $6;
-        ev . operation = $7;
-        ev . key = $8;
-        ev . request = $9;
-        ev . res_code = atoi( $10 . p );
-        ev . error = $11;
-        ev . res_len = ( $12.n == 0 ) ? 0 : atol( $12 . p );
-        ev . obj_size = ( $13.n == 0 ) ? 0 : atol( $13 . p );
-        ev . total_time = ( $14.n == 0 ) ? 0 : atol( $14 . p );
-        ev . turnaround_time = ( $15.n == 0 ) ? 0 : atol( $15 . p );
-        ev . referer = $16;
-        ev . agent = $17;
-        ev . version_id = $18;
-        ev . host_id = $19;
-        ev . cipher_suite = $20;
-        ev . auth_type = $21;
-        ev . host_header = $22;
-        ev . tls_version = $23;
+        ev . bucket = $3;
+        ev . time = $5;
+        ev . ip = $7;
+        ev . requester = $9;
+        ev . request_id = $11;
+        ev . operation = $13;
+        ev . key = $15;
+        ev . request = $17;
+        ev . res_code = $19;
+        ev . error = $21;
+        ev . res_len = $23;
+        ev . obj_size = $25;
+        ev . total_time = $27;
+        ev . turnaround_time = $29;
+        ev . referer = $31;
+        ev . agent = $33;
+        ev . version_id = $35;
+        ev . host_id = $37;
+        ev . cipher_suite = $39;
+        ev . auth_type = $41;
+        ev . host_header = $43;
+        ev . tls_version = $45;
         lib -> acceptLine( ev );
     }
     ;
@@ -108,7 +127,6 @@ aws_requester
 aws_request_id
     : STR
     | STR1
-    | I64
     ;
 
 aws_operation
@@ -129,29 +147,29 @@ aws_error
     ;
 
 aws_bytes_sent
-    : I64
+    : STR
     | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_obj_size
-    : I64
+    : STR
     | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_total_time
-    : I64
+    : STR
     | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_turnaround_time
-    : I64
+    : STR
     | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_version_id
     : STR
     | STR1
-    | DASH
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_host_id
@@ -160,10 +178,10 @@ aws_host_id
     ;
 
 aws_cipher
-    : STR STR          { $$ = $1; $$.n += ( $2.n + 1 ); }
-    | STR1 STR         { $$ = $1; $$.n += ( $2.n + 1 ); }
-    | STR STR1         { $$ = $1; $$.n += ( $2.n + 1 ); }
-    | STR1 STR1        { $$ = $1; $$.n += ( $2.n + 1 ); }   
+    : STR SPACE STR    { $$ = $1; $$.n += ( $3.n + 1 ); }
+    | STR1 SPACE STR   { $$ = $1; $$.n += ( $3.n + 1 ); }
+    | STR SPACE STR1   { $$ = $1; $$.n += ( $3.n + 1 ); }
+    | STR1 SPACE STR1  { $$ = $1; $$.n += ( $3.n + 1 ); }   
     | DASH             { $$.p = NULL; $$.n = 0; } 
     ;
 
@@ -222,7 +240,7 @@ request :
     ;
 
 result_code
-    : I64
+    : STR
     ;
 
 referer

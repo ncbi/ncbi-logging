@@ -33,8 +33,8 @@ struct SLogAWSEvent
     string      ip;
     t_timepoint time;
     SRequest    request;
-    int64_t     res_code;
-    int64_t     res_len;
+    string      res_code;
+    string     res_len;
     string      referer;
     string      agent;
 
@@ -45,9 +45,9 @@ struct SLogAWSEvent
     string      operation;
     string      key;
     string      error;
-    int64_t     obj_size;
-    int64_t     total_time;
-    int64_t     turnaround_time;
+    string      obj_size;
+    string      total_time;
+    string      turnaround_time;
     string      version_id;
     string      host_id;
     string      cipher_suite;
@@ -60,8 +60,8 @@ struct SLogAWSEvent
         ip          = ToString( ev . ip );
         time        = ev . time;
         request     = ev . request;
-        res_code    = ev . res_code;
-        res_len     = ev . res_len;
+        res_code    = ToString( ev . res_code );
+        res_len     = ToString( ev . res_len );
         referer     = ToString( ev . referer );
         agent       = ToString( ev . agent );
 
@@ -72,9 +72,9 @@ struct SLogAWSEvent
         operation   = ToString( ev . operation );
         key         = ToString( ev . key );
         error       = ToString( ev . error );
-        obj_size    = ev . obj_size;
-        total_time  = ev . total_time;
-        turnaround_time = ev . turnaround_time;
+        obj_size    = ToString( ev . obj_size );
+        total_time  = ToString( ev . total_time );
+        turnaround_time = ToString( ev . turnaround_time );
         version_id  = ToString( ev . version_id );
         host_id     = ToString( ev . host_id );
         cipher_suite = ToString( ev . cipher_suite );
@@ -179,7 +179,7 @@ TEST_F ( TestParseFixture, AWS )
     "TLSv1.2";
     "\n";
 
-    const SLogAWSEvent &e = *( parse_aws( InputLine ) );
+    const SLogAWSEvent &e = *( parse_aws( InputLine, true ) );
 
     ASSERT_EQ( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37", e.owner );
     ASSERT_EQ( "sra-pub-src-14", e.bucket );
@@ -204,15 +204,15 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw--",
                e.request.params );
     ASSERT_EQ( "HTTP/1.1", e.request.vers );
-    ASSERT_EQ( 200, e.res_code );
+    ASSERT_EQ( "200", e.res_code );
     ASSERT_EQ( "", e.error );
-    ASSERT_EQ( 0, e.res_len );
-    ASSERT_EQ( 8388608, e.obj_size );
-    ASSERT_EQ( 557, e.total_time );
-    ASSERT_EQ( 12, e.turnaround_time );
+    ASSERT_EQ( "", e.res_len );
+    ASSERT_EQ( "8388608", e.obj_size );
+    ASSERT_EQ( "557", e.total_time );
+    ASSERT_EQ( "12", e.turnaround_time );
     ASSERT_EQ( "-", e.referer );
     ASSERT_EQ( "aws-cli/1.16.102 \"Python\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent );
-    ASSERT_EQ( "-", e.version_id );
+    ASSERT_EQ( "", e.version_id );
     ASSERT_EQ( "fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg=", e.host_id );
     ASSERT_EQ( "SigV4 ECDHE-RSA-AES128-GCM-SHA256", e.cipher_suite );
     ASSERT_EQ( "AuthHeader", e.auth_type );
@@ -227,12 +227,12 @@ TEST_F ( TestParseFixture, AWS_total_time_is_dash )
     
     const SLogAWSEvent &e = *( parse_aws( InputLine ) );
 
-    ASSERT_EQ( 200, e.res_code );
+    ASSERT_EQ( "200", e.res_code );
     ASSERT_EQ( "", e.error );
-    ASSERT_EQ( 0, e.res_len );
-    ASSERT_EQ( 1318480, e.obj_size );
-    ASSERT_EQ( 30, e.total_time );
-    ASSERT_EQ( 0, e.turnaround_time );
+    ASSERT_EQ( "", e.res_len );
+    ASSERT_EQ( "1318480", e.obj_size );
+    ASSERT_EQ( "30", e.total_time );
+    ASSERT_EQ( "", e.turnaround_time );
     ASSERT_EQ( "-", e.referer );
 }
 
