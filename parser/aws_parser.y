@@ -41,7 +41,7 @@ using namespace NCBI::Logging;
 %token DOT SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
 
 %type<tp> time
-%type<s> ip referer agent agent_list params_opt request
+%type<s> ip referer agent agent_list request
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
 %type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
@@ -173,6 +173,7 @@ aws_version_id
 aws_host_id
     : STR
     | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_cipher
@@ -185,6 +186,8 @@ aws_cipher
 
 aws_auth
     : STR
+    | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_host_hdr
@@ -196,16 +199,12 @@ aws_host_hdr
 aws_tls_vers
     : STR
     | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 ip
     : IPV4
     | IPV6
-    ;
-
-params_opt
-    : QMARK QSTR    { $$ = $2; }
-    | %empty        { $$.p = NULL; $$.n = 0; }
     ;
 
 request
