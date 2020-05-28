@@ -106,6 +106,11 @@ log2src_: mkdir $(BINDIR)/log2src
 run2src: log2src_
 	cat data/two_events.txt | $(BINDIR)/log2src >./data/run2src.out
 
+test2src: log2src_
+	mkdir -p actual
+	cat data/two_events.txt | $(BINDIR)/log2src >./actual/run2src.out && diff ./expected/run2src.out ./actual/run2src.out
+	rm -rf actual
+
 #################################################
 # tests
 # assume that Googletests is installed and accessible
@@ -120,13 +125,15 @@ tests: \
 	$(PREFIX_GCP)test_flex \
 	$(PREFIX_GCP)test_parse
 
-runtests: liblogparse run_test_helper tests 
+runparsetests:
 	$(BINDIR)/$(PREFIX_OP)test_flex
 	$(BINDIR)/$(PREFIX_OP)test_parse
 	$(BINDIR)/$(PREFIX_AWS)test_flex
 	$(BINDIR)/$(PREFIX_AWS)test_parse
 	$(BINDIR)/$(PREFIX_GCP)test_flex
 	$(BINDIR)/$(PREFIX_GCP)test_parse
+
+runtests: liblogparse tests run_test_helper runparsetests test2src test2jsn
 
 #################################################
 # scanner - tests
@@ -137,8 +144,12 @@ run_test_helper: test_helper
 TEST_HELPER_OBJ = \
 	test_helper.o 
 
-test_helper: $(addprefix  $(OBJDIR)/,$(TEST_HELPER_OBJ)) $(LIBDIR)/liblogparse.a
-	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread
+$(BINDIR)/test_helper: $(addprefix  $(OBJDIR)/,$(TEST_HELPER_OBJ)) $(LIBDIR)/liblogparse.a
+	$(LD) -o $@ $+ -lgtest -lpthread
+
+test_helper: $(BINDIR)/test_helper
+
+.PHONY: test_helper
 
 #################################################
 # scanner - tests
@@ -165,15 +176,22 @@ GCP_TEST_FLEX_OBJ = \
 	$(PREFIX_GCP)test_flex.o \
 	$(PREFIX_GCP)scanner.o
 
+$(BINDIR)/$(PREFIX_OP)test_flex: $(addprefix  $(OBJDIR)/,$(OP_TEST_FLEX_OBJ))
+	$(LD) -o $@ $+ -lgtest -lpthread
 
-$(PREFIX_OP)test_flex: $(addprefix  $(OBJDIR)/,$(OP_TEST_FLEX_OBJ))
-	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread
+$(PREFIX_OP)test_flex: $(BINDIR)/$(PREFIX_OP)test_flex
 
-$(PREFIX_AWS)test_flex: $(addprefix  $(OBJDIR)/,$(AWS_TEST_FLEX_OBJ))
-	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread
+$(BINDIR)/$(PREFIX_AWS)test_flex: $(addprefix  $(OBJDIR)/,$(AWS_TEST_FLEX_OBJ))
+	$(LD) -o $@ $+ -lgtest -lpthread
 
-$(PREFIX_GCP)test_flex: $(addprefix  $(OBJDIR)/,$(GCP_TEST_FLEX_OBJ))
-	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread
+$(PREFIX_AWS)test_flex: $(BINDIR)/$(PREFIX_AWS)test_flex
+
+$(BINDIR)/$(PREFIX_GCP)test_flex: $(addprefix  $(OBJDIR)/,$(GCP_TEST_FLEX_OBJ))
+	$(LD) -o $@ $+ -lgtest -lpthread
+
+$(PREFIX_GCP)test_flex: $(BINDIR)/$(PREFIX_GCP)test_flex
+
+.PHONY: $(PREFIX_OP)test_flex $(PREFIX_AWS)test_flex $(PREFIX_GCP)test_flex
 
 #################################################
 # parser - tests
@@ -195,14 +213,22 @@ AWS_TEST_PARSE_OBJ = $(PREFIX_AWS)test_parse.o log_lines.o
 GCP_TEST_PARSE_OBJ = $(PREFIX_GCP)test_parse.o log_lines.o
 
 
-$(PREFIX_OP)test_parse: $(addprefix $(OBJDIR)/,$(OP_TEST_PARSE_OBJ))
-	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+$(BINDIR)/$(PREFIX_OP)test_parse: $(addprefix $(OBJDIR)/,$(OP_TEST_PARSE_OBJ))
+	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
 
-$(PREFIX_AWS)test_parse: $(addprefix $(OBJDIR)/,$(AWS_TEST_PARSE_OBJ))
-	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+$(PREFIX_OP)test_parse: $(BINDIR)/$(PREFIX_OP)test_parse
 
-$(PREFIX_GCP)test_parse: $(addprefix $(OBJDIR)/,$(GCP_TEST_PARSE_OBJ))
-	$(LD) -o $(BINDIR)/$@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+$(BINDIR)/$(PREFIX_AWS)test_parse: $(addprefix $(OBJDIR)/,$(AWS_TEST_PARSE_OBJ))
+	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+
+$(PREFIX_AWS)test_parse: $(BINDIR)/$(PREFIX_AWS)test_parse
+
+$(BINDIR)/$(PREFIX_GCP)test_parse: $(addprefix $(OBJDIR)/,$(GCP_TEST_PARSE_OBJ))
+	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+
+$(PREFIX_GCP)test_parse: $(BINDIR)/$(PREFIX_GCP)test_parse
+
+.PHONY: $(PREFIX_OP)test_parse $(PREFIX_AWS)test_parse $(PREFIX_GCP)test_parse
 
 #################################################
 # minimal parser/Json: stdin(any format)->parsing->stdout(Json)
@@ -221,3 +247,6 @@ log2jsn_: mkdir $(BINDIR)/log2jsn
 
 json: log2jsn_
 	cat data/two_events.txt | $(BINDIR)/log2jsn 
+
+test2jsn: log2jsn_
+	# TODO

@@ -1,5 +1,9 @@
 #include "log_lines.hpp"
+
 #include <iostream>
+#include <sstream>
+#include <iomanip>
+
 #include "helper.hpp"
 
 using namespace std;
@@ -25,29 +29,30 @@ string FormatMonth (uint8_t m)
     }
 }
 
-static void FormatTime(t_timepoint t, ostream& out)
+static string FormatTime(const t_timepoint & t)
 {
+    ostringstream out;
+    out << setfill ('0'); 
+
     out << "[";
-    if ( t.day < 10 ) out << "0";
-    out << (int)t.day << "/";
+    out << setw (2) << (int)t.day << "/";
 
     out << FormatMonth( t.month )<<"/";
 
-    out << (int)t.year <<":";
-    if ( t.hour < 10 ) out << "0";
-    out << (int)t.hour <<":";
-    if ( t.minute < 10 ) out << "0";
-    out << (int)t.minute <<":";
-    if ( t.second < 10 ) out << "0";
-    out << (int)t.second <<" ";
+    out << setw (4) << (int)t.year <<":";
+    out << setw (2) << (int)t.hour <<":";
+    out << setw (2) << (int)t.minute <<":";
+    out << setw (2) << (int)t.second <<" ";
     if ( t.offset < 0 ) out << "-";
-    if ( abs(t.offset) < 1000 ) out << "0";
-    out << abs((int)t.offset);
+    out << setw (4) << abs(t.offset);
     out << "]";
+
+    return out.str();
 }
 
-static void FormatRequest(t_request r, ostream& out)
+static string FormatRequest(const t_request & r)
 {
+    ostringstream out;    
     if ( r.server.n > 0 )
     {
         out << "\"" << ToString( r.server ) << "\" ";
@@ -60,6 +65,8 @@ static void FormatRequest(t_request r, ostream& out)
     }
     out << " " << ToString( r.vers );
     out << "\" ";
+
+    return out.str();
 }
 
 struct SRC_OP_LogLines : public OP_LogLines
@@ -91,8 +98,8 @@ struct SRC_OP_LogLines : public OP_LogLines
             mem_os << ToString ( event . user ) << " - ";
         }
         
-        FormatTime ( event.time, mem_os ); mem_os << " ";
-        FormatRequest ( event . request, mem_os );
+        mem_os << FormatTime ( event.time ); mem_os << " ";
+        mem_os << FormatRequest ( event . request );
         mem_os << event.res_code << " ";
         mem_os << event.res_len << " ";
         mem_os << ToString ( event . req_time ) << " ";
@@ -127,16 +134,16 @@ struct SRC_AWS_LogLines : public AWS_LogLines
     }
 
     virtual int acceptLine( const LogAWSEvent & event )
-    {
+    {   //TODO: complete
         mem_os << ToString ( event . owner ) << " ";
         mem_os << ToString ( event . bucket ) << " ";
-        FormatTime ( event.time, mem_os ); mem_os << " ";
+        mem_os << FormatTime ( event.time ); mem_os << " ";
         mem_os << ToString ( event . ip ) << " ";
         mem_os << ToString ( event . requester ) << " ";
         mem_os << ToString ( event . request_id ) << " ";
         mem_os << ToString ( event . operation ) << " ";
         mem_os << ToString ( event . key ) << " ";
-        FormatRequest ( event . request, mem_os );
+        mem_os << FormatRequest ( event . request );
         mem_os << event.res_code << " ";
         mem_os << ToString ( event . error ) << " ";
         mem_os << event.res_len << " ";
@@ -185,6 +192,8 @@ static int parse_aws( void )
 
     return res ? 0 : 3;
 }
+
+//TODO: add GCP
 
 int main ( int argc, const char * argv [], const char * envp []  )
 {
