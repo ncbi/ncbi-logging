@@ -131,6 +131,7 @@ aws_obj_size
 
 aws_total_time
     : I64
+    | DASH                          { $$ = 0; }
     ;
 
 aws_version_id

@@ -260,6 +260,7 @@ static int handle_aws( bool readable )
     cerr << "converting AWS format" << endl;
     AWSToJsonLogLines event_receiver( cout, readable );
     AWS_Parser p( event_receiver, cin );
+    //p . setDebug( true );
     bool res = p . parse();
 
     return res ? 0 : 3;
