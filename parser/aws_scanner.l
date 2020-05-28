@@ -40,7 +40,7 @@ QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]])+
 SPACE   " "
 QMARK   \?
 STR     [.\-a-zA-Z0-9_]+
-STR1    (\/|{STR})([/:/+=][.\-a-zA-Z0-9_]*)+
+STR1    (\/|{STR})([/:/+=%][.\-a-zA-Z0-9_]*)+
 
 %x QUOTED TIMEFMT
 
