@@ -119,6 +119,7 @@ aws_operation
 aws_key
     : STR
     | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_error
