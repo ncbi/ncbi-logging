@@ -76,26 +76,16 @@ TEST_F ( TestFlexFixture, Quotes )
 TEST_F ( TestFlexFixture, QuotedSpace )
 {
     ASSERT_EQ( QUOTE, StartScan("\" \"") );
-    ASSERT_EQ( SPACE, Scan() );
+    ASSERT_EQ( QSTR, Scan() );
 }
 TEST_F ( TestFlexFixture, QuotedQuestion )
 {
     ASSERT_EQ( QUOTE, StartScan("\"?\"") );
-    ASSERT_EQ( QMARK, Scan() );
-}
-TEST_F ( TestFlexFixture, QuotedMethod )
-{
-    ASSERT_EQ( QUOTE, StartScan("\"OPTIONS\"") );
-    ASSERT_EQ( METHOD, Scan() ); ASSERT_EQ( "OPTIONS", Token() );
-}
-TEST_F ( TestFlexFixture, QuotedVers )
-{
-    ASSERT_EQ( QUOTE, StartScan("\"HTTP/2\"") );
-    ASSERT_EQ( VERS, Scan() ); ASSERT_EQ( "HTTP/2", Token() );
+    ASSERT_EQ( QSTR, Scan() );
 }
 TEST_F ( TestFlexFixture, QuotedString )
 {
-    #define str ".Bl0-_~!*'();:@&=+$,/%#[]"
+    #define str ".Bl0-_~!*'();:@&=+$,/%# []"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );

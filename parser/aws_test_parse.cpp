@@ -9,32 +9,13 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-struct SRequest
-{
-    string server;
-    string method;
-    string path;
-    string params;
-    string vers;
-
-    SRequest& operator= ( const t_request &req )
-    {
-       server = ToString( req.server );
-       method = ToString( req.method );
-       path = ToString( req.path );
-       params = ToString( req.params );
-       vers = ToString( req.vers );
-       return *this;
-    }
-};
-
 struct SLogAWSEvent
 {
     string      ip;
     t_timepoint time;
-    SRequest    request;
+    string      request;
     string      res_code;
-    string     res_len;
+    string      res_len;
     string      referer;
     string      agent;
 
@@ -59,7 +40,7 @@ struct SLogAWSEvent
     {
         ip          = ToString( ev . ip );
         time        = ev . time;
-        request     = ev . request;
+        request     = ToString( ev . request );
         res_code    = ToString( ev . res_code );
         res_len     = ToString( ev . res_len );
         referer     = ToString( ev . referer );
@@ -199,11 +180,8 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "REST.PUT.PART", e.operation );
     ASSERT_EQ( "SRR9612637/DRGHT.TC.307_interleaved.fq.1", e.key );
 
-    ASSERT_EQ( "PUT", e.request.method );
-    ASSERT_EQ( "/SRR9612637/DRGHT.TC.307_interleaved.fq.1", e.request.path );
-    ASSERT_EQ( "partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw--",
-               e.request.params );
-    ASSERT_EQ( "HTTP/1.1", e.request.vers );
+    ASSERT_EQ( "PUT /SRR9612637/DRGHT.TC.307_interleaved.fq.1?partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw-- HTTP/1.1", e.request );
+
     ASSERT_EQ( "200", e.res_code );
     ASSERT_EQ( "", e.error );
     ASSERT_EQ( "", e.res_len );

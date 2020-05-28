@@ -121,7 +121,7 @@ namespace NCBI
             t_str       request_id;
             t_str       operation;
             t_str       key;
-            t_request   request;
+            t_str       request;
             t_str       res_code;
             t_str       error;
             t_str       res_len;
@@ -148,6 +148,7 @@ namespace NCBI
                 request_id . n = 0;
                 operation . n = 0;
                 key . n = 0;
+                request . n = 0;
                 res_code . n = 0;
                 error . n = 0;
                 res_len . n = 0;

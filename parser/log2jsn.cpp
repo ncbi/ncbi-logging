@@ -174,16 +174,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
 
-        {
-            JSONObjectRef req = JSON::makeObject();
-            req -> addValue("server",   ToJsonString( e.request.server ) );
-            req -> addValue("method",   ToJsonString( e.request.method ) );
-            req -> addValue("path",     ToJsonString( e.request.path ) );
-            req -> addValue("params",   ToJsonString( e.request.params ) );
-            req -> addValue("vers",     ToJsonString( e.request.vers ) );
-            JSONValueRef rv( req.release() );
-            j -> addValue( "request", rv );
-        }
+        j -> addValue( "request", ToJsonString( e.request ) );
 
         j -> addValue( "res_code", ToJsonString( e.res_code ) );
         j -> addValue( "res_len", ToJsonString( e.res_len ) );

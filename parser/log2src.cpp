@@ -143,8 +143,8 @@ struct SRC_AWS_LogLines : public AWS_LogLines
         mem_os << ToString ( event . request_id ) << " ";
         mem_os << ToString ( event . operation ) << " ";
         mem_os << ToString ( event . key ) << " ";
-        mem_os << FormatRequest ( event . request );
-        mem_os << ToString( event.res_code ) << " ";
+        mem_os << ToString ( event . request ) << " ";
+        mem_os << ToString( event . res_code ) << " ";
         mem_os << ToString ( event . error ) << " ";
         mem_os << ToString( event.res_len ) << " ";
         mem_os << ToString( event.obj_size ) << " ";

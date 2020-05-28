@@ -35,15 +35,13 @@ using namespace NCBI::Logging;
 {
     t_str s;
     t_timepoint tp;
-    t_request req;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR DASH I64
 %token DOT SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
 
 %type<tp> time
-%type<req> request
-%type<s> ip referer agent agent_list params_opt
+%type<s> ip referer agent agent_list params_opt request
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
 %type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
@@ -210,33 +208,8 @@ params_opt
     | %empty        { $$.p = NULL; $$.n = 0; }
     ;
 
-request :
-    QUOTE QSTR QUOTE QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
-    {
-        $$.server = $2;
-        $$.method = $5;
-        $$.path   = $7;
-        $$.params = $8;
-        $$.vers   = $10;
-    }
-    |
-    STR QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
-    {
-        $$.server = $1;
-        $$.method = $3;
-        $$.path   = $5;
-        $$.params = $6;
-        $$.vers   = $8;
-    }
-    |
-    QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
-    {
-        $$.server.p = NULL; $$.server.n = 0;
-        $$.method = $2;
-        $$.path   = $4;
-        $$.params = $5;
-        $$.vers   = $7;
-    }
+request
+    : QUOTE QSTR QUOTE { $$ = $2; }
     ;
 
 result_code
