@@ -28,6 +28,12 @@ insert into formats values ('ETL');
 insert into formats values ('BQS');
 insert into formats values ('ETL + BQS');
 insert into formats values ('Original');
+insert into formats values ('fastq');
+insert into formats values ('metadata');
+insert into formats values ('blast');
+insert into formats values ('contigs');
+insert into formats values ('stat');
+insert into formats values ('snps');
 
 create table scopes (
     scope text not null
@@ -202,7 +208,7 @@ delete from buckets where cloud_provider='S3' and bucket_name in ('sra-pub-src-1
 
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)
-values ('S3', 'sra-pub-sars-cov2', 'CoViD-19', 'Efremov', 'sra-pub-run-1-logs', 's3_readers', 
+values ('S3', 'sra-pub-sars-cov2', 'CoViD-19', 'Efremov', 'sra-pub-run-1-logs', 's3_readers',
     'true', 'Original', 'hot');
 
 insert into buckets (cloud_provider, bucket_name, description,
@@ -212,7 +218,7 @@ values ('S3', 'sra-pub-sars-cov2-metadata-us-east-1', 'CoViD-19', 'Efremov', 'sr
 
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)
-values ('NCBI', 
+values ('NCBI',
     'srafiles11 and friends',
     'applog rotated',
     'Applog',
