@@ -104,6 +104,7 @@ aws_bucket
 aws_requester
     : STR
     | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_request_id
@@ -163,7 +164,8 @@ aws_cipher
     : STR STR          { $$ = $1; $$.n += ( $2.n + 1 ); }
     | STR1 STR         { $$ = $1; $$.n += ( $2.n + 1 ); }
     | STR STR1         { $$ = $1; $$.n += ( $2.n + 1 ); }
-    | STR1 STR1        { $$ = $1; $$.n += ( $2.n + 1 ); }    
+    | STR1 STR1        { $$ = $1; $$.n += ( $2.n + 1 ); }   
+    | DASH             { $$.p = NULL; $$.n = 0; } 
     ;
 
 aws_auth
@@ -173,6 +175,7 @@ aws_auth
 aws_host_hdr
     : STR
     | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_tls_vers
