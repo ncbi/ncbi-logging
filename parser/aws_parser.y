@@ -48,7 +48,7 @@ using namespace NCBI::Logging;
 %type<s> ip referer agent agent_list params_opt
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
 %type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
-%type<i64> result_code result_len aws_obj_size aws_total_time
+%type<i64> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
 
 %start line
 
@@ -60,9 +60,9 @@ line
 
 log_aws
     : aws_owner aws_bucket time ip aws_requester aws_request_id aws_operation
-      aws_key request result_code aws_error result_len aws_obj_size
-      aws_total_time referer agent aws_version_id aws_host_id aws_cipher
-      aws_auth aws_host_hdr aws_tls_vers
+      aws_key request result_code aws_error aws_bytes_sent aws_obj_size
+      aws_total_time aws_turnaround_time referer agent aws_version_id
+      aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
     {
         LogAWSEvent ev;
         ev . owner = $1;
@@ -79,14 +79,15 @@ log_aws
         ev . res_len = $12;
         ev . obj_size = $13;
         ev . total_time = $14;
-        ev . referer = $15;
-        ev . agent = $16;
-        ev . version_id = $17;
-        ev . host_id = $18;
-        ev . cipher_suite = $19;
-        ev . auth_type = $20;
-        ev . host_header = $21;
-        ev . tls_version = $22;
+        ev . turnaround_time = $15;
+        ev . referer = $16;
+        ev . agent = $17;
+        ev . version_id = $18;
+        ev . host_id = $19;
+        ev . cipher_suite = $20;
+        ev . auth_type = $21;
+        ev . host_header = $22;
+        ev . tls_version = $23;
         lib -> acceptLine( ev );
     }
     ;
@@ -121,15 +122,27 @@ aws_key
     ;
 
 aws_error
-    : DASH STR DASH                 { $$ = $2; }
-    | DASH DASH                     { $$.p = NULL; $$.n = 0; }
+    : DASH                          { $$.p = NULL; $$.n = 0; }
+    | STR
+    | STR1
+    ;
+
+aws_bytes_sent
+    : I64
+    | DASH                          { $$ = 0; }
     ;
 
 aws_obj_size
     : I64
+    | DASH                          { $$ = 0; }
     ;
 
 aws_total_time
+    : I64
+    | DASH                          { $$ = 0; }
+    ;
+
+aws_turnaround_time
     : I64
     | DASH                          { $$ = 0; }
     ;
@@ -206,10 +219,6 @@ request :
     ;
 
 result_code
-    : I64
-    ;
-
-result_len
     : I64
     ;
 

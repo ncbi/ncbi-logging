@@ -47,6 +47,7 @@ struct SLogAWSEvent
     string      error;
     int64_t     obj_size;
     int64_t     total_time;
+    int64_t     turnaround_time;
     string      version_id;
     string      host_id;
     string      cipher_suite;
@@ -73,6 +74,7 @@ struct SLogAWSEvent
         error       = ToString( ev . error );
         obj_size    = ev . obj_size;
         total_time  = ev . total_time;
+        turnaround_time = ev . turnaround_time;
         version_id  = ToString( ev . version_id );
         host_id     = ToString( ev . host_id );
         cipher_suite = ToString( ev . cipher_suite );
@@ -162,7 +164,8 @@ TEST_F ( TestParseFixture, AWS )
     "SRR9612637/DRGHT.TC.307_interleaved.fq.1 "
     "\"PUT /SRR9612637/DRGHT.TC.307_interleaved.fq.1?partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw-- HTTP/1.1\" "
     "200 "
-    "- - "
+    "- "
+    "- "
     "8388608 "
     "557 "
     "12 "
@@ -203,9 +206,10 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "HTTP/1.1", e.request.vers );
     ASSERT_EQ( 200, e.res_code );
     ASSERT_EQ( "", e.error );
-    ASSERT_EQ( 8388608, e.res_len );
-    ASSERT_EQ( 557, e.obj_size );
-    ASSERT_EQ( 12, e.total_time );
+    ASSERT_EQ( 0, e.res_len );
+    ASSERT_EQ( 8388608, e.obj_size );
+    ASSERT_EQ( 557, e.total_time );
+    ASSERT_EQ( 12, e.turnaround_time );
     ASSERT_EQ( "-", e.referer );
     ASSERT_EQ( "aws-cli/1.16.102 \"Python\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent );
     ASSERT_EQ( "-", e.version_id );
@@ -223,9 +227,12 @@ TEST_F ( TestParseFixture, AWS_total_time_is_dash )
     
     const SLogAWSEvent &e = *( parse_aws( InputLine ) );
 
-    ASSERT_EQ( 1318480, e.res_len );
-    ASSERT_EQ( 30, e.obj_size );
-    ASSERT_EQ( 0, e.total_time );
+    ASSERT_EQ( 200, e.res_code );
+    ASSERT_EQ( "", e.error );
+    ASSERT_EQ( 0, e.res_len );
+    ASSERT_EQ( 1318480, e.obj_size );
+    ASSERT_EQ( 30, e.total_time );
+    ASSERT_EQ( 0, e.turnaround_time );
     ASSERT_EQ( "-", e.referer );
 }
 

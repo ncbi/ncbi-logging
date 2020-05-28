@@ -122,6 +122,7 @@ namespace NCBI
             t_str       error;
             int64_t     obj_size;
             int64_t     total_time;
+            int64_t     turnaround_time;
             t_str       version_id;
             t_str       host_id;
             t_str       cipher_suite;
