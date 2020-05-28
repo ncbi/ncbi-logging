@@ -95,7 +95,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     {
         JSONObjectRef j = JSON::makeObject();
         j -> addValue( "accepted", JSON::makeBoolean(accepted) );
-
+        j -> addValue( "source", JSON::makeString("op") );
         j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
 
@@ -150,6 +150,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
     {
         JSONObjectRef j = JSON::makeObject();
         j -> addValue( "accepted", JSON::makeBoolean(accepted) );
+        j -> addValue( "source", JSON::makeString("S3") );
 
         j -> addValue( "owner", ToJsonString( e.owner ) );
         j -> addValue( "bucket", ToJsonString( e.bucket ) );
@@ -218,6 +219,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         JSONObjectRef j = JSON::makeObject();
 
         j -> addValue( "accepted", JSON::makeBoolean(accepted) );
+        j -> addValue( "source", JSON::makeString("GS") );
 
         j -> addValue( "time", JSON::makeInteger( e.time ) );
         j -> addValue( "ip", ToJsonString( e.ip ) );
