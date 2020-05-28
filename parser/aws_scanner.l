@@ -41,7 +41,7 @@ QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]])+
 SPACE   " "
 QMARK   \?
 STR     [.\-a-zA-Z0-9_]+
-STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
+STR1    (\/|{STR})([/:/+=][.\-a-zA-Z0-9_]*)+
 
 %x QUOTED TIMEFMT
 
@@ -54,11 +54,7 @@ STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
 \.              { return DOT; }
 -               { MAKE_STR(); return DASH; }
 \]              { return CB; }
-\/              { return SLASH; }
 \:              { return COLON; }
-
-"port="         { return PORT; }
-"rl="           { return RL; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }

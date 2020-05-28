@@ -149,6 +149,7 @@ struct SRC_AWS_LogLines : public AWS_LogLines
         mem_os << event.res_len << " ";
         mem_os << event.obj_size << " ";
         mem_os << event.total_time << " ";
+        mem_os << event.turnaround_time << " ";
         mem_os << "\"" << ToString ( event . referer ) << "\" ";
         mem_os << "\"" << ToString ( event . agent ) << "\" ";
         mem_os << ToString ( event . version_id ) << " ";

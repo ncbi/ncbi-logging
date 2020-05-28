@@ -224,6 +224,9 @@ result_code
 
 referer
     : QUOTE QSTR QUOTE              { $$ = $2; }
+    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | STR
+    | STR1
     ;
 
 agent

@@ -162,6 +162,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 
         j -> addValue( "obj_size", JSON::makeInteger( e.obj_size ) );
         j -> addValue( "total_time", JSON::makeInteger( e.total_time ) );
+        j -> addValue( "turnaround_time", JSON::makeInteger( e.turnaround_time ) );
 
         j -> addValue( "version_id", ToJsonString( e.version_id ) );
         j -> addValue( "host_id", ToJsonString( e.host_id ) );

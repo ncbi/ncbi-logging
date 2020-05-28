@@ -58,11 +58,14 @@ TEST_F ( TestFlexFixture, Dot )             { ASSERT_EQ( DOT,   StartScan(".") )
 TEST_F ( TestFlexFixture, Dash )            { ASSERT_EQ( DASH,  StartScan("-") ); }
 TEST_F ( TestFlexFixture, OpenBracket )     { ASSERT_EQ( OB,    StartScan("[") ); }
 TEST_F ( TestFlexFixture, CloceBracket )    { ASSERT_EQ( CB,    StartScan("]") ); }
-TEST_F ( TestFlexFixture, Slash )           { ASSERT_EQ( SLASH, StartScan("/") ); }
 TEST_F ( TestFlexFixture, Colon )           { ASSERT_EQ( COLON, StartScan(":") ); }
-TEST_F ( TestFlexFixture, Port )            { ASSERT_EQ( PORT,  StartScan("port=") ); }
-TEST_F ( TestFlexFixture, RL )              { ASSERT_EQ( RL,    StartScan("rl=") ); }
 TEST_F ( TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") ); }
+
+TEST_F ( TestFlexFixture, STR )
+{
+    ASSERT_EQ( STR, StartScan("abcdefghijklmnopqrstuvw") );
+    ASSERT_EQ( "abcdefghijklmnopqrstuvw", Token() );
+}
 
 TEST_F ( TestFlexFixture, Quotes )
 {
