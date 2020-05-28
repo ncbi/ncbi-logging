@@ -125,11 +125,13 @@ aws_requester
 aws_request_id
     : STR
     | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }    
     ;
 
 aws_operation
     : STR
     | STR1
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 aws_key
@@ -208,11 +210,13 @@ ip
     ;
 
 request
-    : QUOTE QSTR QUOTE { $$ = $2; }
+    : QUOTE QSTR QUOTE              { $$ = $2; }
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 result_code
     : STR
+    | DASH                          { $$.p = NULL; $$.n = 0; }    
     ;
 
 referer
@@ -224,6 +228,7 @@ referer
 
 agent
     : QUOTE agent_list QUOTE        { $$ = $2; }
+    | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
 agent_list
