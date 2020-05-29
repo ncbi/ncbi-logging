@@ -160,7 +160,7 @@ TEST_F ( TestParseFixture, AWS )
     "TLSv1.2";
     "\n";
 
-    const SLogAWSEvent &e = *( parse_aws( InputLine, true ) );
+    const SLogAWSEvent &e = *( parse_aws( InputLine, false ) );
 
     ASSERT_EQ( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37", e.owner );
     ASSERT_EQ( "sra-pub-src-14", e.bucket );

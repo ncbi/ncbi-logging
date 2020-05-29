@@ -2,7 +2,8 @@
 #include "aws_parser.hpp"
 #include "stdint.h"
 
-#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; /*printf("\nSTR %s\n", yytext );*/ } while(false)
+#define MAKE_STR1()         do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; /*printf("\nSTR1 %s\n", yytext );*/ } while(false)
 #define MAKE_STR_ESCAPED()  do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = true; }  while(false)
 
 %}
@@ -11,6 +12,8 @@
 %option reentrant bison-bridge
 %option prefix="aws_"
 %option stack
+
+%option debug
 
 IPV4SEG     (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])
 IPV4ADDR    ({IPV4SEG}\.){3,3}{IPV4SEG}
@@ -37,7 +40,7 @@ QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\] ?])+
 
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
-STR1    (\/|{STR})([/:/+=%@&*!~;$,#][.\-a-zA-Z0-9_]*)+
+STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 
 %x QUOTED TIMEFMT
 
@@ -50,7 +53,6 @@ STR1    (\/|{STR})([/:/+=%@&*!~;$,#][.\-a-zA-Z0-9_]*)+
 \.              { return DOT; }
 -               { MAKE_STR(); return DASH; }
 \]              { return CB; }
-\:              { return COLON; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
@@ -69,7 +71,9 @@ STR1    (\/|{STR})([/:/+=%@&*!~;$,#][.\-a-zA-Z0-9_]*)+
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {MONTH}         { MAKE_STR(); return MONTH; }
-{STR1}          { MAKE_STR(); return STR1; }
 {STR}           { MAKE_STR(); return STR; }
+{STR1}          { MAKE_STR1(); return STR1; }
+
+.               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 %%

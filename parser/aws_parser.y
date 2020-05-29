@@ -39,6 +39,7 @@ using namespace NCBI::Logging;
 
 %token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR DASH I64
 %token DOT SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
+%token UNRECOGNIZED
 
 %type<tp> time
 %type<s> ip referer agent agent_list request
