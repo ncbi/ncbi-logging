@@ -50,15 +50,12 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 \r\n            { return LF; }
 \n              { return LF; }
 \r              { return CR; }
-\.              { return DOT; }
 -               { MAKE_STR(); return DASH; }
-\]              { return CB; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
-<QUOTED>.           ;
 
 \[                  { yy_push_state( TIMEFMT, yyscanner ); return OB; }
 <TIMEFMT>\]         { yy_pop_state( yyscanner ); return CB; }

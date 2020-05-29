@@ -54,10 +54,8 @@ TEST_F ( TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan("") );
 TEST_F ( TestFlexFixture, SkipSpace )       { ASSERT_EQ( SPACE, StartScan("   ") ); }
 TEST_F ( TestFlexFixture, SkipTab )         { ASSERT_EQ( SPACE, StartScan(" \t ") ); }
 TEST_F ( TestFlexFixture, CR_LF )           { ASSERT_EQ( LF,    StartScan("\r\n") ); }
-TEST_F ( TestFlexFixture, Dot )             { ASSERT_EQ( DOT,   StartScan(".") ); }
 TEST_F ( TestFlexFixture, Dash )            { ASSERT_EQ( DASH,  StartScan("-") ); }
 TEST_F ( TestFlexFixture, OpenBracket )     { ASSERT_EQ( OB,    StartScan("[") ); }
-TEST_F ( TestFlexFixture, CloceBracket )    { ASSERT_EQ( CB,    StartScan("]") ); }
 TEST_F ( TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") ); }
 
 TEST_F ( TestFlexFixture, STR )
