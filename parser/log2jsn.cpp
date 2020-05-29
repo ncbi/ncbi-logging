@@ -75,27 +75,43 @@ struct cmnLogLines
         return 0;
     }
 
-    cmnLogLines( ostream &os, bool readable ) : mem_os( os ), mem_readable( readable ) {};
+    void report( void )
+    {
+        unsigned long int total = num_accepted + num_rejected + num_unrecognized;
+        std::cerr << "total : " << total << endl;
+        std::cerr << "accepted : " << num_accepted << endl;
+        std::cerr << "rejected : " << num_rejected << endl;
+        std::cerr << "unrecognized : " << num_unrecognized << endl;
+    }
+
+    cmnLogLines( ostream &os, bool readable ) : mem_os( os ),
+        mem_readable( readable ) {};
 
     ostream &mem_os;
     bool mem_readable;
+    unsigned long int num_accepted = 0;
+    unsigned long int num_rejected = 0;
+    unsigned long int num_unrecognized = 0;
 };
 
 struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
 {
     virtual int unrecognized( const t_str & text )
     {
+        num_unrecognized ++;
         return cmn_unrecognized( text );
     }
 
     virtual int acceptLine( const LogOPEvent & e )
     {
+        num_accepted ++;
         print_json( MakeJson(e, true) );
         return 0;
     }
 
     virtual int rejectLine( const LogOPEvent & e )
     {
+        num_rejected ++;
         print_json( MakeJson(e, false) );
         return 0;
     }
@@ -140,17 +156,20 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 {
     virtual int unrecognized( const t_str & text )
     {
+        num_unrecognized ++;
         return cmn_unrecognized( text );
     }
 
     virtual int acceptLine( const LogAWSEvent & e )
     {
+        num_accepted ++;
         print_json( MakeJson(e, true) );
         return 0;
     }
 
     virtual int rejectLine( const LogAWSEvent & e )
     {
+        num_rejected ++;
         print_json( MakeJson(e, false) );
         return 0;
     }
@@ -200,17 +219,20 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 {
     virtual int unrecognized( const t_str & text )
     {
+        num_unrecognized ++;
         return cmn_unrecognized( text );
     }
 
     virtual int acceptLine( const LogGCPEvent & e )
     {
+        num_accepted ++;
         print_json( MakeJson(e, true) );
         return 0;
     }
 
     virtual int rejectLine( const LogGCPEvent & e )
     {
+        num_rejected ++;
         print_json( MakeJson(e, false) );
         return 0;
     }
@@ -246,34 +268,37 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     GCPToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
 };
 
-static int handle_on_prem( bool readable ) 
+static int handle_on_prem( bool readable, bool do_report ) 
 {
     cerr << "converting on-premise format" << endl;
     OpToJsonLogLines event_receiver( cout, readable );
     OP_Parser p( event_receiver, cin );
     bool res = p . parse();
-
+    if ( do_report )
+        event_receiver.report();
     return res ? 0 : 3;
 }
 
-static int handle_aws( bool readable ) 
+static int handle_aws( bool readable, bool do_report )
 {
     cerr << "converting AWS format" << endl;
     AWSToJsonLogLines event_receiver( cout, readable );
     AWS_Parser p( event_receiver, cin );
     //p . setDebug( true );
     bool res = p . parse();
-
+    if ( do_report )
+        event_receiver.report();
     return res ? 0 : 3;
 }
 
-static int handle_gcp( bool readable ) 
+static int handle_gcp( bool readable, bool do_report ) 
 {
     cerr << "converting GCP format" << endl;
     GCPToJsonLogLines event_receiver( cout, readable );
     GCP_Parser p( event_receiver, cin );
     bool res = p . parse();
-
+    if ( do_report )
+        event_receiver.report();
     return res ? 0 : 3;
 }
 
@@ -288,9 +313,9 @@ extern "C"
 
         bool b_readable = ( readable == "readable" );
 
-        if ( format == "op"  ) return handle_on_prem( b_readable );
-        if ( format == "aws" ) return handle_aws( b_readable );
-        if ( format == "gcp" ) return handle_gcp( b_readable );
+        if ( format == "op"  ) return handle_on_prem( b_readable, true );
+        if ( format == "aws" ) return handle_aws( b_readable, true );
+        if ( format == "gcp" ) return handle_gcp( b_readable, true );
 
         cerr << "unknown format: " << format << endl;
         return 3;

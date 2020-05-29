@@ -6,4 +6,4 @@ nonesense nonesense
 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR000006 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
 blah 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR000007 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR00008?a=b HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
-139.80.16.229
+rejected
