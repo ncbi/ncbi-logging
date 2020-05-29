@@ -108,3 +108,4 @@ NCBI::Logging::ToString( const t_str & in )
 
     return s.str();
 }
+

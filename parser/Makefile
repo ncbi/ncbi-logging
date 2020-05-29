@@ -109,7 +109,7 @@ run2src: log2src_
 test2src: log2src_
 	mkdir -p actual
 	cat data/two_events.txt | $(BINDIR)/log2src >./actual/run2src.out && diff ./expected/run2src.out ./actual/run2src.out
-	rm -rf actual
+	rm -rf actual/run2src*
 
 #################################################
 # tests
@@ -118,6 +118,7 @@ test2src: log2src_
 #build all test-binaries
 tests: \
 	test_helper \
+	test_loglines \
 	$(PREFIX_OP)test_flex \
 	$(PREFIX_OP)test_parse \
 	$(PREFIX_AWS)test_flex \
@@ -125,7 +126,7 @@ tests: \
 	$(PREFIX_GCP)test_flex \
 	$(PREFIX_GCP)test_parse
 
-runparsetests:
+runparsetests: 
 	$(BINDIR)/$(PREFIX_OP)test_flex
 	$(BINDIR)/$(PREFIX_OP)test_parse
 	$(BINDIR)/$(PREFIX_AWS)test_flex
@@ -133,10 +134,10 @@ runparsetests:
 	$(BINDIR)/$(PREFIX_GCP)test_flex
 	$(BINDIR)/$(PREFIX_GCP)test_parse
 
-runtests: liblogparse tests run_test_helper runparsetests test2src test2jsn
+runtests: liblogparse tests run_test_helper run_test_loglines runparsetests test2src test2jsn
 
 #################################################
-# scanner - tests
+# helper - tests
 
 run_test_helper: test_helper
 	$(BINDIR)/test_helper
@@ -150,6 +151,22 @@ $(BINDIR)/test_helper: $(addprefix  $(OBJDIR)/,$(TEST_HELPER_OBJ)) $(LIBDIR)/lib
 test_helper: $(BINDIR)/test_helper
 
 .PHONY: test_helper
+
+#################################################
+# loglines - tests
+
+run_test_loglines: test_loglines
+	$(BINDIR)/test_loglines
+
+TEST_LOGLINES_OBJ = \
+	test_loglines.o 
+
+$(BINDIR)/test_loglines: $(addprefix  $(OBJDIR)/,$(TEST_LOGLINES_OBJ)) $(LIBDIR)/liblogparse.a
+	$(LD) -o $@ $+ -lgtest -lpthread
+
+test_loglines: $(BINDIR)/test_loglines
+
+.PHONY: test_loglines
 
 #################################################
 # scanner - tests
@@ -249,4 +266,6 @@ json: log2jsn_
 	cat data/two_events.txt | $(BINDIR)/log2jsn 
 
 test2jsn: log2jsn_
-	# TODO
+	mkdir -p actual
+	cat data/two_events.txt | $(BINDIR)/log2jsn op readable >./actual/run2jsn.out && diff ./expected/run2jsn.out ./actual/run2jsn.out
+	rm -rf actual/run2jsn*

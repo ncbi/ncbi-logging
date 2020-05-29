@@ -1,4 +1,7 @@
-#include <log_lines.hpp>
+#include "log_lines.hpp"
+
+#include <sstream>
+#include <iomanip>
 
 #include "op_parser.hpp"
 #include "op_scanner.hpp"
@@ -15,6 +18,49 @@
 
 using namespace std;
 using namespace NCBI::Logging;
+
+static
+string FormatMonth (uint8_t m)
+{
+    switch (m)
+    {
+    case 1: return "Jan";
+    case 2: return "Feb";
+    case 3: return "Mar";
+    case 4: return "Apr";
+    case 5: return "May";
+    case 6: return "Jun";
+    case 7: return "Jul";
+    case 8: return "Aug";
+    case 9: return "Sep";
+    case 10: return "Oct";
+    case 11: return "Nov";
+    case 12: return "Dec";
+    default: return "???";
+    }
+}
+
+string 
+NCBI::Logging::t_timepoint::ToString() const
+{
+    ostringstream out;
+    out << setfill ('0'); 
+
+    out << "[";
+    out << setw (2) << (int)day << "/";
+
+    out << FormatMonth( month )<<"/";
+
+    out << setw (4) << (int)year <<":";
+    out << setw (2) << (int)hour <<":";
+    out << setw (2) << (int)minute <<":";
+    out << setw (2) << (int)second <<" ";
+    out << ( offset < 0 ? "-" : "+" ); 
+    out << setw (4) << abs(offset);
+    out << "]";
+
+    return out.str();
+}
 
 OP_Parser :: OP_Parser( OP_LogLines & p_lines, std::istream & p_input )
 : m_lines ( p_lines ), m_input ( p_input )

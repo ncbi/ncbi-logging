@@ -9,47 +9,6 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-string FormatMonth (uint8_t m)
-{
-    switch (m)
-    {
-    case 1: return "Jan";
-    case 2: return "Feb";
-    case 3: return "Mar";
-    case 4: return "Apr";
-    case 5: return "May";
-    case 6: return "Jun";
-    case 7: return "Jul";
-    case 8: return "Aug";
-    case 9: return "Sep";
-    case 10: return "Oct";
-    case 11: return "Nov";
-    case 12: return "Dec";
-    default: return "???";
-    }
-}
-
-static string FormatTime(const t_timepoint & t)
-{
-    ostringstream out;
-    out << setfill ('0'); 
-
-    out << "[";
-    out << setw (2) << (int)t.day << "/";
-
-    out << FormatMonth( t.month )<<"/";
-
-    out << setw (4) << (int)t.year <<":";
-    out << setw (2) << (int)t.hour <<":";
-    out << setw (2) << (int)t.minute <<":";
-    out << setw (2) << (int)t.second <<" ";
-    if ( t.offset < 0 ) out << "-";
-    out << setw (4) << abs(t.offset);
-    out << "]";
-
-    return out.str();
-}
-
 static string FormatRequest(const t_request & r)
 {
     ostringstream out;    
@@ -98,7 +57,7 @@ struct SRC_OP_LogLines : public OP_LogLines
             mem_os << ToString ( event . user ) << " - ";
         }
         
-        mem_os << FormatTime ( event.time ); mem_os << " ";
+        mem_os << event.time.ToString() << " ";
         mem_os << FormatRequest ( event . request );
         mem_os << event.res_code << " ";
         mem_os << event.res_len << " ";
@@ -137,7 +96,7 @@ struct SRC_AWS_LogLines : public AWS_LogLines
     {   //TODO: complete
         mem_os << ToString ( event . owner ) << " ";
         mem_os << ToString ( event . bucket ) << " ";
-        mem_os << FormatTime ( event.time ); mem_os << " ";
+        mem_os << event.time.ToString() << " ";
         mem_os << ToString ( event . ip ) << " ";
         mem_os << ToString ( event . requester ) << " ";
         mem_os << ToString ( event . request_id ) << " ";

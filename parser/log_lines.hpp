@@ -9,7 +9,7 @@ namespace NCBI
 {
     namespace Logging
     {
-        typedef struct t_timepoint
+        struct t_timepoint
         {
             uint8_t day;
             uint8_t month;
@@ -18,7 +18,9 @@ namespace NCBI
             uint8_t minute;
             uint8_t second;
             int32_t offset;
-        } t_timepoint;
+
+            std::string ToString() const; // [dd/Mon/yyyy:hh:mm:ss (-|+)oooo]
+        };
 
         typedef struct t_request
         {
