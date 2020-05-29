@@ -12,7 +12,7 @@ export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 BUCKETS="logs_s3_public logs_s3_ca"
 for bucket in $BUCKETS; do
     echo "Parsing $bucket"
-    DEST="$RAMDISK/$USER/$YESTERDAY/tst2${PREFIX}_${bucket}"
+    DEST="$RAMDISK/$USER/$YESTERDAY/${PREFIX}_${bucket}"
     rm -rf "$DEST"
     mkdir -p "$DEST"
     cd "$DEST" || exit
