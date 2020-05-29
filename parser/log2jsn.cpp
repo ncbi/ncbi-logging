@@ -61,7 +61,16 @@ struct cmnLogLines
     int cmn_unrecognized( const t_str & text )
     {
         JSONObjectRef j = JSON::makeObject();
-        j -> addValue( "unrecognized", ToJsonString( text ) );
+        try
+        {
+            j -> addValue( "unrecognized", ToJsonString( text ) );
+        }
+        catch(const InvalidUTF8String& e)
+        {
+            j -> addValue( "unrecognized", JSON::makeString( "****Non-UTF8****" ) );
+            std::cerr << "Non-UTF8 input:" << ToString(text) << '\n';
+        }
+        
         print_json( j );
         return 0;
     }
