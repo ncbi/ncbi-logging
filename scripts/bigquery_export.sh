@@ -21,8 +21,8 @@ bq query \
   ip as remote_ip,
   parse_datetime("%d.%m.%Y:%H:%M:%S 0", time) as start_ts, -- 27.5.2020:22:35:16
   datetime_add(parse_datetime("%d.%m.%Y:%H:%M:%S 0", time), interval total_time millisecond) as end_ts,
-  split(request," ")[offset (0)] as http_cmd,
-  split(request, " ")[offset (1)] as uri,
+  split(request," ")[offset (0)] as http_operation,
+  split(request, " ")[offset (1)] as request_uri,
   res_code as http_status,
   res_len as bytes_sent,
   referer as referer,
