@@ -18,21 +18,19 @@ bq query \
     --batch=true \
     --max_rows=10 \
    'SELECT
-  ip as ip,
+  ip as remote_ip,
   parse_datetime("%d.%m.%Y:%H:%M:%S 0", time) as start_ts, -- 27.5.2020:22:35:16
-  split(request, " ")[offset (1)] as uri,
-  res_code as status,
-  res_len as bytecount,
-  referer as referer,
-  agent as agent, -- TODO: -head
   datetime_add(parse_datetime("%d.%m.%Y:%H:%M:%S 0", time), interval total_time millisecond) as end_ts,
+  split(request," ")[offset (0)] as http_cmd,
+  split(request, " ")[offset (1)] as uri,
+  res_code as http_status,
+  res_len as bytes_sent,
+  referer as referer,
+  agent as user_agent, -- TODO: -head
   host_header as host,
-  split(request," ")[offset (0)] as cmd,
   bucket as bucket,
   source as source
-  FROM
-  `ncbi-sandbox-blast.strides_analytics.s3_parsed`
-  '
+  FROM `ncbi-sandbox-blast.strides_analytics.s3_parsed` '
 
 
 bq extract \
