@@ -36,7 +36,12 @@ for bucket in $BUCKETS; do
         totalwc=$(( totalwc + wc))
         touch "$YESTERDAY.json"
         zcat "$file" | time "$HOME/devel/ncbi-logging/parser/bin/log2jsn" >> "$YESTERDAY.json" 2> "$file.err"
-        echo "Parsed $file"
+        newwc=$(wc -l "$YESTERDAY".json | cut -f1 -d' ')
+        echo "Parsed $file, $newwc lines emitted"
+        if [ "$wc" -ne "$newwc" ]; then
+            echo "***** Linecount discrepancy *****"
+        fi
+
         rm -f "$file"
     done
 
@@ -55,10 +60,10 @@ for bucket in $BUCKETS; do
     rm -f "$YESTERDAY.json"
 
     # Remove leading spaces and slashes and pluses
-    sed -i "s/^[ \t]*//" "unrecognized.$YESTERDAY.jsonl"
-    sed -i "s/^[+\/]*//" "unrecognized.$YESTERDAY.jsonl"
-    sed -i "s/^[ \t]*//" "recognized.$YESTERDAY.jsonl"
-    sed -i "s/^[+\/]*//" "recognized.$YESTERDAY.jsonl"
+    #sed -i "s/^[ \t]*//" "unrecognized.$YESTERDAY.jsonl"
+    #sed -i "s/^[+\/]*//" "unrecognized.$YESTERDAY.jsonl"
+    #sed -i "s/^[ \t]*//" "recognized.$YESTERDAY.jsonl"
+    #sed -i "s/^[+\/]*//" "recognized.$YESTERDAY.jsonl"
 
     jq -e -c . < "recognized.$YESTERDAY.jsonl" > /dev/null
     jq -e -c . < "unrecognized.$YESTERDAY.jsonl" > /dev/null
