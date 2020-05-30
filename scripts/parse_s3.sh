@@ -7,7 +7,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab43
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-#YESTERDAY="20200527"
+#YESTERDAY="20200528"
 
 BUCKETS="logs_s3_public logs_s3_ca"
 for bucket in $BUCKETS; do
@@ -68,6 +68,8 @@ for bucket in $BUCKETS; do
     jq -e -c . < "recognized.$YESTERDAY.jsonl" > /dev/null
     jq -e -c . < "unrecognized.$YESTERDAY.jsonl" > /dev/null
 
+    # Don't bother with empty
+    find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;
     gzip -9 ./*.jsonl
 
     gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"

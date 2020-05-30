@@ -21,12 +21,16 @@ bq query \
   ip as remote_ip,
   parse_datetime("%d.%m.%Y:%H:%M:%S 0", time) as start_ts, -- 27.5.2020:22:35:16
   datetime_add(parse_datetime("%d.%m.%Y:%H:%M:%S 0", time), interval total_time millisecond) as end_ts,
-  split(request," ")[offset (0)] as http_operation,
+  case
+      WHEN regexp_contains(agent, r"-head") THEN "HEAD"
+      ELSE split(request, " ")[offset (0)]
+      END as http_operation,
+  --split(request, " ")[offset (0)] as http_operation,
   split(request, " ")[offset (1)] as request_uri,
   res_code as http_status,
-  ifnull(res_len,0) as bytes_sent,
+  ifnull(res_len, 0) as bytes_sent,
   referer as referer,
-  agent as user_agent, -- TODO: -head
+  replace(agent, "-head", "") as user_agent,
   host_header as host,
   bucket as bucket,
   source as source,
