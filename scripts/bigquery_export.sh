@@ -7,9 +7,9 @@ export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab43
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-bq rm -f strides_analytics.detail_export
-
 bq show --schema strides_analytics.s3_parsed
+
+bq rm -f strides_analytics.detail_export
 
 # shellcheck disable=SC2016
 bq query \
@@ -24,20 +24,24 @@ bq query \
   split(request," ")[offset (0)] as http_operation,
   split(request, " ")[offset (1)] as request_uri,
   res_code as http_status,
-  res_len as bytes_sent,
+  ifnull(res_len,0) as bytes_sent,
   referer as referer,
   agent as user_agent, -- TODO: -head
   host_header as host,
   bucket as bucket,
-  source as source
+  source as source,
+  current_datetime() as export_time
   FROM `ncbi-sandbox-blast.strides_analytics.s3_parsed` '
 
+bq show --schema strides_analytics.s3_parsed
 
 bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
     'strides_analytics.detail_export' \
     "gs://strides_analytics/detail/detail.$DATE.*.json.gz"
+
+bq rm -f strides_analytics.detail_export
 
 gsutil ls "gs://strides_analytics/detail/detail.$DATE.*"
 
