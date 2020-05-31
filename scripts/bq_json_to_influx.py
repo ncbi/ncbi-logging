@@ -25,25 +25,52 @@ def main():
         reccount += 1
         rec = json.loads(line)
 
-        outrec = {
-            "measurement": "detail",
-            "tags": {
-                "remote_ip": rec["remote_ip"],
-                "host": rec["host"],
-                "source": rec["source"],
-            },
-            "time": rec["start_ts"],
-            "fields": {
-                "end_ts": rec["end_ts"],
-                "http_operation": rec["http_operation"],
-                "request_uri": rec["request_uri"],
-                "http_status": rec["http_status"],
-                "bytes_sent": rec["bytes_sent"],
-                "referer": rec["referer"],
-                "user_agent": rec["user_agent"],
-                "bucket": rec["bucket"],
-            },
-        }
+        if "city_name" in rec:
+            outrec = {
+                "measurement": "summary",
+                "tags": {
+                    "remote_ip": rec["remote_ip"],
+                    "host": rec["host"],
+                    "source": "S3",
+                },
+                "time": rec["start_ts"],
+                "fields": {
+                    "num_requests": rec["num_requests"],
+                    "end_ts": rec["end_ts"],
+                    "http_operations": rec["http_operations"],
+                    "request_uri": rec["request_uri"],
+                    "http_statuses": rec["http_statuses"],
+                    "bytes_sent": rec["bytes_sent"],
+                    "referers": rec["referers"],
+                    "user_agent": rec["user_agent"],
+                    "bucket": rec["bucket"],
+                    "city_name": rec["city_name"],
+                    "country": rec["country"],
+                    "region": rec["region"],
+                    "domain": rec["domain"],
+                },
+            }
+        else:
+            outrec = {
+                "measurement": "detail",
+                "tags": {
+                    "remote_ip": rec["remote_ip"],
+                    "host": rec["host"],
+                    "source": rec["source"],
+                },
+                "time": rec["start_ts"],
+                "fields": {
+                    "end_ts": rec["end_ts"],
+                    "http_operation": rec["http_operation"],
+                    "request_uri": rec["request_uri"],
+                    "http_status": rec["http_status"],
+                    "bytes_sent": rec["bytes_sent"],
+                    "referer": rec["referer"],
+                    "user_agent": rec["user_agent"],
+                    "bucket": rec["bucket"],
+                },
+            }
+
         json_body.append(outrec)
         if len(json_body) >= 1000:
             if not client.write_points(json_body):
