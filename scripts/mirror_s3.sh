@@ -7,6 +7,8 @@ type -a aws
 
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='S3' order by log_bucket desc")
 
+#YESTERDAY="20200530"
+
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     # NOTES:
@@ -51,6 +53,8 @@ for LOG_BUCKET in $buckets; do
 
     gsutil cp "$TAR" "$DEST_BUCKET"
     gsutil ls -l "$DEST_BUCKET"
+
+    rm -rf "$DEST"
 done
 
 echo "Done"
