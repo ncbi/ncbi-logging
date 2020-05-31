@@ -3,10 +3,6 @@
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
 
-export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
-export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
-gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='GS' order by log_bucket desc")
 
 echo "buckets is '$buckets'"
@@ -18,15 +14,16 @@ for LOG_BUCKET in $buckets; do
 
     # TODO: Fetch scope for destination bucket
     if [[ $LOG_BUCKET =~ "-pub-" ]]; then
+        export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
+        export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
+        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+
         DEST_BUCKET="gs://strides_analytics_logs_gs_public/"
     fi
+
     if [[ $LOG_BUCKET =~ "-ca-" ]]; then
         DEST_BUCKET="gs://strides_analytics_logs_gs_ca/"
     fi
-
-    export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
-    export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
-    gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
     gsutil -q -m cp "gs://$LOG_BUCKET/*_$YESTERDAY_UNDER*_v0" .
 
