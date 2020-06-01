@@ -36,8 +36,6 @@ QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?]+
 QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?])+
 
 SPACE   " "
-STR     [.\-a-zA-Z0-9_]+
-STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
 
 %x QUOTED
 
@@ -47,11 +45,7 @@ STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
 \r\n            { return LF; }
 \n              { return LF; }
 \r              { return CR; }
-\.              { return DOT; }
 \,              { return COMMA; }
--               { MAKE_STR(); return DASH; }
-\/              { return SLASH; }
-\:              { return COLON; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
@@ -62,11 +56,5 @@ STR1    {STR}([/:/+=][.\-a-zA-Z0-9_]*)+
 <QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
 <QUOTED>.           ;
-
-{IPV4ADDR}      { MAKE_STR(); return IPV4; }
-{IPV6ADDR}      { MAKE_STR(); return IPV6; }
-{I64}           { yylval -> i64 = atol( yytext ); return I64; }
-{STR1}          { MAKE_STR(); return STR1; }
-{STR}           { MAKE_STR(); return STR; }
 
 %%

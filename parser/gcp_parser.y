@@ -37,9 +37,9 @@ using namespace NCBI::Logging;
     int64_t i64;
 }
 
-%token<s> STR STR1 IPV4 IPV6 QSTR DASH
+%token<s> IPV4 IPV6 QSTR
 %token<i64> I64
-%token DOT SLASH COLON QUOTE RL CR LF SPACE QMARK COMMA
+%token QUOTE RL CR LF SPACE QMARK COMMA
 
 %type<s> ip ip_region method uri host referrer agent agent_list
 %type<s> req_id operation bucket object
