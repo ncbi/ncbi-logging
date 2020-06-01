@@ -81,6 +81,8 @@ struct cmnLogLines
         std::cerr << "total : " << total << endl;
         std::cerr << "accepted : " << num_accepted << endl;
         std::cerr << "rejected : " << num_rejected << endl;
+        if ( num_headers > 0 )
+            std::cerr << "headers : " << num_headers << endl;
         std::cerr << "unrecognized : " << num_unrecognized << endl;
     }
 
@@ -91,6 +93,7 @@ struct cmnLogLines
     bool mem_readable;
     unsigned long int num_accepted = 0;
     unsigned long int num_rejected = 0;
+    unsigned long int num_headers = 0;
     unsigned long int num_unrecognized = 0;
 };
 
@@ -234,6 +237,12 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     {
         num_rejected ++;
         print_json( MakeJson(e, false) );
+        return 0;
+    }
+
+    virtual int headerLine( const LogGCPHeader & hdr )
+    {
+        num_headers ++;
         return 0;
     }
 

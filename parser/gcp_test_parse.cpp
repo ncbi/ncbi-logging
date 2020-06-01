@@ -71,6 +71,11 @@ struct TestLogLines : public GCP_LogLines
         return 0;
     }
 
+    virtual int headerLine( const LogGCPHeader & hdr )
+    {
+        return 0;
+    }
+
     vector< string > m_unrecognized;
     SLogGCPEvent * last_accepted = nullptr;
     SLogGCPEvent * last_rejected = nullptr;

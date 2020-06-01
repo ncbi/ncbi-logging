@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 #include <cstring>
 
 #include "types.h"
@@ -113,6 +114,13 @@ namespace NCBI
             }
         };
 
+        struct LogGCPHeader
+        {
+            void append_fieldname( const t_str &name );
+
+            std::vector< std::string > m_fieldnames;
+        };
+
         struct LogAWSEvent
         {
             t_str       owner;
@@ -211,6 +219,7 @@ namespace NCBI
             // if you want to hang on to the strings, copy them inside here
             virtual int acceptLine( const LogGCPEvent & event ) = 0;
             virtual int rejectLine( const LogGCPEvent & event ) = 0;
+            virtual int headerLine( const LogGCPHeader & hdr ) = 0;
 
             virtual ~ GCP_LogLines () noexcept {}
         };

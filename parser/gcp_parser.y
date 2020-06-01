@@ -60,6 +60,25 @@ log_hdr
       hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA
       hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item
     {
+        LogGCPHeader hdr;
+        hdr . append_fieldname( $1 );
+        hdr . append_fieldname( $3 );
+        hdr . append_fieldname( $5 );
+        hdr . append_fieldname( $7 );
+        hdr . append_fieldname( $9 );
+        hdr . append_fieldname( $11 );
+        hdr . append_fieldname( $13 );
+        hdr . append_fieldname( $15 );
+        hdr . append_fieldname( $17 );
+        hdr . append_fieldname( $19 );
+        hdr . append_fieldname( $21 );
+        hdr . append_fieldname( $23 );
+        hdr . append_fieldname( $25 );
+        hdr . append_fieldname( $27 );
+        hdr . append_fieldname( $29 );
+        hdr . append_fieldname( $31 );
+        hdr . append_fieldname( $33 );
+        lib -> headerLine( hdr );
     }
 
 hdr_item

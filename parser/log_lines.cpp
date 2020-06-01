@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 #include "op_parser.hpp"
 #include "op_scanner.hpp"
@@ -9,6 +10,8 @@
 #include "aws_scanner.hpp"
 #include "gcp_parser.hpp"
 #include "gcp_scanner.hpp"
+
+#include "types.h"
 
 #ifdef YYDEBUG
     extern int op_debug;
@@ -145,6 +148,11 @@ bool AWS_Parser :: parse()
 }
 
 /* ============================================================================== */
+void NCBI::Logging::LogGCPHeader::append_fieldname( const t_str &name )
+{
+    string s_name( ToString( name ) );
+    m_fieldnames . push_back( s_name );
+}
 
 GCP_Parser :: GCP_Parser( GCP_LogLines & p_lines, std::istream & p_input )
 : m_lines ( p_lines ), m_input ( p_input )
