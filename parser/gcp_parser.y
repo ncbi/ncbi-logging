@@ -42,7 +42,7 @@ using namespace NCBI::Logging;
 %token QUOTE RL CR LF SPACE QMARK COMMA
 
 %type<s> ip ip_region method uri host referrer agent agent_list
-%type<s> req_id operation bucket object
+%type<s> req_id operation bucket object hdr_item
 %type<i64> q_i64 time ip_type status req_bytes res_bytes time_taken
 
 %start line
@@ -52,6 +52,18 @@ using namespace NCBI::Logging;
 line
     :
     | log_gcp       { return 0; }
+    | log_hdr       { return 0; }
+    ;
+
+log_hdr
+    : hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA
+      hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA
+      hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item
+    {
+    }
+
+hdr_item
+    : QUOTE QSTR QUOTE      { $$ = $2; }
     ;
 
 log_gcp
