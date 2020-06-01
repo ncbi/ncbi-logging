@@ -125,6 +125,7 @@ time_taken
 
 host
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 referrer
@@ -144,22 +145,27 @@ agent_list
 
 req_id
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 operation
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 bucket
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 object
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 q_i64
     : QUOTE I64 QUOTE       { $$ = $2; }
+    | QUOTE QUOTE           { $$ = 0; }
     ;
 
 %%

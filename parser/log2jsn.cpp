@@ -296,6 +296,7 @@ static int handle_gcp( bool readable, bool do_report )
     cerr << "converting GCP format" << endl;
     GCPToJsonLogLines event_receiver( cout, readable );
     GCP_Parser p( event_receiver, cin );
+    //p . setDebug( true );
     bool res = p . parse();
     if ( do_report )
         event_receiver.report();
