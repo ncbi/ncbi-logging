@@ -77,7 +77,7 @@ struct cmnLogLines
 
     void report( void )
     {
-        unsigned long int total = num_accepted + num_rejected + num_unrecognized;
+        unsigned long int total = num_accepted + num_rejected + num_unrecognized + num_headers;
         std::cerr << "total : " << total << endl;
         std::cerr << "accepted : " << num_accepted << endl;
         std::cerr << "rejected : " << num_rejected << endl;
@@ -242,7 +242,22 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 
     virtual int headerLine( const LogGCPHeader & hdr )
     {
+        JSONObjectRef obj = JSON::makeObject();
+        obj -> addValue( "header", JSON::makeBoolean(true) );
+
+        JSONArrayRef j = JSON::makeArray();
+        for (auto i=hdr.m_fieldnames.begin(); i != hdr.m_fieldnames.end(); ++i)
+        {
+            j -> appendValue( JSON::makeString( String( *i ) ) );
+        }
+
+        JSONValueRef v = j->clone(); //TODO: is clone() really necessary?
+        obj -> addValue( String("fields"), v );
+
         num_headers ++;
+
+        print_json( obj );
+
         return 0;
     }
 
