@@ -37,7 +37,7 @@ using namespace NCBI::Logging;
 }
 
 %token<s> IPV4 IPV6 QSTR I64
-%token QUOTE CR LF COMMA
+%token QUOTE COMMA UNRECOGNIZED
 
 %type<s> ip ip_region method uri host referrer agent
 %type<s> req_id operation bucket object hdr_item hdr_item_text

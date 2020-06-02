@@ -55,7 +55,6 @@ public:
 TEST_F ( TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan("") ); }
 TEST_F ( TestFlexFixture, SkipSpace )       { ASSERT_EQ( 0,     StartScan("   ") ); }
 TEST_F ( TestFlexFixture, SkipTab )         { ASSERT_EQ( 0,     StartScan(" \t ") ); }
-TEST_F ( TestFlexFixture, CR_LF )           { ASSERT_EQ( LF,    StartScan("\r\n") ); }
 TEST_F ( TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") ); }
 
 TEST_F ( TestFlexFixture, Quotes )

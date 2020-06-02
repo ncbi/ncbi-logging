@@ -42,9 +42,6 @@ SPACE   " "
 %%
 
 [ \t]           ;
-\r\n            { return LF; }
-\n              { return LF; }
-\r              { return CR; }
 \,              { return COMMA; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
@@ -56,4 +53,5 @@ SPACE   " "
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED(); return QSTR; }
 <QUOTED>.           ;
 
+.               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 %%

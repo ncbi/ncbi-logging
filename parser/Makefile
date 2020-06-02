@@ -104,11 +104,11 @@ $(BINDIR)/log2src: $(addprefix $(OBJDIR)/,$(LOG2SRCOBJ)) $(LIBDIR)/liblogparse.a
 log2src_: mkdir $(BINDIR)/log2src
 
 run2src: log2src_
-	cat data/two_events.txt | $(BINDIR)/log2src >./data/run2src.out
+	cat data/op_two_events.txt | $(BINDIR)/log2src >./data/run2src.out
 
 test2src: log2src_
 	mkdir -p actual
-	cat data/two_events.txt | $(BINDIR)/log2src >./actual/run2src.out && diff ./expected/run2src.out ./actual/run2src.out
+	cat data/op_two_events.txt | $(BINDIR)/log2src >./actual/run2src.out && diff ./expected/run2src.out ./actual/run2src.out
 	rm -rf actual/run2src*
 
 #################################################
@@ -270,7 +270,7 @@ test2jsn: log2jsn_
 	@cat data/op_two_events.txt    | $(BINDIR)/log2jsn op readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
 						&& diff ./expected/op_two_events.out ./actual/op_two_events.out \
 						&& diff ./expected/op_two_events.err ./actual/op_two_events.err 
-	@cat data/gcp_unrecognized.log | $(BINDIR)/log2jsn gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
+	cat data/gcp_unrecognized.log | $(BINDIR)/log2jsn gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
 						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
 	@ echo "test2json passed"
