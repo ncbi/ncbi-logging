@@ -117,6 +117,7 @@ namespace NCBI
         struct LogGCPHeader
         {
             void append_fieldname( const t_str &name );
+            void clear() { m_fieldnames.clear(); }
 
             std::vector< std::string > m_fieldnames;
         };
@@ -222,6 +223,8 @@ namespace NCBI
             virtual int headerLine( const LogGCPHeader & hdr ) = 0;
 
             virtual ~ GCP_LogLines () noexcept {}
+
+            LogGCPHeader header;
         };
 
 

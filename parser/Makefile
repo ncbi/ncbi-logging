@@ -266,6 +266,12 @@ json: log2jsn_
 	cat data/two_events.txt | $(BINDIR)/log2jsn 
 
 test2jsn: log2jsn_
-	mkdir -p actual
-	cat data/two_events.txt | $(BINDIR)/log2jsn op readable >./actual/run2jsn.out && diff ./expected/run2jsn.out ./actual/run2jsn.out
-	rm -rf actual/run2jsn*
+	@mkdir -p actual
+	@cat data/op_two_events.txt    | $(BINDIR)/log2jsn op readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
+						&& diff ./expected/op_two_events.out ./actual/op_two_events.out \
+						&& diff ./expected/op_two_events.err ./actual/op_two_events.err 
+	@cat data/gcp_unrecognized.log | $(BINDIR)/log2jsn gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
+						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
+						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
+	@ echo "test2json passed"
+	@rm -rf actual/run2jsn*
