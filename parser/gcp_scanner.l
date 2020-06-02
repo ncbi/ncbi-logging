@@ -50,11 +50,11 @@ SPACE   " "
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
 <QUOTED>{SPACE}     { return SPACE; }
-<QUOTED>{I64}       { yylval -> i64 = atol( yytext ); return I64; }
+<QUOTED>{I64}       { MAKE_STR(); return I64; }
 <QUOTED>{IPV4ADDR}  { MAKE_STR(); return IPV4; }
 <QUOTED>{IPV6ADDR}  { MAKE_STR(); return IPV6; }
 <QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
-<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED(); return QSTR; }
 <QUOTED>.           ;
 
 %%

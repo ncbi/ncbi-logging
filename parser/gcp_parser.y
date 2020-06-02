@@ -34,16 +34,14 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
-    int64_t i64;
 }
 
-%token<s> IPV4 IPV6 QSTR
-%token<i64> I64
-%token QUOTE RL CR LF SPACE QMARK COMMA
+%token<s> IPV4 IPV6 QSTR I64
+%token QUOTE CR LF SPACE COMMA
 
 %type<s> ip ip_region method uri host referrer agent agent_list
 %type<s> req_id operation bucket object hdr_item
-%type<i64> q_i64 time ip_type status req_bytes res_bytes time_taken
+%type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
 
 %start line
 
@@ -83,6 +81,7 @@ log_hdr
 
 hdr_item
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE I64 QUOTE      { $$ = $2; }
     ;
 
 log_gcp
@@ -91,16 +90,16 @@ log_gcp
       referrer COMMA agent COMMA req_id COMMA operation COMMA bucket COMMA object
     {
         LogGCPEvent ev;
-        ev . time = $1;
+        ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
         ev . ip = $3;
-        ev . ip_type = $5;
+        ev . ip_type = ( $5 . p == nullptr ) ? 0 : atoi( $5 . p );
         ev . ip_region = $7;
         ev . method = $9;
         ev . uri = $11;
-        ev . status = $13;
-        ev . request_bytes = $15;
-        ev . result_bytes = $17;
-        ev . time_taken = $19;
+        ev . status = ( $13 . p == nullptr ) ? 0 : atol( $13 . p );
+        ev . request_bytes = ( $15 . p == nullptr ) ? 0 : atol( $15 . p );
+        ev . result_bytes = ( $17 . p == nullptr ) ? 0 : atol( $17 . p );
+        ev . time_taken = ( $19 . p == nullptr ) ? 0 : atol( $19 . p );
         ev . host = $21;
         ev . referrer = $23;
         ev . agent = $25;
@@ -196,7 +195,7 @@ object
 
 q_i64
     : QUOTE I64 QUOTE       { $$ = $2; }
-    | QUOTE QUOTE           { $$ = 0; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 %%
