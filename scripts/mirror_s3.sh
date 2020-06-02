@@ -8,6 +8,7 @@ type -a aws
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='S3' order by log_bucket desc")
 
 #YESTERDAY="20200530"
+#YESTERDAY_DASY="2020-05-30"
 
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
@@ -16,7 +17,7 @@ for LOG_BUCKET in $buckets; do
     #   huge numbers of objects
     # * We copy to ramdisk to avoid seeks, since we have thousands of small files
 
-    DEST="$RAMDISK/S3-$LOG_BUCKET/$YESTERDAY"
+    DEST="$TMP/S3-$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$DEST"
     cd "$DEST" || exit
 
