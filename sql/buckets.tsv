@@ -66,7 +66,38 @@ GS	sra-pub-zq-6		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	
 GS	sra-pub-zq-7		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	GS log	cold
 GS	sra-pub-zq-8		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	GS log	cold
 GS	sra-pub-zq-9		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	GS log	cold
-NCBI	srafiles11 and friends	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap1	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap3	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	faspgap32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp1	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp13	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp2	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	ftp33	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	gapsview11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	gapsview21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles13	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles23	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles33	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles34	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles35	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
+NCBI	srafiles36	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive		public	false	nginx log	hot
 S3	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-run-logs	s3_readers	private	true	ETL & BQS	hot
 S3	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-run-logs	s3_readers	private	true	ETL & BQS	hot
 S3	sra-ca-run-11		nih-sra-datastore-protected	sra-ca-run-logs	s3_readers	private	true	ETL & BQS	hot
