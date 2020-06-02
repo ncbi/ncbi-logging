@@ -176,11 +176,13 @@ bool GCP_Parser :: parse()
     int res = 0;
     string line;
     yyscan_t sc;
-    gcp_lex_init( &sc );
+    //gcp_lex_init( &sc );
 
     while( 0 == res && getline( m_input, line ) )
     {
-        gcp__scan_string( line.c_str(), sc );
+        gcp_lex_init( &sc ); /* should be out of the loop, but how to reset the state otherwise? */
+        // printf( "\nLINE:'%s'\n", line.c_str() );
+        YY_BUFFER_STATE bs = gcp__scan_string( line.c_str(), sc );
 
         res = gcp_parse( sc, & m_lines );
         // return of unrecognized 0 ... coninue, 1 ... abort
@@ -189,7 +191,10 @@ bool GCP_Parser :: parse()
             t_str err_line = { line . c_str(), (int)line . size() };
             res = m_lines . unrecognized( err_line );
         }
+
+        gcp__delete_buffer( bs, sc );
+        gcp_lex_destroy( sc ); /* should be out of the loop, but how to reset the state otherwise? */
     }
-    gcp_lex_destroy( sc );
+    //gcp_lex_destroy( sc );
     return res == 0;
 }
