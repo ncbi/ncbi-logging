@@ -42,7 +42,9 @@ public:
 
     void TestIPV6 ( const char * addr )
     {
-        ASSERT_EQ( IPV6, StartScan(addr) );
+        string quoted = string("\"") + addr + "\"";
+        ASSERT_EQ( QUOTE, StartScan(quoted.c_str()) );
+        ASSERT_EQ( IPV6, Scan() );
         ASSERT_EQ( addr, Token() );
     }
 
@@ -54,21 +56,12 @@ TEST_F ( TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan("") );
 TEST_F ( TestFlexFixture, SkipSpace )       { ASSERT_EQ( 0,     StartScan("   ") ); }
 TEST_F ( TestFlexFixture, SkipTab )         { ASSERT_EQ( 0,     StartScan(" \t ") ); }
 TEST_F ( TestFlexFixture, CR_LF )           { ASSERT_EQ( LF,    StartScan("\r\n") ); }
-TEST_F ( TestFlexFixture, Dot )             { ASSERT_EQ( DOT,   StartScan(".") ); }
-TEST_F ( TestFlexFixture, Dash )            { ASSERT_EQ( DASH,  StartScan("-") ); }
-TEST_F ( TestFlexFixture, Slash )           { ASSERT_EQ( SLASH, StartScan("/") ); }
-TEST_F ( TestFlexFixture, Colon )           { ASSERT_EQ( COLON, StartScan(":") ); }
 TEST_F ( TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") ); }
 
 TEST_F ( TestFlexFixture, Quotes )
 {
     ASSERT_EQ( QUOTE, StartScan("\"\"") );
     ASSERT_EQ( QUOTE, Scan() );ASSERT_EQ( 0, Scan() );
-}
-TEST_F ( TestFlexFixture, QuotedSpace )
-{
-    ASSERT_EQ( QUOTE, StartScan("\" \"") );
-    ASSERT_EQ( SPACE, Scan() );
 }
 TEST_F ( TestFlexFixture, QuotedString )
 {
@@ -97,8 +90,10 @@ TEST_F ( TestFlexFixture, QuotedEscapedQuote )
 
 TEST_F ( TestFlexFixture, IPV4 )
 {
-    const char * addr = "255.24.110.9";
-    ASSERT_EQ( IPV4, StartScan(addr) ); ASSERT_EQ( addr, Token() );
+    const char * addr = "\"255.24.110.9\"";
+    ASSERT_EQ( QUOTE, StartScan(addr) ); 
+    ASSERT_EQ( IPV4, Scan() ); 
+    ASSERT_EQ( "255.24.110.9", Token() );
 }
 
 TEST_F ( TestFlexFixture, IPV6_1 )      { TestIPV6 ( "1:22:333:4444:5:6:7:8" ); }

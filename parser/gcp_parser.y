@@ -37,10 +37,10 @@ using namespace NCBI::Logging;
 }
 
 %token<s> IPV4 IPV6 QSTR I64
-%token QUOTE CR LF SPACE COMMA
+%token QUOTE CR LF COMMA
 
-%type<s> ip ip_region method uri host referrer agent agent_list
-%type<s> req_id operation bucket object hdr_item
+%type<s> ip ip_region method uri host referrer agent
+%type<s> req_id operation bucket object hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
 
 %start line
@@ -54,7 +54,7 @@ line
     ;
 
 log_hdr
-    : hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA
+    : hdr_item_text COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA
       hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA
       hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item COMMA hdr_item
     {
@@ -78,6 +78,10 @@ log_hdr
         hdr . append_fieldname( $33 );
         lib -> headerLine( hdr );
     }
+
+hdr_item_text
+    : QUOTE QSTR QUOTE      { $$ = $2; }
+    ;
 
 hdr_item
     : QUOTE QSTR QUOTE      { $$ = $2; }
@@ -164,13 +168,7 @@ referrer
     ;
 
 agent
-    : QUOTE agent_list QUOTE        { $$ = $2; }
-    ;
-
-agent_list
-    : QSTR                          { $$ = $1; }
-    | agent_list QSTR               { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
-    | agent_list SPACE              { $$.n += 1;    $$.escaped = $1.escaped; }
+    : QUOTE QSTR QUOTE      { $$ = $2; }
     ;
 
 req_id

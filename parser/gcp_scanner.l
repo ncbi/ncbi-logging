@@ -32,8 +32,8 @@ IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_
 
 I64     [-+]?[0-9]+
 
-QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?]+
-QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?])+
+QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]? ]+
+QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]? ])+
 
 SPACE   " "
 
@@ -49,7 +49,6 @@ SPACE   " "
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
-<QUOTED>{SPACE}     { return SPACE; }
 <QUOTED>{I64}       { MAKE_STR(); return I64; }
 <QUOTED>{IPV4ADDR}  { MAKE_STR(); return IPV4; }
 <QUOTED>{IPV6ADDR}  { MAKE_STR(); return IPV6; }
