@@ -34,7 +34,7 @@ SQLCACHE="$RAMDISK/${USER}"
 mkdir -p "$SQLCACHE"
 if [ ! -e "$SQLCACHE/buckets.db" ]; then
     echo "Refreshing sqlite cache"
-    export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab431a.json
+    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
     gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
     export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 

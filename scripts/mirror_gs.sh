@@ -14,9 +14,9 @@ for LOG_BUCKET in $buckets; do
 
     # TODO: Fetch scope for destination bucket
     if [[ $LOG_BUCKET =~ "-pub-" ]]; then
-        export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
+        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/nih-sra-datastore-c9b0ec6d9244.json
         export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
-        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+        gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
 
         DEST_BUCKET="gs://strides_analytics_logs_gs_public"
     fi
@@ -31,7 +31,7 @@ for LOG_BUCKET in $buckets; do
     time find ./ -name "*_v0" -exec gzip -9 -f {} \;
     echo "Processed  $LOG_BUCKET"
 
-    export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab431a.json
+    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
     gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
     export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
