@@ -115,24 +115,22 @@ struct TestLogLines : public OP_LogLines
 
     virtual int acceptLine( const LogOPEvent & event )
     {
-        last_accepted = new SLogOPEvent( event );
+        m_accepted . push_back ( SLogOPEvent( event ) );
         return 0;
     }
 
     virtual int rejectLine( const LogOPEvent & event )
     {
-        last_rejected = new SLogOPEvent( event );
+        m_rejected . push_back ( SLogOPEvent( event ) );
         return 0;
     }
 
-    vector< string > m_unrecognized;
-    SLogOPEvent * last_accepted = nullptr;
-    SLogOPEvent * last_rejected = nullptr;
+    vector< string >        m_unrecognized;
+    vector < SLogOPEvent>   m_accepted;
+    vector < SLogOPEvent>   m_rejected;
 
     virtual ~TestLogLines()
     {
-        delete last_accepted;
-        delete last_rejected;
     }
 };
 
@@ -148,14 +146,14 @@ public:
     virtual void SetUp() {}
     virtual void TearDown() {}
 
-    const SLogOPEvent * parse_str( const char * input )
+    const SLogOPEvent parse_str( const char * input )
     {
         std::istringstream inputstream( input );
         {
             OP_Parser p( m_lines, inputstream );
             if ( !p.parse() ) throw logic_error( "parsing failed" );
-            if ( nullptr == m_lines.last_accepted ) throw logic_error( "last_accepted is null" );
-            return m_lines . last_accepted;
+            if ( m_lines.m_accepted.empty() ) throw logic_error( "last_m_accepted is null" );
+            return m_lines . m_accepted.back();
         }
     }
 
@@ -175,7 +173,7 @@ TEST_F ( TestParseFixture, OnPremise_NoUser )
 {
     const char * InputLine =
 "158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-dump.2.9.1\" \"-\" port=443 rl=293\n";
-    const SLogOPEvent &e = *( parse_str( InputLine ) );
+    SLogOPEvent e = parse_str( InputLine );
 
     ASSERT_EQ( "158.111.236.250", e.ip );
 
@@ -207,7 +205,7 @@ TEST_F ( TestParseFixture, OnPremise_User )
 {
     const char * InputLine =
 "158.111.236.250 - userid [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-dump.2.9.1\" \"-\" port=443 rl=293\n";
-    const SLogOPEvent &e = *( parse_str( InputLine ) );
+    SLogOPEvent e = parse_str( InputLine );
 
     ASSERT_EQ( "158.111.236.250", e.ip );
     ASSERT_EQ( "userid", e.user );
@@ -218,7 +216,7 @@ TEST_F ( TestParseFixture, OnPremise_Request_Params )
 {
     const char * InputLine =
 "158.111.236.250 - userid [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927?param1=value HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-dump.2.9.1\" \"-\" port=443 rl=293\n";
-    const SLogOPEvent &e = *( parse_str( InputLine ) );
+    SLogOPEvent e = parse_str( InputLine );
 
     ASSERT_EQ( "param1=value", e.request.params );
 }
@@ -231,8 +229,8 @@ TEST_F ( TestParseFixture, OnPremise_OnlyIP )
         OP_Parser p( m_lines, inputstream );
         p.setDebug( false );
         ASSERT_TRUE( p.parse() );
-        ASSERT_NE( nullptr, m_lines.last_rejected );
-        ASSERT_EQ( "158.111.236.250", m_lines.last_rejected -> ip );
+        ASSERT_EQ( 1, m_lines.m_rejected.size() );
+        ASSERT_EQ( "158.111.236.250", m_lines.m_rejected.back().ip );
     }
 }
 
@@ -262,13 +260,34 @@ TEST_F ( TestParseFixture, OnPremise_multiple_nonesense )
     }
 }
 
-TEST_F ( TestParseFixture, OnPremise_EscapedQuote )
-{
+TEST_F ( TestParseFixture, OnPremise_MultiLine )
+{ 
     const char * InputLine =
+"158.111.236.250 - - [01/Feb/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-\\\"dump.2.9.1\\\"\" \"-\" port=443 rl=293\n"
 "158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-\\\"dump.2.9.1\\\"\" \"-\" port=443 rl=293\n";
-    const SLogOPEvent &e = *( parse_str( InputLine ) );
 
-    ASSERT_EQ( "linux64 sra-toolkit fastq-\"dump.2.9.1\"", e.agent );
+    std::istringstream inputstream( InputLine );
+    {
+        OP_Parser p( m_lines, inputstream );
+        ASSERT_TRUE ( p.parse() );
+        ASSERT_EQ( 2, m_lines.m_accepted.size() );
+    }
+}
+
+TEST_F ( TestParseFixture, OnPremise_ErrorLine )
+{   // consume the error line completely, be prepared to parse the next line with the cleared status of the scanner
+    const char * InputLine =
+"total nonesense\n"
+"158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-\\\"dump.2.9.1\\\"\" \"-\" port=443 rl=293\n";
+
+    std::istringstream inputstream( InputLine );
+    {
+        OP_Parser p( m_lines, inputstream );
+        ASSERT_TRUE ( p.parse() );
+        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
+        ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
+        ASSERT_EQ ( 1, m_lines.m_unrecognized.size() ); // line 1
+    }
 }
 
 extern "C"

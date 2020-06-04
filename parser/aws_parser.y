@@ -256,6 +256,4 @@ time
 void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char * msg )
 {
     // TODO: find a way to comunicate the syntax error to the consumer...
-    // t_str msg_p = { msg, (int)strlen( msg ) };
-    // lib -> unrecognized( msg_p );
 }

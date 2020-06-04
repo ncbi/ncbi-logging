@@ -99,12 +99,12 @@ public:
     virtual void SetUp() {}
     virtual void TearDown() {}
 
-    const SLogGCPEvent * parse_gcp( const char * input )
+    const SLogGCPEvent * parse_gcp( const char * input, bool p_debug = false )
     {
         std::istringstream inputstream( input );
         {
             GCP_Parser p( m_lines, inputstream );
-            //p.setDebug( true );
+            p.setDebug( p_debug );
             if ( !p.parse() ) throw logic_error( "parsing failed" );
             if ( nullptr == m_lines.last_accepted ) throw logic_error( "last_accepted is null" );
             return m_lines . last_accepted;
@@ -165,6 +165,27 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( "storage.objects.get", e . operation );
     ASSERT_EQ( "sra-pub-src-9", e . bucket );
     ASSERT_EQ( "SRR1371108/CGAG_2.1.fastq.gz", e . object );
+}
+
+TEST_F ( TestParseFixture, GCP_EmptyAgent )
+{
+    const char * InputLine =
+    "\"1591118933830501\",\"35.202.252.53\",\"1\",\"\",\"GET\",\"/sra-pub-run-8/SRR10303547/SRR10303547.1?GoogleAccessId=data-access-service%40nih-sra-datastore.iam.gserviceaccount.com&Expires=1591478828&userProject=nih-sra-datastore&Signature=ZNzj62MP4PWwSVvtkmsB97Lu33wQq4cFGLyWRJTcb%2F8h1BvVXi3lokOoT16ihScR%0At2EHti%2FgQ80VVMv9BGpAY%2FQ9HTqXeq57N53tMcjXQQMKFVttyXgIW89OLWO0UC0h%0AZdFq5AcKZywgnZql8z3RoaQi%2FPKdrdMO803tW%2Bxe%2Boy8sCd%2FyCXcG9jBrkGbdqPc%0A3xnyuycW1Va4LHIh4muGGdFSIqBk7oaLjkjLV54L8e4InzFMD3Kx0Q5raIlNadxx%0AIX%2B2hoPJuCdSh6IxEikrvUri%2Fd6i9Nqo%2BkZ%2BPSGtvlah9I9AafXrs3EAlwZkvc%2Bp%0AnjssKH8zalZQ5SmPpfHImQ%3D%3D%0A\",\"206\",\"0\",\"262144\",\"31000\",\"storage.googleapis.com\",\"\",\"\",\"AAANsUnhN-04LMubyLe-H4MQzIYbbqFwxT85S0jQpptnyQoxcHZP2JsKPbvPI9OK7TJkHIZRBcc4vvt6atty7aj6UoY\",\"GET_Object\",\"sra-pub-run-8\",\"SRR10303547/SRR10303547.1\""
+    "\n";
+
+    const SLogGCPEvent &e = *( parse_gcp( InputLine ) );
+    ASSERT_EQ( "", e . agent );
+}
+
+TEST_F ( TestParseFixture, GCP_EmptyIP_EmptyURI )
+{
+    const char * InputLine =
+    "\"1591062496651000\",\"\",\"\",\"\",\"PUT\",\"\",\"200\",\"\",\"\",\"\",\"\",\"\",\"GCS Lifecycle Management\",\"02478f5fe3deaa079d1a4f6033043a80\",\"PUT_Object\",\"sra-pub-src-3\",\"SRR1269314/s_3_11000.p1_export.txt.gzb_fixed.bam\""
+    "\n";
+
+    const SLogGCPEvent &e = *( parse_gcp( InputLine ) );
+    ASSERT_EQ( "", e . ip );
+    ASSERT_EQ( "", e . uri );
 }
 
 // TODO test for specified ip-region

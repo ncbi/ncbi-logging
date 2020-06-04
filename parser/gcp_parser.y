@@ -103,6 +103,7 @@ time
 ip
     : QUOTE IPV4 QUOTE      { $$ = $2; }
     | QUOTE IPV6 QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 ip_type
@@ -120,6 +121,7 @@ method
 
 uri
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 status
@@ -150,6 +152,7 @@ referrer
 
 agent
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 req_id

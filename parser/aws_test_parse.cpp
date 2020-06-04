@@ -75,24 +75,22 @@ struct TestLogLines : public AWS_LogLines
 
     virtual int acceptLine( const LogAWSEvent & event )
     {
-        last_accepted = new SLogAWSEvent( event );
+        m_accepted . push_back ( SLogAWSEvent( event ) );
         return 0;
     }
 
     virtual int rejectLine( const LogAWSEvent & event )
     {
-        last_rejected = new SLogAWSEvent( event );
+        m_rejected . push_back ( SLogAWSEvent( event ) );
         return 0;
     }
 
-    vector< string > m_unrecognized;
-    SLogAWSEvent * last_accepted = nullptr;
-    SLogAWSEvent * last_rejected = nullptr;
+    vector< string >        m_unrecognized;
+    vector < SLogAWSEvent > m_accepted;
+    vector < SLogAWSEvent > m_rejected;
 
     virtual ~TestLogLines()
     {
-        delete last_accepted;
-        delete last_rejected;
     }
 };
 
@@ -108,16 +106,15 @@ public:
     virtual void SetUp() {}
     virtual void TearDown() {}
 
-    const SLogAWSEvent * parse_aws( const char * input, bool debug_it = false )
+    SLogAWSEvent parse_aws( const char * input, bool debug_it = false )
     {
         std::istringstream inputstream( input );
         {
             AWS_Parser p( m_lines, inputstream );
-            p.setDebug( debug_it );
             if ( !p.parse() ) throw logic_error( "parsing failed" );
-            if ( nullptr == m_lines.last_accepted ) throw logic_error( "last_accepted is null" );
-            return m_lines . last_accepted;
-        }
+            if ( m_lines.m_accepted.empty() ) throw logic_error( "last_m_accepted is null" );
+            return m_lines . m_accepted.back();
+        }        
     }
 
     TestLogLines m_lines;
@@ -160,7 +157,7 @@ TEST_F ( TestParseFixture, AWS )
     "TLSv1.2";
     "\n";
 
-    const SLogAWSEvent &e = *( parse_aws( InputLine, false ) );
+    SLogAWSEvent e = parse_aws( InputLine, false );
 
     ASSERT_EQ( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37", e.owner );
     ASSERT_EQ( "sra-pub-src-14", e.bucket );
@@ -203,7 +200,7 @@ TEST_F ( TestParseFixture, AWS_total_time_is_dash )
     const char * InputLine =
     "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
     
-    const SLogAWSEvent &e = *( parse_aws( InputLine ) );
+    SLogAWSEvent e = parse_aws( InputLine, false );
 
     ASSERT_EQ( "200", e.res_code );
     ASSERT_EQ( "", e.error );
@@ -214,9 +211,37 @@ TEST_F ( TestParseFixture, AWS_total_time_is_dash )
     ASSERT_EQ( "-", e.referer );
 }
 
+TEST_F ( TestParseFixture, AWS_MultiLine )
+{
+    const char * InputLine =
+    "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2\n"
+    "8dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2\n";
+    
+    std::istringstream inputstream( InputLine );
+    {
+        AWS_Parser p( m_lines, inputstream );
+        ASSERT_TRUE ( p.parse() );
+        ASSERT_EQ( 2, m_lines.m_accepted.size() );
+    }
+}
 
-/*
-*/
+// TEST_F ( TestParseFixture, AWS_MultiLine_ErrorRecovery )
+// {
+//     const char * InputLine =
+//     "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/XXX/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2\n"
+//     "8dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2\n";
+    
+//     std::istringstream inputstream( InputLine );
+//     {
+//         AWS_Parser p( m_lines, inputstream );
+//         p.setDebug(true);
+//         ASSERT_TRUE ( p.parse() );
+//         ASSERT_EQ ( 0, m_lines.m_rejected.size() );
+//         ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
+//         ASSERT_EQ ( 1, m_lines.m_unrecognized.size() ); // line 1
+//     }
+// }
+
 //TODO: GCP
 //TODO AWS version with error-code
 //TODO handle escaped quotes in quoted string
