@@ -188,6 +188,29 @@ TEST_F ( TestParseFixture, GCP_EmptyIP_EmptyURI )
     ASSERT_EQ( "", e . uri );
 }
 
+TEST_F ( TestParseFixture, GCP_EmptyIP_ReqId_Numeric )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.77.223\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\",\"SRR002994/SRR002994.2\""
+    "\n";
+
+    const SLogGCPEvent &e = *( parse_gcp( InputLine ) );
+    ASSERT_EQ( "19919634438459959682894277668675", e.request_id );
+}
+
+TEST_F ( TestParseFixture, GCP_ErrorRecovery )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"nonsense\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\",\"SRR002994/SRR002994.2\""
+    "\n"
+    
+    "\"1554306916471623\",\"35.245.77.223\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\",\"SRR002994/SRR002994.2\""
+    "\n"    ;
+
+    const SLogGCPEvent &e = *( parse_gcp( InputLine ) );
+    ASSERT_EQ( "19919634438459959682894277668675", e.request_id );
+}
+
 // TODO test for specified ip-region
 // TODO test with referrer present
 // TODO quoted string with escaped quotes inside

@@ -12,6 +12,8 @@
 %option prefix="op_"
 %option stack
 
+%option debug
+
 IPV4SEG     (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])
 IPV4ADDR    ({IPV4SEG}\.){3,3}{IPV4SEG}
 
@@ -79,3 +81,10 @@ STR     [.\-a-zA-Z0-9_]+
 {STR}           { MAKE_STR(); return STR; }
 
 %%
+
+void op_scan_reset( yyscan_t yyscanner )
+{
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    BEGIN( INITIAL );
+}
+

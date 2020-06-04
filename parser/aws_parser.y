@@ -53,6 +53,7 @@ using namespace NCBI::Logging;
 
 line
     : log_aws       { return 0; }
+    | log_aws_err   { return 0; }
     ;
 
 log_aws
@@ -105,6 +106,15 @@ log_aws
         ev . host_header = $43;
         ev . tls_version = $45;
         lib -> acceptLine( ev );
+    }
+    ;
+
+log_aws_err
+    : aws_owner error
+    {
+        LogAWSEvent ev;
+        ev . owner = $1;
+        lib -> rejectLine( ev );
     }
     ;
 

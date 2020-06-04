@@ -277,16 +277,17 @@ TEST_F ( TestParseFixture, OnPremise_MultiLine )
 TEST_F ( TestParseFixture, OnPremise_ErrorLine )
 {   // consume the error line completely, be prepared to parse the next line with the cleared status of the scanner
     const char * InputLine =
-"total nonesense\n"
+"158.111.236.249 - \"%\"\n"
 "158.111.236.250 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-\\\"dump.2.9.1\\\"\" \"-\" port=443 rl=293\n";
 
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
+        //p.setDebug(true);
         ASSERT_TRUE ( p.parse() );
-        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
+        ASSERT_EQ ( 1, m_lines.m_rejected.size() ); // line 1
         ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
-        ASSERT_EQ ( 1, m_lines.m_unrecognized.size() ); // line 1
+        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
     }
 }
 

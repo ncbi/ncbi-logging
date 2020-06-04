@@ -74,3 +74,9 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 .               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 %%
+
+void aws_scan_reset( yyscan_t yyscanner )
+{
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    BEGIN( INITIAL );
+}

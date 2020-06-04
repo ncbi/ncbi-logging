@@ -13,6 +13,10 @@
 
 #include "types.h"
 
+extern void op_scan_reset( yyscan_t yyscanner );
+extern void aws_scan_reset( yyscan_t yyscanner );
+extern void gcp_scan_reset( yyscan_t yyscanner );
+
 #ifdef YYDEBUG
     extern int op_debug;
     extern int aws_debug;
@@ -89,6 +93,8 @@ bool OP_Parser :: parse()
     yyscan_t sc;
     op_lex_init( &sc );
 
+    op_set_debug( op_debug, sc );
+
     while( 0 == res && getline( m_input, line ) )
     {
         op__scan_string( line.c_str(), sc );
@@ -100,6 +106,7 @@ bool OP_Parser :: parse()
             t_str err_line = { line . c_str(), (int)line . size() };
             res = m_lines . unrecognized( err_line );
         }
+        op_scan_reset( sc );
     }
     op_lex_destroy( sc );
     return res == 0;
@@ -142,6 +149,8 @@ bool AWS_Parser :: parse()
             t_str err_line = { line . c_str(), (int)line . size() };
             res = m_lines . unrecognized( err_line );
         }
+
+        aws_scan_reset( sc );
     }
     aws_lex_destroy( sc );
     return res == 0;
@@ -180,8 +189,6 @@ bool GCP_Parser :: parse()
 
     while( 0 == res && getline( m_input, line ) )
     {
-//        gcp_lex_init( &sc ); /* should be out of the loop, but how to reset the state otherwise? */
-        // printf( "\nLINE:'%s'\n", line.c_str() );
         YY_BUFFER_STATE bs = gcp__scan_string( line.c_str(), sc );
 
         res = gcp_parse( sc, & m_lines );
@@ -193,8 +200,9 @@ bool GCP_Parser :: parse()
         }
 
         gcp__delete_buffer( bs, sc );
-//        gcp_lex_destroy( sc ); /* should be out of the loop, but how to reset the state otherwise? */
+        gcp_scan_reset( sc );
     }
+    
     gcp_lex_destroy( sc );
     return res == 0;
 }

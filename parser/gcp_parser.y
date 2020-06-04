@@ -157,6 +157,7 @@ agent
 
 req_id
     : QUOTE QSTR QUOTE      { $$ = $2; }
+    | QUOTE I64 QUOTE       { $$ = $2; }
     | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
