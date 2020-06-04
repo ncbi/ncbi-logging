@@ -97,7 +97,7 @@ log_gcp
     ;
 
 time
-    : q_i64
+    : QUOTE I64 QUOTE       { $$ = $2; } /* if empty, would conflict with the log_hdr rule */
     ;
 
 ip
