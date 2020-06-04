@@ -107,22 +107,19 @@ struct SLogAWSEvent : public SCommonLogEvent
 */
 struct TestLogLines : public OP_LogLines
 {
-    virtual int unrecognized( const t_str & text )
+    virtual void unrecognized( const t_str & text )
     {
         m_unrecognized . push_back( ToString( text ) );
-        return 0;
     }
 
-    virtual int acceptLine( const LogOPEvent & event )
+    virtual void acceptLine( const LogOPEvent & event )
     {
         m_accepted . push_back ( SLogOPEvent( event ) );
-        return 0;
     }
 
-    virtual int rejectLine( const LogOPEvent & event )
+    virtual void rejectLine( const LogOPEvent & event )
     {
         m_rejected . push_back ( SLogOPEvent( event ) );
-        return 0;
     }
 
     vector< string >        m_unrecognized;
@@ -150,8 +147,7 @@ public:
     {
         std::istringstream inputstream( input );
         {
-            OP_Parser p( m_lines, inputstream );
-            if ( !p.parse() ) throw logic_error( "parsing failed" );
+            OP_Parser( m_lines, inputstream ).parse();
             if ( m_lines.m_accepted.empty() ) throw logic_error( "last_m_accepted is null" );
             return m_lines . m_accepted.back();
         }
@@ -163,10 +159,7 @@ public:
 TEST_F ( TestParseFixture, Empty )
 {
     std::istringstream input ( "" );
-    {
-        OP_Parser p( m_lines, input );
-        ASSERT_TRUE( p.parse() );
-    }
+    OP_Parser( m_lines, input ).parse();
 }
 
 TEST_F ( TestParseFixture, OnPremise_NoUser )
@@ -227,8 +220,7 @@ TEST_F ( TestParseFixture, OnPremise_OnlyIP )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
-        p.setDebug( false );
-        ASSERT_TRUE( p.parse() );
+        p.parse();
         ASSERT_EQ( 1, m_lines.m_rejected.size() );
         ASSERT_EQ( "158.111.236.250", m_lines.m_rejected.back().ip );
     }
@@ -240,7 +232,7 @@ TEST_F ( TestParseFixture, OnPremise_unrecognized )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
-        ASSERT_TRUE( p.parse() );
+        p.parse();
         ASSERT_EQ( 1, m_lines . m_unrecognized . size() );
         ASSERT_EQ( "total nonesense", m_lines . m_unrecognized[ 0 ] );
     }
@@ -252,7 +244,7 @@ TEST_F ( TestParseFixture, OnPremise_multiple_nonesense )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
-        ASSERT_TRUE( p.parse() );
+        p.parse();
         ASSERT_EQ( 3, m_lines . m_unrecognized . size() );
         ASSERT_EQ( "total nonesense", m_lines . m_unrecognized[ 0 ] );
         ASSERT_EQ( "more nonesense", m_lines . m_unrecognized[ 1 ] );
@@ -269,7 +261,7 @@ TEST_F ( TestParseFixture, OnPremise_MultiLine )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
-        ASSERT_TRUE ( p.parse() );
+        p.parse();
         ASSERT_EQ( 2, m_lines.m_accepted.size() );
     }
 }
@@ -283,8 +275,7 @@ TEST_F ( TestParseFixture, OnPremise_ErrorLine )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
-        //p.setDebug(true);
-        ASSERT_TRUE ( p.parse() );
+        p.parse();
         ASSERT_EQ ( 1, m_lines.m_rejected.size() ); // line 1
         ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 

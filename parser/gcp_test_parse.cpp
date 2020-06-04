@@ -53,27 +53,23 @@ struct SLogGCPEvent
 
 struct TestLogLines : public GCP_LogLines
 {
-    virtual int unrecognized( const t_str & text )
+    virtual void unrecognized( const t_str & text )
     {
         m_unrecognized . push_back( ToString( text ) );
-        return 0;
     }
 
-    virtual int acceptLine( const LogGCPEvent & event )
+    virtual void acceptLine( const LogGCPEvent & event )
     {
         m_accepted . push_back ( SLogGCPEvent( event ) );
-        return 0;
     }
 
-    virtual int rejectLine( const LogGCPEvent & event )
+    virtual void rejectLine( const LogGCPEvent & event )
     {
         m_rejected . push_back ( SLogGCPEvent( event ) );
-        return 0;
     }
 
-    virtual int headerLine( const LogGCPHeader & hdr )
+    virtual void headerLine( const LogGCPHeader & hdr )
     {
-        return 0;
     }
 
     vector< string > m_unrecognized;
@@ -104,7 +100,7 @@ public:
         {
             GCP_Parser p( m_lines, inputstream );
             p.setDebug( p_debug );
-            if ( !p.parse() ) throw logic_error( "parsing failed" );
+            p.parse();
             if ( m_lines.m_accepted.empty() ) throw logic_error( "last_m_accepted is null" );
             return m_lines . m_accepted.back();
         }
@@ -116,10 +112,7 @@ public:
 TEST_F ( TestParseFixture, Empty )
 {
     std::istringstream input ( "" );
-    {
-        GCP_Parser p( m_lines, input );
-        ASSERT_TRUE( p.parse() );
-    }
+    GCP_Parser( m_lines, input ).parse();
 }
 
 // GCP

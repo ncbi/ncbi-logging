@@ -48,22 +48,22 @@ string FormatMonth (uint8_t m)
 }
 
 string 
-NCBI::Logging::t_timepoint::ToString() const
+NCBI::Logging::ToString( const t_timepoint & t ) 
 {
     ostringstream out;
     out << setfill ('0'); 
 
     out << "[";
-    out << setw (2) << (int)day << "/";
+    out << setw (2) << (int)t.day << "/";
 
-    out << FormatMonth( month )<<"/";
+    out << FormatMonth( t.month )<<"/";
 
-    out << setw (4) << (int)year <<":";
-    out << setw (2) << (int)hour <<":";
-    out << setw (2) << (int)minute <<":";
-    out << setw (2) << (int)second <<" ";
-    out << ( offset < 0 ? "-" : "+" ); 
-    out << setw (4) << abs(offset);
+    out << setw (4) << (int)t.year <<":";
+    out << setw (2) << (int)t.hour <<":";
+    out << setw (2) << (int)t.minute <<":";
+    out << setw (2) << (int)t.second <<" ";
+    out << ( t.offset < 0 ? "-" : "+" ); 
+    out << setw (4) << abs(t.offset);
     out << "]";
 
     return out.str();
@@ -86,30 +86,28 @@ void OP_Parser :: setDebug( bool on )
     #endif
 }
 
-bool OP_Parser :: parse()
+void OP_Parser :: parse()
 {
-    int res = 0;
     string line;
     yyscan_t sc;
     op_lex_init( &sc );
 
     op_set_debug( op_debug, sc );
 
-    while( 0 == res && getline( m_input, line ) )
+    while( getline( m_input, line ) )
     {
-        op__scan_string( line.c_str(), sc );
+        YY_BUFFER_STATE bs = op__scan_string( line.c_str(), sc );
 
-        res = op_parse( sc, & m_lines );
-        // return of unrecognized 0 ... coninue, 1 ... abort
-        if ( res != 0 )
+        if ( op_parse( sc, & m_lines ) != 0 )
         {
             t_str err_line = { line . c_str(), (int)line . size() };
-            res = m_lines . unrecognized( err_line );
+            m_lines . unrecognized( err_line );
         }
+
+        gcp__delete_buffer( bs, sc );
         op_scan_reset( sc );
     }
     op_lex_destroy( sc );
-    return res == 0;
 }
 
 /* ============================================================================== */
@@ -131,29 +129,26 @@ void AWS_Parser :: setDebug( bool on )
     #endif
 }
 
-bool AWS_Parser :: parse()
+void AWS_Parser :: parse()
 {
-    int res = 0;
     string line;
     yyscan_t sc;
     aws_lex_init( &sc );
 
-    while( 0 == res && getline( m_input, line ) )
+    while( getline( m_input, line ) )
     {
-        aws__scan_string( line.c_str(), sc );
+        YY_BUFFER_STATE bs = aws__scan_string( line.c_str(), sc );
 
-        res = aws_parse( sc, & m_lines );
-        // return of unrecognized 0 ... coninue, 1 ... abort
-        if ( res != 0 )
+        if ( aws_parse( sc, & m_lines ) != 0 )
         {
             t_str err_line = { line . c_str(), (int)line . size() };
-            res = m_lines . unrecognized( err_line );
+            m_lines . unrecognized( err_line );
         }
 
+        gcp__delete_buffer( bs, sc );
         aws_scan_reset( sc );
     }
     aws_lex_destroy( sc );
-    return res == 0;
 }
 
 /* ============================================================================== */
@@ -180,23 +175,20 @@ void GCP_Parser :: setDebug( bool on )
     #endif
 }
 
-bool GCP_Parser :: parse()
+void GCP_Parser :: parse()
 {
-    int res = 0;
     string line;
     yyscan_t sc;
     gcp_lex_init( &sc );
 
-    while( 0 == res && getline( m_input, line ) )
+    while( getline( m_input, line ) )
     {
         YY_BUFFER_STATE bs = gcp__scan_string( line.c_str(), sc );
 
-        res = gcp_parse( sc, & m_lines );
-        // return of unrecognized 0 ... coninue, 1 ... abort
-        if ( res != 0 )
+        if ( gcp_parse( sc, & m_lines ) != 0 )
         {
             t_str err_line = { line . c_str(), (int)line . size() };
-            res = m_lines . unrecognized( err_line );
+            m_lines . unrecognized( err_line );
         }
 
         gcp__delete_buffer( bs, sc );
@@ -204,5 +196,4 @@ bool GCP_Parser :: parse()
     }
     
     gcp_lex_destroy( sc );
-    return res == 0;
 }

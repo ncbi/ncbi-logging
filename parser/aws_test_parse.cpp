@@ -67,22 +67,19 @@ struct SLogAWSEvent
 
 struct TestLogLines : public AWS_LogLines
 {
-    virtual int unrecognized( const t_str & text )
+    virtual void unrecognized( const t_str & text )
     {
         m_unrecognized . push_back( ToString( text ) );
-        return 0;
     }
 
-    virtual int acceptLine( const LogAWSEvent & event )
+    virtual void acceptLine( const LogAWSEvent & event )
     {
         m_accepted . push_back ( SLogAWSEvent( event ) );
-        return 0;
     }
 
-    virtual int rejectLine( const LogAWSEvent & event )
+    virtual void rejectLine( const LogAWSEvent & event )
     {
         m_rejected . push_back ( SLogAWSEvent( event ) );
-        return 0;
     }
 
     vector< string >        m_unrecognized;
@@ -112,7 +109,7 @@ public:
         {
             AWS_Parser p( m_lines, inputstream );
             p.setDebug( p_debug );
-            if ( !p.parse() ) throw logic_error( "parsing failed" );
+            p.parse();
             if ( m_lines.m_accepted.empty() ) throw logic_error( "last_m_accepted is null" );
             return m_lines . m_accepted.back();
         }        
@@ -124,10 +121,7 @@ public:
 TEST_F ( TestParseFixture, Empty )
 {
     std::istringstream input ( "" );
-    {
-        AWS_Parser p( m_lines, input );
-        ASSERT_TRUE( p.parse() );
-    }
+    AWS_Parser( m_lines, input ).parse();
 }
 
 TEST_F ( TestParseFixture, AWS )
@@ -221,7 +215,7 @@ TEST_F ( TestParseFixture, AWS_MultiLine )
     std::istringstream inputstream( InputLine );
     {
         AWS_Parser p( m_lines, inputstream );
-        ASSERT_TRUE ( p.parse() );
+        p.parse();
         ASSERT_EQ( 2, m_lines.m_accepted.size() );
     }
 }
@@ -236,8 +230,7 @@ TEST_F ( TestParseFixture, AWS_MultiLine_ErrorRecovery )
     std::istringstream inputstream( InputLine );
     {
         AWS_Parser p( m_lines, inputstream );
-        //p.setDebug(true);
-        ASSERT_TRUE ( p.parse() );
+        p.parse();
         ASSERT_EQ ( 1, m_lines.m_rejected.size() ); // line 1
         ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );

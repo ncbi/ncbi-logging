@@ -93,8 +93,8 @@ TEST_F ( TestFlexFixture, QuotedString )
 {
     #define str ".Bl0-_~!*'();:@&=+$,/%#[]"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
-    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );
+    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     #undef str
 }
 TEST_F ( TestFlexFixture, QuotedNonAscii )

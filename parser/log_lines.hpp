@@ -10,7 +10,7 @@ namespace NCBI
 {
     namespace Logging
     {
-        struct t_timepoint
+        typedef struct t_timepoint
         {
             uint8_t day;
             uint8_t month;
@@ -19,9 +19,9 @@ namespace NCBI
             uint8_t minute;
             uint8_t second;
             int32_t offset;
+        } t_timepoint;
 
-            std::string ToString() const; // [dd/Mon/yyyy:hh:mm:ss (-|+)oooo]
-        };
+        std::string ToString( const t_timepoint& t ); // [dd/Mon/yyyy:hh:mm:ss (-|+)oooo]
 
         typedef struct t_request
         {
@@ -181,46 +181,37 @@ namespace NCBI
 
         struct OP_LogLines
         {
-            // TODO maybe using an exception to abort if the receiver
-            // cannot handle the events ( any more ) ...
-            // i.e. return void
-            virtual int unrecognized( const t_str & text ) = 0;
+            virtual void unrecognized( const t_str & text ) = 0;
 
             // any t_str structures incide event will be invalidated upon return from these methods
             // if you want to hang on to the strings, copy them inside here
-            virtual int acceptLine( const LogOPEvent & event ) = 0;
-            virtual int rejectLine( const LogOPEvent & event ) = 0;
+            virtual void acceptLine( const LogOPEvent & event ) = 0;
+            virtual void rejectLine( const LogOPEvent & event ) = 0;
 
             virtual ~ OP_LogLines () noexcept {}
         };
 
         struct AWS_LogLines
         {
-            // TODO maybe using an exception to abort if the receiver
-            // cannot handle the events ( any more ) ...
-            // i.e. return void
-            virtual int unrecognized( const t_str & text ) = 0;
+            virtual void unrecognized( const t_str & text ) = 0;
 
             // any t_str structures incide event will be invalidated upon return from these methods
             // if you want to hang on to the strings, copy them inside here
-            virtual int acceptLine( const LogAWSEvent & event ) = 0;
-            virtual int rejectLine( const LogAWSEvent & event ) = 0;
+            virtual void acceptLine( const LogAWSEvent & event ) = 0;
+            virtual void rejectLine( const LogAWSEvent & event ) = 0;
 
             virtual ~ AWS_LogLines () noexcept {}
         };
 
         struct GCP_LogLines
         {
-            // TODO maybe using an exception to abort if the receiver
-            // cannot handle the events ( any more ) ...
-            // i.e. return void
-            virtual int unrecognized( const t_str & text ) = 0;
+            virtual void unrecognized( const t_str & text ) = 0;
 
             // any t_str structures incide event will be invalidated upon return from these methods
             // if you want to hang on to the strings, copy them inside here
-            virtual int acceptLine( const LogGCPEvent & event ) = 0;
-            virtual int rejectLine( const LogGCPEvent & event ) = 0;
-            virtual int headerLine( const LogGCPHeader & hdr ) = 0;
+            virtual void acceptLine( const LogGCPEvent & event ) = 0;
+            virtual void rejectLine( const LogGCPEvent & event ) = 0;
+            virtual void headerLine( const LogGCPHeader & hdr ) = 0;
 
             virtual ~ GCP_LogLines () noexcept {}
 
@@ -234,7 +225,7 @@ namespace NCBI
             OP_Parser( OP_LogLines &loglines, std::istream &input );
             OP_Parser( OP_LogLines &loglines ); // uses cin for input
 
-            bool parse(); // maybe void and rely on exceptions to communicate "big" failures
+            void parse(); 
 
             void setDebug( bool on );
 
@@ -249,7 +240,7 @@ namespace NCBI
             AWS_Parser( AWS_LogLines &loglines, std::istream &input );
             AWS_Parser( AWS_LogLines &loglines ); // uses cin for input
 
-            bool parse(); // maybe void and rely on exceptions to communicate "big" failures
+            void parse(); 
 
             void setDebug( bool on );
 
@@ -264,7 +255,7 @@ namespace NCBI
             GCP_Parser( GCP_LogLines &loglines, std::istream &input );
             GCP_Parser( GCP_LogLines &loglines ); // uses cin for input
 
-            bool parse(); // maybe void and rely on exceptions to communicate "big" failures
+            void parse(); 
 
             void setDebug( bool on );
 

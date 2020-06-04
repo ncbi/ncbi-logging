@@ -15,7 +15,7 @@ TEST ( TestLogLines, t_timepoint_ToString )
     t . minute = 5;
     t . second = 6;
     t . offset = 7;    
-    ASSERT_EQ( "[01/Feb/0003:04:05:06 +0007]", t.ToString() );
+    ASSERT_EQ( "[01/Feb/0003:04:05:06 +0007]", ToString(t) );
 }
 
 TEST ( TestLogLines, t_timepoint_ToString_NegOffset )
@@ -28,7 +28,7 @@ TEST ( TestLogLines, t_timepoint_ToString_NegOffset )
     t . minute = 5;
     t . second = 6;
     t . offset = -500;    
-    ASSERT_EQ( "[01/Feb/0003:04:05:06 -0500]", t.ToString() );
+    ASSERT_EQ( "[01/Feb/0003:04:05:06 -0500]", ToString(t) );
 }
 
 TEST ( TestLogLines, t_timepoint_ToString_BadMonth )
@@ -41,7 +41,7 @@ TEST ( TestLogLines, t_timepoint_ToString_BadMonth )
     t . minute = 5;
     t . second = 6;
     t . offset = -500;    
-    ASSERT_EQ( "[01/\?\?\?/0003:04:05:06 -0500]", t.ToString() );
+    ASSERT_EQ( "[01/\?\?\?/0003:04:05:06 -0500]", ToString(t) );
 }
 
 extern "C"
