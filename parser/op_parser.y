@@ -40,7 +40,8 @@ using namespace NCBI::Logging;
 
 %token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR
 %token<i64> I64
-%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
+%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK 
+%token UNRECOGNIZED
 
 %type<tp> time
 %type<req> request

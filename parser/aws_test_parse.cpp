@@ -106,11 +106,12 @@ public:
     virtual void SetUp() {}
     virtual void TearDown() {}
 
-    SLogAWSEvent parse_aws( const char * input, bool debug_it = false )
+    SLogAWSEvent parse_aws( const char * input, bool p_debug = false )
     {
         std::istringstream inputstream( input );
         {
             AWS_Parser p( m_lines, inputstream );
+            p.setDebug( p_debug );
             if ( !p.parse() ) throw logic_error( "parsing failed" );
             if ( m_lines.m_accepted.empty() ) throw logic_error( "last_m_accepted is null" );
             return m_lines . m_accepted.back();

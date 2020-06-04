@@ -49,8 +49,18 @@ using namespace NCBI::Logging;
 
 line
     :
-    | log_gcp       { return 0; }
-    | log_hdr       { lib->headerLine( lib->header ); lib->header.clear(); return 0; }
+    | log_gcp       { YYACCEPT; }
+    | log_hdr       { lib->headerLine( lib->header ); lib->header.clear(); YYACCEPT; }
+    | log_err       { YYACCEPT; }
+    ;
+
+log_err
+    : time error
+    {
+        LogGCPEvent ev;
+        ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
+        lib -> rejectLine( ev );
+    }
     ;
 
 log_hdr

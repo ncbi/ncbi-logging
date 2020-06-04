@@ -4,16 +4,16 @@ BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj
 
-CC := gcc
-CPP := g++
+CC := gcc -c
+CPP := g++ -c
 LD := g++
-CXXFLAGS += -c -I . -g -MMD
+CXXFLAGS += -I . -g -MMD
 
 PREFIX_OP := op_
 PREFIX_AWS := aws_
 PREFIX_GCP := gcp_
 
-all: log2src_ log2jsn_
+all: log2jsn_
 
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
@@ -34,6 +34,10 @@ mkdir:
 $(OBJDIR)/%.o: %.cpp
 	$(CPP) $(CXXFLAGS) $< -o $@
 
+-include $(OBJDIR)/*.d
+
+#################################################
+# C++ log parsing library
 
 $(OBJDIR)/$(PREFIX_OP)parser.o:  $(OBJDIR)/$(PREFIX_OP)scanner.o
 
@@ -62,11 +66,6 @@ $(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l
 $(PREFIX_GCP)parser.cpp: $(PREFIX_GCP)parser.y
 	bison --report all -d $(PREFIX_GCP)parser.y --output-file $(PREFIX_GCP)parser.cpp
 
--include $(OBJDIR)/*.d
-
-#################################################
-# C++ log parsing library
-
 LOG_LINES_SRC = \
 	helper.cpp \
 	$(PREFIX_OP)parser.cpp \
@@ -94,39 +93,25 @@ $(LIBDIR)/liblogparse.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_OBJ))
 lib liblogparse: mkdir $(LIBDIR)/liblogparse.a
 
 #################################################
-# minimal parser: stdin(any format)->parsing->stdout(csv)
-
-LOG2SRCOBJ = log2src.o
-
-$(BINDIR)/log2src: $(addprefix $(OBJDIR)/,$(LOG2SRCOBJ)) $(LIBDIR)/liblogparse.a
-	$(LD) -o $@ $^
-
-log2src_: mkdir $(BINDIR)/log2src
-
-run2src: log2src_
-	cat data/op_two_events.txt | $(BINDIR)/log2src >./data/run2src.out
-
-test2src: log2src_
-	mkdir -p actual
-	cat data/op_two_events.txt | $(BINDIR)/log2src >./actual/run2src.out && diff ./expected/run2src.out ./actual/run2src.out
-	rm -rf actual/run2src*
-
-#################################################
 # tests
 # assume that Googletests is installed and accessible
 
+runtests: liblogparse run_ut test2jsn
+
 #build all test-binaries
 tests: \
-	test_helper \
-	test_loglines \
-	$(PREFIX_OP)test_flex \
-	$(PREFIX_OP)test_parse \
-	$(PREFIX_AWS)test_flex \
-	$(PREFIX_AWS)test_parse \
-	$(PREFIX_GCP)test_flex \
-	$(PREFIX_GCP)test_parse
+	$(BINDIR)/test_helper \
+	$(BINDIR)/test_loglines \
+	$(BINDIR)/$(PREFIX_OP)test_flex \
+	$(BINDIR)/$(PREFIX_OP)test_parse \
+	$(BINDIR)/$(PREFIX_AWS)test_flex \
+	$(BINDIR)/$(PREFIX_AWS)test_parse \
+	$(BINDIR)/$(PREFIX_GCP)test_flex \
+	$(BINDIR)/$(PREFIX_GCP)test_parse
 
-runparsetests: 
+run_ut: tests
+	$(BINDIR)/test_helper
+	$(BINDIR)/test_loglines
 	$(BINDIR)/$(PREFIX_OP)test_flex
 	$(BINDIR)/$(PREFIX_OP)test_parse
 	$(BINDIR)/$(PREFIX_AWS)test_flex
@@ -134,13 +119,8 @@ runparsetests:
 	$(BINDIR)/$(PREFIX_GCP)test_flex
 	$(BINDIR)/$(PREFIX_GCP)test_parse
 
-runtests: liblogparse tests run_test_helper run_test_loglines runparsetests test2src test2jsn
-
 #################################################
 # helper - tests
-
-run_test_helper: test_helper
-	$(BINDIR)/test_helper
 
 TEST_HELPER_OBJ = \
 	test_helper.o 
@@ -150,13 +130,13 @@ $(BINDIR)/test_helper: $(addprefix  $(OBJDIR)/,$(TEST_HELPER_OBJ)) $(LIBDIR)/lib
 
 test_helper: $(BINDIR)/test_helper
 
-.PHONY: test_helper
+run_test_helper: test_helper
+	$(BINDIR)/test_helper
+
+.PHONY: test_helper run_test_helper
 
 #################################################
 # loglines - tests
-
-run_test_loglines: test_loglines
-	$(BINDIR)/test_loglines
 
 TEST_LOGLINES_OBJ = \
 	test_loglines.o 
@@ -166,20 +146,13 @@ $(BINDIR)/test_loglines: $(addprefix  $(OBJDIR)/,$(TEST_LOGLINES_OBJ)) $(LIBDIR)
 
 test_loglines: $(BINDIR)/test_loglines
 
-.PHONY: test_loglines
+run_test_loglines: test_loglines
+	$(BINDIR)/test_loglines
+
+.PHONY: test_loglines run_test_loglines
 
 #################################################
 # scanner - tests
-
-$(PREFIX_OP)flextest: lib $(PREFIX_OP)test_flex
-	$(BINDIR)/$(PREFIX_OP)test_flex
-
-$(PREFIX_AWS)flextest: lib $(PREFIX_AWS)test_flex
-	$(BINDIR)/$(PREFIX_AWS)test_flex
-
-$(PREFIX_GCP)flextest: lib $(PREFIX_GCP)test_flex
-	$(BINDIR)/$(PREFIX_GCP)test_flex
-
 
 OP_TEST_FLEX_OBJ = \
 	$(PREFIX_OP)test_flex.o \
@@ -208,44 +181,46 @@ $(BINDIR)/$(PREFIX_GCP)test_flex: $(addprefix  $(OBJDIR)/,$(GCP_TEST_FLEX_OBJ))
 
 $(PREFIX_GCP)test_flex: $(BINDIR)/$(PREFIX_GCP)test_flex
 
+run_$(PREFIX_OP)flextest: lib $(PREFIX_OP)test_flex
+	$(BINDIR)/$(PREFIX_OP)test_flex
+
+run_$(PREFIX_AWS)flextest: lib $(PREFIX_AWS)test_flex
+	$(BINDIR)/$(PREFIX_AWS)test_flex
+
+run_$(PREFIX_GCP)flextest: lib $(PREFIX_GCP)test_flex
+	$(BINDIR)/$(PREFIX_GCP)test_flex
+
+.PHONY: run_$(PREFIX_OP)test_flex run_$(PREFIX_AWS)test_flex run_$(PREFIX_GCP)test_flex
 .PHONY: $(PREFIX_OP)test_flex $(PREFIX_AWS)test_flex $(PREFIX_GCP)test_flex
 
 #################################################
 # parser - tests
 
-$(PREFIX_OP)parsetest: lib $(PREFIX_OP)test_parse
-	$(BINDIR)/$(PREFIX_OP)test_parse
-
-$(PREFIX_AWS)parsetest: lib $(PREFIX_AWS)test_parse
-	$(BINDIR)/$(PREFIX_AWS)test_parse
-
-$(PREFIX_GCP)parsetest: lib $(PREFIX_GCP)test_parse
-	$(BINDIR)/$(PREFIX_GCP)test_parse
-
-
 OP_TEST_PARSE_OBJ = $(PREFIX_OP)test_parse.o log_lines.o
-
 AWS_TEST_PARSE_OBJ = $(PREFIX_AWS)test_parse.o log_lines.o
-
 GCP_TEST_PARSE_OBJ = $(PREFIX_GCP)test_parse.o log_lines.o
 
 
 $(BINDIR)/$(PREFIX_OP)test_parse: $(addprefix $(OBJDIR)/,$(OP_TEST_PARSE_OBJ))
 	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
 
-$(PREFIX_OP)test_parse: $(BINDIR)/$(PREFIX_OP)test_parse
-
 $(BINDIR)/$(PREFIX_AWS)test_parse: $(addprefix $(OBJDIR)/,$(AWS_TEST_PARSE_OBJ))
 	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
-
-$(PREFIX_AWS)test_parse: $(BINDIR)/$(PREFIX_AWS)test_parse
 
 $(BINDIR)/$(PREFIX_GCP)test_parse: $(addprefix $(OBJDIR)/,$(GCP_TEST_PARSE_OBJ))
 	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
 
-$(PREFIX_GCP)test_parse: $(BINDIR)/$(PREFIX_GCP)test_parse
 
-.PHONY: $(PREFIX_OP)test_parse $(PREFIX_AWS)test_parse $(PREFIX_GCP)test_parse
+run_$(PREFIX_OP)parsetest: lib $(BINDIR)/$(PREFIX_OP)test_parse
+	$(BINDIR)/$(PREFIX_OP)test_parse
+
+run_$(PREFIX_AWS)parsetest: lib $(BINDIR)/$(PREFIX_AWS)test_parse
+	$(BINDIR)/$(PREFIX_AWS)test_parse
+
+run_$(PREFIX_GCP)parsetest: lib $(BINDIR)/$(PREFIX_GCP)test_parse
+	$(BINDIR)/$(PREFIX_GCP)test_parse
+
+.PHONY: run_$(PREFIX_OP)test_parse run_$(PREFIX_AWS)test_parse run_$(PREFIX_GCP)test_parse
 
 #################################################
 # minimal parser/Json: stdin(any format)->parsing->stdout(Json)
@@ -267,9 +242,12 @@ json: log2jsn_
 
 test2jsn: log2jsn_
 	@mkdir -p actual
-	@cat data/op_two_events.txt    | $(BINDIR)/log2jsn op readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
+	cat data/op_two_events.txt    | $(BINDIR)/log2jsn op readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
 						&& diff ./expected/op_two_events.out ./actual/op_two_events.out \
 						&& diff ./expected/op_two_events.err ./actual/op_two_events.err 
+	cat data/aws_unrecognized.log | $(BINDIR)/log2jsn aws >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \
+						&& diff ./expected/aws_unrecognized.out ./actual/aws_unrecognized.out \
+						&& diff ./expected/aws_unrecognized.err ./actual/aws_unrecognized.err
 	cat data/gcp_unrecognized.log | $(BINDIR)/log2jsn gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
 						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err

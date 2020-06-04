@@ -80,6 +80,8 @@ STR     [.\-a-zA-Z0-9_]+
 {MONTH}         { MAKE_STR(); return MONTH; }
 {STR}           { MAKE_STR(); return STR; }
 
+.               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+
 %%
 
 void op_scan_reset( yyscan_t yyscanner )

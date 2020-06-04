@@ -64,6 +64,7 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 <TIMEFMT>\/         { return SLASH; }
 <TIMEFMT>[ \t]      { ; }
 <TIMEFMT>{MONTH}    { MAKE_STR(); return MONTH; }
+<TIMEFMT>.          { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
