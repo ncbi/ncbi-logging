@@ -72,7 +72,7 @@ for bucket in $BUCKETS; do
     find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;
     gzip -9 ./*.jsonl
 
-    gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
+    gsutil -m cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
     gsutil ls -l "gs://${PREFIX}_logs_parsed/$bucket/"
     date
     rm -rf "$DEST"

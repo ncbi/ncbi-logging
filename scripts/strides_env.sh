@@ -9,7 +9,7 @@ export SCRIPTDIR="$PWD"
 export PREFIX="strides_analytics"
 export PGVER="postgresql-12.3"
 export PGDATA="$HOME/pgdata12"
-export PATH="$HOME/$PGVER/bin:$HOME/.local/bin:/opt/python-all/bin:$HOME/google-cloud-sdk/bin:$PATH"
+export PATH="$HOME/$PGVER/bin:$HOME/.local/bin:/opt/python-all/bin:$HOME/google-cloud-sdk/bin:/netopt/ncbi_tools64/bin/:$PATH"
 export AWS_PROFILE="strides-analytics"
 export LD_LIBRARY_PATH="$HOME/$PGVER/lib"
 export LD_LIBRARY_PATH="$HOME/lib:$HOME/.local/lib:$LD_LIBRARY_PATH"
@@ -30,8 +30,10 @@ export YESTERDAY_UNDER
 renice +19 -p $$ > /dev/null 2>&1
 
 SQLCACHE="$RAMDISK/${USER}_${DATE}"
+SQLCACHE="$RAMDISK/${USER}"
 mkdir -p "$SQLCACHE"
 if [ ! -e "$SQLCACHE/buckets.db" ]; then
+    echo "Refreshing sqlite cache"
     export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/sandbox-blast-847af7ab431a.json
     gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
     export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
