@@ -258,4 +258,23 @@ test2jsn: log2jsn_
 #################################################
 # some valgrind checks...
 
-#VG_PARSETEST 
+VG_OPTIONS := --leak-check=full --error-exitcode=1
+
+vg_op : $(BINDIR)/log2jsn $(BINDIR)/op_test_flex $(BINDIR)/op_test_parse
+	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_flex
+	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_parse
+	cat data/op_two_events.txt | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn op
+
+vg_gcp : $(BINDIR)/log2jsn $(BINDIR)/gcp_test_flex $(BINDIR)/gcp_test_parse
+	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_flex
+	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_parse
+	cat data/gcp_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn gcp
+
+vg_aws : $(BINDIR)/log2jsn $(BINDIR)/aws_test_flex $(BINDIR)/aws_test_parse
+	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_flex
+	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_parse
+	cat data/aws_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn aws
+
+vg_all : vg_op vg_gcp vg_aws
+
+.PHONY: vg_op vg_gcp vg_aws vg_all
