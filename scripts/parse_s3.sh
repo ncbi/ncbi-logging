@@ -7,7 +7,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-#YESTERDAY="20200601"
+#YESTERDAY="20200602"
 
 BUCKETS="logs_s3_public logs_s3_ca"
 for bucket in $BUCKETS; do
@@ -59,6 +59,7 @@ for bucket in $BUCKETS; do
 
     rm -f "$YESTERDAY.json"
 
+    echo "Verifying JSON..."
     # Remove leading spaces and slashes and pluses
     #sed -i "s/^[ \t]*//" "unrecognized.$YESTERDAY.jsonl"
     #sed -i "s/^[+\/]*//" "unrecognized.$YESTERDAY.jsonl"
@@ -68,10 +69,12 @@ for bucket in $BUCKETS; do
     jq -e -c . < "recognized.$YESTERDAY.jsonl" > /dev/null
     jq -e -c . < "unrecognized.$YESTERDAY.jsonl" > /dev/null
 
+    echo "Gzipping..."
     # Don't bother with empty
     find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;
     gzip -9 ./*.jsonl
 
+    echo "Uploading..."
     gsutil -m cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
     gsutil ls -l "gs://${PREFIX}_logs_parsed/$bucket/"
     date
