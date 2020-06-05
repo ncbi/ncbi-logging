@@ -48,7 +48,7 @@ sqlcmd () {
 .headers off
 .mode tabs
 .nullvalue NULL
-${query}
+${query} ;
 EOF
 }
 
