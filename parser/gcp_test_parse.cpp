@@ -205,6 +205,15 @@ TEST_F ( TestParseFixture, GCP_ErrorRecovery )
     ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
 }
 
+TEST_F ( TestParseFixture, GCP_rejected )
+{
+    const char * InputLine =
+    "\"1588261829246636\",\"35.245.218.83\",\"1\",\"\",\"POST\",\"/resumable/upload/storage/v1/b/sra-pub-src-14/o?fields=generation%2CcustomerEncryption%2Cmd5Hash%2Ccrc32c%2Cetag%2Csize&alt=json&userProject=nih-sra-datastore&uploadType=resumable\",\"200\",\"1467742168\",\"158\",\"11330000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUnxuPe3SnDN8Y2xbJ2y94VV3u924Bfq6MLxdYC5L6aemGMz3KGEFHWBlJnz96leDkMCkJZFJO-40Rw7wdV__fs\",\"storage.objects.insert\",\"sra-pub-src-14\",\"SRR1929577/{control_24h_biorep1}.fastq.gz\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine, true );
+    ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
+}
+
 // TODO test for specified ip-region
 // TODO test with referrer present
 // TODO quoted string with escaped quotes inside
