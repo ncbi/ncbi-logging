@@ -24,23 +24,19 @@ $cd ncbi-logging/parser
 $git checkout VDB-4214
 
 $make
-$make runtests
+# there are 2 versions build: log2jsn-dbg ( debug-version ) and log2jsn-rel ( release-version )
+# the release-version is about 2.5 times faster
+# the 2 binaries are in the bin-subdirectory
 
-$ make log2jsn_ # build ./bin/log2json
+$make runtests
 
 # Command line options:
 
 # to process an on-premises log, 1 line per log entry (default)
-$ cat data/some_events.txt | bin/log2jsn op
+$ cat data/some_events.txt | bin/log2jsn-rel op
 
 # to process an aws log (default), pretty-printed 
-$ cat data/aws_bucket_log.log | bin/log2jsn aws readable
+$ cat data/aws_bucket_log.log | bin/log2jsn-rel aws readable
 
 # to process a gcp log (default)
-$ cat data/gcp_bucket_log.log | bin/log2jsn gcp
-
-To modify the log2jsn tool, modify this file: log2jsn.cpp
-
-# rebuild log2jsn, amongst other things:
-$ make   
-
+$ cat data/gcp_bucket_log.log | bin/log2jsn-rel gcp
