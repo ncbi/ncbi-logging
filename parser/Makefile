@@ -7,7 +7,7 @@ OBJDIR = obj
 CC := gcc -c
 CPP := g++ -c
 LD := g++
-CXXFLAGS += -I . -g -MMD
+CXXFLAGS += -I . -MMD
 
 PREFIX_OP := op_
 PREFIX_AWS := aws_
@@ -32,20 +32,25 @@ clean:
 mkdir:
 	@ mkdir -p $(LIBDIR) $(BINDIR) $(OBJDIR)
 
-$(OBJDIR)/%.o: %.cpp
-	$(CPP) $(CXXFLAGS) $< -o $@
+$(OBJDIR)/%.dbg.o: %.cpp
+	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
+
+$(OBJDIR)/%.rel.o: %.cpp
+	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
 -include $(OBJDIR)/*.d
 
 #################################################
 # C++ log parsing library
 
-$(OBJDIR)/$(PREFIX_OP)parser.o:  $(OBJDIR)/$(PREFIX_OP)scanner.o
+$(OBJDIR)/$(PREFIX_OP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_OP)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_OP)parser.rel.o:  $(OBJDIR)/$(PREFIX_OP)scanner.rel.o
 
-$(OBJDIR)/$(PREFIX_AWS)parser.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.o
+$(OBJDIR)/$(PREFIX_AWS)parser.dbg.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
 
-$(OBJDIR)/$(PREFIX_GCP)parser.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.o
-
+$(OBJDIR)/$(PREFIX_GCP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_GCP)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.rel.o
 
 $(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l
 	flex --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
@@ -74,24 +79,19 @@ LOG_LINES_SRC = \
 	$(PREFIX_AWS)parser.cpp \
 	$(PREFIX_AWS)scanner.cpp \
 	$(PREFIX_GCP)parser.cpp \
-	$(PREFIX_GCP)scanner.cpp
+	$(PREFIX_GCP)scanner.cpp \
+ 	log_lines.cpp \
 
-log_lines.o: $(LOG_LINES_SRC)
+LOGLIB_DBG_OBJ = $(subst .cpp,.dbg.o,$(LOG_LINES_SRC)) 
+LOGLIB_REL_OBJ = $(subst .cpp,.rel.o,$(LOG_LINES_SRC))
 
-LOGLIB_OBJ = \
-	$(PREFIX_OP)parser.o \
-	$(PREFIX_OP)scanner.o \
-	$(PREFIX_AWS)parser.o \
-	$(PREFIX_AWS)scanner.o \
-	$(PREFIX_GCP)parser.o \
-	$(PREFIX_GCP)scanner.o \
-	helper.o \
-	log_lines.o
-
-$(LIBDIR)/liblogparse.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_OBJ))
+$(LIBDIR)/liblogparse-dbg.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_DBG_OBJ))
 	ar r $@ $+
 
-lib liblogparse: mkdir $(LIBDIR)/liblogparse.a
+$(LIBDIR)/liblogparse-rel.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_REL_OBJ))
+	ar r $@ $+
+
+lib liblogparse: mkdir $(LIBDIR)/liblogparse-dbg.a $(LIBDIR)/liblogparse-rel.a
 
 #################################################
 # tests
@@ -101,155 +101,238 @@ runtests: liblogparse run_ut test2jsn
 
 #build all test-binaries
 tests: \
-	$(BINDIR)/test_helper \
-	$(BINDIR)/test_loglines \
-	$(BINDIR)/$(PREFIX_OP)test_flex \
-	$(BINDIR)/$(PREFIX_OP)test_parse \
-	$(BINDIR)/$(PREFIX_AWS)test_flex \
-	$(BINDIR)/$(PREFIX_AWS)test_parse \
-	$(BINDIR)/$(PREFIX_GCP)test_flex \
-	$(BINDIR)/$(PREFIX_GCP)test_parse
+	$(BINDIR)/test_helper-dbg \
+	$(BINDIR)/test_loglines-dbg \
+	$(BINDIR)/$(PREFIX_OP)test_flex-dbg \
+	$(BINDIR)/$(PREFIX_OP)test_parse-dbg \
+	$(BINDIR)/$(PREFIX_AWS)test_flex-dbg \
+	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg \
+	$(BINDIR)/$(PREFIX_GCP)test_flex-dbg \
+	$(BINDIR)/$(PREFIX_GCP)test_parse-dbg
 
 run_ut: tests
-	$(BINDIR)/test_helper
-	$(BINDIR)/test_loglines
-	$(BINDIR)/$(PREFIX_OP)test_flex
-	$(BINDIR)/$(PREFIX_OP)test_parse
-	$(BINDIR)/$(PREFIX_AWS)test_flex
-	$(BINDIR)/$(PREFIX_AWS)test_parse
-	$(BINDIR)/$(PREFIX_GCP)test_flex
-	$(BINDIR)/$(PREFIX_GCP)test_parse
+	$(BINDIR)/test_helper-dbg
+	$(BINDIR)/test_loglines-dbg
+	$(BINDIR)/$(PREFIX_OP)test_flex-dbg
+	$(BINDIR)/$(PREFIX_OP)test_parse-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_flex-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
+	$(BINDIR)/$(PREFIX_GCP)test_flex-dbg
+	$(BINDIR)/$(PREFIX_GCP)test_parse-dbg
 
 #################################################
 # helper - tests
 
-TEST_HELPER_OBJ = \
-	test_helper.o 
+TEST_HELPER_SRC = \
+	test_helper.cpp
 
-$(BINDIR)/test_helper: $(addprefix  $(OBJDIR)/,$(TEST_HELPER_OBJ)) $(LIBDIR)/liblogparse.a
+TEST_HELPER_DBG_OBJ = $(addprefix  $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_HELPER_SRC)))
+TEST_HELPER_REL_OBJ = $(addprefix  $(OBJDIR)/,$(subst .cpp,.rel.o,$(TEST_HELPER_SRC)))
+
+$(BINDIR)/test_helper-dbg: $(TEST_HELPER_DBG_OBJ) $(LIBDIR)/liblogparse-dbg.a
 	$(LD) -o $@ $+ -lgtest -lpthread
 
-test_helper: $(BINDIR)/test_helper
+$(BINDIR)/test_helper-rel: $(TEST_HELPER_REL_OBJ) $(LIBDIR)/liblogparse-rel.a
+	$(LD) -o $@ $+ -lgtest -lpthread
+
+test_helper: mkdir $(BINDIR)/test_helper-dbg $(BINDIR)/test_helper-rel
 
 run_test_helper: test_helper
-	$(BINDIR)/test_helper
+	$(BINDIR)/test_helper-dbg
+	$(BINDIR)/test_helper-rel
 
 .PHONY: test_helper run_test_helper
 
 #################################################
 # loglines - tests
 
-TEST_LOGLINES_OBJ = \
-	test_loglines.o 
+TEST_LOGLINES_SRC = \
+	test_loglines.cpp
 
-$(BINDIR)/test_loglines: $(addprefix  $(OBJDIR)/,$(TEST_LOGLINES_OBJ)) $(LIBDIR)/liblogparse.a
+TEST_LOGLINES_DBG_OBJ = $(addprefix  $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_LOGLINES_SRC)))
+TEST_LOGLINES_REL_OBJ = $(addprefix  $(OBJDIR)/,$(subst .cpp,.rel.o,$(TEST_LOGLINES_SRC)))
+
+$(BINDIR)/test_loglines-dbg: $(TEST_LOGLINES_DBG_OBJ) $(LIBDIR)/liblogparse-dbg.a
 	$(LD) -o $@ $+ -lgtest -lpthread
 
-test_loglines: $(BINDIR)/test_loglines
+$(BINDIR)/test_loglines-rel: $(TEST_LOGLINES_REL_OBJ) $(LIBDIR)/liblogparse-rel.a
+	$(LD) -o $@ $+ -lgtest -lpthread
+
+test_loglines: mkdir $(BINDIR)/test_loglines-dbg $(BINDIR)/test_loglines-rel
 
 run_test_loglines: test_loglines
-	$(BINDIR)/test_loglines
+	$(BINDIR)/test_loglines-dbg
+	$(BINDIR)/test_loglines-rel
 
 .PHONY: test_loglines run_test_loglines
 
 #################################################
 # scanner - tests
 
-OP_TEST_FLEX_OBJ = \
-	$(PREFIX_OP)test_flex.o \
-	$(PREFIX_OP)scanner.o
+# On Premises
+OP_TEST_FLEX_SRC = \
+	$(PREFIX_OP)test_flex.cpp \
+	$(PREFIX_OP)scanner.cpp
 
-AWS_TEST_FLEX_OBJ = \
-	$(PREFIX_AWS)test_flex.o \
-	$(PREFIX_AWS)scanner.o
+OP_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(OP_TEST_FLEX_SRC)))
+OP_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(OP_TEST_FLEX_SRC)))
 
-GCP_TEST_FLEX_OBJ = \
-	$(PREFIX_GCP)test_flex.o \
-	$(PREFIX_GCP)scanner.o
-
-$(BINDIR)/$(PREFIX_OP)test_flex: $(addprefix  $(OBJDIR)/,$(OP_TEST_FLEX_OBJ))
+$(BINDIR)/$(PREFIX_OP)test_flex-dbg: $(OP_TEST_FLEX_DBG_OBJ)
 	$(LD) -o $@ $+ -lgtest -lpthread
 
-$(PREFIX_OP)test_flex: $(BINDIR)/$(PREFIX_OP)test_flex
-
-$(BINDIR)/$(PREFIX_AWS)test_flex: $(addprefix  $(OBJDIR)/,$(AWS_TEST_FLEX_OBJ))
+$(BINDIR)/$(PREFIX_OP)test_flex-rel: $(OP_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $+ -lgtest -lpthread
 
-$(PREFIX_AWS)test_flex: $(BINDIR)/$(PREFIX_AWS)test_flex
+run_$(PREFIX_OP)flextest: lib $(BINDIR)/$(PREFIX_OP)test_flex-dbg $(BINDIR)/$(PREFIX_OP)test_flex-rel
+	$(BINDIR)/$(PREFIX_OP)test_flex-dbg
+	$(BINDIR)/$(PREFIX_OP)test_flex-rel
 
-$(BINDIR)/$(PREFIX_GCP)test_flex: $(addprefix  $(OBJDIR)/,$(GCP_TEST_FLEX_OBJ))
+.PHONY: run_$(PREFIX_OP)test_flex 
+
+# AWS
+
+AWS_TEST_FLEX_SRC = \
+	$(PREFIX_AWS)test_flex.cpp \
+	$(PREFIX_AWS)scanner.cpp
+
+AWS_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS_TEST_FLEX_SRC)))
+AWS_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS_TEST_FLEX_SRC)))
+
+$(BINDIR)/$(PREFIX_AWS)test_flex-dbg: $(AWS_TEST_FLEX_DBG_OBJ)
 	$(LD) -o $@ $+ -lgtest -lpthread
 
-$(PREFIX_GCP)test_flex: $(BINDIR)/$(PREFIX_GCP)test_flex
+$(BINDIR)/$(PREFIX_AWS)test_flex-rel: $(AWS_TEST_FLEX_REL_OBJ)
+	$(LD) -o $@ $+ -lgtest -lpthread
 
-run_$(PREFIX_OP)flextest: lib $(PREFIX_OP)test_flex
-	$(BINDIR)/$(PREFIX_OP)test_flex
+run_$(PREFIX_AWS)flextest: lib $(BINDIR)/$(PREFIX_AWS)test_flex-dbg $(BINDIR)/$(PREFIX_AWS)test_flex-rel
+	$(BINDIR)/$(PREFIX_AWS)test_flex-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_flex-rel
 
-run_$(PREFIX_AWS)flextest: lib $(PREFIX_AWS)test_flex
-	$(BINDIR)/$(PREFIX_AWS)test_flex
+.PHONY: run_$(PREFIX_AWS)test_flex 
 
-run_$(PREFIX_GCP)flextest: lib $(PREFIX_GCP)test_flex
-	$(BINDIR)/$(PREFIX_GCP)test_flex
+#GCP
 
-.PHONY: run_$(PREFIX_OP)test_flex run_$(PREFIX_AWS)test_flex run_$(PREFIX_GCP)test_flex
-.PHONY: $(PREFIX_OP)test_flex $(PREFIX_AWS)test_flex $(PREFIX_GCP)test_flex
+GCP_TEST_FLEX_SRC = \
+	$(PREFIX_GCP)test_flex.cpp \
+	$(PREFIX_GCP)scanner.cpp
+
+GCP_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(GCP_TEST_FLEX_SRC)))
+GCP_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(GCP_TEST_FLEX_SRC)))
+
+$(BINDIR)/$(PREFIX_GCP)test_flex-dbg: $(GCP_TEST_FLEX_DBG_OBJ)
+	$(LD) -o $@ $+ -lgtest -lpthread
+
+$(BINDIR)/$(PREFIX_GCP)test_flex-rel: $(GCP_TEST_FLEX_SRC)
+	$(LD) -o $@ $+ -lgtest -lpthread
+
+run_$(PREFIX_GCP)flextest: lib $(BINDIR)/$(PREFIX_GCP)test_flex-dbg $(BINDIR)/$(PREFIX_GCP)test_flex-rel
+	$(BINDIR)/$(PREFIX_GCP)test_flex-dbg
+	$(BINDIR)/$(PREFIX_GCP)test_flex-rel
+
+.PHONY: run_$(PREFIX_GCP)test_flex
 
 #################################################
 # parser - tests
 
-OP_TEST_PARSE_OBJ = $(PREFIX_OP)test_parse.o log_lines.o
-AWS_TEST_PARSE_OBJ = $(PREFIX_AWS)test_parse.o log_lines.o
-GCP_TEST_PARSE_OBJ = $(PREFIX_GCP)test_parse.o log_lines.o
+# On Premises
 
+OP_TEST_PARSE_SRC = \
+	$(PREFIX_OP)test_parse.cpp
 
-$(BINDIR)/$(PREFIX_OP)test_parse: $(addprefix $(OBJDIR)/,$(OP_TEST_PARSE_OBJ))
-	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+OP_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(OP_TEST_PARSE_SRC)))
+OP_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(OP_TEST_PARSE_SRC)))
 
-$(BINDIR)/$(PREFIX_AWS)test_parse: $(addprefix $(OBJDIR)/,$(AWS_TEST_PARSE_OBJ))
-	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+$(BINDIR)/$(PREFIX_OP)test_parse-dbg: $(OP_TEST_PARSE_DBG_OBJ) lib
+	$(LD) -o $@ $< -lgtest -lpthread $(LIBDIR)/liblogparse-dbg.a
 
-$(BINDIR)/$(PREFIX_GCP)test_parse: $(addprefix $(OBJDIR)/,$(GCP_TEST_PARSE_OBJ))
-	$(LD) -o $@ $+ -lgtest -lpthread $(LIBDIR)/liblogparse.a
+$(BINDIR)/$(PREFIX_OP)test_parse-rel: $(OP_TEST_PARSE_REL_OBJ) lib
+	$(LD) -o $@ $< -lgtest -lpthread $(LIBDIR)/liblogparse-rel.a
 
+run_$(PREFIX_OP)parsetest: $(BINDIR)/$(PREFIX_OP)test_parse-dbg $(BINDIR)/$(PREFIX_OP)test_parse-rel
+	$(BINDIR)/$(PREFIX_OP)test_parse-dbg
+	$(BINDIR)/$(PREFIX_OP)test_parse-rel
 
-run_$(PREFIX_OP)parsetest: lib $(BINDIR)/$(PREFIX_OP)test_parse
-	$(BINDIR)/$(PREFIX_OP)test_parse
+.PHONY: run_$(PREFIX_OP)test_parse 
 
-run_$(PREFIX_AWS)parsetest: lib $(BINDIR)/$(PREFIX_AWS)test_parse
-	$(BINDIR)/$(PREFIX_AWS)test_parse
+# AWS
 
-run_$(PREFIX_GCP)parsetest: lib $(BINDIR)/$(PREFIX_GCP)test_parse
-	$(BINDIR)/$(PREFIX_GCP)test_parse
+AWS_TEST_PARSE_SRC = \
+	$(PREFIX_AWS)test_parse.cpp
 
-.PHONY: run_$(PREFIX_OP)test_parse run_$(PREFIX_AWS)test_parse run_$(PREFIX_GCP)test_parse
+AWS_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS_TEST_PARSE_SRC)))
+AWS_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS_TEST_PARSE_SRC)))
+
+$(BINDIR)/$(PREFIX_AWS)test_parse-dbg: $(AWS_TEST_PARSE_DBG_OBJ) lib
+	$(LD) -o $@ $< -lgtest -lpthread $(LIBDIR)/liblogparse-dbg.a
+
+$(BINDIR)/$(PREFIX_AWS)test_parse-rel: $(AWS_TEST_PARSE_REL_OBJ) lib
+	$(LD) -o $@ $< -lgtest -lpthread $(LIBDIR)/liblogparse-rel.a
+
+run_$(PREFIX_AWS)parsetest: $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
+	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
+
+.PHONY: run_$(PREFIX_AWS)test_parse 
+
+# GCP
+
+GCP_TEST_PARSE_SRC = \
+	$(PREFIX_GCP)test_parse.cpp
+
+GCP_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(GCP_TEST_PARSE_SRC)))
+GCP_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(GCP_TEST_PARSE_SRC)))
+
+$(BINDIR)/$(PREFIX_GCP)test_parse-dbg: $(GCP_TEST_PARSE_DBG_OBJ) lib 
+	$(LD) -o $@ $< -lgtest -lpthread $(LIBDIR)/liblogparse-dbg.a
+
+$(BINDIR)/$(PREFIX_GCP)test_parse-rel: $(GCP_TEST_PARSE_REL_OBJ) lib 
+	$(LD) -o $@ $< -lgtest -lpthread $(LIBDIR)/liblogparse-rel.a
+
+run_$(PREFIX_GCP)parsetest: $(BINDIR)/$(PREFIX_GCP)test_parse-dbg $(BINDIR)/$(PREFIX_GCP)test_parse-rel
+	$(BINDIR)/$(PREFIX_GCP)test_parse-dbg
+	$(BINDIR)/$(PREFIX_GCP)test_parse-rel
+
+.PHONY: run_$(PREFIX_GCP)test_parse
 
 #################################################
 # minimal parser/Json: stdin(any format)->parsing->stdout(Json)
 
-LOG2JSNOBJ = log2jsn.o
+LOG2JSN_SRC = log2jsn.cpp
+
+LOG2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(LOG2JSN_SRC)))
+LOG2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(LOG2JSN_SRC)))
 
 # Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
 JWT_TOOL ?= ../../ncbi-vdb3/jwt-tool
 
 CXXFLAGS += -I$(JWT_TOOL)/inc
 
-$(BINDIR)/log2jsn: $(addprefix $(OBJDIR)/,$(LOG2JSNOBJ)) $(LIBDIR)/liblogparse.a
+$(BINDIR)/log2jsn-dbg: $(LOG2JSN_DBG_OBJ) $(LIBDIR)/liblogparse-dbg.a
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
-log2jsn_: mkdir $(BINDIR)/log2jsn
+$(BINDIR)/log2jsn-rel: $(LOG2JSN_REL_OBJ) $(LIBDIR)/liblogparse-rel.a
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
+
+log2jsn_: mkdir $(BINDIR)/log2jsn-dbg $(BINDIR)/log2jsn-rel
 
 json: log2jsn_
-	cat data/two_events.txt | $(BINDIR)/log2jsn 
+	cat data/two_events.txt | $(BINDIR)/log2jsn-dbg 
+
+# acceptance 
+
+# which version to run for acceptance (uncomment one)
+LOG2JSON = $(BINDIR)/log2jsn-dbg
+#LOG2JSON = $(BINDIR)/log2jsn-rel
 
 test2jsn: log2jsn_
 	@mkdir -p actual
-	cat data/op_two_events.txt    | $(BINDIR)/log2jsn op readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
+	cat data/op_two_events.txt    | $(LOG2JSON) op readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
 						&& diff ./expected/op_two_events.out ./actual/op_two_events.out \
 						&& diff ./expected/op_two_events.err ./actual/op_two_events.err 
-	cat data/aws_unrecognized.log | $(BINDIR)/log2jsn aws >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \
+	cat data/aws_unrecognized.log | $(LOG2JSON) aws >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \
 						&& diff ./expected/aws_unrecognized.out ./actual/aws_unrecognized.out \
 						&& diff ./expected/aws_unrecognized.err ./actual/aws_unrecognized.err
-	cat data/gcp_unrecognized.log | $(BINDIR)/log2jsn gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
+	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
 						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
 	@ echo "test2json passed"
@@ -260,20 +343,24 @@ test2jsn: log2jsn_
 
 VG_OPTIONS := --leak-check=full --error-exitcode=1
 
-vg_op : $(BINDIR)/log2jsn $(BINDIR)/op_test_flex $(BINDIR)/op_test_parse
-	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_flex
-	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_parse
-	cat data/op_two_events.txt | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn op
+# which version to run under valginrd (uncomment one)
+BUILD = dbg
+#BUILD = rel
 
-vg_gcp : $(BINDIR)/log2jsn $(BINDIR)/gcp_test_flex $(BINDIR)/gcp_test_parse
-	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_flex
-	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_parse
-	cat data/gcp_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn gcp
+vg_op : $(BINDIR)/log2jsn-$(BUILD) $(BINDIR)/op_test_flex-$(BUILD) $(BINDIR)/op_test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_parse-$(BUILD)
+	cat data/op_two_events.txt | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn-$(BUILD) op
 
-vg_aws : $(BINDIR)/log2jsn $(BINDIR)/aws_test_flex $(BINDIR)/aws_test_parse
-	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_flex
-	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_parse
-	cat data/aws_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn aws
+vg_gcp : $(BINDIR)/log2jsn-$(BUILD) $(BINDIR)/gcp_test_flex-$(BUILD) $(BINDIR)/gcp_test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_parse-$(BUILD)
+	cat data/gcp_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn-$(BUILD) gcp
+
+vg_aws : $(BINDIR)/log2jsn-$(BUILD) $(BINDIR)/aws_test_flex-$(BUILD) $(BINDIR)/aws_test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_parse-$(BUILD)
+	cat data/aws_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn-$(BUILD) aws
 
 vg_all : vg_op vg_gcp vg_aws
 

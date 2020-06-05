@@ -147,9 +147,9 @@
     "agent"     : "",
     "forwarded" : "",
     "ip"        : "139.80.16.229",
-    "port"      : 443,
+    "port"      : 0,
     "referer"   : "",
-    "req_len"   : 293,
+    "req_len"   : 0,
     "req_time"  : "",
     "request" :
     {
@@ -159,9 +159,9 @@
         "server" : "",
         "vers"   : ""
     },
-    "res_code"  : 206,
-    "res_len"   : 32768,
+    "res_code"  : 0,
+    "res_len"   : 0,
     "source"    : "NCBI",
-    "time"      : "1.1.2020:2:50:24 -500",
+    "time"      : "0.0.0:0:0:0 0",
     "user"      : ""
 }
