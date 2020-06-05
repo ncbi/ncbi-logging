@@ -51,6 +51,9 @@ namespace NCBI
                 agent . n = 0;
                 unparsed . n = 0;
                 memset( &request, 0, sizeof request );
+                memset( &time, 0, sizeof time );
+                res_code = 0;
+                res_len = 0;
             }
         };
 
@@ -68,6 +71,8 @@ namespace NCBI
                 user . n = 0;
                 req_time . n = 0;
                 forwarded . n = 0;
+                port  = 0;
+                req_len = 0;
             }
         };
 

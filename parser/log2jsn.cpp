@@ -23,7 +23,7 @@ static JSONValueRef ToJsonString( const t_str & in )
     }
 }
 
-static String FormatTime(t_timepoint t)
+static String FormatTime( const t_timepoint & t )
 {
     ostringstream ret;
     ret << (int)t.day << "."

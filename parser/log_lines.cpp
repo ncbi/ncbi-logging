@@ -104,7 +104,7 @@ void OP_Parser :: parse()
             m_lines . unrecognized( err_line );
         }
 
-        gcp__delete_buffer( bs, sc );
+        op__delete_buffer( bs, sc );
         op_scan_reset( sc );
     }
     op_lex_destroy( sc );
@@ -145,7 +145,7 @@ void AWS_Parser :: parse()
             m_lines . unrecognized( err_line );
         }
 
-        gcp__delete_buffer( bs, sc );
+        aws__delete_buffer( bs, sc );
         aws_scan_reset( sc );
     }
     aws_lex_destroy( sc );

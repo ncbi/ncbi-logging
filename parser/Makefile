@@ -14,6 +14,7 @@ PREFIX_AWS := aws_
 PREFIX_GCP := gcp_
 
 all: log2jsn_
+	@echo "done"
 
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
@@ -253,3 +254,8 @@ test2jsn: log2jsn_
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
 	@ echo "test2json passed"
 	@rm -rf actual/run2jsn*
+
+#################################################
+# some valgrind checks...
+
+#VG_PARSETEST 
