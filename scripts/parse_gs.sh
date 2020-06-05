@@ -7,7 +7,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-#YESTERDAY="20200530"
+#YESTERDAY="20200603"
 
 BUCKETS="logs_gs_public logs_gs_ca"
 for bucket in $BUCKETS; do
@@ -24,7 +24,7 @@ for bucket in $BUCKETS; do
         wc=$(zcat "$file" | wc -l | cut -f1 -d' ')
         echo -n "Parsing $file, $wc lines ... "
         totalwc=$(( totalwc + wc))
-        zcat "$file" | time "$HOME/devel/ncbi-logging/parser/bin/log2jsn" gcp > "$file.json" 2> "$file.err"
+        zcat "$file" | time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" gcp > "$file.json" 2> "$file.err"
         newwc=$(wc -l "$file".json | cut -f1 -d' ')
         echo -n "Parsed, $newwc lines emitted"
         if [ "$wc" -ne "$newwc" ]; then
