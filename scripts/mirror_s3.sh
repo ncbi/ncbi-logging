@@ -17,7 +17,7 @@ for LOG_BUCKET in $buckets; do
     #   huge numbers of objects
     # * We copy to ramdisk to avoid seeks, since we have thousands of small files
 
-    DEST="/tmp/$USER/S3-$LOG_BUCKET/$YESTERDAY"
+    DEST="$TMP/S3-$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$DEST"
     cd "$DEST" || exit
 
