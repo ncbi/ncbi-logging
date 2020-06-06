@@ -204,7 +204,11 @@ update buckets set log_bucket='sra-ca-logs-1',
     format='GS log'
     where cloud_provider='GS' and log_bucket='sra-ca-run-logs';
 
-delete from buckets where cloud_provider='S3' and bucket_name in ('sra-pub-src-1','sra-pub-src-2');
+update buckets
+set log_bucket='sra-pub-src-1-logs',
+    service_account='s3_readers',
+    owner='nih-nlm-ncbi-sra-opendata'
+where cloud_provider='S3' and bucket_name in ('sra-pub-src-1','sra-pub-src-2');
 
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)
@@ -447,3 +451,9 @@ values ('NCBI', 'srafiles36',
 .mode tabs
 --.width 20
 select * from buckets order by cloud_provider, bucket_name;
+
+.headers off
+.mode csv
+.output buckets.csv
+select * from buckets order by cloud_provider, bucket_name;
+
