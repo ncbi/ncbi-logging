@@ -3,3 +3,5 @@ pip -q install pre-commit influxdb
 git clone https://github.com/ncbi/ncbi-logging
 cd ncbi-logging
 pre-commit run --all-files
+sudo amazon-linux-extras install epel
+sudo yum --enablerepo epel install moreutils
