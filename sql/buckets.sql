@@ -149,6 +149,23 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-4');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-5');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-6');
 
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-1');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-2');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-3');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-4');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-5');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-6');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-7');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-8');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-pub-zq-9');
+
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-ca-zq-1');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-ca-zq-2');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-ca-zq-3');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-ca-zq-4');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-ca-zq-5');
+insert into buckets (cloud_provider, bucket_name) values ('GS', 'sra-ca-zq-6');
+
 -- https://confluence.ncbi.nlm.nih.gov/display/SRA/SRA+Environments+in+the+Cloud
 update buckets
     set owner='nih-nlm-ncbi-sra',
