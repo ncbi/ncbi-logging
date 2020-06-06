@@ -1,14 +1,14 @@
 .bail on
 pragma page_size=512; -- DB is half the size
 create table cloud_providers (
-    cloud_provder text not null
+    cloud_provder text primary key
 );
 insert into cloud_providers values ('S3');
 insert into cloud_providers values ('GS');
 insert into cloud_providers values ('NCBI');
 
 create table service_accounts (
-    service_account text not null,
+    service_account text primary key,
     owner text
 );
 
@@ -17,7 +17,7 @@ insert into service_accounts (service_account) values ('opendata');
 insert into service_accounts (service_account) values ('s3_readers');
 
 create table formats (
-    format text not null
+    format text primary key
 );
 insert into formats values ('GS log');
 insert into formats values ('nginx log');
@@ -36,25 +36,34 @@ insert into formats values ('stat');
 insert into formats values ('snps');
 
 create table scopes (
-    scope text not null
+    scope text primary key
 );
 insert into scopes values ('public');
 insert into scopes values ('private');
 insert into scopes values ('user-pays');
 
 create table storage_classes (
-    storage_class text
+    storage_class text primary key
 );
 insert into storage_classes values ('hot');
 insert into storage_classes values ('cold');
 insert into storage_classes values ('deep');
+
+create table log_buckets (
+    log_bucket text primary key
+);
+insert into log_buckets values ('sra-pub-src-1-logs');
+insert into log_buckets values ('sra-pub-logs-1');
+insert into log_buckets values ('sra-pub-run-1-logs');
+insert into log_buckets values ('sra-ca-logs-1');
+insert into log_buckets values ('sra-ca-run-logs');
 
 create table buckets (
     cloud_provider text not null references cloud_providers (cloud_provider),
     bucket_name text not null,
     description text,
     owner text,
-    log_bucket text,
+    log_bucket text references log_buckets (log_bucket) default ('sra-pub-src-1-logs'),
     service_account text references service_accounts (service_account) default 'strides-analytics',
     scope text references scopes (scope) default 'public',
     immutable text default "false",
