@@ -15,5 +15,6 @@ MAILTO=""
 
 #16  1 * * * cd $HOME/ncbi-logging/scripts && ./mirror_s3.sh | ts 2>&1 >> $HOME/mirror_s3.log
 16  2 * * * cd $HOME/ncbi-logging/scripts && ./mirror_gs.sh | ts 2>&1 >> $HOME/mirror_gs.log
+16  3 * * * cd $HOME/ncbi-logging/scripts && ./mirror_op.sh | ts 2>&1 >> $HOME/mirror_op.log
 16 20 * * * cd $HOME/ncbi-logging/scripts && ./parse_s3.sh  | ts 2>&1 >> $HOME/parse_s3.log
 16 21 * * * cd $HOME/ncbi-logging/scripts && ./parse_gs.sh  | ts 2>&1 >> $HOME/parse_gs.log

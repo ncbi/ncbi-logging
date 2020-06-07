@@ -24,11 +24,15 @@ for LOG_BUCKET in $buckets; do
 
 # TODO: Fetch scope for destination bucket
 # TODO: Fetch service account for AWS --profile
-    if [[ $LOG_BUCKET =~ "-pub-" ]]; then
+    if [[ $LOG_BUCKET =~ "-pub-src-" ]]; then
         DEST_BUCKET="gs://strides_analytics_logs_s3_public"
         PROFILE="strides-analytics"
     fi
-    if [[ $LOG_BUCKET =~ "-ca-" ]]; then
+    if [[ $LOG_BUCKET =~ "-pub-run-" ]]; then
+        DEST_BUCKET="gs://strides_analytics_logs_s3_public"
+        PROFILE="s3_readers"
+    fi
+    if [[ $LOG_BUCKET =~ "-ca-run-" ]]; then
         DEST_BUCKET="gs://strides_analytics_logs_s3_ca"
         PROFILE="s3_readers"
     fi
@@ -38,7 +42,7 @@ for LOG_BUCKET in $buckets; do
     objects=$(aws s3 ls "s3://$LOG_BUCKET/$YESTERDAY_DASH" --profile "$PROFILE" | cut -c 32- )
     wc=$(echo "$objects" | wc -l)
     echo "Copying $wc objects from $LOG_BUCKET into $DEST"
-    echo "$objects" | xargs -I % -P 24 aws s3 --profile "$PROFILE" cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
+    echo "$objects" | xargs -I % -P 50 aws s3 --profile "$PROFILE" cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
     set -e
     date
     echo "Copied $LOG_BUCKET to $DEST"
