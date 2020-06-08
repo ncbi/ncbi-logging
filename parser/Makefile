@@ -297,20 +297,31 @@ run_$(PREFIX_GCP)parsetest: $(BINDIR)/$(PREFIX_GCP)test_parse-dbg $(BINDIR)/$(PR
 #################################################
 # minimal parser/Json: stdin(any format)->parsing->stdout(Json)
 
+# Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
+JWT_TOOL ?= ../../ncbi-vdb3/jwt-tool
+
 LOG2JSN_SRC = log2jsn.cpp
+CMD_SRC_LOCATION = $(JWT_TOOL)/tool
+CMD_SRC = $(CMD_SRC_LOCATION)/cmdline.cpp
 
 LOG2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(LOG2JSN_SRC)))
 LOG2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(LOG2JSN_SRC)))
 
-# Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
-JWT_TOOL ?= ../../ncbi-vdb3/jwt-tool
+DBG_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
+REL_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
 
-CXXFLAGS += -I$(JWT_TOOL)/inc
+$(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
+	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
 
-$(BINDIR)/log2jsn-dbg: $(LOG2JSN_DBG_OBJ) $(LIBDIR)/liblogparse-dbg.a
+$(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
+	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
+
+CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/tool
+
+$(BINDIR)/log2jsn-dbg: $(LOG2JSN_DBG_OBJ) $(DBG_CMD_OBJ) $(LIBDIR)/liblogparse-dbg.a
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
-$(BINDIR)/log2jsn-rel: $(LOG2JSN_REL_OBJ) $(LIBDIR)/liblogparse-rel.a
+$(BINDIR)/log2jsn-rel: $(LOG2JSN_REL_OBJ) $(REL_CMD_OBJ) $(LIBDIR)/liblogparse-rel.a
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
 log2jsn_: mkdir $(BINDIR)/log2jsn-dbg $(BINDIR)/log2jsn-rel
@@ -326,7 +337,7 @@ LOG2JSON = $(BINDIR)/log2jsn-dbg
 
 test2jsn: log2jsn_
 	@mkdir -p actual
-	cat data/op_two_events.txt    | $(LOG2JSON) op readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
+	cat data/op_two_events.txt    | $(LOG2JSON) op --readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
 						&& diff ./expected/op_two_events.out ./actual/op_two_events.out \
 						&& diff ./expected/op_two_events.err ./actual/op_two_events.err 
 	cat data/aws_unrecognized.log | $(LOG2JSON) aws >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \

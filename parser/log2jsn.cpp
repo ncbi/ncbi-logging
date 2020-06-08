@@ -4,6 +4,9 @@
 #include <string>
 
 #include <ncbi/json.hpp>
+#include <ncbi/secure/except.hpp>
+#include <ncbi/secure/string.hpp>
+#include <cmdline.hpp>
 
 #include "helper.hpp"
 
@@ -283,81 +286,103 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     GCPToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
 };
 
-static void handle_on_prem( bool readable, bool do_report ) 
+static void handle_on_prem( bool readable, bool do_report, bool do_debug = false ) 
 {
     cerr << "converting on-premise format" << endl;
     OpToJsonLogLines event_receiver( cout, readable );
     OP_Parser p( event_receiver, cin );
+    p . setDebug( do_debug );
     p . parse();
     if ( do_report )
         event_receiver.report();
 }
 
-static void handle_aws( bool readable, bool do_report )
+static void handle_aws( bool readable, bool do_report, bool do_debug = false )
 {
     cerr << "converting AWS format" << endl;
     AWSToJsonLogLines event_receiver( cout, readable );
     AWS_Parser p( event_receiver, cin );
-    //p . setDebug( true );
+    p . setDebug( do_debug );
     p . parse();
     if ( do_report )
         event_receiver.report();
 }
 
-static void handle_gcp( bool readable, bool do_report ) 
+static void handle_gcp( bool readable, bool do_report, bool do_debug = false ) 
 {
     cerr << "converting GCP format" << endl;
     GCPToJsonLogLines event_receiver( cout, readable );
     GCP_Parser p( event_receiver, cin );
-    //p . setDebug( true );
+    p . setDebug( do_debug );
     p . parse();
     if ( do_report )
         event_receiver.report();
 }
 
-extern "C"
+enum logformat{ op, aws, gcp, unknown };
+
+static logformat string2logformat( const ncbi::String & fmt )
 {
-    int main ( int argc, const char * argv [], const char * envp []  )
+    if ( fmt.equal( "op" ) )       { return op; }
+    else if ( fmt.equal( "aws" ) ) { return aws; }
+    else if ( fmt.equal( "gcp" ) ) { return gcp; }
+    return unknown;
+}
+
+static int perform_parsing( logformat fmt, bool readable, bool do_report, bool do_debug = false )
+{
+    switch( fmt )
     {
-            
-        string format( "aws" );
-        string readable( "" );
-        if ( argc > 1 ) format = argv[ 1 ];
-        if ( argc > 2 ) readable = argv[ 2 ];
-
-        bool b_readable = ( readable == "readable" );
-
-        try
-        {
-            if ( format == "op"  ) 
-            {
-                handle_on_prem( b_readable, true );
-            }
-            else if ( format == "aws" ) 
-            {
-                handle_aws( b_readable, true );
-            }
-            else if ( format == "gcp" ) 
-            {
-                handle_gcp( b_readable, true );
-            }
-            else
-            {
-                cerr << "Unknown format: " << format << endl;
-                return 3;
-            }
-        }
-        catch( const exception & e)
-        {
-            cerr << "Exception caught: " << e.what() << endl;
-            return 1;
-        }
-        catch(...)
-        {
-            cerr << "Unknown exception caught" << endl;
-            return 2;
-        }
-
-        return 0;
+        case op  : handle_on_prem( readable, do_report, do_debug ); break;
+        case aws : handle_aws( readable, do_report, do_debug ); break;
+        case gcp : handle_gcp( readable, do_report, do_debug ); break;
+        default  : {
+                        cerr << "Unknown format " << endl;
+                        return 3;
+                   }
     }
+    return 0;
+}
+
+int main ( int argc, char * argv [], const char * envp []  )
+{
+    try
+    {
+        ncbi::String format;
+        bool help = false;
+        bool readable = false;
+        bool debug = false;
+        bool vers = false;
+
+        ncbi::Cmdline args( argc, argv );
+        args . addParam( format, "format", "set the input format [ aws, gcp, op ]" );
+        args . addOption( readable, "r", "readable", "pretty print json output" );
+        args . addOption( debug, "d", "debug", "parse with debug-output" );
+        args . addOption( vers, "V", "version", "show version" );
+        args . addOption( help, "h", "help", "show help" );
+
+        args . parse();
+
+        if ( help )
+            args . help();
+
+        if ( vers )
+            cout << "version: 1.0" << endl;
+        
+        if ( !help && !vers )
+            return perform_parsing( string2logformat( format ), readable, true, debug );
+        else
+            return 0;
+    }
+    catch( const exception & e)
+    {
+        cerr << "Exception caught: " << e.what() << endl;
+        return 1;
+    }
+    catch(...)
+    {
+        cerr << "Unknown exception caught" << endl;
+        return 2;
+    }
+    return 0;
 }
