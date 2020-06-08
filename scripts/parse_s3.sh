@@ -16,7 +16,7 @@ for bucket in $BUCKETS; do
     rm -rf "$DEST"
     mkdir -p "$DEST"
     cd "$DEST" || exit
-    gsutil cp "gs://${PREFIX}_${bucket}/$YESTERDAY.tar.gz" .
+    gsutil cp "gs://${PREFIX}_${bucket}/$YESTERDAY.$bucket.tar.gz" .
     for tgz in *.tar.gz; do
         echo "Extracting $tgz"
         set +e

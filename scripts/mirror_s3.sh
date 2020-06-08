@@ -48,7 +48,7 @@ for LOG_BUCKET in $buckets; do
     date
     echo "Copied $LOG_BUCKET to $DEST"
     mkdir -p "$HOME/s3_prod/"
-    TAR="$HOME/s3_prod/$YESTERDAY.tar.gz"
+    TAR="$HOME/s3_prod/$YESTERDAY.$LOG_BUCKET.tar.gz"
 
     cd "$DEST/.." || exit
     tar -caf "$TAR" "$YESTERDAY"
