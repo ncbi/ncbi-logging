@@ -59,13 +59,16 @@ for bucket in $BUCKETS; do
 
     rm -f "$YESTERDAY.json"
 
+    echo "Verifying JSON..."
     jq -e -c . < "recognized.$YESTERDAY.jsonl" > /dev/null
     jq -e -c . < "unrecognized.$YESTERDAY.jsonl" > /dev/null
 
     # Don't bother with empty
+    echo "Gzipping..."
     find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;
     gzip -v -9 ./*.jsonl
 
+    echo "Uploading..."
     gsutil -m cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
     gsutil ls -l "gs://${PREFIX}_logs_parsed/$bucket/"
     date
