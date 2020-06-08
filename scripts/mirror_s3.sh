@@ -26,11 +26,11 @@ for LOG_BUCKET in $buckets; do
 # TODO: Fetch service account for AWS --profile
     if [[ $LOG_BUCKET =~ "-pub-src-" ]]; then
         DEST_BUCKET="gs://strides_analytics_logs_s3_public"
-        PROFILE="strides-analytics"
+        PROFILE="s3_readers"
     fi
     if [[ $LOG_BUCKET =~ "-pub-run-" ]]; then
         DEST_BUCKET="gs://strides_analytics_logs_s3_public"
-        PROFILE="s3_readers"
+        PROFILE="strides-analytics"
     fi
     if [[ $LOG_BUCKET =~ "-ca-run-" ]]; then
         DEST_BUCKET="gs://strides_analytics_logs_s3_ca"
