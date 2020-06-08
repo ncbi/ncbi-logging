@@ -351,6 +351,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         ncbi::String format;
         bool help = false;
         bool readable = false;
+        bool no_report = false;
         bool debug = false;
         bool vers = false;
 
@@ -358,6 +359,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addParam( format, "format", "set the input format [ aws, gcp, op ]" );
         args . addOption( readable, "r", "readable", "pretty print json output" );
         args . addOption( debug, "d", "debug", "parse with debug-output" );
+        args . addOption( no_report, "n", "no-report", "supress report" );
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
 
@@ -370,7 +372,7 @@ int main ( int argc, char * argv [], const char * envp []  )
             cout << "version: 1.0" << endl;
         
         if ( !help && !vers )
-            return perform_parsing( string2logformat( format ), readable, true, debug );
+            return perform_parsing( string2logformat( format ), readable, !no_report, debug );
         else
             return 0;
     }
