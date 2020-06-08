@@ -39,9 +39,10 @@ for LOG_BUCKET in $buckets; do
 
     # NOTE: Much faster to use aws ls than aws cp with include/excludes
     set +e
+    echo "Listing s3://$LOG_BUCKET/$YESTERDAY_DASH using $PROFILE"
     objects=$(aws s3 ls "s3://$LOG_BUCKET/$YESTERDAY_DASH" --profile "$PROFILE" | cut -c 32- )
     wc=$(echo "$objects" | wc -l)
-    echo "Copying $wc objects from $LOG_BUCKET into $DEST"
+    echo "Copying $wc objects from $LOG_BUCKET into $DEST using $PROFILE"
     echo "$objects" | xargs -I % -P 50 aws s3 --profile "$PROFILE" cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
     set -e
     date
