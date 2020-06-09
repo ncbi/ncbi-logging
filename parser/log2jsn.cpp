@@ -368,7 +368,7 @@ int main ( int argc, char * argv [], const char * envp []  )
 {
     try
     {
-        ncbi::String format;
+        ncbi::String format( "op" );
         bool help = false;
         bool readable = false;
         bool no_report = false;
@@ -377,13 +377,15 @@ int main ( int argc, char * argv [], const char * envp []  )
         bool vers = false;
 
         ncbi::Cmdline args( argc, argv );
-        args . addParam( format, "format", "set the input format [ aws, gcp, op ]" );
         args . addOption( readable, "r", "readable", "pretty print json output" );
         args . addOption( debug, "d", "debug", "parse with debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
         args . addOption( print_line_nr, "p", "print-line-nr", "print line numbers" );
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
+
+        args . startOptionalParams();
+        args . addParam( format, "format", "set the input format [ op, aws, gcp ] - dflt:op" );
 
         args . parse();
 
