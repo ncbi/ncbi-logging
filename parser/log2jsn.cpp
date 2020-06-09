@@ -88,15 +88,17 @@ struct cmnLogLines
         std::cerr << "unrecognized : " << num_unrecognized << endl;
     }
 
-    cmnLogLines( ostream &os, bool readable ) : mem_os( os ),
-        mem_readable( readable ) {};
+    cmnLogLines( ostream &os, bool readable, bool print_line_nr ) : mem_os( os ),
+        mem_readable( readable ), mem_print_line_nr( print_line_nr ) {};
 
     ostream &mem_os;
     bool mem_readable;
+    bool mem_print_line_nr;
     unsigned long int num_accepted = 0;
     unsigned long int num_rejected = 0;
     unsigned long int num_headers = 0;
     unsigned long int num_unrecognized = 0;
+    unsigned long int line_nr = 0;
 };
 
 struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
@@ -105,18 +107,21 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     {
         num_unrecognized ++;
         cmn_unrecognized( text );
+        line_nr ++;
     }
 
     virtual void acceptLine( const LogOPEvent & e )
     {
         num_accepted ++;
         print_json( MakeJson(e, true) );
+        line_nr ++;
     }
 
     virtual void rejectLine( const LogOPEvent & e )
     {
         num_rejected ++;
         print_json( MakeJson(e, false) );
+        line_nr ++;
     }
 
     JSONObjectRef MakeJson( const LogOPEvent & e, bool accepted )
@@ -149,10 +154,12 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
         j -> addValue( "port", JSON::makeInteger( e.port ) );
         j -> addValue( "req_len", JSON::makeInteger( e.req_len ) );
 
+        if ( mem_print_line_nr )
+            j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
         return j;
     }
 
-    OpToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
+    OpToJsonLogLines( ostream &os, bool readable, bool print_line_nr ) : cmnLogLines( os, readable, print_line_nr ) {};
 };
 
 struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
@@ -161,18 +168,21 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
     {
         num_unrecognized ++;
         cmn_unrecognized( text );
+        line_nr ++;
     }
 
     virtual void acceptLine( const LogAWSEvent & e )
     {
         num_accepted ++;
         print_json( MakeJson(e, true) );
+        line_nr ++;
     }
 
     virtual void rejectLine( const LogAWSEvent & e )
     {
         num_rejected ++;
         print_json( MakeJson(e, false) );
+        line_nr ++;
     }
 
     JSONObjectRef MakeJson( const LogAWSEvent & e, bool accepted )
@@ -210,10 +220,13 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         j -> addValue( "referer", ToJsonString( e.referer ) );
         j -> addValue( "agent", ToJsonString( e.agent ) );
 
+        if ( mem_print_line_nr )
+            j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
+
         return j;
     }
 
-    AWSToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
+    AWSToJsonLogLines( ostream &os, bool readable, bool print_line_nr ) : cmnLogLines( os, readable, print_line_nr ) {};
 };
 
 struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
@@ -222,18 +235,21 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     {
         num_unrecognized ++;
         cmn_unrecognized( text );
+        line_nr ++;
     }
 
     virtual void acceptLine( const LogGCPEvent & e )
     {
         num_accepted ++;
         print_json( MakeJson(e, true) );
+        line_nr ++;
     }
 
     virtual void rejectLine( const LogGCPEvent & e )
     {
         num_rejected ++;
         print_json( MakeJson(e, false) );
+        line_nr ++;
     }
 
     virtual void headerLine( const LogGCPHeader & hdr )
@@ -280,16 +296,19 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         j -> addValue( "bucket", ToJsonString( e.bucket ) );
         j -> addValue( "object", ToJsonString( e.object ) );
 
+        if ( mem_print_line_nr )
+            j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
+
         return j;
     }
 
-    GCPToJsonLogLines( ostream &os, bool readable ) : cmnLogLines( os, readable ) {};
+    GCPToJsonLogLines( ostream &os, bool readable, bool print_line_nr ) : cmnLogLines( os, readable, print_line_nr ) {};
 };
 
-static void handle_on_prem( bool readable, bool do_report, bool do_debug = false ) 
+static void handle_on_prem( bool readable, bool do_report, bool print_line_nr, bool do_debug = false ) 
 {
     cerr << "converting on-premise format" << endl;
-    OpToJsonLogLines event_receiver( cout, readable );
+    OpToJsonLogLines event_receiver( cout, readable, print_line_nr );
     OP_Parser p( event_receiver, cin );
     p . setDebug( do_debug );
     p . parse();
@@ -297,10 +316,10 @@ static void handle_on_prem( bool readable, bool do_report, bool do_debug = false
         event_receiver.report();
 }
 
-static void handle_aws( bool readable, bool do_report, bool do_debug = false )
+static void handle_aws( bool readable, bool do_report, bool print_line_nr, bool do_debug = false )
 {
     cerr << "converting AWS format" << endl;
-    AWSToJsonLogLines event_receiver( cout, readable );
+    AWSToJsonLogLines event_receiver( cout, readable, print_line_nr );
     AWS_Parser p( event_receiver, cin );
     p . setDebug( do_debug );
     p . parse();
@@ -308,10 +327,10 @@ static void handle_aws( bool readable, bool do_report, bool do_debug = false )
         event_receiver.report();
 }
 
-static void handle_gcp( bool readable, bool do_report, bool do_debug = false ) 
+static void handle_gcp( bool readable, bool do_report, bool print_line_nr, bool do_debug = false ) 
 {
     cerr << "converting GCP format" << endl;
-    GCPToJsonLogLines event_receiver( cout, readable );
+    GCPToJsonLogLines event_receiver( cout, readable, print_line_nr );
     GCP_Parser p( event_receiver, cin );
     p . setDebug( do_debug );
     p . parse();
@@ -329,13 +348,14 @@ static logformat string2logformat( const ncbi::String & fmt )
     return unknown;
 }
 
-static int perform_parsing( logformat fmt, bool readable, bool do_report, bool do_debug = false )
+static int perform_parsing( logformat fmt, bool readable, bool do_report,
+        bool print_line_nr, bool do_debug = false )
 {
     switch( fmt )
     {
-        case op  : handle_on_prem( readable, do_report, do_debug ); break;
-        case aws : handle_aws( readable, do_report, do_debug ); break;
-        case gcp : handle_gcp( readable, do_report, do_debug ); break;
+        case op  : handle_on_prem( readable, do_report, print_line_nr, do_debug ); break;
+        case aws : handle_aws( readable, do_report, print_line_nr, do_debug ); break;
+        case gcp : handle_gcp( readable, do_report, print_line_nr, do_debug ); break;
         default  : {
                         cerr << "Unknown format " << endl;
                         return 3;
@@ -352,6 +372,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         bool help = false;
         bool readable = false;
         bool no_report = false;
+        bool print_line_nr = false;
         bool debug = false;
         bool vers = false;
 
@@ -360,6 +381,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addOption( readable, "r", "readable", "pretty print json output" );
         args . addOption( debug, "d", "debug", "parse with debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
+        args . addOption( print_line_nr, "p", "print-line-nr", "print line numbers" );
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
 
@@ -372,7 +394,7 @@ int main ( int argc, char * argv [], const char * envp []  )
             cout << "version: 1.0" << endl;
         
         if ( !help && !vers )
-            return perform_parsing( string2logformat( format ), readable, !no_report, debug );
+            return perform_parsing( string2logformat( format ), readable, !no_report, print_line_nr, debug );
         else
             return 0;
     }
