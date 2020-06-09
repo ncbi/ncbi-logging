@@ -14,7 +14,6 @@ struct SRequest
     string server;
     string method;
     string path;
-    string params;
     string vers;
 
     SRequest& operator= ( const t_request &req )
@@ -22,7 +21,6 @@ struct SRequest
        server = ToString( req.server );
        method = ToString( req.method );
        path = ToString( req.path );
-       params = ToString( req.params );
        vers = ToString( req.vers );
        return *this;
     }
@@ -205,15 +203,6 @@ TEST_F ( TestParseFixture, OnPremise_User )
     ASSERT_EQ( 1, e.time.day );
 }
 
-TEST_F ( TestParseFixture, OnPremise_Request_Params )
-{
-    const char * InputLine =
-"158.111.236.250 - userid [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra34/SRR/003923/SRR4017927?param1=value HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-dump.2.9.1\" \"-\" port=443 rl=293\n";
-    SLogOPEvent e = parse_str( InputLine );
-
-    ASSERT_EQ( "param1=value", e.request.params );
-}
-
 TEST_F ( TestParseFixture, OnPremise_OnlyIP )
 {
     const char * InputLine = "158.111.236.250\n";
@@ -278,6 +267,37 @@ TEST_F ( TestParseFixture, OnPremise_ErrorLine )
         p.parse();
         ASSERT_EQ ( 1, m_lines.m_rejected.size() ); // line 1
         ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
+        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
+    }
+}
+
+TEST_F ( TestParseFixture, OnPremise_QmarkInReferer )
+{   
+    const char * InputLine =
+"61.153.216.106 - - [07/Jun/2020:00:04:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra47/SRR/010462/SRR10713958 HTTP/1.1\" 206 34758384 1959.489 \"https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR10713958#\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36 Edg/83.0.478.45\" \"-\" port=443 rl=459\n";
+
+    std::istringstream inputstream( InputLine );
+    {
+        OP_Parser p( m_lines, inputstream );
+        //p.setDebug(true);
+        p.parse();
+        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
+        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
+        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
+    }
+}
+
+TEST_F ( TestParseFixture, OnPremise_NoVersion )
+{   
+    const char * InputLine =
+"165.112.6.3 - - [07/Jun/2020:00:06:24 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET /\" 400 248 0.000 \"-\" \"-\" \"-\" port=443 rl=7";
+
+    std::istringstream inputstream( InputLine );
+    {
+        OP_Parser p( m_lines, inputstream );
+        p.parse();
+        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
+        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
     }
 }

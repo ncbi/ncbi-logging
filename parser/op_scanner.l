@@ -34,15 +34,14 @@ IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_
 
 MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"
-VERS    "HTTP/"("1.0"|"1.1"|"2"|"3")
+VERS    "HTTP/"("1.0"|"1.1"|"2"|"2.0"|"3")
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
 
-QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]]+
-QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]])+
+QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?]+
+QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?])+
 
 SPACE   " "
-QMARK   \?
 STR     [.\-a-zA-Z0-9_]+
 
 %x QUOTED
@@ -66,7 +65,6 @@ STR     [.\-a-zA-Z0-9_]+
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
 <QUOTED>{SPACE}     { return SPACE; }
-<QUOTED>{QMARK}     { return QMARK; }
 <QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }

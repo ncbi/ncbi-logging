@@ -137,7 +137,6 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
             req -> addValue("server",   ToJsonString( e.request.server ) );
             req -> addValue("method",   ToJsonString( e.request.method ) );
             req -> addValue("path",     ToJsonString( e.request.path ) );
-            req -> addValue("params",   ToJsonString( e.request.params ) );
             req -> addValue("vers",     ToJsonString( e.request.vers ) );
             JSONValueRef rv( req.release() );
             j -> addValue( "request", rv );

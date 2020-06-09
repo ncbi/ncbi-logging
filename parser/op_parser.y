@@ -40,12 +40,12 @@ using namespace NCBI::Logging;
 
 %token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR
 %token<i64> I64
-%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK 
+%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE  
 %token UNRECOGNIZED
 
 %type<tp> time
 %type<req> request
-%type<s> ip user req_time referer agent agent_list forwarded params_opt
+%type<s> ip user req_time referer agent agent_list forwarded vers_opt
 %type<i64> result_code result_len port req_len
 
 %start line
@@ -97,37 +97,34 @@ user
     | STR                           { $$ = $1; }
     ;
 
-params_opt
-    : QMARK QSTR    { $$ = $2; }
+vers_opt
+    : SPACE VERS    { $$ = $2; }
     | %empty        { $$.p = NULL; $$.n = 0; }
     ;
 
 request :
-    QUOTE QSTR QUOTE QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
+    QUOTE QSTR QUOTE QUOTE METHOD SPACE QSTR vers_opt QUOTE
     {
         $$.server = $2;
         $$.method = $5;
         $$.path   = $7;
-        $$.params = $8;
-        $$.vers   = $10;
+        $$.vers   = $8;
     }
     |
-    STR QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
+    STR QUOTE METHOD SPACE QSTR vers_opt QUOTE
     {
         $$.server = $1;
         $$.method = $3;
         $$.path   = $5;
-        $$.params = $6;
-        $$.vers   = $8;
+        $$.vers   = $6;
     }
     |
-    QUOTE METHOD SPACE QSTR params_opt SPACE VERS QUOTE
+    QUOTE METHOD SPACE QSTR vers_opt QUOTE
     {
         $$.server.p = NULL; $$.server.n = 0;
         $$.method = $2;
         $$.path   = $4;
-        $$.params = $5;
-        $$.vers   = $7;
+        $$.vers   = $5;
     }
     ;
 

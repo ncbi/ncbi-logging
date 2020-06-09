@@ -248,7 +248,7 @@ $(BINDIR)/$(PREFIX_OP)test_parse-dbg: $(OP_TEST_PARSE_DBG_OBJ) lib
 $(BINDIR)/$(PREFIX_OP)test_parse-rel: $(OP_TEST_PARSE_REL_OBJ) lib
 	$(LD) -o $@ $< -lgtest -lpthread $(LIBDIR)/liblogparse-rel.a
 
-run_$(PREFIX_OP)parsetest: $(BINDIR)/$(PREFIX_OP)test_parse-dbg $(BINDIR)/$(PREFIX_OP)test_parse-rel
+run_$(PREFIX_OP)parsetest: mkdir $(BINDIR)/$(PREFIX_OP)test_parse-dbg $(BINDIR)/$(PREFIX_OP)test_parse-rel
 	$(BINDIR)/$(PREFIX_OP)test_parse-dbg
 	$(BINDIR)/$(PREFIX_OP)test_parse-rel
 
@@ -337,9 +337,9 @@ LOG2JSON = $(BINDIR)/log2jsn-dbg
 
 test2jsn: log2jsn_
 	@mkdir -p actual
-	cat data/op_two_events.txt    | $(LOG2JSON) op --readable >./actual/op_two_events.out 2>./actual/op_two_events.err \
-						&& diff ./expected/op_two_events.out ./actual/op_two_events.out \
-						&& diff ./expected/op_two_events.err ./actual/op_two_events.err 
+	cat data/op_unrecognized.log    | $(LOG2JSON) op -p --readable >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
+						&& diff ./expected/op_unrecognized.out ./actual/op_unrecognized.out \
+						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
 	cat data/aws_unrecognized.log | $(LOG2JSON) aws >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \
 						&& diff ./expected/aws_unrecognized.out ./actual/aws_unrecognized.out \
 						&& diff ./expected/aws_unrecognized.err ./actual/aws_unrecognized.err

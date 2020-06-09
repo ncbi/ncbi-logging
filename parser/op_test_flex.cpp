@@ -76,8 +76,8 @@ TEST_F ( OP_TestFlexFixture, QuotedSpace )
 }
 TEST_F ( OP_TestFlexFixture, QuotedQuestion )
 {
-    ASSERT_EQ( QUOTE, StartScan("\"?\"") );
-    ASSERT_EQ( QMARK, Scan() );
+    ASSERT_EQ( QUOTE, StartScan("\"?\"") ); // ? is not special
+    ASSERT_EQ( QSTR, Scan() );
 }
 TEST_F ( OP_TestFlexFixture, QuotedMethod )
 {
@@ -88,6 +88,11 @@ TEST_F ( OP_TestFlexFixture, QuotedVers )
 {
     ASSERT_EQ( QUOTE, StartScan("\"HTTP/2\"") );
     ASSERT_EQ( VERS, Scan() ); ASSERT_EQ( "HTTP/2", Token() );
+}
+TEST_F ( OP_TestFlexFixture, QuotedVers2_0 )
+{
+    ASSERT_EQ( QUOTE, StartScan("\"HTTP/2.0\"") );
+    ASSERT_EQ( VERS, Scan() ); ASSERT_EQ( "HTTP/2.0", Token() );
 }
 TEST_F ( OP_TestFlexFixture, QuotedString )
 {
