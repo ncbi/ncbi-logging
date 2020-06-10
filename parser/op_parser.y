@@ -101,6 +101,7 @@ user
 vers_opt
     : SPACE VERS    { $$ = $2; }
     | SPACE         { EMPTY_TSTR($$); }
+
     | %empty        { EMPTY_TSTR($$); }
     ;
 
@@ -142,6 +143,14 @@ request
         $$.method = $2;
         $$.path   = $4;
         $$.vers   = $5;
+    }
+    |
+    STR QUOTE method_opt QUOTE
+    {
+        $$.server = $1;
+        $$.method = $3;        
+        EMPTY_TSTR($$.path);
+        EMPTY_TSTR($$.vers);
     }
     ;
 

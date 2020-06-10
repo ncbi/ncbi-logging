@@ -329,6 +329,22 @@ TEST_F ( TestParseFixture, OnPremise_SpaceAsProtcol )
     check_accepted( InputLine );
 }
 
+TEST_F ( TestParseFixture, OnPremise_JustMethod )
+{   
+    const char * InputLine =
+"10.154.195.11 - - [07/Jun/2020:08:32:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 400 150 0.001 \"-\" \"-\" \"-\" port=80 rl=0";
+
+    check_accepted( InputLine );
+}
+
+TEST_F ( TestParseFixture, OnPremise_SomethingWrong )
+{   
+    const char * InputLine =
+"13.56.21.202 - - [07/Jun/2020:22:26:43 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"\\x16\\x03\\x01\\x02\\x00\\x01\\x00\\x01\\xFC\\x03\\x03\\xD5\\xAC\\xA1\\xD1r\\x85\\x91)\\x92v\\xB0p\\x038B#\\xD9\\x007\\x08\\xCB\\x86\\x08\\x8C\\x1Cs\\x04 \\x99\\x8A\\xC0\\x12 a\\xD7\\xC9C\\xEE\\x93\\x91\\xBF\\xCEASvP\\x9F\\xDB\\x91\\x85\\x9D\\xB4\\xF7Ee\\x80%^\\xBD\\xF3\\x02\\xB4\\x00w\\xBE\\x00\\xD2\\x13\\x02\\x13\\x03\\x13\\x01\\xC0,\\xC00\\x00\\xA3\\x00\\x9F\\xCC\\xA9\\xCC\\xA8\\xCC\\xAA\\xC0\\xAF\\xC0\\xAD\\xC0\\xA3\\xC0\\x9F\\xC0]\\xC0a\\xC0W\\xC0S\\x00\\xA7\\xC0+\\xC0/\\x00\\xA2\\x00\\x9E\\xC0\\xAE\\xC0\\xAC\\xC0\\xA2\\xC0\\x9E\\xC0\\x5C\\xC0`\\xC0V\\xC0R\\x00\\xA6\\xC0$\\xC0(\\x00k\\x00j\\xC0s\\xC0w\\x00\\xC4\\x00\\xC3\\x00m\\x00\\xC5\\xC0#\\xC0'\\x00g\\x00@\\xC0r\\xC0v\\x00\\xBE\\x00\\xBD\\x00l\\x00\\xBF\\xC0\" 400 150 0.071 \"-\" \"-\" \"-\" port=80 rl=0";
+
+    check_accepted( InputLine, true );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
