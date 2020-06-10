@@ -1,13 +1,8 @@
 13.59.252.14 - - [07/Jun/2020:01:09:52 -0400] "sra-download.ncbi.nlm.nih.gov" "\x16\x03\x01\x00\xCF\x01\x00\x00\xCB\x03\x01" 400 150 0.011 "-" "-" "-" port=80 rl=0
 13.59.252.14 - - [07/Jun/2020:01:10:23 -0400] "sra-download.ncbi.nlm.nih.gov" "PROPFIND / HTTP/1.1" 405 552 0.000 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)" "-" port=80 rl=376
-13.59.252.14 - - [07/Jun/2020:01:10:24 -0400] "sra-download.ncbi.nlm.nih.gov" "PROPFIND / HTTP/1.1" 405 552 0.000 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)" "-" port=443 rl=376
 13.59.252.14 - - [07/Jun/2020:01:14:11 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /login/?user=|\x22`id`\x22| HTTP/1.1" 301 162 0.000 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)" "-" port=80 rl=336
 146.118.64.48 - - [07/Jun/2020:02:47:10 -0400] "sra-download.ncbi.nlm.nih.gov" "HEAD /traces/sra19/SRR/009763/SRR9997476 HTTP/1.1" 200 0 0.000 "-" "" "-" port=443 rl=117
-152.16.191.90 - - [07/Jun/2020:04:14:34 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /traces/sra74/SRR/008095/SRR8289632 HTTP/1.1" 206 262144 0.000 "-" "" "-" port=443 rl=303
-152.16.191.90 - - [07/Jun/2020:04:28:07 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /traces/sra74/SRR/008096/SRR8290764 HTTP/1.1" 206 262144 0.000 "-" "" "-" port=443 rl=303
 34.201.223.169 - - [07/Jun/2020:04:49:09 -0400] "sra-download.ncbi.nlm.nih.gov" "\x16\x03\x01\x00\xCF\x01\x00\x00\xCB\x03\x01\x1D\x018\xD1L}!\xFC\x1FiEv\x12\xE8\x1Fk\x9F\xE7\x0E<\x22~\xAA$G=\x1B\x8E%\x1E\x15\xA9\x00\x00R\xC0" 400 150 0.013 "-" "-" "-" port=80 rl=0
-34.201.223.169 - - [07/Jun/2020:04:49:09 -0400] "sra-download.ncbi.nlm.nih.gov" "\x16\x03\x00\x00}\x01\x00\x00y\x03\x00\xB4e\xAF\x80\x13\xED\x0CAV\xEAI\xE7#\x9D\xB2N!-r$\xA4\xFB\x9EMvB\x8CT\x97\x87~\xE3\x00\x00R\xC0" 400 150 0.016 "-" "-" "-" port=80 rl=0
-34.201.223.169 - - [07/Jun/2020:04:49:09 -0400] "sra-download.ncbi.nlm.nih.gov" "\x15\x03\x01\x00\x02\x02P" 400 150 0.008 "-" "-" "-" port=443 rl=0
 13.59.252.14 - - [07/Jun/2020:01:09:44 -0400] "sra-download.ncbi.nlm.nih.gov" "GET ..\x5C..\x5C..\x5C..\x5C..\x5C..\x5C..\x5C..\x5C..\x5C..\x5Cwindows\x5Cwin.ini HTTP/1.1" 400 150 0.012 "-" "-" "-" port=80 rl=0
 13.59.252.14 - - [07/Jun/2020:01:09:45 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /cgi-bin/d6rw1r5y.asp?<script>document.cookie=%22testtifh=7678;%22</script> HTTP/1.1" 301 162 0.000 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)" "-" port=80 rl=390
 61.153.216.106 - - [07/Jun/2020:00:04:05 -0400] "sra-download.ncbi.nlm.nih.gov" "GET /traces/sra47/SRR/010462/SRR10713958 HTTP/1.1" 206 34758384 1959.489 "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR10713958#" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36 Edg/83.0.478.45" "-" port=443 rl=459
@@ -21,6 +16,6 @@
 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR5946882 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
 nonesense nonesense
 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR000006 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
-blah 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR000007 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
+unrecognized 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR000007 HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] "GET /traces/sra32/SRR/005807/SRR00008?a=b HTTP/1.1" 206 32768 0.000 "-" "linux64 sra-toolkit fastq-dump.2.9.3" "-" port=443 rl=293
 139.80.16.229

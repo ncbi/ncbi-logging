@@ -7,6 +7,121 @@
     "port"      : 80,
     "referer"   : "-",
     "req_len"   : 0,
+    "req_time"  : "0.011",
+    "request" :
+    {
+        "method" : "",
+        "path"   : "\\x16\\x03\\x01\\x00\\xCF\\x01\\x00\\x00\\xCB\\x03\\x01",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : ""
+    },
+    "res_code"  : 400,
+    "res_len"   : 150,
+    "source"    : "NCBI",
+    "time"      : "7.6.2020:1:9:52 -400",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)",
+    "forwarded" : "-",
+    "ip"        : "13.59.252.14",
+    "line_nr"   : 1,
+    "port"      : 80,
+    "referer"   : "-",
+    "req_len"   : 376,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "PROPFIND",
+        "path"   : "/",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 405,
+    "res_len"   : 552,
+    "source"    : "NCBI",
+    "time"      : "7.6.2020:1:10:23 -400",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)",
+    "forwarded" : "-",
+    "ip"        : "13.59.252.14",
+    "line_nr"   : 2,
+    "port"      : 80,
+    "referer"   : "-",
+    "req_len"   : 336,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "GET",
+        "path"   : "/login/?user=|\\x22`id`\\x22|",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 301,
+    "res_len"   : 162,
+    "source"    : "NCBI",
+    "time"      : "7.6.2020:1:14:11 -400",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "",
+    "forwarded" : "-",
+    "ip"        : "146.118.64.48",
+    "line_nr"   : 3,
+    "port"      : 443,
+    "referer"   : "-",
+    "req_len"   : 117,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "HEAD",
+        "path"   : "/traces/sra19/SRR/009763/SRR9997476",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 200,
+    "res_len"   : 0,
+    "source"    : "NCBI",
+    "time"      : "7.6.2020:2:47:10 -400",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "-",
+    "forwarded" : "-",
+    "ip"        : "34.201.223.169",
+    "line_nr"   : 4,
+    "port"      : 80,
+    "referer"   : "-",
+    "req_len"   : 0,
+    "req_time"  : "0.013",
+    "request" :
+    {
+        "method" : "",
+        "path"   : "\\x16\\x03\\x01\\x00\\xCF\\x01\\x00\\x00\\xCB\\x03\\x01\\x1D\\x018\\xD1L}!\\xFC\\x1FiEv\\x12\\xE8\\x1Fk\\x9F\\xE7\\x0E<\\x22~\\xAA$G=\\x1B\\x8E%\\x1E\\x15\\xA9\\x00\\x00R\\xC0",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : ""
+    },
+    "res_code"  : 400,
+    "res_len"   : 150,
+    "source"    : "NCBI",
+    "time"      : "7.6.2020:4:49:9 -400",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "-",
+    "forwarded" : "-",
+    "ip"        : "13.59.252.14",
+    "line_nr"   : 5,
+    "port"      : 80,
+    "referer"   : "-",
+    "req_len"   : 0,
     "req_time"  : "0.012",
     "request" :
     {
@@ -26,7 +141,7 @@
     "agent"     : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)",
     "forwarded" : "-",
     "ip"        : "13.59.252.14",
-    "line_nr"   : 1,
+    "line_nr"   : 6,
     "port"      : 80,
     "referer"   : "-",
     "req_len"   : 390,
@@ -49,7 +164,7 @@
     "agent"     : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36 Edg/83.0.478.45",
     "forwarded" : "-",
     "ip"        : "61.153.216.106",
-    "line_nr"   : 2,
+    "line_nr"   : 7,
     "port"      : 443,
     "referer"   : "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR10713958#",
     "req_len"   : 459,
@@ -72,7 +187,7 @@
     "agent"     : "-",
     "forwarded" : "-",
     "ip"        : "165.112.6.3",
-    "line_nr"   : 3,
+    "line_nr"   : 8,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 7,
@@ -95,7 +210,7 @@
     "agent"     : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3314.0 Safari/537.36 SE 2.X MetaSr 1.0",
     "forwarded" : "-",
     "ip"        : "13.78.48.192",
-    "line_nr"   : 4,
+    "line_nr"   : 9,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 54,
@@ -118,7 +233,7 @@
     "agent"     : "-",
     "forwarded" : "-",
     "ip"        : "165.112.6.3",
-    "line_nr"   : 5,
+    "line_nr"   : 10,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 7,
@@ -141,7 +256,7 @@
     "agent"     : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36 Edg/83.0.478.45",
     "forwarded" : "-",
     "ip"        : "61.153.216.106",
-    "line_nr"   : 6,
+    "line_nr"   : 11,
     "port"      : 443,
     "referer"   : "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR10713958#",
     "req_len"   : 460,
@@ -164,7 +279,7 @@
     "agent"     : "linux64 sra-toolkit fastq-dump.2.9.1",
     "forwarded" : "-",
     "ip"        : "158.111.236.250",
-    "line_nr"   : 7,
+    "line_nr"   : 12,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 293,
@@ -187,7 +302,7 @@
     "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
     "forwarded" : "-",
     "ip"        : "139.80.16.229",
-    "line_nr"   : 8,
+    "line_nr"   : 13,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 293,
@@ -210,7 +325,7 @@
     "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
     "forwarded" : "-",
     "ip"        : "139.80.16.229",
-    "line_nr"   : 9,
+    "line_nr"   : 14,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 293,
@@ -233,7 +348,7 @@
     "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
     "forwarded" : "-",
     "ip"        : "139.80.16.229",
-    "line_nr"   : 10,
+    "line_nr"   : 15,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 293,
@@ -259,7 +374,7 @@
     "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
     "forwarded" : "-",
     "ip"        : "139.80.16.229",
-    "line_nr"   : 12,
+    "line_nr"   : 17,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 293,
@@ -278,14 +393,14 @@
     "user"      : ""
 }
 {
-    "unrecognized" : "blah 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] \"GET /traces/sra32/SRR/005807/SRR000007 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-dump.2.9.3\" \"-\" port=443 rl=293"
+    "unrecognized" : "unrecognized 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] \"GET /traces/sra32/SRR/005807/SRR000007 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-dump.2.9.3\" \"-\" port=443 rl=293"
 }
 {
     "accepted"  : true,
     "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
     "forwarded" : "-",
     "ip"        : "139.80.16.229",
-    "line_nr"   : 14,
+    "line_nr"   : 19,
     "port"      : 443,
     "referer"   : "-",
     "req_len"   : 293,
@@ -308,7 +423,7 @@
     "agent"     : "",
     "forwarded" : "",
     "ip"        : "139.80.16.229",
-    "line_nr"   : 15,
+    "line_nr"   : 20,
     "port"      : 0,
     "referer"   : "",
     "req_len"   : 0,

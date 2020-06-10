@@ -57,7 +57,7 @@ TEST_F ( OP_TestFlexFixture, CR_LF )           { ASSERT_EQ( LF,    StartScan("\r
 TEST_F ( OP_TestFlexFixture, Dot )             { ASSERT_EQ( DOT,   StartScan(".") ); }
 TEST_F ( OP_TestFlexFixture, Dash )            { ASSERT_EQ( DASH,  StartScan("-") ); }
 TEST_F ( OP_TestFlexFixture, OpenBracket )     { ASSERT_EQ( OB,    StartScan("[") ); }
-TEST_F ( OP_TestFlexFixture, CloceBracket )    { ASSERT_EQ( CB,    StartScan("]") ); }
+TEST_F ( OP_TestFlexFixture, CloseBracket )    { ASSERT_EQ( CB,    StartScan("]") ); }
 TEST_F ( OP_TestFlexFixture, Slash )           { ASSERT_EQ( SLASH, StartScan("/") ); }
 TEST_F ( OP_TestFlexFixture, Colon )           { ASSERT_EQ( COLON, StartScan(":") ); }
 TEST_F ( OP_TestFlexFixture, Port )            { ASSERT_EQ( PORT,  StartScan("port=") ); }
@@ -74,15 +74,15 @@ TEST_F ( OP_TestFlexFixture, QuotedSpace )
     ASSERT_EQ( QUOTE, StartScan("\" \"") );
     ASSERT_EQ( SPACE, Scan() );
 }
-TEST_F ( OP_TestFlexFixture, QuotedQuestion )
-{
-    ASSERT_EQ( QUOTE, StartScan("\"?\"") ); // ? is not special
-    ASSERT_EQ( QSTR, Scan() );
-}
 TEST_F ( OP_TestFlexFixture, QuotedMethod )
 {
     ASSERT_EQ( QUOTE, StartScan("\"OPTIONS\"") );
     ASSERT_EQ( METHOD, Scan() ); ASSERT_EQ( "OPTIONS", Token() );
+}
+TEST_F ( OP_TestFlexFixture, PropfindMethod )
+{
+    ASSERT_EQ( QUOTE, StartScan("\"PROPFIND\"") );
+    ASSERT_EQ( METHOD, Scan() ); ASSERT_EQ( "PROPFIND", Token() );
 }
 TEST_F ( OP_TestFlexFixture, QuotedVers )
 {
@@ -96,7 +96,7 @@ TEST_F ( OP_TestFlexFixture, QuotedVers2_0 )
 }
 TEST_F ( OP_TestFlexFixture, QuotedString )
 {
-    #define str ".Bl0-_~!*'();:@&=+$,/%#[]"
+    #define str ".Bl0-_~!*'();:@&=+$,/%#[]?\\<>|`{}"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );
     ASSERT_FALSE ( token . s . escaped ); // no '\' inside

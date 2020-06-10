@@ -33,13 +33,15 @@ IPV6_12     ({IPV6SEG}:){1,4}:{IPV4ADDR}
 IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_8}|{IPV6_9}|{IPV6_10}|{IPV6_11}|{IPV6_12}
 
 MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
-METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"
+METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"|"PROPFIND"
 VERS    "HTTP/"("1.0"|"1.1"|"2"|"2.0"|"3")
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
 
-QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?\\<>|]+
-QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?\\<>|])+
+STR_CHARS   [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?\\<>|`{}]
+
+QSTR        {STR_CHARS}+
+QSTR_ESC    (\\\"|{STR_CHARS})+
 
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+

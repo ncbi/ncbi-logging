@@ -302,6 +302,37 @@ TEST_F ( TestParseFixture, OnPremise_NoVersion )
     }
 }
 
+TEST_F ( TestParseFixture, OnPremise_NoNothing )
+{   
+    const char * InputLine =
+"13.59.252.14 - - [07/Jun/2020:01:09:52 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"\\x16\\x03\\x01\\x00\\xCF\\x01\\x00\\x00\\xCB\\x03\\x01\" 400 150 0.011 \"-\" \"-\" \"-\" port=80 rl=0";
+
+    std::istringstream inputstream( InputLine );
+    {
+        OP_Parser p( m_lines, inputstream );
+        p.parse();
+        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
+        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
+        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
+    }
+}
+
+TEST_F ( TestParseFixture, OnPremise_EmptyAgent )
+{   
+    const char * InputLine =
+"146.118.64.48 - - [07/Jun/2020:02:47:10 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /traces/sra19/SRR/009763/SRR9997476 HTTP/1.1\" 200 0 0.000 \"-\" \"\" \"-\" port=443 rl=117";
+
+    std::istringstream inputstream( InputLine );
+    {
+        OP_Parser p( m_lines, inputstream );
+        p.parse();
+        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
+        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
+        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
+    }
+}
+
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

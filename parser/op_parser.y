@@ -19,6 +19,7 @@ using namespace std;
 using namespace NCBI::Logging;
 
 void op_error( yyscan_t locp, NCBI::Logging::OP_LogLines * lib, const char* msg );
+#define EMPTY_TSTR(t) do { t.p = NULL; t.n = 0; } while (false)
 
 %}
 
@@ -45,7 +46,7 @@ using namespace NCBI::Logging;
 
 %type<tp> time
 %type<req> request
-%type<s> ip user req_time referer agent agent_list forwarded vers_opt
+%type<s> ip user req_time referer agent agent_list forwarded vers_opt method_opt
 %type<i64> result_code result_len port req_len
 
 %start line
@@ -93,17 +94,31 @@ ip
     ;
 
 user
-    : DASH                          { $$.p = NULL; $$.n = 0; }
+    : DASH                          { EMPTY_TSTR($$); }
     | STR                           { $$ = $1; }
     ;
 
 vers_opt
     : SPACE VERS    { $$ = $2; }
-    | %empty        { $$.p = NULL; $$.n = 0; }
+    | %empty        { EMPTY_TSTR($$); }
     ;
 
-request :
-    QUOTE QSTR QUOTE QUOTE METHOD SPACE QSTR vers_opt QUOTE
+method_opt
+    : METHOD        { $$ = $1; }
+    | %empty        { EMPTY_TSTR($$); }
+    ;
+
+request 
+    : 
+    QUOTE QSTR QUOTE QUOTE QSTR QUOTE
+    {
+        $$.server = $2;
+        EMPTY_TSTR($$.method);
+        $$.path   = $5;
+        EMPTY_TSTR($$.vers);
+    }
+    |
+    QUOTE QSTR QUOTE QUOTE method_opt SPACE QSTR vers_opt QUOTE
     {
         $$.server = $2;
         $$.method = $5;
@@ -111,7 +126,7 @@ request :
         $$.vers   = $8;
     }
     |
-    STR QUOTE METHOD SPACE QSTR vers_opt QUOTE
+    STR QUOTE method_opt SPACE QSTR vers_opt QUOTE
     {
         $$.server = $1;
         $$.method = $3;
@@ -119,9 +134,9 @@ request :
         $$.vers   = $6;
     }
     |
-    QUOTE METHOD SPACE QSTR vers_opt QUOTE
+    QUOTE method_opt SPACE QSTR vers_opt QUOTE
     {
-        $$.server.p = NULL; $$.server.n = 0;
+        EMPTY_TSTR($$.server);
         $$.method = $2;
         $$.path   = $4;
         $$.vers   = $5;
@@ -146,6 +161,7 @@ referer
 
 agent
     : QUOTE agent_list QUOTE        { $$ = $2; }
+    | QUOTE QUOTE                   { EMPTY_TSTR($$); }
     ;
 
 agent_list
