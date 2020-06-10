@@ -46,6 +46,15 @@ public:
         ASSERT_EQ( addr, Token() );
     }
 
+    void TestQuotedToken( int token_type, const char * token )
+    {
+        string quoted = "\"";
+        quoted += token;
+        quoted += "\"";
+        ASSERT_EQ( QUOTE, StartScan( quoted.c_str() ) );
+        ASSERT_EQ( token_type, Scan() );
+        ASSERT_EQ( string( token ), Token() );
+    }
     yyscan_t sc;
     YYSTYPE token;
 };
@@ -74,29 +83,17 @@ TEST_F ( OP_TestFlexFixture, QuotedSpace )
     ASSERT_EQ( QUOTE, StartScan("\" \"") );
     ASSERT_EQ( SPACE, Scan() );
 }
-TEST_F ( OP_TestFlexFixture, QuotedMethod )
-{
-    ASSERT_EQ( QUOTE, StartScan("\"OPTIONS\"") );
-    ASSERT_EQ( METHOD, Scan() ); ASSERT_EQ( "OPTIONS", Token() );
-}
-TEST_F ( OP_TestFlexFixture, PropfindMethod )
-{
-    ASSERT_EQ( QUOTE, StartScan("\"PROPFIND\"") );
-    ASSERT_EQ( METHOD, Scan() ); ASSERT_EQ( "PROPFIND", Token() );
-}
-TEST_F ( OP_TestFlexFixture, QuotedVers )
-{
-    ASSERT_EQ( QUOTE, StartScan("\"HTTP/2\"") );
-    ASSERT_EQ( VERS, Scan() ); ASSERT_EQ( "HTTP/2", Token() );
-}
-TEST_F ( OP_TestFlexFixture, QuotedVers2_0 )
-{
-    ASSERT_EQ( QUOTE, StartScan("\"HTTP/2.0\"") );
-    ASSERT_EQ( VERS, Scan() ); ASSERT_EQ( "HTTP/2.0", Token() );
-}
+TEST_F ( OP_TestFlexFixture, QuotedMethod )         { TestQuotedToken( METHOD, "OPTIONS" ); }
+TEST_F ( OP_TestFlexFixture, PropfindMethod )       { TestQuotedToken( METHOD, "PROPFIND" ); }
+TEST_F ( OP_TestFlexFixture, QuotedVers )           { TestQuotedToken( VERS, "HTTP/2" ); }
+TEST_F ( OP_TestFlexFixture, QuotedVers2_0 )        { TestQuotedToken( VERS, "HTTP/2.0" ); }
+TEST_F ( OP_TestFlexFixture, QuotedVersNoNumber )   { TestQuotedToken( VERS, "HTTP/" ); }
+TEST_F ( OP_TestFlexFixture, QuotedVersMixedcase )  { TestQuotedToken( VERS, "HttP/1.0" ); }
+TEST_F ( OP_TestFlexFixture, QuotedVersAnyNumber )  { TestQuotedToken( VERS, "HTTP/3.14" ); }
+
 TEST_F ( OP_TestFlexFixture, QuotedString )
 {
-    #define str ".Bl0-_~!*'();:@&=+$,/%#[]?\\<>|`{}"
+    #define str ".Bl0-_~!*'();:@&=+$,/%#[]?\\<>|`{}^"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );
     ASSERT_FALSE ( token . s . escaped ); // no '\' inside

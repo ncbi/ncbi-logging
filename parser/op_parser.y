@@ -100,12 +100,14 @@ user
 
 vers_opt
     : SPACE VERS    { $$ = $2; }
+    | SPACE         { EMPTY_TSTR($$); }
     | %empty        { EMPTY_TSTR($$); }
     ;
 
 method_opt
     : METHOD        { $$ = $1; }
     | %empty        { EMPTY_TSTR($$); }
+    | QSTR          { $$ = $1; }
     ;
 
 request 

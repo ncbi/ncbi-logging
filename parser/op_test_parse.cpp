@@ -151,6 +151,19 @@ public:
         }
     }
 
+    void check_accepted( const char * input, bool _debug = false )
+    {
+        std::istringstream inputstream( input );
+        {
+            OP_Parser p( m_lines, inputstream );
+            p.setDebug( _debug );
+            p.parse();
+            if ( 0 != m_lines.m_rejected.size() ) throw logic_error( "the line was rejected" );
+            if ( 1 != m_lines.m_accepted.size() ) throw logic_error( "the line was not accepted" );
+            if ( 0 != m_lines.m_unrecognized.size() ) throw logic_error( "the line was not recognized" );
+        }
+    }
+
     TestLogLines m_lines;
 };
 
@@ -209,6 +222,7 @@ TEST_F ( TestParseFixture, OnPremise_OnlyIP )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
+        p.setDebug( false );
         p.parse();
         ASSERT_EQ( 1, m_lines.m_rejected.size() );
         ASSERT_EQ( "158.111.236.250", m_lines.m_rejected.back().ip );
@@ -221,6 +235,7 @@ TEST_F ( TestParseFixture, OnPremise_unrecognized )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
+        p.setDebug( false );
         p.parse();
         ASSERT_EQ( 1, m_lines . m_unrecognized . size() );
         ASSERT_EQ( "total nonesense", m_lines . m_unrecognized[ 0 ] );
@@ -233,6 +248,7 @@ TEST_F ( TestParseFixture, OnPremise_multiple_nonesense )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
+        p.setDebug( false );
         p.parse();
         ASSERT_EQ( 3, m_lines . m_unrecognized . size() );
         ASSERT_EQ( "total nonesense", m_lines . m_unrecognized[ 0 ] );
@@ -250,6 +266,7 @@ TEST_F ( TestParseFixture, OnPremise_MultiLine )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
+        p.setDebug( false );
         p.parse();
         ASSERT_EQ( 2, m_lines.m_accepted.size() );
     }
@@ -264,6 +281,7 @@ TEST_F ( TestParseFixture, OnPremise_ErrorLine )
     std::istringstream inputstream( InputLine );
     {
         OP_Parser p( m_lines, inputstream );
+        p.setDebug( false );
         p.parse();
         ASSERT_EQ ( 1, m_lines.m_rejected.size() ); // line 1
         ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
@@ -276,15 +294,7 @@ TEST_F ( TestParseFixture, OnPremise_QmarkInReferer )
     const char * InputLine =
 "61.153.216.106 - - [07/Jun/2020:00:04:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra47/SRR/010462/SRR10713958 HTTP/1.1\" 206 34758384 1959.489 \"https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR10713958#\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36 Edg/83.0.478.45\" \"-\" port=443 rl=459\n";
 
-    std::istringstream inputstream( InputLine );
-    {
-        OP_Parser p( m_lines, inputstream );
-        //p.setDebug(true);
-        p.parse();
-        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
-        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
-        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
-    }
+    check_accepted( InputLine );
 }
 
 TEST_F ( TestParseFixture, OnPremise_NoVersion )
@@ -292,14 +302,7 @@ TEST_F ( TestParseFixture, OnPremise_NoVersion )
     const char * InputLine =
 "165.112.6.3 - - [07/Jun/2020:00:06:24 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET /\" 400 248 0.000 \"-\" \"-\" \"-\" port=443 rl=7";
 
-    std::istringstream inputstream( InputLine );
-    {
-        OP_Parser p( m_lines, inputstream );
-        p.parse();
-        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
-        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
-        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
-    }
+    check_accepted( InputLine );
 }
 
 TEST_F ( TestParseFixture, OnPremise_NoNothing )
@@ -307,14 +310,7 @@ TEST_F ( TestParseFixture, OnPremise_NoNothing )
     const char * InputLine =
 "13.59.252.14 - - [07/Jun/2020:01:09:52 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"\\x16\\x03\\x01\\x00\\xCF\\x01\\x00\\x00\\xCB\\x03\\x01\" 400 150 0.011 \"-\" \"-\" \"-\" port=80 rl=0";
 
-    std::istringstream inputstream( InputLine );
-    {
-        OP_Parser p( m_lines, inputstream );
-        p.parse();
-        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
-        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
-        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
-    }
+    check_accepted( InputLine );
 }
 
 TEST_F ( TestParseFixture, OnPremise_EmptyAgent )
@@ -322,16 +318,16 @@ TEST_F ( TestParseFixture, OnPremise_EmptyAgent )
     const char * InputLine =
 "146.118.64.48 - - [07/Jun/2020:02:47:10 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /traces/sra19/SRR/009763/SRR9997476 HTTP/1.1\" 200 0 0.000 \"-\" \"\" \"-\" port=443 rl=117";
 
-    std::istringstream inputstream( InputLine );
-    {
-        OP_Parser p( m_lines, inputstream );
-        p.parse();
-        ASSERT_EQ ( 0, m_lines.m_rejected.size() );
-        ASSERT_EQ ( 1, m_lines.m_accepted.size() );
-        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() ); 
-    }
+    check_accepted( InputLine );
 }
 
+TEST_F ( TestParseFixture, OnPremise_SpaceAsProtcol )
+{   
+    const char * InputLine =
+"10.154.195.11 - - [07/Jun/2020:08:32:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET / \" 301 162 0.001 \"-\" \"-\" \"-\" port=80 rl=8";
+
+    check_accepted( InputLine );
+}
 
 extern "C"
 {

@@ -52,21 +52,21 @@ $(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
 $(OBJDIR)/$(PREFIX_GCP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_GCP)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.rel.o
 
-$(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l
+$(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l $(PREFIX_OP)parser.hpp
 	flex --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
 
 $(PREFIX_OP)parser.cpp: $(PREFIX_OP)parser.y
 	bison --report all -d $(PREFIX_OP)parser.y --output-file $(PREFIX_OP)parser.cpp
 
 
-$(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l
+$(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l $(PREFIX_AWS)parser.hpp
 	flex --header-file=$(PREFIX_AWS)scanner.hpp --outfile=$(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.l
 
 $(PREFIX_AWS)parser.cpp: $(PREFIX_AWS)parser.y
 	bison --report all -d $(PREFIX_AWS)parser.y --output-file $(PREFIX_AWS)parser.cpp
 
 
-$(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l
+$(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l $(PREFIX_GCP)parser.hpp
 	flex --header-file=$(PREFIX_GCP)scanner.hpp --outfile=$(PREFIX_GCP)scanner.cpp $(PREFIX_GCP)scanner.l
 
 $(PREFIX_GCP)parser.cpp: $(PREFIX_GCP)parser.y
