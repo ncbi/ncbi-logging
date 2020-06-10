@@ -39,14 +39,15 @@ using namespace NCBI::Logging;
     t_request req;
 }
 
-%token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR
+%token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC
 %token<i64> I64
 %token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE  
 %token UNRECOGNIZED
 
 %type<tp> time
-%type<req> request
-%type<s> ip user req_time referer agent agent_list forwarded vers_opt method_opt
+%type<req> server_and_request request
+%type<s> ip user req_time referer agent agent_list forwarded vers_opt method server
+%type<s> quoted_list quoted_list_body quoted_list_elem 
 %type<i64> result_code result_len port req_len
 
 %start line
@@ -59,7 +60,7 @@ line
     ;
 
 log_onprem
-    : ip DASH user time request result_code result_len req_time referer agent forwarded port req_len
+    : ip DASH user time server_and_request result_code result_len req_time referer agent forwarded port req_len
     {
         LogOPEvent ev;
         ev . ip = $1;
@@ -105,53 +106,68 @@ vers_opt
     | %empty        { EMPTY_TSTR($$); }
     ;
 
-method_opt
+method
     : METHOD        { $$ = $1; }
-    | %empty        { EMPTY_TSTR($$); }
-    | QSTR          { $$ = $1; }
     ;
 
-request 
-    : 
-    QUOTE QSTR QUOTE QUOTE QSTR QUOTE
-    {
-        $$.server = $2;
-        EMPTY_TSTR($$.method);
-        $$.path   = $5;
-        EMPTY_TSTR($$.vers);
-    }
-    |
-    QUOTE QSTR QUOTE QUOTE method_opt SPACE QSTR vers_opt QUOTE
-    {
-        $$.server = $2;
-        $$.method = $5;
-        $$.path   = $7;
-        $$.vers   = $8;
-    }
-    |
-    STR QUOTE method_opt SPACE QSTR vers_opt QUOTE
-    {
-        $$.server = $1;
-        $$.method = $3;
-        $$.path   = $5;
-        $$.vers   = $6;
-    }
-    |
-    QUOTE method_opt SPACE QSTR vers_opt QUOTE
+server 
+    : QUOTE QSTR QUOTE  { $$ = $2; }
+    | STR               { $$ = $1; }
+    ;
+
+request
+    : QUOTE method SPACE QSTR vers_opt QUOTE
     {
         EMPTY_TSTR($$.server);
         $$.method = $2;
         $$.path   = $4;
         $$.vers   = $5;
     }
-    |
-    STR QUOTE method_opt QUOTE
+    | QUOTE method QUOTE
     {
-        $$.server = $1;
-        $$.method = $3;        
+        EMPTY_TSTR($$.server);
+        $$.method = $2;
         EMPTY_TSTR($$.path);
         EMPTY_TSTR($$.vers);
     }
+    ;
+
+server_and_request 
+    : server request
+    {
+        $$ = $2;
+        $$.server = $1;
+    }
+    | server quoted_list
+    { 
+        $$.server = $1;
+        $$.method = $2; 
+        EMPTY_TSTR($$.path);
+        EMPTY_TSTR($$.vers);
+    }    
+    | request
+    {
+        EMPTY_TSTR($$.server);
+        $$ = $1;
+    }
+    ;
+
+quoted_list
+    : QUOTE quoted_list_body QUOTE  { $$ = $2; }
+    | QUOTE QUOTE                   { EMPTY_TSTR($$); }
+    ;
+
+quoted_list_elem
+    : QSTR      { $$ = $1; }
+    | VERS      { $$ = $1; }
+    | QSTR_ESC  { $$ = $1; }
+    ;
+
+quoted_list_body
+    : quoted_list_elem                          { $$ = $1; }
+    | quoted_list_body SPACE quoted_list_elem   { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    | quoted_list_body SPACE METHOD             { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    | quoted_list_body METHOD                   { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
     ;
 
 result_code
@@ -171,14 +187,14 @@ referer
     ;
 
 agent
-    : QUOTE agent_list QUOTE        { $$ = $2; }
-    | QUOTE QUOTE                   { EMPTY_TSTR($$); }
+    : QUOTE agent_list QUOTE    { $$ = $2; }
+    | QUOTE QUOTE               { EMPTY_TSTR($$); }
     ;
 
 agent_list
-    : QSTR                          { $$ = $1; }
-    | agent_list QSTR               { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
-    | agent_list SPACE              { $$.n += 1;    $$.escaped = $1.escaped; }
+    : QSTR                { $$ = $1; }
+    | agent_list QSTR     { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
+    | agent_list SPACE    { $$.n += 1;    $$.escaped = $1.escaped; }
     ;
 
 forwarded

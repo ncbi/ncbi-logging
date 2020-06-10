@@ -73,6 +73,9 @@ TEST_F ( OP_TestFlexFixture, Port )            { ASSERT_EQ( PORT,  StartScan("po
 TEST_F ( OP_TestFlexFixture, RL )              { ASSERT_EQ( RL,    StartScan("rl=") ); }
 TEST_F ( OP_TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") ); }
 
+// TEST_F ( OP_TestFlexFixture, Domain_1 )        { ASSERT_EQ( DOMAIN, StartScan("a1-2b-33c") ); }
+// TEST_F ( OP_TestFlexFixture, Domain_2 )        { ASSERT_EQ( DOMAIN, StartScan("a.bb.ccc") ); }
+
 TEST_F ( OP_TestFlexFixture, Quotes )
 {
     ASSERT_EQ( QUOTE, StartScan("\"\"") );

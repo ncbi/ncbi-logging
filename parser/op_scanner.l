@@ -47,6 +47,10 @@ QSTR_ESC    (\\\"|{STR_CHARS})+
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
 
+    /* not ued for now*/
+DOMAIN_CHARS    [A-Za-z0-9\-]
+DOMAIN          {DOMAIN_CHARS}(\.{DOMAIN_CHARS})*
+
 %x QUOTED
 
 %%
@@ -72,7 +76,7 @@ STR     [.\-a-zA-Z0-9_]+
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
-<QUOTED>.           ;
+<QUOTED>.           ;                                               /* TODO: include in the output token */
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
