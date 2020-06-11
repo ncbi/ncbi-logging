@@ -46,8 +46,8 @@ using namespace NCBI::Logging;
 
 %type<tp> time
 %type<req> server_and_request request
-%type<s> ip user req_time referer agent agent_list forwarded vers_opt method server
-%type<s> quoted_list quoted_list_body quoted_list_elem 
+%type<s> ip user req_time referer agent agent_list forwarded method server
+%type<s> quoted_list quoted_list_body quoted_list_elem qstr_list
 %type<i64> result_code result_len port req_len
 
 %start line
@@ -99,13 +99,6 @@ user
     | STR                           { $$ = $1; }
     ;
 
-vers_opt
-    : SPACE VERS    { $$ = $2; }
-    | SPACE         { EMPTY_TSTR($$); }
-
-    | %empty        { EMPTY_TSTR($$); }
-    ;
-
 method
     : METHOD        { $$ = $1; }
     ;
@@ -115,13 +108,32 @@ server
     | STR               { $$ = $1; }
     ;
 
+qstr_list
+    : QSTR                  { $$ = $1; }
+    | qstr_list SPACE QSTR  { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    ;
+
 request
-    : QUOTE method SPACE QSTR vers_opt QUOTE
+    : QUOTE method SPACE qstr_list SPACE VERS QUOTE
     {
         EMPTY_TSTR($$.server);
         $$.method = $2;
         $$.path   = $4;
-        $$.vers   = $5;
+        $$.vers   = $6;
+    }
+    | QUOTE method SPACE qstr_list SPACE QUOTE
+    {
+        EMPTY_TSTR($$.server);
+        $$.method = $2;
+        $$.path   = $4;
+        EMPTY_TSTR($$.vers);
+    }
+    | QUOTE method SPACE qstr_list QUOTE
+    {
+        EMPTY_TSTR($$.server);
+        $$.method = $2;
+        $$.path   = $4;
+        EMPTY_TSTR($$.vers);
     }
     | QUOTE method QUOTE
     {
@@ -141,8 +153,8 @@ server_and_request
     | server quoted_list
     { 
         $$.server = $1;
-        $$.method = $2; 
-        EMPTY_TSTR($$.path);
+        EMPTY_TSTR($$.method);
+        $$.path = $2; 
         EMPTY_TSTR($$.vers);
     }    
     | request
