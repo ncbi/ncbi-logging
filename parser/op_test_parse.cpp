@@ -363,6 +363,13 @@ TEST_F ( TestParseFixture, OnPremise_NoServer )
     check_accepted( InputLine );
 }
 
+TEST_F ( TestParseFixture, OnPremise_cmdline_as_request )
+{   
+    const char * InputLine =
+"159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /srapub/SRR5385591.sra > SRR5385591.sra.out 2>&1 HTTP/1.1\" 404 0 0.000 \"-\" \"linux64 sra-toolkit test-sra.2.8.2\" \"-\" port=443 rl=164";
+    check_accepted( InputLine );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
