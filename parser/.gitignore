@@ -3,6 +3,7 @@ bin
 lib
 *.output
 actual
+gmon.out
 
 #do not exclude op_scanner.* etc. that would exclude [op|aws]_scanner.[y|l] too!
 op_scanner.cpp

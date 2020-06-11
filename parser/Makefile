@@ -1,4 +1,4 @@
-.PHONY: clean all run
+.PHONY: clean all run prof
 
 BINDIR = bin
 LIBDIR = lib
@@ -8,6 +8,7 @@ CC := gcc -c
 CPP := g++ -c
 LD := g++
 CXXFLAGS += -I . -MMD
+GPROFFLAGS = -pg
 
 PREFIX_OP := op_
 PREFIX_AWS := aws_
@@ -15,6 +16,8 @@ PREFIX_GCP := gcp_
 
 all: log2jsn_
 	@echo "done"
+
+prof: log2jsn_prof
 
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
@@ -38,6 +41,9 @@ $(OBJDIR)/%.dbg.o: %.cpp
 $(OBJDIR)/%.rel.o: %.cpp
 	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
+$(OBJDIR)/%.prof.o: %.cpp
+	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) -g $< -o $(OBJDIR)/$(*F).prof.o
+
 -include $(OBJDIR)/*.d
 
 #################################################
@@ -45,12 +51,15 @@ $(OBJDIR)/%.rel.o: %.cpp
 
 $(OBJDIR)/$(PREFIX_OP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_OP)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_OP)parser.rel.o:  $(OBJDIR)/$(PREFIX_OP)scanner.rel.o
+$(OBJDIR)/$(PREFIX_OP)parser.prof.o:  $(OBJDIR)/$(PREFIX_OP)scanner.prof.o
 
 $(OBJDIR)/$(PREFIX_AWS)parser.dbg.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
+$(OBJDIR)/$(PREFIX_AWS)parser.prof.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.prof.o
 
 $(OBJDIR)/$(PREFIX_GCP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_GCP)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.rel.o
+$(OBJDIR)/$(PREFIX_GCP)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.prof.o
 
 $(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l $(PREFIX_OP)parser.hpp
 	flex --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
@@ -84,11 +93,15 @@ LOG_LINES_SRC = \
 
 LOGLIB_DBG_OBJ = $(subst .cpp,.dbg.o,$(LOG_LINES_SRC)) 
 LOGLIB_REL_OBJ = $(subst .cpp,.rel.o,$(LOG_LINES_SRC))
+LOGLIB_PROF_OBJ = $(subst .cpp,.prof.o,$(LOG_LINES_SRC)) 
 
 $(LIBDIR)/liblogparse-dbg.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_DBG_OBJ))
 	ar r $@ $+
 
 $(LIBDIR)/liblogparse-rel.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_REL_OBJ))
+	ar r $@ $+
+
+$(LIBDIR)/liblogparse-prof.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_PROF_OBJ))
 	ar r $@ $+
 
 lib liblogparse: mkdir $(LIBDIR)/liblogparse-dbg.a $(LIBDIR)/liblogparse-rel.a
@@ -306,6 +319,7 @@ CMD_SRC = $(CMD_SRC_LOCATION)/cmdline.cpp
 
 LOG2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(LOG2JSN_SRC)))
 LOG2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(LOG2JSN_SRC)))
+LOG2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(LOG2JSN_SRC)))
 
 DBG_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
 REL_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
@@ -324,10 +338,12 @@ $(BINDIR)/log2jsn-dbg: $(LOG2JSN_DBG_OBJ) $(DBG_CMD_OBJ) $(LIBDIR)/liblogparse-d
 $(BINDIR)/log2jsn-rel: $(LOG2JSN_REL_OBJ) $(REL_CMD_OBJ) $(LIBDIR)/liblogparse-rel.a
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
+$(BINDIR)/log2jsn-prof: $(LOG2JSN_PROF_OBJ) $(DBG_CMD_OBJ) $(LIBDIR)/liblogparse-prof.a
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+
 log2jsn_: mkdir $(BINDIR)/log2jsn-dbg $(BINDIR)/log2jsn-rel
 
-json: log2jsn_
-	cat data/two_events.txt | $(BINDIR)/log2jsn-dbg 
+log2jsn_prof: mkdir $(BINDIR)/log2jsn-prof
 
 # acceptance 
 
@@ -336,7 +352,7 @@ LOG2JSON = $(BINDIR)/log2jsn-dbg
 #LOG2JSON = $(BINDIR)/log2jsn-rel
 
 test2jsn: log2jsn_
-	@mkdir -p actual
+	@ mkdir -p actual
 	cat data/op_unrecognized.log    | $(LOG2JSON) op -p --readable >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized.out ./actual/op_unrecognized.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
@@ -347,7 +363,9 @@ test2jsn: log2jsn_
 						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
 	@ echo "test2json passed"
-	@rm -rf actual/run2jsn*
+	@ rm -rf actual/run2jsn*
+
+.PHONY: log2jsn_ log2jsn_prof test2jsn
 
 #################################################
 # some valgrind checks...
