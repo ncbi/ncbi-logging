@@ -69,6 +69,7 @@ NCBI::Logging::ToString( const t_timepoint & t )
     return out.str();
 }
 
+
 OP_Parser :: OP_Parser( OP_LogLines & p_lines, std::istream & p_input )
 : m_lines ( p_lines ), m_input ( p_input )
 {

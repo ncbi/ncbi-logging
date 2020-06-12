@@ -64,47 +64,6 @@ struct SLogOPEvent
     }
 };
 
-/*
-struct SLogAWSEvent : public SCommonLogEvent
-{
-    string      owner;
-    string      bucket;
-    string      requester;
-    string      request_id;
-    string      operation;
-    string      key;
-    string      error;
-    int64_t     obj_size;
-    int64_t     total_time;
-    string      version_id;
-    string      host_id;
-    string      cipher_suite;
-    string      auth_type;
-    string      host_header;
-    string      tls_version;
-
-    SLogAWSEvent( const LogAWSEvent &ev ) : SCommonLogEvent( ev )
-    {
-        SCommonLogEvent::operator=( ev );
-
-        owner       = ToString( ev . owner );
-        bucket      = ToString( ev . bucket );
-        requester   = ToString( ev . requester );
-        request_id  = ToString( ev . request_id );
-        operation   = ToString( ev . operation );
-        key         = ToString( ev . key );
-        error       = ToString( ev . error );
-        obj_size    = ev . obj_size;
-        total_time  = ev . total_time;
-        version_id  = ToString( ev . version_id );
-        host_id     = ToString( ev . host_id );
-        cipher_suite = ToString( ev . cipher_suite );
-        auth_type   = ToString( ev . auth_type );
-        host_header = ToString( ev . host_header );
-        tls_version = ToString( ev . tls_version );
-    }
-};
-*/
 struct TestLogLines : public OP_LogLines
 {
     virtual void unrecognized( const t_str & text )
