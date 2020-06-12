@@ -53,6 +53,25 @@ struct cmnLogLines
         }
     }
 
+    void MakeCmnJson( JSONObjectRef & j, const CommonLogEvent & e, bool accepted )
+    {
+        if ( accepted )
+        {
+            j -> addValue( "accepted", JSON::makeBoolean(true) );
+        }
+        else
+        {
+            j -> addValue( "accepted", JSON::makeBoolean(false) );
+            j -> addValue( "unparsed", ToJsonString( e.unparsed ) );
+        }
+        j -> addValue( "ip", ToJsonString( e.ip ) );
+        j -> addValue( "referer", ToJsonString( e.referer ) );
+        j -> addValue( "agent", ToJsonString( e.agent ) );
+
+        if ( mem_print_line_nr )
+            j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
+    }
+
     void print_json( JSONObjectRef j )
     {
         if ( mem_readable )
@@ -128,20 +147,9 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     {
         JSONObjectRef j = JSON::makeObject();
 
-        if ( accepted )
-        {
-            j -> addValue( "accepted", JSON::makeBoolean(true) );
-        }
-        else
-        {
-            j -> addValue( "accepted", JSON::makeBoolean(false) );
-            j -> addValue( "unparsed", ToJsonString( e.unparsed ) );
-        }
-
+        MakeCmnJson( j, e, accepted );
         j -> addValue( "source", JSON::makeString("NCBI") );
-        j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
-
         {
             JSONObjectRef req = JSON::makeObject();
             req -> addValue("server",   ToJsonString( e.request.server ) );
@@ -151,20 +159,14 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
             JSONValueRef rv( req.release() );
             j -> addValue( "request", rv );
         }
-
         j -> addValue( "res_code", JSON::makeInteger( e.res_code ) );
         j -> addValue( "res_len", JSON::makeInteger( e.res_len ) );
-        j -> addValue( "referer", ToJsonString( e.referer ) );
-        j -> addValue( "agent", ToJsonString( e.agent ) );
-
         j -> addValue( "user", ToJsonString( e.user ) );
         j -> addValue( "req_time", ToJsonString( e.req_time ) );
         j -> addValue( "forwarded", ToJsonString( e.forwarded ) );
         j -> addValue( "port", JSON::makeInteger( e.port ) );
         j -> addValue( "req_len", JSON::makeInteger( e.req_len ) );
 
-        if ( mem_print_line_nr )
-            j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
         return j;
     }
 
@@ -195,9 +197,9 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
     JSONObjectRef MakeJson( const LogAWSEvent & e, bool accepted )
     {
         JSONObjectRef j = JSON::makeObject();
-        j -> addValue( "accepted", JSON::makeBoolean(accepted) );
-        j -> addValue( "source", JSON::makeString("S3") );
 
+        MakeCmnJson( j, e, accepted );
+        j -> addValue( "source", JSON::makeString("S3") );
         j -> addValue( "owner", ToJsonString( e.owner ) );
         j -> addValue( "bucket", ToJsonString( e.bucket ) );
         j -> addValue( "requester", ToJsonString( e.requester ) );
@@ -205,31 +207,19 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         j -> addValue( "operation", ToJsonString( e.operation ) );
         j -> addValue( "key", ToJsonString( e.key ) );
         j -> addValue( "error", ToJsonString( e.error ) );
-
         j -> addValue( "obj_size", ToJsonString( e.obj_size ) );
         j -> addValue( "total_time", ToJsonString( e.total_time ) );
         j -> addValue( "turnaround_time", ToJsonString( e.turnaround_time ) );
-
         j -> addValue( "version_id", ToJsonString( e.version_id ) );
         j -> addValue( "host_id", ToJsonString( e.host_id ) );
         j -> addValue( "cipher_suite", ToJsonString( e.cipher_suite ) );
         j -> addValue( "auth_type", ToJsonString( e.auth_type ) );
         j -> addValue( "host_header", ToJsonString( e.host_header ) );
         j -> addValue( "tls_version", ToJsonString( e.tls_version ) );
-
-        j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
-
         j -> addValue( "request", ToJsonString( e.request ) );
-
         j -> addValue( "res_code", ToJsonString( e.res_code ) );
         j -> addValue( "res_len", ToJsonString( e.res_len ) );
-        j -> addValue( "referer", ToJsonString( e.referer ) );
-        j -> addValue( "agent", ToJsonString( e.agent ) );
-
-        if ( mem_print_line_nr )
-            j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
-
         return j;
     }
 
@@ -283,11 +273,9 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     {
         JSONObjectRef j = JSON::makeObject();
 
-        j -> addValue( "accepted", JSON::makeBoolean(accepted) );
+        MakeCmnJson( j, e, accepted );
         j -> addValue( "source", JSON::makeString("GS") );
-
         j -> addValue( "time", JSON::makeInteger( e.time ) );
-        j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "ip_type", JSON::makeInteger( e.ip_type ) );
         j -> addValue( "ip_region", ToJsonString( e.ip_region ) );
         j -> addValue( "method", ToJsonString( e.method ) );
@@ -297,16 +285,10 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         j -> addValue( "result_bytes", JSON::makeInteger( e.result_bytes ) );
         j -> addValue( "time_taken", JSON::makeInteger( e.time_taken ) );
         j -> addValue( "host", ToJsonString( e.host ) );
-        j -> addValue( "referrer", ToJsonString( e.referer ) );
-        j -> addValue( "agent", ToJsonString( e.agent ) );
         j -> addValue( "request_id", ToJsonString( e.request_id ) );
         j -> addValue( "operation", ToJsonString( e.operation ) );
         j -> addValue( "bucket", ToJsonString( e.bucket ) );
         j -> addValue( "object", ToJsonString( e.object ) );
-
-        if ( mem_print_line_nr )
-            j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
-
         return j;
     }
 
