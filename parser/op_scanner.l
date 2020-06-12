@@ -93,7 +93,7 @@ YY_BUFFER_STATE op_scan_reset( const char * input, yyscan_t yyscanner )
     return ret;
 }
 
-void op_input( yyscan_t yyscanner, t_str & str )
+void op_get_scanner_input( yyscan_t yyscanner, t_str & str )
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
     const char * input = (const char*) ( yyg -> yyextra_r );

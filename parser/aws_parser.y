@@ -29,7 +29,7 @@ void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* ms
 #include "types.h"
 #include "log_lines.hpp"
 
-extern void aws_input( void * yyscanner, t_str & str );
+extern void aws_get_scanner_input( void * yyscanner, t_str & str );
 
 using namespace NCBI::Logging;
 }
@@ -117,7 +117,7 @@ log_aws_err
     {
         LogAWSEvent ev;
         ev . owner = $1;
-        aws_input( scanner, ev . unparsed );
+        aws_get_scanner_input( scanner, ev . unparsed );
         lib -> rejectLine( ev );
     }
     ;

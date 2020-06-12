@@ -29,7 +29,7 @@ void gcp_error( yyscan_t locp, NCBI::Logging::GCP_LogLines * lib, const char* ms
 #include "types.h"
 #include "log_lines.hpp"
 
-extern void gcp_input( void * yyscanner, t_str & str );
+extern void gcp_get_scanner_input( void * yyscanner, t_str & str );
 
 using namespace NCBI::Logging;
 
@@ -63,7 +63,7 @@ log_err
     {
         LogGCPEvent ev;
         ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
-        gcp_input( scanner, ev . unparsed );
+        gcp_get_scanner_input( scanner, ev . unparsed );
         lib -> rejectLine( ev );
     }
     ;
