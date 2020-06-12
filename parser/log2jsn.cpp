@@ -263,21 +263,24 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 
     virtual void headerLine( const LogGCPHeader & hdr )
     {
-        JSONObjectRef obj = JSON::makeObject();
-        obj -> addValue( "header", JSON::makeBoolean(true) );
-
-        JSONArrayRef j = JSON::makeArray();
-        for (auto i=hdr.m_fieldnames.begin(); i != hdr.m_fieldnames.end(); ++i)
+        if ( m_print_headers )
         {
-            j -> appendValue( JSON::makeString( String( *i ) ) );
+            JSONObjectRef obj = JSON::makeObject();
+            obj -> addValue( "header", JSON::makeBoolean(true) );
+
+            JSONArrayRef j = JSON::makeArray();
+            for (auto i=hdr.m_fieldnames.begin(); i != hdr.m_fieldnames.end(); ++i)
+            {
+                j -> appendValue( JSON::makeString( String( *i ) ) );
+            }
+
+            JSONValueRef v = j->clone();
+            obj -> addValue( String("fields"), v );
+
+            print_json( obj );
         }
-
-        JSONValueRef v = j->clone();
-        obj -> addValue( String("fields"), v );
-
         num_headers ++;
-
-        print_json( obj );
+        line_nr ++;            
     }
 
     JSONObjectRef MakeJson( const LogGCPEvent & e, bool accepted )
@@ -311,7 +314,10 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         return j;
     }
 
-    GCPToJsonLogLines( ostream &os, bool readable, bool print_line_nr ) : cmnLogLines( os, readable, print_line_nr ) {};
+    GCPToJsonLogLines( ostream &os, bool readable, bool print_line_nr, bool print_headers )
+        : cmnLogLines( os, readable, print_line_nr ), m_print_headers( print_headers ) {};
+
+    bool m_print_headers;
 };
 
 static void handle_on_prem( bool readable, bool do_report, bool print_line_nr, bool do_debug = false ) 
@@ -336,10 +342,10 @@ static void handle_aws( bool readable, bool do_report, bool print_line_nr, bool 
         event_receiver.report();
 }
 
-static void handle_gcp( bool readable, bool do_report, bool print_line_nr, bool do_debug = false ) 
+static void handle_gcp( bool readable, bool do_report, bool print_line_nr, bool print_headers, bool do_debug = false ) 
 {
     cerr << "converting GCP format" << endl;
-    GCPToJsonLogLines event_receiver( cout, readable, print_line_nr );
+    GCPToJsonLogLines event_receiver( cout, readable, print_line_nr, print_headers );
     GCP_Parser p( event_receiver, cin );
     p . setDebug( do_debug );
     p . parse();
@@ -358,13 +364,13 @@ static logformat string2logformat( const ncbi::String & fmt )
 }
 
 static int perform_parsing( logformat fmt, bool readable, bool do_report,
-        bool print_line_nr, bool do_debug = false )
+        bool print_line_nr, bool print_headers, bool do_debug = false )
 {
     switch( fmt )
     {
         case op  : handle_on_prem( readable, do_report, print_line_nr, do_debug ); break;
         case aws : handle_aws( readable, do_report, print_line_nr, do_debug ); break;
-        case gcp : handle_gcp( readable, do_report, print_line_nr, do_debug ); break;
+        case gcp : handle_gcp( readable, do_report, print_line_nr, print_headers, do_debug ); break;
         default  : {
                         cerr << "Unknown format " << endl;
                         return 3;
@@ -382,6 +388,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         bool readable = false;
         bool no_report = false;
         bool print_line_nr = false;
+        bool print_headers = false;
         bool debug = false;
         bool vers = false;
 
@@ -390,6 +397,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addOption( debug, "d", "debug", "parse with debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
         args . addOption( print_line_nr, "p", "print-line-nr", "print line numbers" );
+        args . addOption( print_headers, "H", "print-headers", "print header lines ( gcp only )" );        
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
 
@@ -405,7 +413,7 @@ int main ( int argc, char * argv [], const char * envp []  )
             cout << "version: 1.0" << endl;
         
         if ( !help && !vers )
-            return perform_parsing( string2logformat( format ), readable, !no_report, print_line_nr, debug );
+            return perform_parsing( string2logformat( format ), readable, !no_report, print_line_nr, print_headers, debug );
         else
             return 0;
     }

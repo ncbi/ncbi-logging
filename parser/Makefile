@@ -362,6 +362,9 @@ test2jsn: log2jsn_
 	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
 						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
+	cat data/gcp_with_headers.log | $(LOG2JSON) gcp -H >./actual/gcp_with_headers.out 2>./actual/gcp_with_headers.err \
+						&& diff ./expected/gcp_with_headers.out ./actual/gcp_with_headers.out \
+						&& diff ./expected/gcp_with_headers.err ./actual/gcp_with_headers.err
 	@ echo "test2json passed"
 	@ rm -rf actual/run2jsn*
 
