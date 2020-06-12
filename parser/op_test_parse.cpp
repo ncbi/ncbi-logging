@@ -59,6 +59,8 @@ struct SLogOPEvent
         forwarded   = ToString( ev . forwarded );
         port        = ev . port;
         req_len     = ev . req_len;
+
+        unparsed    = ToString( ev . unparsed );
     }
 };
 
@@ -161,6 +163,20 @@ public:
             if ( 0 != m_lines.m_rejected.size() ) throw logic_error( "the line was rejected" );
             if ( 1 != m_lines.m_accepted.size() ) throw logic_error( "the line was not accepted" );
             if ( 0 != m_lines.m_unrecognized.size() ) throw logic_error( "the line was not recognized" );
+        }
+    }
+
+    void check_rejected( const char * input, bool _debug = false )
+    {
+        std::istringstream inputstream( input );
+        {
+            OP_Parser p( m_lines, inputstream );
+            p.setDebug( _debug );
+            p.parse();
+            if ( 1 != m_lines.m_rejected.size() ) throw logic_error( "the line was not rejected" );
+            if ( 0 != m_lines.m_accepted.size() ) throw logic_error( "the line was  falsely accepted" );
+            if ( 0 != m_lines.m_unrecognized.size() ) throw logic_error( "the line was not recognized" );
+            if ( string( input ) != m_lines.m_rejected.front().unparsed ) throw logic_error( "the source line was lost" );
         }
     }
 
@@ -368,6 +384,13 @@ TEST_F ( TestParseFixture, OnPremise_cmdline_as_request )
     const char * InputLine =
 "159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /srapub/SRR5385591.sra > SRR5385591.sra.out 2>&1 HTTP/1.1\" 404 0 0.000 \"-\" \"linux64 sra-toolkit test-sra.2.8.2\" \"-\" port=443 rl=164";
     check_accepted( InputLine );
+}
+
+TEST_F ( TestParseFixture, OnPremise_rejected_unparsed_set )
+{   
+    const char * InputLine =
+"139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] ";
+    check_rejected( InputLine );
 }
 
 extern "C"

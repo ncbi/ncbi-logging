@@ -36,6 +36,8 @@ struct SLogAWSEvent
     string      host_header;
     string      tls_version;
 
+    string      unparsed;
+
     SLogAWSEvent( const LogAWSEvent &ev )
     {
         ip          = ToString( ev . ip );
@@ -62,6 +64,8 @@ struct SLogAWSEvent
         auth_type   = ToString( ev . auth_type );
         host_header = ToString( ev . host_header );
         tls_version = ToString( ev . tls_version );
+
+        unparsed = ToString( ev . unparsed );
     }
 };
 
@@ -234,6 +238,22 @@ TEST_F ( TestParseFixture, AWS_MultiLine_ErrorRecovery )
         ASSERT_EQ ( 1, m_lines.m_rejected.size() ); // line 1
         ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );
+    }
+}
+
+TEST_F ( TestParseFixture, AWS_UnparsedInput_WhenRejected )
+{
+    const char * InputLine =
+"7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/XXX/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    std::istringstream inputstream( InputLine );
+    {
+        AWS_Parser p( m_lines, inputstream );
+        p.parse();
+        ASSERT_EQ ( 1, m_lines.m_rejected.size() ); 
+        ASSERT_EQ ( string (InputLine), m_lines.m_rejected.front().unparsed);
+        ASSERT_EQ ( 0, m_lines.m_accepted.size() ); 
+        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
     }
 }
 

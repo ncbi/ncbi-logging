@@ -28,6 +28,9 @@ void op_error( yyscan_t locp, NCBI::Logging::OP_LogLines * lib, const char* msg 
 #include "types.h"
 #include "log_lines.hpp"
 #include "helper.hpp"
+
+extern void op_input( void * yyscanner, t_str & str );
+
 using namespace NCBI::Logging;
 }
 
@@ -85,6 +88,7 @@ log_onprem_err
     {
         LogOPEvent ev;
         ev . ip = $1;
+        op_input( scanner, ev . unparsed );
         lib -> rejectLine( ev );
     }
     ;

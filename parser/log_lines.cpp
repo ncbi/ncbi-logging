@@ -13,9 +13,9 @@
 
 #include "types.h"
 
-extern void op_scan_reset( yyscan_t yyscanner );
-extern void aws_scan_reset( yyscan_t yyscanner );
-extern void gcp_scan_reset( yyscan_t yyscanner );
+extern YY_BUFFER_STATE op_scan_reset( const char * input, yyscan_t yyscanner );
+extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
+extern YY_BUFFER_STATE gcp_scan_reset( const char * input, yyscan_t yyscanner );
 
 #ifdef YYDEBUG
     extern int op_debug;
@@ -96,7 +96,7 @@ void OP_Parser :: parse()
 
     while( getline( m_input, line ) )
     {
-        YY_BUFFER_STATE bs = op__scan_string( line.c_str(), sc );
+        YY_BUFFER_STATE bs = op_scan_reset( line.c_str(), sc );
 
         if ( op_parse( sc, & m_lines ) != 0 )
         {
@@ -105,7 +105,6 @@ void OP_Parser :: parse()
         }
 
         op__delete_buffer( bs, sc );
-        op_scan_reset( sc );
     }
     op_lex_destroy( sc );
 }
@@ -137,7 +136,7 @@ void AWS_Parser :: parse()
 
     while( getline( m_input, line ) )
     {
-        YY_BUFFER_STATE bs = aws__scan_string( line.c_str(), sc );
+        YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
         if ( aws_parse( sc, & m_lines ) != 0 )
         {
@@ -146,7 +145,6 @@ void AWS_Parser :: parse()
         }
 
         aws__delete_buffer( bs, sc );
-        aws_scan_reset( sc );
     }
     aws_lex_destroy( sc );
 }
@@ -183,7 +181,7 @@ void GCP_Parser :: parse()
 
     while( getline( m_input, line ) )
     {
-        YY_BUFFER_STATE bs = gcp__scan_string( line.c_str(), sc );
+        YY_BUFFER_STATE bs = gcp_scan_reset( line.c_str(), sc );
 
         if ( gcp_parse( sc, & m_lines ) != 0 )
         {
@@ -192,7 +190,6 @@ void GCP_Parser :: parse()
         }
 
         gcp__delete_buffer( bs, sc );
-        gcp_scan_reset( sc );
     }
     
     gcp_lex_destroy( sc );

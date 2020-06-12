@@ -76,8 +76,20 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 
 %%
 
-void aws_scan_reset( yyscan_t yyscanner )
+
+YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner )
+{
+    YY_BUFFER_STATE ret = aws__scan_string( input, yyscanner );
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    yyg -> yyextra_r = (void*)input;
+    BEGIN( INITIAL );
+    return ret;
+}
+
+void aws_input( yyscan_t yyscanner, t_str & str )
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
-    BEGIN( INITIAL );
+    const char * input = (const char*) ( yyg -> yyextra_r );
+    str . p = input;
+    str . n = strlen( input ); // looks wasteful but only happens when we report errors 
 }

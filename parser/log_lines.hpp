@@ -97,6 +97,8 @@ namespace NCBI
             t_str       bucket;
             t_str       object;
 
+            t_str       unparsed;
+
             LogGCPEvent()
             {
                 time = 0;
@@ -116,6 +118,7 @@ namespace NCBI
                 operation . n = 0;
                 bucket . n = 0;
                 object . n = 0;
+                unparsed . n = 0;
             }
         };
 

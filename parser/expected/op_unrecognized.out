@@ -669,5 +669,30 @@
     "res_len"   : 0,
     "source"    : "NCBI",
     "time"      : "0.0.0:0:0:0 0",
+    "unparsed"  : "139.80.16.229",
+    "user"      : ""
+}
+{
+    "accepted"  : false,
+    "agent"     : "",
+    "forwarded" : "",
+    "ip"        : "139.80.16.229",
+    "line_nr"   : 31,
+    "port"      : 0,
+    "referer"   : "",
+    "req_len"   : 0,
+    "req_time"  : "",
+    "request" :
+    {
+        "method" : "",
+        "path"   : "",
+        "server" : "",
+        "vers"   : ""
+    },
+    "res_code"  : 0,
+    "res_len"   : 0,
+    "source"    : "NCBI",
+    "time"      : "0.0.0:0:0:0 0",
+    "unparsed"  : "139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] ",
     "user"      : ""
 }

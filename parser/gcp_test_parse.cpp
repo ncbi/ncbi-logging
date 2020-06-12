@@ -28,6 +28,7 @@ struct SLogGCPEvent
     string      operation;
     string      bucket;
     string      object;
+    string      unparsed;
 
     SLogGCPEvent( const LogGCPEvent &ev )
     {
@@ -48,6 +49,7 @@ struct SLogGCPEvent
         operation   = ToString( ev . operation );
         bucket      = ToString( ev . bucket );
         object      = ToString( ev . object );
+        unparsed    = ToString( ev . unparsed );
     }
 };
 
@@ -211,7 +213,23 @@ TEST_F ( TestParseFixture, GCP_rejected )
     "\"1588261829246636\",\"35.245.218.83\",\"1\",\"\",\"POST\",\"/resumable/upload/storage/v1/b/sra-pub-src-14/o?fields=generation%2CcustomerEncryption%2Cmd5Hash%2Ccrc32c%2Cetag%2Csize&alt=json&userProject=nih-sra-datastore&uploadType=resumable\",\"200\",\"1467742168\",\"158\",\"11330000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUnxuPe3SnDN8Y2xbJ2y94VV3u924Bfq6MLxdYC5L6aemGMz3KGEFHWBlJnz96leDkMCkJZFJO-40Rw7wdV__fs\",\"storage.objects.insert\",\"sra-pub-src-14\",\"SRR1929577/{control_24h_biorep1}.fastq.gz\"";
 
     SLogGCPEvent e = parse_gcp( InputLine );
-    ASSERT_EQ ( 1, m_lines.m_accepted.size() ); // line 2
+    ASSERT_EQ ( 1, m_lines.m_accepted.size() );
+}
+
+TEST_F ( TestParseFixture, GCP_UnparsedInput_WhenRejected )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"nonsense\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\",\"SRR002994/SRR002994.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        p.parse();
+        ASSERT_EQ ( 1, m_lines.m_rejected.size() ); 
+        ASSERT_EQ ( string (InputLine), m_lines.m_rejected.front().unparsed);
+        ASSERT_EQ ( 0, m_lines.m_accepted.size() ); 
+        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
+    }
 }
 
 // TODO test for specified ip-region

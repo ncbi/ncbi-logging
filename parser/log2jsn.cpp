@@ -127,7 +127,17 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     JSONObjectRef MakeJson( const LogOPEvent & e, bool accepted )
     {
         JSONObjectRef j = JSON::makeObject();
-        j -> addValue( "accepted", JSON::makeBoolean(accepted) );
+
+        if ( accepted )
+        {
+            j -> addValue( "accepted", JSON::makeBoolean(true) );
+        }
+        else
+        {
+            j -> addValue( "accepted", JSON::makeBoolean(false) );
+            j -> addValue( "unparsed", ToJsonString( e.unparsed ) );
+        }
+
         j -> addValue( "source", JSON::makeString("NCBI") );
         j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
