@@ -22,7 +22,7 @@ struct SLogGCPEvent
     int64_t     result_bytes;
     int64_t     time_taken;
     string      host;
-    string      referrer;
+    string      referer;
     string      agent;
     string      request_id;
     string      operation;
@@ -43,7 +43,7 @@ struct SLogGCPEvent
         result_bytes = ev . result_bytes;
         time_taken  = ev. time_taken;
         host        = ToString( ev . host );
-        referrer    = ToString( ev . referrer );
+        referer     = ToString( ev . referer );
         agent       = ToString( ev . agent );
         request_id  = ToString( ev . request_id );
         operation   = ToString( ev . operation );
@@ -153,7 +153,7 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( 291, e . result_bytes );
     ASSERT_EQ( 27000, e . time_taken );
     ASSERT_EQ( "www.googleapis.com", e . host );
-    ASSERT_EQ( "", e . referrer );
+    ASSERT_EQ( "", e . referer );
     ASSERT_EQ( "apitools gsutil/4.37 Python/2.7.13 (linux2) \"google\"-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)", e . agent );
     ASSERT_EQ( "AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs", e . request_id );
     ASSERT_EQ( "storage.objects.get", e . operation );

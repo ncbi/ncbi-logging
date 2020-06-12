@@ -298,7 +298,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         j -> addValue( "result_bytes", JSON::makeInteger( e.result_bytes ) );
         j -> addValue( "time_taken", JSON::makeInteger( e.time_taken ) );
         j -> addValue( "host", ToJsonString( e.host ) );
-        j -> addValue( "referrer", ToJsonString( e.referrer ) );
+        j -> addValue( "referrer", ToJsonString( e.referer ) );
         j -> addValue( "agent", ToJsonString( e.agent ) );
         j -> addValue( "request_id", ToJsonString( e.request_id ) );
         j -> addValue( "operation", ToJsonString( e.operation ) );

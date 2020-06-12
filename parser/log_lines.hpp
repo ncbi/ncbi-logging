@@ -35,13 +35,8 @@ namespace NCBI
         struct CommonLogEvent
         {
             t_str       ip;
-            t_timepoint time;
-            t_request   request;
-            int64_t     res_code;
-            int64_t     res_len;
             t_str       referer;
             t_str       agent;
-
             t_str       unparsed;
 
             CommonLogEvent()
@@ -49,38 +44,43 @@ namespace NCBI
                 ip . n = 0;
                 referer . n = 0;
                 agent . n = 0;
-                unparsed . n = 0;
-                memset( &request, 0, sizeof request );
-                memset( &time, 0, sizeof time );
-                res_code = 0;
-                res_len = 0;
+                unparsed . n = 0;                
             }
         };
 
         // Maybe in a separate header
         struct LogOPEvent : public CommonLogEvent
         {
+            t_timepoint time;
             t_str       user;
             t_str       req_time;
             t_str       forwarded;
             int64_t     port;
             int64_t     req_len;
 
+            t_request   request;
+            int64_t     res_code;
+            int64_t     res_len;
+
             LogOPEvent() : CommonLogEvent()
             {
+                memset( &time, 0, sizeof time );
                 user . n = 0;
                 req_time . n = 0;
                 forwarded . n = 0;
                 port  = 0;
                 req_len = 0;
+
+                memset( &request, 0, sizeof request );
+                res_code = 0;
+                res_len = 0;
             }
         };
 
         // Maybe in a separate header
-        struct LogGCPEvent
+        struct LogGCPEvent : public CommonLogEvent
         {
             int64_t     time;           // in microseconds
-            t_str       ip;
             int64_t     ip_type;        // 1..ipv4, 2..ipv6
             t_str       ip_region;      // empty, reserved
             t_str       method;
@@ -90,19 +90,14 @@ namespace NCBI
             int64_t     result_bytes;
             int64_t     time_taken;     // in microsenconds
             t_str       host;
-            t_str       referrer;
-            t_str       agent;
             t_str       request_id;
             t_str       operation;
             t_str       bucket;
             t_str       object;
 
-            t_str       unparsed;
-
             LogGCPEvent()
             {
                 time = 0;
-                ip . n = 0;
                 ip_type = 0;
                 ip_region . n = 0;
                 method . n = 0;
@@ -112,13 +107,10 @@ namespace NCBI
                 result_bytes = 0;
                 time_taken = 0;
                 host . n = 0;
-                referrer . n = 0;
-                agent . n = 0;
                 request_id . n = 0;
                 operation . n = 0;
                 bucket . n = 0;
                 object . n = 0;
-                unparsed . n = 0;
             }
         };
 
@@ -130,12 +122,11 @@ namespace NCBI
             std::vector< std::string > m_fieldnames;
         };
 
-        struct LogAWSEvent
+        struct LogAWSEvent : public CommonLogEvent
         {
             t_str       owner;
             t_str       bucket;
             t_timepoint time;
-            t_str       ip;
             t_str       requester;
             t_str       request_id;
             t_str       operation;
@@ -147,8 +138,6 @@ namespace NCBI
             t_str       obj_size;
             t_str       total_time;
             t_str       turnaround_time;
-            t_str       referer;
-            t_str       agent;
             t_str       version_id;
             t_str       host_id;
             t_str       cipher_suite;
@@ -156,13 +145,10 @@ namespace NCBI
             t_str       host_header;
             t_str       tls_version;
 
-            t_str       unparsed;
-
             LogAWSEvent()
             {
                 owner . n = 0;
                 bucket . n = 0;
-                ip . n = 0;
                 requester . n = 0;
                 request_id . n = 0;
                 operation . n = 0;
@@ -174,16 +160,12 @@ namespace NCBI
                 obj_size . n = 0;
                 total_time . n = 0;
                 turnaround_time . n = 0;
-                referer . n = 0;
-                agent . n = 0;
                 version_id . n = 0;
                 host_id . n = 0;
                 cipher_suite . n = 0;
                 auth_type . n = 0;
                 host_header . n = 0;
                 tls_version . n = 0;
-
-                unparsed . n = 0;
             }
         };
 

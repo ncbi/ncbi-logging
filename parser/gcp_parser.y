@@ -101,7 +101,7 @@ log_gcp
         ev . result_bytes = ( $17 . p == nullptr ) ? 0 : atol( $17 . p );
         ev . time_taken = ( $19 . p == nullptr ) ? 0 : atol( $19 . p );
         ev . host = $21;
-        ev . referrer = $23;
+        ev . referer = $23;
         ev . agent = $25;
         ev . request_id = $27;
         ev . operation = $29;
