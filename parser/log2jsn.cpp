@@ -63,6 +63,7 @@ struct cmnLogLines
 
     void cmn_unrecognized( const t_str & text )
     {
+        num_unrecognized ++;
         JSONObjectRef j = JSON::makeObject();
         try
         {
@@ -75,6 +76,7 @@ struct cmnLogLines
         }
         
         print_json( j );
+        line_nr ++;
     }
 
     void report( void )
@@ -98,16 +100,14 @@ struct cmnLogLines
     unsigned long int num_rejected = 0;
     unsigned long int num_headers = 0;
     unsigned long int num_unrecognized = 0;
-    unsigned long int line_nr = 0;
+    unsigned long int line_nr = 1;
 };
 
 struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        num_unrecognized ++;
         cmn_unrecognized( text );
-        line_nr ++;
     }
 
     virtual void acceptLine( const LogOPEvent & e )
@@ -175,9 +175,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        num_unrecognized ++;
         cmn_unrecognized( text );
-        line_nr ++;
     }
 
     virtual void acceptLine( const LogAWSEvent & e )
@@ -242,9 +240,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        num_unrecognized ++;
         cmn_unrecognized( text );
-        line_nr ++;
     }
 
     virtual void acceptLine( const LogGCPEvent & e )
