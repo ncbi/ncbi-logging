@@ -272,7 +272,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
             j -> appendValue( JSON::makeString( String( *i ) ) );
         }
 
-        JSONValueRef v = j->clone(); //TODO: is clone() really necessary?
+        JSONValueRef v = j->clone();
         obj -> addValue( String("fields"), v );
 
         num_headers ++;

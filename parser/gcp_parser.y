@@ -200,7 +200,5 @@ q_i64
 
 void gcp_error( yyscan_t locp, NCBI::Logging::GCP_LogLines * lib, const char * msg )
 {
-    // TODO: find a way to comunicate the syntax error to the consumer...
-    // t_str msg_p = { msg, (int)strlen( msg ) };
-    // lib -> unrecognized( msg_p );
+    // intentionally left empty, we communicate errors rejected lines
 }

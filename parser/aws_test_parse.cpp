@@ -257,12 +257,7 @@ TEST_F ( TestParseFixture, AWS_UnparsedInput_WhenRejected )
     }
 }
 
-//TODO: GCP
-//TODO AWS version with error-code
-//TODO handle escaped quotes in quoted string
-//TODO: various line endings
 //TODO: rejected lines with more than IP recognized
-
 
 extern "C"
 {

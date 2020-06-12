@@ -232,10 +232,6 @@ TEST_F ( TestParseFixture, GCP_UnparsedInput_WhenRejected )
     }
 }
 
-// TODO test for specified ip-region
-// TODO test with referrer present
-// TODO quoted string with escaped quotes inside
-
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

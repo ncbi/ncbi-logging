@@ -34,7 +34,6 @@ IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_
 
 MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"|"PROPFIND"
-XVERS   "HTTP/"("1.0"|"1.1"|"2"|"2.0"|"3")
 VERS    [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
@@ -46,10 +45,6 @@ QSTR_ESC    (\\\"|{STR_CHARS})+
 
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
-
-    /* not ued for now*/
-DOMAIN_CHARS    [A-Za-z0-9\-]
-DOMAIN          {DOMAIN_CHARS}(\.{DOMAIN_CHARS})*
 
 %x QUOTED
 
