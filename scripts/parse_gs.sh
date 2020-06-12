@@ -24,11 +24,12 @@ for bucket in $BUCKETS; do
         wc=$(zcat "$file" | wc -l | cut -f1 -d' ')
         echo -n "Parsing $file, $wc lines ... "
         totalwc=$(( totalwc + wc))
-        zcat "$file" | time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" gcp > "$file.json" 2> "$file.err"
-        newwc=$(wc -l "$file".json | cut -f1 -d' ')
+        zcat "$file" | time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" gcp > "$file.${bucket}.json" 2> "$file.err"
+        newwc=$(wc -l "$file"."${bucket}".json | cut -f1 -d' ')
         echo -n "Parsed, $newwc lines emitted"
         if [ "$wc" -ne "$newwc" ]; then
             echo "***** Linecount discrepancy *****"
+            exit 1
         fi
         echo
 
@@ -36,30 +37,30 @@ for bucket in $BUCKETS; do
     done
 
     echo "Combining..."
-    rm -f "$YESTERDAY.json"
+    rm -f "$YESTERDAY.${bucket}.json"
     for file in ./*.json; do
-        touch "$YESTERDAY.json"
-        cat "$file" >> "$YESTERDAY.json"
+        touch "$YESTERDAY.${bucket}.json"
+        cat "$file" >> "$YESTERDAY.${bucket}.json"
     done
     echo "Combined"
 
     set +e
-    grep "{\"unrecognized\":\"" "$YESTERDAY.json" > "unrecognized.$YESTERDAY.jsonl"
-    grep -v "{\"unrecognized\":\"" "$YESTERDAY.json" > "recognized.$YESTERDAY.jsonl"
+    grep "{\"unrecognized\":\"" "$YESTERDAY.${bucket}.json" > "unrecognized.$YESTERDAY.${bucket}.jsonl"
+    grep -v "{\"unrecognized\":\"" "$YESTERDAY.${bucket}.json" > "recognized.$YESTERDAY.${bucket}.jsonl"
     set -e
 
-    unrecwc=$(wc -l "unrecognized.$YESTERDAY.jsonl" | cut -f1 -d' ')
-    recwc=$(wc -l "recognized.$YESTERDAY.jsonl" | cut -f1 -d' ')
+    unrecwc=$(wc -l "unrecognized.$YESTERDAY.${bucket}.jsonl" | cut -f1 -d' ')
+    recwc=$(wc -l "recognized.$YESTERDAY.${bucket}.jsonl" | cut -f1 -d' ')
 
     printf "Recognized lines:   %8d\n" "$recwc"
     printf "Unrecognized lines: %8d\n" "$unrecwc"
     printf "Total lines:        %8d\n" "$totalwc"
 
-    rm -f "$YESTERDAY.json"
+    rm -f "$YESTERDAY.${bucket}.json"
 
     echo "Verifying JSON..."
-    jq -e -c . < "recognized.$YESTERDAY.jsonl" > /dev/null
-    jq -e -c . < "unrecognized.$YESTERDAY.jsonl" > /dev/null
+    jq -e -c . < "recognized.$YESTERDAY.${bucket}.jsonl" > /dev/null
+    jq -e -c . < "unrecognized.$YESTERDAY.${bucket}.jsonl" > /dev/null
 
     # Don't bother with empty
     echo "Gzipping..."

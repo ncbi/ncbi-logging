@@ -14,6 +14,7 @@ bq rm -f strides_analytics.detail_export
 YESTERDAY="20200528"
 DATE="20200529"
 
+# TODO: Use BigQuery parameters instead of shell substitution?
 QUERY=$(cat <<-ENDOFQUERY
 SELECT
   ip as remote_ip,
