@@ -206,13 +206,11 @@ insert into buckets (cloud_provider, bucket_name, description,
         and bucket_name like 'sra-pub-%' or bucket_name like 'sra-ca-%';
 
 update buckets set log_bucket='sra-pub-logs-1',
-    format='GS log',
     owner='nih-sra-datastore'
     where cloud_provider='GS' and log_bucket='sra-pub-run-1-logs';
 
 update buckets set log_bucket='sra-ca-logs-1',
-    owner='nih-sra-datastore-protected',
-    format='GS log'
+    owner='nih-sra-datastore-protected'
     where cloud_provider='GS' and log_bucket='sra-ca-run-logs';
 
 update buckets

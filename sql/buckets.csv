@@ -1,70 +1,70 @@
-GS,sra-ca-run-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-run-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-src-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-src-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-src-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",cold
-GS,sra-ca-zq-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-zq-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-zq-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-zq-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-zq-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"GS log",hot
-GS,sra-pub-run-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-1-logs,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-run-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",hot
-GS,sra-pub-src-10,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-11,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-12,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-13,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-14,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",hot
-GS,sra-pub-src-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-src-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
-GS,sra-pub-zq-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"GS log",cold
+GS,sra-ca-run-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-run-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,"ETL & BQS",hot
+GS,sra-ca-src-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,hot
+GS,sra-ca-src-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-src-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,Original,cold
+GS,sra-ca-zq-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,,hot
+GS,sra-ca-zq-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,,hot
+GS,sra-ca-zq-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,,hot
+GS,sra-ca-zq-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,,hot
+GS,sra-ca-zq-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,,hot
+GS,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,public,true,,hot
+GS,sra-pub-run-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-1-logs,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"S3 log",cold
+GS,sra-pub-run-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-run-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"EQL & BQS",cold
+GS,sra-pub-src-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,hot
+GS,sra-pub-src-10,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-11,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-12,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-13,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-14,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,hot
+GS,sra-pub-src-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-src-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
+GS,sra-pub-zq-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,,cold
 NCBI,faspgap1,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive,"",public,false,"nginx log",hot
 NCBI,faspgap11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive,"",public,false,"nginx log",hot
 NCBI,faspgap12,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive,"",public,false,"nginx log",hot
