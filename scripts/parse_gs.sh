@@ -7,9 +7,10 @@ export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-#YESTERDAY="20200603"
+#YESTERDAY="20200601"
 
 BUCKETS="logs_gs_public logs_gs_ca"
+BUCKETS="logs_gs_public"
 for bucket in $BUCKETS; do
     DEST="$RAMDISK/$USER/$YESTERDAY/${PREFIX}_${bucket}"
     rm -rf "$DEST"
@@ -27,7 +28,8 @@ for bucket in $BUCKETS; do
         zcat "$file" | time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" gcp > "$file.${bucket}.json" 2> "$file.err"
         newwc=$(wc -l "$file"."${bucket}".json | cut -f1 -d' ')
         echo -n "Parsed, $newwc lines emitted"
-        if [ "$wc" -ne "$newwc" ]; then
+        expected=$(( newwc + 1 )) # Ignore header
+        if [ "$wc" -ne "$expected" ]; then
             echo "***** Linecount discrepancy *****"
             exit 1
         fi
@@ -68,11 +70,9 @@ for bucket in $BUCKETS; do
     gzip -v -9 ./*.jsonl
 
     echo "Uploading..."
-    gsutil -m cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
+    gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
     gsutil ls -l "gs://${PREFIX}_logs_parsed/$bucket/"
-    date
     rm -rf "$DEST"
 done
-
+#done
 echo "Done"
-date

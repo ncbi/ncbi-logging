@@ -24,4 +24,3 @@ for LOG_BUCKET in $buckets; do
 done
 
 echo "Done"
-date

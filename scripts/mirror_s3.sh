@@ -45,7 +45,6 @@ for LOG_BUCKET in $buckets; do
     echo "Copying $wc objects from $LOG_BUCKET into $DEST using $PROFILE"
     echo "$objects" | xargs -I % -P 50 aws s3 --profile "$PROFILE" cp "s3://$LOG_BUCKET/%" "$DEST/%" --quiet
     set -e
-    date
     echo "Copied $LOG_BUCKET to $DEST"
     mkdir -p "$HOME/s3_prod/"
     TAR="$HOME/s3_prod/$YESTERDAY.$LOG_BUCKET.tar.gz"
@@ -68,4 +67,3 @@ for LOG_BUCKET in $buckets; do
 done
 
 echo "Done"
-date

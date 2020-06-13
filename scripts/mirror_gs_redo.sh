@@ -3,12 +3,16 @@
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
 
-buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='GS' order by log_bucket desc")
+buckets="sra-pub-logs-1"
+
+YESTERDAY_DASH="$1"
+YESTERDAY_UNDER=${YESTERDAY_DASH//-/_}
+YESTERDAY=${YESTERDAY_DASH//-}
 
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Processing $LOG_BUCKET"
-    DEST="$PANFS/gs_prod2/$LOG_BUCKET/$YESTERDAY"
+    DEST="/dev/shm/gs_prod2/$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$DEST"
     cd "$DEST" || exit
 
@@ -25,7 +29,8 @@ for LOG_BUCKET in $buckets; do
         DEST_BUCKET="gs://strides_analytics_logs_gs_ca"
     fi
 
-    gsutil -q -m cp "gs://$LOG_BUCKET/*_$YESTERDAY_UNDER*_v0" .
+    echo "Copying from $LOG_BUCKET to $DEST..."
+    gsutil -q cp "gs://$LOG_BUCKET/*_$YESTERDAY_UNDER*_v0" .
 
     echo "gzipping..."
     time find ./ -name "*_v0" -exec gzip -9 -f {} \;
@@ -36,8 +41,10 @@ for LOG_BUCKET in $buckets; do
     export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
     echo "Copying from $DEST to $DEST_BUCKET/$YESTERDAY"
-    gsutil -q -m cp "$DEST/*" "$DEST_BUCKET/$YESTERDAY/"
+    # gsutil -q -m cp "$DEST/*" "$DEST_BUCKET/$YESTERDAY/"
     echo
+    cd ..
+    rm -rf "$DEST"
 done
 
 echo "Done"

@@ -73,11 +73,9 @@ for bucket in $BUCKETS; do
     gzip -9 -v ./*.jsonl
 
     echo "Uploading..."
-    gsutil -m cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
+    gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
     gsutil ls -l "gs://${PREFIX}_logs_parsed/$bucket/"
-    date
     rm -rf "$DEST"
 done
 
 echo "Done"
-date

@@ -7,12 +7,65 @@ export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-bq show --schema strides_analytics.s3_parsed
+#YESTERDAY="20200610"
+#DATE="20200610"
 
-bq rm -f strides_analytics.detail_export
+gsutil ls  -lR gs://strides_analytics_logs_parsed/
 
-YESTERDAY="20200528"
-DATE="20200529"
+if [[ "$DATE" == "false" ]]; then
+    bq rm  -f strides_analytics.s3_test
+    bq mk \
+        --table \
+        strides_analytics.s3_test \
+        accepted:BOOLEAN,agent:STRING,auth_type:STRING,bucket:STRING,cipher_suite:STRING,error:STRING,host_header:STRING,host_id:STRING,ip:STRING,key:STRING,obj_size:INTEGER,operation:STRING,owner:STRING,referer:STRING,request:STRING,request_id:STRING,requester:STRING,res_code:INTEGER,res_len:INTEGER,source:STRING,time:STRING,tls_version:STRING,total_time:INTEGER,turnaround_time:INTEGER,version_id:STRING
+
+    cat << EOF > op_test_schema.json
+    [
+    { "name": "accepted", "type": "BOOLEAN", "mode": "NULLABLE" },
+    { "name": "agent", "type": "STRING", "mode": "NULLABLE" },
+    { "name": "forwarded", "type": "STRING", "mode": "NULLABLE" },
+    { "name": "ip", "type": "STRING", "mode": "NULLABLE" },
+    { "name": "port", "type": "INTEGER", "mode": "NULLABLE" },
+    { "name": "referer", "type": "STRING", "mode": "NULLABLE" },
+    { "name": "req_len", "type": "INTEGER", "mode": "NULLABLE" },
+    { "name": "req_time", "type": "STRING", "mode": "NULLABLE" },
+    { "name": "request", "type": "RECORD", "mode": "REPEATED",
+    "fields": [
+            { "name": "method", "type": "STRING", "mode": "NULLABLE" },
+            { "name": "params", "type": "STRING", "mode": "NULLABLE" },
+            { "name": "path", "type": "STRING", "mode": "NULLABLE" },
+            { "name": "server", "type": "STRING", "mode": "NULLABLE" },
+            { "name": "vers", "type": "STRING", "mode": "NULLABLE" }
+        ]
+    },
+    { "name": "res_code", "type": "INTEGER", "mode": "NULLABLE" },
+    { "name": "res_len", "type": "INTEGER", "mode": "NULLABLE" },
+    { "name": "source", "type": "STRING", "mode": "NULLABLE" },
+    { "name": "time", "type": "STRING", "mode": "NULLABLE" },
+    { "name": "user", "type": "STRING", "mode": "NULLABLE" }
+    ]
+EOF
+
+    jq -e -c . < op_test_schema.json
+    bq rm  -f strides_analytics.op_test
+    bq mk \
+        --table strides_analytics.op_test \
+        ./op_test_schema.json
+fi
+
+
+bq load \
+    --autodetect \
+    --source_format=NEWLINE_DELIMITED_JSON \
+    strides_analytics.s3_test \
+    "gs://strides_analytics_logs_parsed/logs_s3_public/recognized.${YESTERDAY}.jsonl.gz"
+
+bq load \
+    --source_format=NEWLINE_DELIMITED_JSON \
+    strides_analytics.op_test \
+    "gs://strides_analytics_logs_parsed/sra_prod/recognized.${YESTERDAY}.jsonl.gz"
+
+
 
 # TODO: Use BigQuery parameters instead of shell substitution?
 QUERY=$(cat <<-ENDOFQUERY
@@ -46,6 +99,11 @@ ENDOFQUERY
 QUERY="${QUERY//\\/}"
 
 echo "Query is $QUERY"
+
+bq show --schema strides_analytics.s3_parsed
+
+bq rm -f strides_analytics.detail_export
+
 
 # shellcheck disable=SC2016
 bq query \
@@ -119,12 +177,12 @@ mkdir -p "$PANFS/detail"
 cd "$PANFS/detail" || exit
 rm -f "$PANFS"/detail/detail."$DATE".* || true
 gsutil ls -p ncbi-sandbox-blast "gs://strides_analytics/detail/detail.$DATE.*"
-gsutil -m cp -r "gs://strides_analytics/detail/detail.$DATE.*" "$PANFS/detail/"
+gsutil  cp -r "gs://strides_analytics/detail/detail.$DATE.*" "$PANFS/detail/"
 
 mkdir -p "$PANFS/summary"
 cd "$PANFS/summary" || exit
 rm -f "$PANFS"/summary/summary."$DATE".* || true
 gsutil ls -p ncbi-sandbox-blast "gs://strides_analytics/summary/summary.$DATE.*"
-gsutil -m cp -r "gs://strides_analytics/summary/summary.$DATE.*" "$PANFS/summary/"
+gsutil  cp -r "gs://strides_analytics/summary/summary.$DATE.*" "$PANFS/summary/"
 
 date
