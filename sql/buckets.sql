@@ -15,6 +15,7 @@ create table service_accounts (
 insert into service_accounts (service_account) values ('strides-analytics');
 insert into service_accounts (service_account) values ('opendata');
 insert into service_accounts (service_account) values ('s3_readers');
+insert into service_accounts (service_account) values ('logmon');
 
 create table formats (
     format text primary key
@@ -169,7 +170,7 @@ update buckets
 
 update buckets
     set owner='nih-sra-datastore-protected',
-    service_account='s3_readers',
+    service_account='logmon',
     log_bucket='sra-ca-run-logs',
     immutable="true",
     scope='private',
