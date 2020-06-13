@@ -162,7 +162,7 @@ update buckets
 
 update buckets
     set format='EQL & BQS'
-    where bucket_name like 'sra-pub-run-%';
+    where bucket_name like 'sra-pub-run-%' and bucket_name not like '%log%';
 
 update buckets
     set storage_class = 'cold' where bucket_name not in ('sra-pub-src-1','sra-pub-src-2');

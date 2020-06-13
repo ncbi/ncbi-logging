@@ -133,7 +133,7 @@ S3	sra-ca-zq-4		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	
 S3	sra-ca-zq-5		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true		hot
 S3	sra-ca-zq-6		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true		hot
 S3	sra-pub-run-1		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	EQL & BQS	cold
-S3	sra-pub-run-1-logs		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	EQL & BQS	cold
+S3	sra-pub-run-1-logs		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	S3 log	cold
 S3	sra-pub-run-2		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	EQL & BQS	cold
 S3	sra-pub-run-3		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	EQL & BQS	cold
 S3	sra-pub-run-4		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	EQL & BQS	cold
