@@ -11,16 +11,18 @@ echo "buckets is '$buckets'"
 
 mkdir -p "$PANFS/s3_prod/objects/"
 
+export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
+export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
+gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+
 for LOG_BUCKET in $buckets; do
     profile=$(sqlcmd "select service_account from buckets where cloud_provider='GS' and bucket_name='$LOG_BUCKET'")
 
     echo "Getting objects for $LOG_BUCKET, profile $profile"
 
-    "./s3_lister.py" "$LOG_BUCKET" | \
+    "./gs_lister.py" "$LOG_BUCKET" | \
         gzip -9 -c > \
-        "$PANFS/s3_prod/objects/$DATE.gs.objects-$LOG_BUCKET.gz" &
-
-    ls -l "$PANFS/s3_prod/objects/$DATE.gs.objects-$LOG_BUCKET.gz"
+        "$PANFS/gs_prod/objects/$DATE.gs.objects-$LOG_BUCKET.gz" &
 
 done
 

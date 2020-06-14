@@ -69,10 +69,14 @@ for bucket in $BUCKETS; do
     find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;
     gzip -v -9 ./*.jsonl
 
+export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
+gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
+export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
+
     echo "Uploading..."
     gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
     gsutil ls -l "gs://${PREFIX}_logs_parsed/$bucket/"
-    rm -rf "$DEST"
+    #rm -rf "$DEST"
 done
 #done
 echo "Done"
