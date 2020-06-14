@@ -8,24 +8,26 @@ fi
 
 PROVIDER=$1
 DATE_UNDER=$2
+PROVIDER_LC=${PROVIDER,,}
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
 
-
-if [[ "$PROVIDER" = "S3" || "$PROVIDER" = "GS" || "$PROVIDER" = "OP" ]]; then
-    echo
-else
-    echo "Invalid provider $PROVIDER"
-    echo "$USAGE"
-    exit 1
-fi
-
-if [[ ${#DATE_UNDER} -ne 10 ]]; then
-    echo "Invalid date: $DATE_UNDER"
-    echo "$USAGE"
-    exit 2
-fi
+case "$PROVIDER" in
+    S3)
+        export PARSER="aws"
+        ;;
+    GS)
+        export PARSER="gcp"
+        ;;
+    OP)
+        export PARSER="op"
+        ;;
+    *)
+        echo "Invalid provider $PROVIDER"
+        echo "$USAGE"
+        exit 1
+esac
 
 DATE=${DATE_UNDER//_}
 DATE_DASH=${DATE_UNDER//_/-}
@@ -38,7 +40,8 @@ echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Processing $LOG_BUCKET"
     MIRROR="$PANFS/$PROVIDER/$LOG_BUCKET/mirror"
-    TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$DATE.tar.gz"
+    TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
+    mkdir -p "$(dirname "$TGZ")"
 
     mkdir -p "$MIRROR"
     cd "$MIRROR" || exit
@@ -62,10 +65,10 @@ for LOG_BUCKET in $buckets; do
 
     echo "rsynced, tarring to $TGZ ..."
 
-    find . -print0 -name "$WILDCARD" | tar -caf "$TGZ" --null --files-from -
+    find . -name "$WILDCARD" -print0| tar -caf "$TGZ" --null --files-from -
     ls -l "$TGZ"
 
-    DEST_BUCKET="gs://strides_analytics_logs_${PROVIDER}_public/"
+    DEST_BUCKET="gs://strides_analytics_logs_${PROVIDER_LC}_public/"
 
     export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
     gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
