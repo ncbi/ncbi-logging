@@ -39,7 +39,7 @@ buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Processing $LOG_BUCKET"
-    MIRROR="$PANFS/$PROVIDER/$LOG_BUCKET/mirror"
+    MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
     TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
     mkdir -p "$(dirname "$TGZ")"
 

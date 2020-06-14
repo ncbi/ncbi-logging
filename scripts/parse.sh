@@ -99,8 +99,10 @@ for LOG_BUCKET in $buckets; do
         ls -la
 
         echo "Uploading..."
-        gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/$LOG_BUCKET/"
-        gsutil ls -l "gs://${PREFIX}_logs_parsed/$LOG_BUCKET/"
-        #rm -rf "$DEST"
+
+        gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/logs_gs_public/"
+        #gsutil ls "gs://strides_analytics_logs_parsed/logs_gs_public/"
+        cd ..
+        rm -rf "$PARSE_DEST"
     fi
 done
