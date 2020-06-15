@@ -156,12 +156,14 @@ bq show --schema strides_analytics.summary_export
 
 echo "Queries complete"
 
+gsutil rm -f "gs://strides_analytics/detail/detail.$DATE.*.json.gz"
 bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
     'strides_analytics.detail_export' \
     "gs://strides_analytics/detail/detail.$DATE.*.json.gz"
 
+gsutil rm -f "gs://strides_analytics/summary/summary.$DATE.*.json.gz"
 bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \

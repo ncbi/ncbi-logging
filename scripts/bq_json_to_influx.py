@@ -1,9 +1,22 @@
 #!/usr/bin/env python3
 
+import datetime
 import sys
 import json
 from pathlib import Path
 from influxdb import InfluxDBClient
+
+
+def parsedt(str):
+    # 2019-12-31 00:09:27 UTC
+    # 2020-05-27T22:35:51.889
+    # 2019-12-29T12:45:57
+    if "UTC" in str:
+        return datetime.datetime.strptime(str, "%Y-%m-%d %H:%M:%S %z")
+    elif "." in str:
+        return datetime.datetime.strptime(str, "%Y-%m-%dT%H:%M:%S.%f")
+    else:
+        return datetime.datetime.strptime(str, "%Y-%m-%dT%H:%M:%S")
 
 
 def main():
@@ -33,10 +46,10 @@ def main():
                     "host": rec["host"],
                     "source": "S3",
                 },
-                "time": rec["start_ts"],
+                "time": parsedt(rec["start_ts"]),
                 "fields": {
                     "num_requests": rec["num_requests"],
-                    "end_ts": rec["end_ts"],
+                    "end_ts": parsedt(rec["end_ts"]),
                     "http_operations": rec["http_operations"],
                     "request_uri": rec["request_uri"],
                     "http_statuses": rec["http_statuses"],
@@ -58,9 +71,9 @@ def main():
                     "host": rec["host"],
                     "source": rec["source"],
                 },
-                "time": rec["start_ts"],
+                "time": parsedt(rec["start_ts"]),
                 "fields": {
-                    "end_ts": rec["end_ts"],
+                    "end_ts": parsedt(rec["end_ts"]),
                     "http_operation": rec["http_operation"],
                     "request_uri": rec["request_uri"],
                     "http_status": rec["http_status"],
@@ -70,11 +83,28 @@ def main():
                     "bucket": rec["bucket"],
                 },
             }
+        elif "first_appearance_provider" in rec:
+            outrec = {
+                "measurement": "object_first_appearance_v0",
+                "tags": {
+                    "key": rec["key"],
+                    "source": rec["source"],
+                    "bucket": rec["bucket"],
+                },
+                "time": parsedt(rec["lastmodified"]),
+                "fields": {
+                    "size": int(rec["first_size"]),
+                    "checksum": rec["first_etag"],
+                    "first_appearance_provider": parsedt(
+                        rec["first_appearance_provider"]
+                    ),
+                },
+            }
         elif "storageclass" in rec:
             outrec = {
                 "measurement": "object_delta",
                 "tags": {"key": rec["key"], "source": rec["source"]},
-                "time": rec["lastmodified"],
+                "time": parsedt(rec["lastmodified"]),
                 "fields": {
                     "storageclass": rec["storageclass"],
                     "bucket": rec["bucket"],
