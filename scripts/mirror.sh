@@ -59,8 +59,16 @@ for LOG_BUCKET in $buckets; do
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        gsutil -m rsync "s3://$LOG_BUCKET/" .
+        if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
+            cp "$PANFS"/s3_prod/"$DATE".src.combine.gz .
+        else
+            cp "$PANFS"/s3_prod/"$DATE".combine.gz .
+        fi
+
         WILDCARD="${DATE_DASH}-*"
+#        gsutil -m rsync "s3://$LOG_BUCKET/" .
+        gunzip ./*combine.gz
+        WILDCARD="*.combine"
     fi
 
     echo "rsynced, tarring to $TGZ ..."

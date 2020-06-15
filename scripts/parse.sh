@@ -100,6 +100,7 @@ for LOG_BUCKET in $buckets; do
 
         echo "Uploading..."
 
+        gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
         gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/logs_gs_public/"
         #gsutil ls "gs://strides_analytics_logs_parsed/logs_gs_public/"
         cd ..

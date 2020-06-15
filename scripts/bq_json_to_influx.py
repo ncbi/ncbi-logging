@@ -50,7 +50,7 @@ def main():
                     "domain": rec["domain"],
                 },
             }
-        else:
+        elif "http_operation" in rec:
             outrec = {
                 "measurement": "detail",
                 "tags": {
@@ -70,6 +70,21 @@ def main():
                     "bucket": rec["bucket"],
                 },
             }
+        elif "storageclass" in rec:
+            outrec = {
+                "measurement": "object_delta",
+                "tags": {"key": rec["key"], "source": rec["source"]},
+                "time": rec["lastmodified"],
+                "fields": {
+                    "storageclass": rec["storageclass"],
+                    "bucket": rec["bucket"],
+                    "size": int(rec["size"]),
+                    "etag": rec["etag"],
+                },
+            }
+        else:
+            print(f"Unknown record type {rec}", file=sys.stderr)
+            sys.exit(1)
 
         json_body.append(outrec)
         if len(json_body) >= 1000:
