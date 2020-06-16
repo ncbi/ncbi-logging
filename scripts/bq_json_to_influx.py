@@ -12,11 +12,12 @@ def parsedt(str):
     # 2020-05-27T22:35:51.889
     # 2019-12-29T12:45:57
     if "UTC" in str:
-        return datetime.datetime.strptime(str, "%Y-%m-%d %H:%M:%S %z")
+        dt = datetime.datetime.strptime(str, "%Y-%m-%d %H:%M:%S %Z")
     elif "." in str:
-        return datetime.datetime.strptime(str, "%Y-%m-%dT%H:%M:%S.%f")
+        dt = datetime.datetime.strptime(str, "%Y-%m-%dT%H:%M:%S.%f")
     else:
-        return datetime.datetime.strptime(str, "%Y-%m-%dT%H:%M:%S")
+        dt = datetime.datetime.strptime(str, "%Y-%m-%dT%H:%M:%S")
+    return dt.isoformat()
 
 
 def main():
@@ -85,16 +86,13 @@ def main():
             }
         elif "first_appearance_provider" in rec:
             outrec = {
-                "measurement": "object_first_appearance_v0",
-                "tags": {
-                    "key": rec["key"],
-                    "source": rec["source"],
-                    "bucket": rec["bucket"],
-                },
+                "measurement": "object_appearance_v1",
+                "tags": {"source": rec["source"], "bucket": rec["bucket"]},
                 "time": parsedt(rec["lastmodified"]),
                 "fields": {
-                    "size": int(rec["first_size"]),
-                    "checksum": rec["first_etag"],
+                    "key": rec["key"],
+                    "size": int(rec["size"]),
+                    "checksum": rec["checksum"],
                     "first_appearance_provider": parsedt(
                         rec["first_appearance_provider"]
                     ),
@@ -116,6 +114,8 @@ def main():
             print(f"Unknown record type {rec}", file=sys.stderr)
             sys.exit(1)
 
+        print(outrec)
+        # sys.exit(1)
         json_body.append(outrec)
         if len(json_body) >= 1000:
             if not client.write_points(json_body):

@@ -1,17 +1,34 @@
 #!/bin/bash
 
-USAGE="Usage: $0 {S3,GS,OP} YYYY_MM_DD"
-if [ "$#" -ne 2 ]; then
-    echo "$USAGE"
-    exit 1
-fi
-
-PROVIDER=$1
-DATE_UNDER=$2
-PROVIDER_LC=${PROVIDER,,}
+USAGE="Usage: $0 {S3,GS,OP} [YYYY_MM_DD]"
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
+
+case "$#" in
+    0)
+        echo "$USAGE"
+        exit 1
+        ;;
+    1)
+        PROVIDER=$1
+        DATE_UNDER=$(date "+%Y_%m_%d") #_%H%
+        ;;
+    2)
+        PROVIDER=$1
+        DATE_UNDER=$2
+        ;;
+    *)
+        echo "$USAGE"
+        exit 1
+        ;;
+esac
+
+PROVIDER_LC=${PROVIDER,,}
+DATE=${DATE_UNDER//_}
+DATE_DASH=${DATE_UNDER//_/-}
+
+echo "DATE=$DATE DATE_UNDER=$DATE_UNDER DATE_DASH=$DATE_DASH"
 
 case "$PROVIDER" in
     S3)
@@ -29,10 +46,6 @@ case "$PROVIDER" in
         exit 1
 esac
 
-DATE=${DATE_UNDER//_}
-DATE_DASH=${DATE_UNDER//_/-}
-
-echo "DATE=$DATE DATE_UNDER=$DATE_UNDER DATE_DASH=$DATE_DASH"
 
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' order by log_bucket desc")
 
@@ -86,4 +99,8 @@ for LOG_BUCKET in $buckets; do
     gsutil cp "$TGZ" "$DEST_BUCKET"
     echo "Done with $LOG_BUCKET"
 done
+
+cd "$TMP"/GS || exit
+tar -czf "$PANFS"/GS."$DATE".tar.gz . &
+
 echo "Done"

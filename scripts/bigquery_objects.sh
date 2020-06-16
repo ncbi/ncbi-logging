@@ -7,14 +7,14 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 # Reduce from 5B ($3.50) -> 50M for cost reduction
-bq rm -f -t strides_analytics.objects_uniq
+bq rm -f -t strides_analytics.objects_uniq || true
 bq query \
     --nouse_legacy_sql \
     --destination_table strides_analytics.objects_uniq \
     "select distinct * except (now, md5) from strides_analytics.objects"
 
 
-bq rm -f -t strides_analytics.object_delta
+bq rm -f -t strides_analytics.object_delta || true
 bq query \
     --destination_table strides_analytics.object_delta \
     --nouse_legacy_sql \
@@ -28,7 +28,7 @@ bq query \
   FROM ncbi-logmon.strides_analytics.objects_uniq
   INNER JOIN changed_objects USING (key, storageclass, source, bucket)"
 
-gsutil rm -f "gs://logmon_export/object_delta.$DATE.*"
+gsutil rm -f "gs://logmon_export/object_delta.$DATE.*" || true
 bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
@@ -42,7 +42,7 @@ gsutil  cp -r "gs://logmon_export/object_delta.$DATE.*" .
 
 
 
-bq rm -f -t strides_analytics.object_first_appearance
+bq rm -f -t strides_analytics.object_first_appearance || true
 bq query \
     --destination_table strides_analytics.object_first_appearance \
     --nouse_legacy_sql \
@@ -52,12 +52,12 @@ bq query \
       FROM strides_analytics.objects_uniq
       GROUP BY key, source)
      SELECT distinct key, source, bucket,
-            size as size, etag as checksum,
+            size, etag as checksum,
             lastmodified , first_appearance_provider
      FROM strides_analytics.objects_uniq
      INNER JOIN first_appear USING (key, source)"
 
-gsutil rm -f "gs://logmon_export/object_first_appearance.$DATE.*"
+gsutil rm -f "gs://logmon_export/object_first_appearance.$DATE.*" || true
 bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
@@ -70,7 +70,7 @@ rm -f object_first_appearance."$DATE".* || true
 gsutil  cp -r "gs://logmon_export/object_first_appearance.$DATE.*" .
 
 
-bq rm -f -t strides_analytics.object_disappear
+bq rm -f -t strides_analytics.object_disappear || true
 bq query \
     --destination_table strides_analytics.object_disappear \
     --nouse_legacy_sql \
