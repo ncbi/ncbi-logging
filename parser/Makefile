@@ -8,7 +8,7 @@ CC := gcc -c
 CPP := g++ -c
 LD := g++
 CXXFLAGS += -I . -MMD
-GPROFFLAGS = -pg
+GPROFFLAGS = -pg -O3
 
 PREFIX_OP := op_
 PREFIX_AWS := aws_
@@ -42,7 +42,7 @@ $(OBJDIR)/%.rel.o: %.cpp
 	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
 $(OBJDIR)/%.prof.o: %.cpp
-	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) -g $< -o $(OBJDIR)/$(*F).prof.o
+	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
 
 -include $(OBJDIR)/*.d
 
