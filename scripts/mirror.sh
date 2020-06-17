@@ -12,11 +12,11 @@ case "$#" in
         ;;
     1)
         PROVIDER=$1
-        DATE_UNDER=$(date "+%Y_%m_%d") #_%H%
+        YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d") #_%H%
         ;;
     2)
         PROVIDER=$1
-        DATE_UNDER=$2
+        YESTERDAY_UNDER=$2
         ;;
     *)
         echo "$USAGE"
@@ -25,10 +25,10 @@ case "$#" in
 esac
 
 PROVIDER_LC=${PROVIDER,,}
-DATE=${DATE_UNDER//_}
-DATE_DASH=${DATE_UNDER//_/-}
+YESTERDAY=${YESTERDAY_UNDER//_}
+YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
-echo "DATE=$DATE DATE_UNDER=$DATE_UNDER DATE_DASH=$DATE_DASH"
+echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
 
 case "$PROVIDER" in
     S3)
@@ -62,24 +62,24 @@ for LOG_BUCKET in $buckets; do
     echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
 
     if [ "$PROVIDER" = "GS" ]; then
-        TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
+        TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
         export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
         export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
         gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
         gsutil -m rsync "gs://$LOG_BUCKET/" .
-        WILDCARD="*_usage_${DATE_UNDER}_*v0"
+        WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        TGZ="$HOME/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
+        TGZ="$HOME/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
 #        if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
-#            cp "$PANFS"/s3_prod/"$DATE".src.combine.gz .
+#            cp "$PANFS"/s3_prod/"$YESTERDAY".src.combine.gz .
 #        else
-#            cp "$PANFS"/s3_prod/"$DATE".combine.gz .
+#            cp "$PANFS"/s3_prod/"$YESTERDAY".combine.gz .
 #        fi
 
-        WILDCARD="${DATE_DASH}-*"
+        WILDCARD="${YESTERDAY_DASH}-*"
 #        gsutil -m rsync "s3://$LOG_BUCKET/" .
 #        gunzip ./*combine.gz
 #        WILDCARD="*.combine"
@@ -104,6 +104,6 @@ for LOG_BUCKET in $buckets; do
 done
 
 #cd "$TMP"/GS || exit
-#tar -czf "$PANFS"/GS."$DATE".tar.gz . &
+#tar -czf "$PANFS"/GS."$YESTERDAY".tar.gz . &
 
 echo "Done"
