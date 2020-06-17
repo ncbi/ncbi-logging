@@ -33,9 +33,11 @@ echo "DATE=$DATE DATE_UNDER=$DATE_UNDER DATE_DASH=$DATE_DASH"
 case "$PROVIDER" in
     S3)
         export PARSER="aws"
+        export MIRROR="$HOME/S3.all"
         ;;
     GS)
         export PARSER="gcp"
+        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
         ;;
     OP)
         export PARSER="op"
@@ -52,9 +54,6 @@ buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Processing $LOG_BUCKET"
-    MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
-    TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
-    mkdir -p "$(dirname "$TGZ")"
 
     mkdir -p "$MIRROR"
     cd "$MIRROR" || exit
@@ -63,6 +62,7 @@ for LOG_BUCKET in $buckets; do
     echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
 
     if [ "$PROVIDER" = "GS" ]; then
+        TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
         export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
         export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
         gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
@@ -72,21 +72,24 @@ for LOG_BUCKET in $buckets; do
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
-            cp "$PANFS"/s3_prod/"$DATE".src.combine.gz .
-        else
-            cp "$PANFS"/s3_prod/"$DATE".combine.gz .
-        fi
+        TGZ="$HOME/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
+#        if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
+#            cp "$PANFS"/s3_prod/"$DATE".src.combine.gz .
+#        else
+#            cp "$PANFS"/s3_prod/"$DATE".combine.gz .
+#        fi
 
         WILDCARD="${DATE_DASH}-*"
 #        gsutil -m rsync "s3://$LOG_BUCKET/" .
-        gunzip ./*combine.gz
-        WILDCARD="*.combine"
+#        gunzip ./*combine.gz
+#        WILDCARD="*.combine"
     fi
 
-    echo "rsynced, tarring to $TGZ ..."
+    mkdir -p "$(dirname "$TGZ")"
+    echo "rsynced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
     find . -name "$WILDCARD" -print0| tar -caf "$TGZ" --null --files-from -
+    echo "Tarred"
     ls -l "$TGZ"
 
     DEST_BUCKET="gs://strides_analytics_logs_${PROVIDER_LC}_public/"
@@ -100,7 +103,7 @@ for LOG_BUCKET in $buckets; do
     echo "Done with $LOG_BUCKET"
 done
 
-cd "$TMP"/GS || exit
-tar -czf "$PANFS"/GS."$DATE".tar.gz . &
+#cd "$TMP"/GS || exit
+#tar -czf "$PANFS"/GS."$DATE".tar.gz . &
 
 echo "Done"
