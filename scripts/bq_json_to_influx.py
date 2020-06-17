@@ -114,7 +114,7 @@ def main():
             print(f"Unknown record type {rec}", file=sys.stderr)
             sys.exit(1)
 
-        print(outrec)
+        # print(outrec)
         # sys.exit(1)
         json_body.append(outrec)
         if len(json_body) >= 1000:
