@@ -39,6 +39,48 @@ static String FormatTime( const t_timepoint & t )
     return String(ret.str());
 }
 
+ostream& operator<< (ostream& os, const t_str & s)
+{
+    os << "\"";
+    for ( auto i = 0; i < s.n; ++i )
+    {
+        switch ( s.p[i] )
+        {
+        case '\\':
+        case '\"':
+            os << '\\';
+            break;
+        }
+        os << s.p[i];
+    }
+    os << "\"";
+    return os;
+}
+
+ostream& operator<< (ostream& os, const t_timepoint & t)
+{
+    os << "\"";
+    os << (int)t.day << "."
+        << (int)t.month <<"."
+        << (int)t.year <<":"
+        << (int)t.hour <<":"
+        << (int)t.minute <<":"
+        << (int)t.second <<" "
+        << (int)t.offset;
+    os << "\"";
+    return os;
+}
+
+struct Options
+{
+    bool readable = false;
+    bool report = true;
+    bool print_line_nr = false;
+    bool print_headers = false;
+    bool debug = false;
+    bool jsonlib = false;
+};
+
 struct cmnLogLines
 {
     JSONValueRef ToJsonString( const t_str & in )
@@ -68,13 +110,13 @@ struct cmnLogLines
         j -> addValue( "referer", ToJsonString( e.referer ) );
         j -> addValue( "agent", ToJsonString( e.agent ) );
 
-        if ( mem_print_line_nr )
+        if ( mem_options . print_line_nr )
             j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
     }
 
     void print_json( JSONObjectRef j )
     {
-        if ( mem_readable )
+        if ( mem_options . readable )
             mem_os << j->readableJSON().toSTLString() << endl;
         else
             mem_os << j->toJSON().toSTLString() << endl;
@@ -109,12 +151,11 @@ struct cmnLogLines
         std::cerr << "unrecognized : " << num_unrecognized << endl;
     }
 
-    cmnLogLines( ostream &os, bool readable, bool print_line_nr ) : mem_os( os ),
-        mem_readable( readable ), mem_print_line_nr( print_line_nr ) {};
+    cmnLogLines( ostream &os, const Options & options ) : mem_os( os ),
+        mem_options( options ) {};
 
     ostream &mem_os;
-    bool mem_readable;
-    bool mem_print_line_nr;
+    Options mem_options;
     unsigned long int num_accepted = 0;
     unsigned long int num_rejected = 0;
     unsigned long int num_headers = 0;
@@ -132,15 +173,62 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     virtual void acceptLine( const LogOPEvent & e )
     {
         num_accepted ++;
-        print_json( MakeJson(e, true) );
+        if ( mem_options . jsonlib )
+        {
+            print_json( MakeJson(e, true) );
+        }
+        else
+        {
+            print_direct(e, true);
+        }
+        
         line_nr ++;
     }
 
     virtual void rejectLine( const LogOPEvent & e )
     {
         num_rejected ++;
-        print_json( MakeJson(e, false) );
+        if ( mem_options . jsonlib )
+        {
+            print_json( MakeJson( e, false) );
+        }
+        else
+        {
+            print_direct(e, false);
+        }
         line_nr ++;
+    }
+
+    void print_direct ( const LogOPEvent & e, bool accepted )
+    {
+        mem_os << "{\"accepted\":" << (accepted ? "true":"false");
+        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"forwarded\":" << e.forwarded;
+        mem_os << ",\"ip\":" << e.ip;
+        if ( mem_options . print_line_nr )
+            mem_os << ",\"line_nr\":" << line_nr;
+        mem_os << ",\"port\":" << e.port;
+        mem_os << ",\"referer\":" << e.referer;
+        mem_os << ",\"req_len\":" << e.req_len;
+        mem_os << ",\"req_time\":" << e.req_time;
+
+        mem_os << ",\"request\":{";
+            mem_os << "\"method\":" << e.request.method;
+            mem_os << ",\"path\":" << e.request.path;
+            mem_os << ",\"server\":" << e.request.server;
+            mem_os << ",\"vers\":" << e.request.vers;
+
+        mem_os << "},\"res_code\":" << e.res_code;
+        mem_os << ",\"res_len\":" << e.res_len;
+        mem_os << ",\"source\":\"NCBI\"";
+        mem_os << ",\"time\":" << e.time;
+
+        if ( !accepted )
+        {
+            mem_os << ",\"unparsed\":" << e.unparsed;
+        }
+        mem_os << ",\"user\":" << e.user;
+        mem_os << "}" <<endl;
     }
 
     JSONObjectRef MakeJson( const LogOPEvent & e, bool accepted )
@@ -170,7 +258,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
         return j;
     }
 
-    OpToJsonLogLines( ostream &os, bool readable, bool print_line_nr ) : cmnLogLines( os, readable, print_line_nr ) {};
+    OpToJsonLogLines( ostream &os, const Options& options ) : cmnLogLines( os, options ) {};
 };
 
 struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
@@ -183,15 +271,66 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
     virtual void acceptLine( const LogAWSEvent & e )
     {
         num_accepted ++;
-        print_json( MakeJson(e, true) );
+        if ( mem_options . jsonlib )
+        {
+            print_json( MakeJson( e, true ) );
+        }
+        else
+        {
+            print_direct(e, true );
+        }
         line_nr ++;
     }
 
     virtual void rejectLine( const LogAWSEvent & e )
     {
         num_rejected ++;
-        print_json( MakeJson(e, false) );
+        if ( mem_options . jsonlib )
+        {
+            print_json( MakeJson( e, false) );
+        }
+        else
+        {
+            print_direct(e, false);
+        }
         line_nr ++;
+    }
+
+    void print_direct ( const LogAWSEvent & e, bool accepted )
+    {
+        mem_os << "{\"accepted\":" << (accepted ? "true":"false");
+        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"auth_type\":" << e.auth_type;
+        mem_os << ",\"bucket\":" << e.bucket;
+        mem_os << ",\"cipher_suite\":" << e.cipher_suite;
+        mem_os << ",\"error\":" << e.error;
+        mem_os << ",\"host_header\":" << e.host_header;
+        mem_os << ",\"host_id\":" << e.host_id;
+        mem_os << ",\"ip\":" << e.ip;
+        mem_os << ",\"key\":" << e.key;
+        if ( mem_options . print_line_nr )
+            mem_os << ",\"line_nr\":" << line_nr;
+        mem_os << ",\"obj_size\":" << e.obj_size;
+        mem_os << ",\"operation\":" << e.operation;
+        mem_os << ",\"owner\":" << e.owner;
+        mem_os << ",\"referer\":" << e.referer;
+        mem_os << ",\"request\":" << e.request;
+        mem_os << ",\"request_id\":" << e.request_id;
+        mem_os << ",\"requester\":" << e.requester;
+        mem_os << ",\"res_code\":" << e.res_code;
+        mem_os << ",\"res_len\":" << e.res_len;
+        mem_os << ",\"source\":\"S3\"";
+        mem_os << ",\"time\":" << e.time;
+        mem_os << ",\"tls_version\":" << e.tls_version;
+        mem_os << ",\"total_time\":" << e.total_time;
+        mem_os << ",\"turnaround_time\":" << e.turnaround_time;
+        if ( !accepted )
+        {
+            mem_os << ",\"unparsed\":" << e.unparsed;
+        }
+        mem_os << ",\"version_id\":" << e.version_id;
+
+        mem_os << "}" <<endl;
     }
 
     JSONObjectRef MakeJson( const LogAWSEvent & e, bool accepted )
@@ -223,7 +362,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         return j;
     }
 
-    AWSToJsonLogLines( ostream &os, bool readable, bool print_line_nr ) : cmnLogLines( os, readable, print_line_nr ) {};
+    AWSToJsonLogLines( ostream &os, const Options& options ) : cmnLogLines( os, options ) {};
 };
 
 struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
@@ -236,20 +375,33 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     virtual void acceptLine( const LogGCPEvent & e )
     {
         num_accepted ++;
-        print_json( MakeJson(e, true) );
+        if ( mem_options . jsonlib )
+        {
+            print_json( MakeJson( e, true) );
+        }
+        else
+        {
+            print_direct(e, true);
+        }
         line_nr ++;
     }
 
     virtual void rejectLine( const LogGCPEvent & e )
     {
         num_rejected ++;
-        print_json( MakeJson(e, false) );
-        line_nr ++;
+        if ( mem_options . jsonlib )
+        {
+            print_json( MakeJson( e, false) );
+        }
+        else
+        {
+            print_direct(e, false);
+        }        line_nr ++;
     }
 
     virtual void headerLine( const LogGCPHeader & hdr )
     {
-        if ( m_print_headers )
+        if ( mem_options . print_headers )
         {
             JSONObjectRef obj = JSON::makeObject();
             obj -> addValue( "header", JSON::makeBoolean(true) );
@@ -267,6 +419,37 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         }
         num_headers ++;
         line_nr ++;            
+    }
+
+    void print_direct ( const LogGCPEvent & e, bool accepted )
+    {
+        mem_os << "{\"accepted\":" << (accepted ? "true":"false");
+        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"bucket\":" << e.bucket;
+        mem_os << ",\"host\":" << e.host;
+        mem_os << ",\"ip\":" << e.ip;
+        mem_os << ",\"ip_region\":" << e.ip_region;
+        mem_os << ",\"ip_type\":" << e.ip_type;
+        if ( mem_options . print_line_nr )
+            mem_os << ",\"line_nr\":" << line_nr;
+        mem_os << ",\"method\":" << e.method;
+        mem_os << ",\"object\":" << e.object;
+        mem_os << ",\"operation\":" << e.operation;
+        mem_os << ",\"referer\":" << e.referer;
+        mem_os << ",\"request_bytes\":" << e.request_bytes;
+        mem_os << ",\"request_id\":" << e.request_id;
+        mem_os << ",\"result_bytes\":" << e.result_bytes;
+        mem_os << ",\"source\":\"GS\"";
+        mem_os << ",\"status\":" << e.status;
+        mem_os << ",\"time\":" << e.time;
+        mem_os << ",\"time_taken\":" << e.time_taken;
+        mem_os << ",\"uri\":" << e.uri;
+        if ( !accepted )
+        {
+            mem_os << ",\"unparsed\":" << e.unparsed;
+        }
+
+        mem_os << "}" <<endl;
     }
 
     JSONObjectRef MakeJson( const LogGCPEvent & e, bool accepted )
@@ -292,42 +475,40 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         return j;
     }
 
-    GCPToJsonLogLines( ostream &os, bool readable, bool print_line_nr, bool print_headers )
-        : cmnLogLines( os, readable, print_line_nr ), m_print_headers( print_headers ) {};
-
-    bool m_print_headers;
+    GCPToJsonLogLines( ostream &os, const Options& options ) : cmnLogLines( os, options ) {};
 };
 
-static void handle_on_prem( bool readable, bool do_report, bool print_line_nr, bool do_debug = false ) 
+
+static void handle_on_prem( const Options & options ) 
 {
     cerr << "converting on-premise format" << endl;
-    OpToJsonLogLines event_receiver( cout, readable, print_line_nr );
+    OpToJsonLogLines event_receiver( cout, options );
     OP_Parser p( event_receiver, cin );
-    p . setDebug( do_debug );
+    p . setDebug( options . debug );
     p . parse();
-    if ( do_report )
+    if ( options . report )
         event_receiver.report();
 }
 
-static void handle_aws( bool readable, bool do_report, bool print_line_nr, bool do_debug = false )
+static void handle_aws( const Options & options )
 {
     cerr << "converting AWS format" << endl;
-    AWSToJsonLogLines event_receiver( cout, readable, print_line_nr );
+    AWSToJsonLogLines event_receiver( cout, options );
     AWS_Parser p( event_receiver, cin );
-    p . setDebug( do_debug );
+    p . setDebug( options . debug );
     p . parse();
-    if ( do_report )
+    if ( options . report )
         event_receiver.report();
 }
 
-static void handle_gcp( bool readable, bool do_report, bool print_line_nr, bool print_headers, bool do_debug = false ) 
+static void handle_gcp( const Options & options ) 
 {
     cerr << "converting GCP format" << endl;
-    GCPToJsonLogLines event_receiver( cout, readable, print_line_nr, print_headers );
+    GCPToJsonLogLines event_receiver( cout, options );
     GCP_Parser p( event_receiver, cin );
-    p . setDebug( do_debug );
+    p . setDebug( options . debug );
     p . parse();
-    if ( do_report )
+    if ( options . report )
         event_receiver.report();
 }
 
@@ -341,14 +522,13 @@ static logformat string2logformat( const ncbi::String & fmt )
     return unknown;
 }
 
-static int perform_parsing( logformat fmt, bool readable, bool do_report,
-        bool print_line_nr, bool print_headers, bool do_debug = false )
+static int perform_parsing( logformat fmt, const Options & options ) 
 {
     switch( fmt )
     {
-        case op  : handle_on_prem( readable, do_report, print_line_nr, do_debug ); break;
-        case aws : handle_aws( readable, do_report, print_line_nr, do_debug ); break;
-        case gcp : handle_gcp( readable, do_report, print_line_nr, print_headers, do_debug ); break;
+        case op  : handle_on_prem( options ); break;
+        case aws : handle_aws( options ); break;
+        case gcp : handle_gcp( options ); break;
         default  : {
                         cerr << "Unknown format " << endl;
                         return 3;
@@ -363,19 +543,17 @@ int main ( int argc, char * argv [], const char * envp []  )
     {
         ncbi::String format( "op" );
         bool help = false;
-        bool readable = false;
-        bool no_report = false;
-        bool print_line_nr = false;
-        bool print_headers = false;
-        bool debug = false;
+        Options options;
         bool vers = false;
+        bool no_report = false;
 
         ncbi::Cmdline args( argc, argv );
-        args . addOption( readable, "r", "readable", "pretty print json output" );
-        args . addOption( debug, "d", "debug", "parse with debug-output" );
+        args . addOption( options . readable, "r", "readable", "pretty print json output ( only with -j )" );
+        args . addOption( options . debug, "d", "debug", "parse with debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
-        args . addOption( print_line_nr, "p", "print-line-nr", "print line numbers" );
-        args . addOption( print_headers, "H", "print-headers", "print header lines ( gcp only )" );        
+        args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
+        args . addOption( options . print_headers, "H", "print-headers", "print header lines ( gcp only )" );        
+        args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );        
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
 
@@ -384,14 +562,22 @@ int main ( int argc, char * argv [], const char * envp []  )
 
         args . parse();
 
+        options.report = ! no_report;
+
         if ( help )
             args . help();
+
+        if ( options . readable && ! options . jsonlib )
+        {
+            cout << "-r can only be used with -j" << endl;
+            return 3;
+        }
 
         if ( vers )
             cout << "version: 1.0" << endl;
         
         if ( !help && !vers )
-            return perform_parsing( string2logformat( format ), readable, !no_report, print_line_nr, print_headers, debug );
+            return perform_parsing( string2logformat( format ), options );
         else
             return 0;
     }

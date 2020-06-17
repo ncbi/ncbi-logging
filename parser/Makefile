@@ -339,7 +339,7 @@ $(BINDIR)/log2jsn-rel: $(LOG2JSN_REL_OBJ) $(REL_CMD_OBJ) $(LIBDIR)/liblogparse-r
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel-no-atomic -lutf8proc -lmbedcrypto
 
 $(BINDIR)/log2jsn-prof: $(LOG2JSN_PROF_OBJ) $(DBG_CMD_OBJ) $(LIBDIR)/liblogparse-prof.a
-	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel-no-busy -lutf8proc -lmbedcrypto
 
 log2jsn_: mkdir $(BINDIR)/log2jsn-dbg $(BINDIR)/log2jsn-rel
 
@@ -353,7 +353,7 @@ LOG2JSON = $(BINDIR)/log2jsn-dbg
 
 test2jsn: log2jsn_
 	@ mkdir -p actual
-	cat data/op_unrecognized.log    | $(LOG2JSON) op -p --readable >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
+	cat data/op_unrecognized.log    | $(LOG2JSON) op -p >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized.out ./actual/op_unrecognized.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
 	cat data/aws_unrecognized.log | $(LOG2JSON) aws >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \
@@ -365,6 +365,9 @@ test2jsn: log2jsn_
 	cat data/gcp_with_headers.log | $(LOG2JSON) gcp -H >./actual/gcp_with_headers.out 2>./actual/gcp_with_headers.err \
 						&& diff ./expected/gcp_with_headers.out ./actual/gcp_with_headers.out \
 						&& diff ./expected/gcp_with_headers.err ./actual/gcp_with_headers.err
+	cat data/op_unrecognized.log  | $(LOG2JSON) op -p -j --readable >./actual/op_unrecognized_pretty.out 2>./actual/op_unrecognized.err \
+						&& diff ./expected/op_unrecognized_pretty.out ./actual/op_unrecognized_pretty.out \
+						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
 	@ echo "test2json passed"
 	@ rm -rf actual/run2jsn*
 
