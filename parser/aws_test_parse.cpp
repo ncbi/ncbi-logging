@@ -9,11 +9,28 @@
 using namespace std;
 using namespace NCBI::Logging;
 
+struct SRequest
+{
+    string server;
+    string method;
+    string path;
+    string vers;
+
+    SRequest& operator= ( const t_request &req )
+    {
+       server = ToString( req.server );
+       method = ToString( req.method );
+       path = ToString( req.path );
+       vers = ToString( req.vers );
+       return *this;
+    }
+};
+
 struct SLogAWSEvent
 {
     string      ip;
     t_timepoint time;
-    string      request;
+    SRequest      request;
     string      res_code;
     string      res_len;
     string      referer;
@@ -42,7 +59,7 @@ struct SLogAWSEvent
     {
         ip          = ToString( ev . ip );
         time        = ev . time;
-        request     = ToString( ev . request );
+        request     = ev . request;
         res_code    = ToString( ev . res_code );
         res_len     = ToString( ev . res_len );
         referer     = ToString( ev . referer );
@@ -176,7 +193,10 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "REST.PUT.PART", e.operation );
     ASSERT_EQ( "SRR9612637/DRGHT.TC.307_interleaved.fq.1", e.key );
 
-    ASSERT_EQ( "PUT /SRR9612637/DRGHT.TC.307_interleaved.fq.1?partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw-- HTTP/1.1", e.request );
+    ASSERT_EQ( "PUT", e.request.method );
+    ASSERT_EQ( "/SRR9612637/DRGHT.TC.307_interleaved.fq.1?partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw--", 
+                e.request.path );
+    ASSERT_EQ( "HTTP/1.1", e.request.vers );
 
     ASSERT_EQ( "200", e.res_code );
     ASSERT_EQ( "", e.error );
@@ -209,6 +229,16 @@ TEST_F ( TestParseFixture, AWS_total_time_is_dash )
     ASSERT_EQ( "", e.turnaround_time );
     ASSERT_EQ( "-", e.referer );
 }
+
+TEST_F ( TestParseFixture, AWS_SpaceInReferrer )
+{
+    const char * InputLine =
+    "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"referrer with spaces\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+    
+    SLogAWSEvent e = parse_aws( InputLine, false );
+    ASSERT_EQ( "referrer with spaces", e.referer );
+}
+
 
 TEST_F ( TestParseFixture, AWS_MultiLine )
 {

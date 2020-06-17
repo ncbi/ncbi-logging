@@ -362,9 +362,6 @@ test2jsn: log2jsn_
 	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
 						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
-	cat data/gcp_with_headers.log | $(LOG2JSON) gcp -H >./actual/gcp_with_headers.out 2>./actual/gcp_with_headers.err \
-						&& diff ./expected/gcp_with_headers.out ./actual/gcp_with_headers.out \
-						&& diff ./expected/gcp_with_headers.err ./actual/gcp_with_headers.err
 	cat data/op_unrecognized.log  | $(LOG2JSON) op -p -j --readable >./actual/op_unrecognized_pretty.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized_pretty.out ./actual/op_unrecognized_pretty.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 

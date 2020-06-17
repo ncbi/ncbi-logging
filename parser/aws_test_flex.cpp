@@ -73,7 +73,7 @@ TEST_F ( AWS_TestFlexFixture, Quotes )
 TEST_F ( AWS_TestFlexFixture, QuotedSpace )
 {
     ASSERT_EQ( QUOTE, StartScan("\" \"") );
-    ASSERT_EQ( QSTR, Scan() );
+    ASSERT_EQ( SPACE, Scan() );
 }
 TEST_F ( AWS_TestFlexFixture, QuotedQuestion )
 {
@@ -82,7 +82,7 @@ TEST_F ( AWS_TestFlexFixture, QuotedQuestion )
 }
 TEST_F ( AWS_TestFlexFixture, QuotedString )
 {
-    #define str ".Bl0-_~!*'();:@&=+$,/%# []"
+    #define str ".Bl0-_~!*'();:@&=+$,/%#[]"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );
     ASSERT_FALSE ( token . s . escaped ); // no '\' inside

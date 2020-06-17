@@ -135,6 +135,8 @@ void AWS_Parser :: parse()
     yyscan_t sc;
     aws_lex_init( &sc );
 
+    aws_set_debug( aws_debug, sc );
+
     while( getline( m_input, line ) )
     {
         YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
@@ -151,12 +153,6 @@ void AWS_Parser :: parse()
 }
 
 /* ============================================================================== */
-void NCBI::Logging::LogGCPHeader::append_fieldname( const t_str &name )
-{
-    string s_name( ToString( name ) );
-    m_fieldnames . push_back( s_name );
-}
-
 GCP_Parser :: GCP_Parser( GCP_LogLines & p_lines, std::istream & p_input )
 : m_lines ( p_lines ), m_input ( p_input )
 {

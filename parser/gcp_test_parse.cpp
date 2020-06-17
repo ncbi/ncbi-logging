@@ -9,13 +9,31 @@
 using namespace std;
 using namespace NCBI::Logging;
 
+//TODO: promote to a shared place 
+struct SRequest
+{
+    string server;
+    string method;
+    string path;
+    string vers;
+
+    SRequest& operator= ( const t_request &req )
+    {
+       server = ToString( req.server );
+       method = ToString( req.method );
+       path = ToString( req.path );
+       vers = ToString( req.vers );
+       return *this;
+    }
+};
+
 struct SLogGCPEvent
 {
     int64_t     time;
+    SRequest    request;
     string      ip;
     int64_t     ip_type;
     string      ip_region;
-    string      method;
     string      uri;
     int64_t     status;
     int64_t     request_bytes;
@@ -27,16 +45,15 @@ struct SLogGCPEvent
     string      request_id;
     string      operation;
     string      bucket;
-    string      object;
     string      unparsed;
 
     SLogGCPEvent( const LogGCPEvent &ev )
     {
         time        = ev . time;
+        request     = ev . request;
         ip          = ToString( ev . ip );
         ip_type     = ev . ip_type;
         ip_region   = ToString( ev . ip_region );
-        method      = ToString( ev . method );
         uri         = ToString( ev . uri );
         status      = ev . status;
         request_bytes = ev . request_bytes;
@@ -48,7 +65,6 @@ struct SLogGCPEvent
         request_id  = ToString( ev . request_id );
         operation   = ToString( ev . operation );
         bucket      = ToString( ev . bucket );
-        object      = ToString( ev . object );
         unparsed    = ToString( ev . unparsed );
     }
 };
@@ -70,7 +86,7 @@ struct TestLogLines : public GCP_LogLines
         m_rejected . push_back ( SLogGCPEvent( event ) );
     }
 
-    virtual void headerLine( const LogGCPHeader & hdr )
+    virtual void headerLine()
     {
     }
 
@@ -146,7 +162,7 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( "35.245.177.170", e.ip );
     ASSERT_EQ( 1, e.ip_type );
     ASSERT_EQ( "", e.ip_region );
-    ASSERT_EQ( "GET", e.method );
+    ASSERT_EQ( "GET", e.request.method );
     ASSERT_EQ( "/storage/v1/b/sra-pub-src-9/o/SRR1371108%2FCGAG_2.1.fastq.gz?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl", e . uri );
     ASSERT_EQ( 404, e . status );
     ASSERT_EQ( 0, e . request_bytes );
@@ -158,7 +174,7 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( "AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs", e . request_id );
     ASSERT_EQ( "storage.objects.get", e . operation );
     ASSERT_EQ( "sra-pub-src-9", e . bucket );
-    ASSERT_EQ( "SRR1371108/CGAG_2.1.fastq.gz", e . object );
+    ASSERT_EQ( "SRR1371108/CGAG_2.1.fastq.gz", e . request . path );
 }
 
 TEST_F ( TestParseFixture, GCP_EmptyAgent )

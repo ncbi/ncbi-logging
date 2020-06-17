@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
 #include <cstring>
 
 #include "types.h"
@@ -83,7 +82,6 @@ namespace NCBI
             int64_t     time;           // in microseconds
             int64_t     ip_type;        // 1..ipv4, 2..ipv6
             t_str       ip_region;      // empty, reserved
-            t_str       method;
             t_str       uri;
             int64_t     status;
             int64_t     request_bytes;
@@ -93,14 +91,13 @@ namespace NCBI
             t_str       request_id;
             t_str       operation;
             t_str       bucket;
-            t_str       object;
+            t_request   request;
 
             LogGCPEvent()
             {
                 time = 0;
                 ip_type = 0;
                 ip_region . n = 0;
-                method . n = 0;
                 uri . n = 0;
                 status = 0;
                 request_bytes = 0;
@@ -110,16 +107,7 @@ namespace NCBI
                 request_id . n = 0;
                 operation . n = 0;
                 bucket . n = 0;
-                object . n = 0;
             }
-        };
-
-        struct LogGCPHeader
-        {
-            void append_fieldname( const t_str &name );
-            void clear() { m_fieldnames.clear(); }
-
-            std::vector< std::string > m_fieldnames;
         };
 
         struct LogAWSEvent : public CommonLogEvent
@@ -131,7 +119,7 @@ namespace NCBI
             t_str       request_id;
             t_str       operation;
             t_str       key;
-            t_str       request;
+            t_request   request;
             t_str       res_code;
             t_str       error;
             t_str       res_len;
@@ -153,7 +141,6 @@ namespace NCBI
                 request_id . n = 0;
                 operation . n = 0;
                 key . n = 0;
-                request . n = 0;
                 res_code . n = 0;
                 error . n = 0;
                 res_len . n = 0;
@@ -201,11 +188,9 @@ namespace NCBI
             // if you want to hang on to the strings, copy them inside here
             virtual void acceptLine( const LogGCPEvent & event ) = 0;
             virtual void rejectLine( const LogGCPEvent & event ) = 0;
-            virtual void headerLine( const LogGCPHeader & hdr ) = 0;
+            virtual void headerLine() = 0;
 
             virtual ~ GCP_LogLines () noexcept {}
-
-            LogGCPHeader header;
         };
 
 

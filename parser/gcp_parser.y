@@ -21,6 +21,7 @@ using namespace std;
 using namespace NCBI::Logging;
 
 void gcp_error( yyscan_t locp, NCBI::Logging::GCP_LogLines * lib, const char* msg );
+#define EMPTY_TSTR(t) do { t.p = NULL; t.n = 0; } while (false)
 
 %}
 
@@ -54,7 +55,7 @@ using namespace NCBI::Logging;
 line
     :
     | log_gcp       { YYACCEPT; }
-    | log_hdr       { lib->headerLine( lib->header ); lib->header.clear(); YYACCEPT; }
+    | log_hdr       { lib -> headerLine(); YYACCEPT; }
     | log_err       { YYACCEPT; }
     ;
 
@@ -69,19 +70,19 @@ log_err
     ;
 
 log_hdr
-    : hdr_item_text             { lib->header.append_fieldname( $1 ); }
-    | log_hdr COMMA hdr_item    { lib->header.append_fieldname( $3 ); }
+    : hdr_item_text             {} 
+    | log_hdr COMMA hdr_item    {} 
     ;
 
 hdr_item_text
-    : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    : QUOTE QSTR QUOTE   {}   
+    | QUOTE QUOTE        {} 
     ;
 
 hdr_item
-    : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE I64 QUOTE       { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    : QUOTE QSTR QUOTE   {} 
+    | QUOTE I64 QUOTE    {} 
+    | QUOTE QUOTE        {} 
     ;
 
 log_gcp
@@ -94,7 +95,7 @@ log_gcp
         ev . ip = $3;
         ev . ip_type = ( $5 . p == nullptr ) ? 0 : atoi( $5 . p );
         ev . ip_region = $7;
-        ev . method = $9;
+        // $9 (method) goes into ev.request below
         ev . uri = $11;
         ev . status = ( $13 . p == nullptr ) ? 0 : atol( $13 . p );
         ev . request_bytes = ( $15 . p == nullptr ) ? 0 : atol( $15 . p );
@@ -106,7 +107,12 @@ log_gcp
         ev . request_id = $27;
         ev . operation = $29;
         ev . bucket = $31;
-        ev . object = $33;
+
+        ev . request . method = $9;
+        ev . request . path = $33;
+        EMPTY_TSTR( ev . request . server );
+        EMPTY_TSTR( ev . request . vers );
+
         lib -> acceptLine( ev );
     }
     ;

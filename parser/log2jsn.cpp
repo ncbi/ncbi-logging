@@ -76,7 +76,6 @@ struct Options
     bool readable = false;
     bool report = true;
     bool print_line_nr = false;
-    bool print_headers = false;
     bool debug = false;
     bool jsonlib = false;
 };
@@ -314,8 +313,13 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         mem_os << ",\"operation\":" << e.operation;
         mem_os << ",\"owner\":" << e.owner;
         mem_os << ",\"referer\":" << e.referer;
-        mem_os << ",\"request\":" << e.request;
-        mem_os << ",\"request_id\":" << e.request_id;
+
+        mem_os << ",\"request\":{";
+            mem_os << "\"method\":" << e.request.method;
+            mem_os << ",\"path\":" << e.request.path;
+            mem_os << ",\"vers\":" << e.request.vers;
+
+        mem_os << "},\"request_id\":" << e.request_id;
         mem_os << ",\"requester\":" << e.requester;
         mem_os << ",\"res_code\":" << e.res_code;
         mem_os << ",\"res_len\":" << e.res_len;
@@ -356,7 +360,14 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         j -> addValue( "host_header", ToJsonString( e.host_header ) );
         j -> addValue( "tls_version", ToJsonString( e.tls_version ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
-        j -> addValue( "request", ToJsonString( e.request ) );
+        {
+            JSONObjectRef req = JSON::makeObject();
+            req -> addValue("method",   ToJsonString( e.request.method ) );
+            req -> addValue("path",     ToJsonString( e.request.path ) );
+            req -> addValue("vers",     ToJsonString( e.request.vers ) );
+            JSONValueRef rv( req.release() );
+            j -> addValue( "request", rv );
+        }
         j -> addValue( "res_code", ToJsonString( e.res_code ) );
         j -> addValue( "res_len", ToJsonString( e.res_len ) );
         return j;
@@ -399,24 +410,8 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         }        line_nr ++;
     }
 
-    virtual void headerLine( const LogGCPHeader & hdr )
+    virtual void headerLine()
     {
-        if ( mem_options . print_headers )
-        {
-            JSONObjectRef obj = JSON::makeObject();
-            obj -> addValue( "header", JSON::makeBoolean(true) );
-
-            JSONArrayRef j = JSON::makeArray();
-            for (auto i=hdr.m_fieldnames.begin(); i != hdr.m_fieldnames.end(); ++i)
-            {
-                j -> appendValue( JSON::makeString( String( *i ) ) );
-            }
-
-            JSONValueRef v = j->clone();
-            obj -> addValue( String("fields"), v );
-
-            print_json( obj );
-        }
         num_headers ++;
         line_nr ++;            
     }
@@ -432,11 +427,15 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         mem_os << ",\"ip_type\":" << e.ip_type;
         if ( mem_options . print_line_nr )
             mem_os << ",\"line_nr\":" << line_nr;
-        mem_os << ",\"method\":" << e.method;
-        mem_os << ",\"object\":" << e.object;
         mem_os << ",\"operation\":" << e.operation;
         mem_os << ",\"referer\":" << e.referer;
-        mem_os << ",\"request_bytes\":" << e.request_bytes;
+
+        mem_os << ",\"request\":{";
+            mem_os << "\"method\":" << e.request.method;
+            mem_os << ",\"path\":" << e.request.path;
+            mem_os << ",\"vers\":" << e.request.vers;
+
+        mem_os << "},\"request_bytes\":" << e.request_bytes;
         mem_os << ",\"request_id\":" << e.request_id;
         mem_os << ",\"result_bytes\":" << e.result_bytes;
         mem_os << ",\"source\":\"GS\"";
@@ -461,7 +460,6 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         j -> addValue( "time", JSON::makeInteger( e.time ) );
         j -> addValue( "ip_type", JSON::makeInteger( e.ip_type ) );
         j -> addValue( "ip_region", ToJsonString( e.ip_region ) );
-        j -> addValue( "method", ToJsonString( e.method ) );
         j -> addValue( "uri", ToJsonString( e.uri ) );
         j -> addValue( "status", JSON::makeInteger( e.status ) );
         j -> addValue( "request_bytes", JSON::makeInteger( e.request_bytes ) );
@@ -471,7 +469,14 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         j -> addValue( "request_id", ToJsonString( e.request_id ) );
         j -> addValue( "operation", ToJsonString( e.operation ) );
         j -> addValue( "bucket", ToJsonString( e.bucket ) );
-        j -> addValue( "object", ToJsonString( e.object ) );
+        {
+            JSONObjectRef req = JSON::makeObject();
+            req -> addValue("method",   ToJsonString( e.request.method ) );
+            req -> addValue("path",     ToJsonString( e.request.path ) );
+            req -> addValue("vers",     ToJsonString( e.request.vers ) );
+            JSONValueRef rv( req.release() );
+            j -> addValue( "request", rv );
+        }
         return j;
     }
 
@@ -552,7 +557,6 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addOption( options . debug, "d", "debug", "parse with debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
         args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
-        args . addOption( options . print_headers, "H", "print-headers", "print header lines ( gcp only )" );        
         args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );        
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );

@@ -21,6 +21,7 @@ using namespace std;
 using namespace NCBI::Logging;
 
 void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* msg );
+#define EMPTY_TSTR(t) do { t.p = NULL; t.n = 0; } while (false)
 
 %}
 
@@ -38,6 +39,7 @@ using namespace NCBI::Logging;
 {
     t_str s;
     t_timepoint tp;
+    t_request req;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR DASH I64
@@ -45,10 +47,11 @@ using namespace NCBI::Logging;
 %token UNRECOGNIZED
 
 %type<tp> time
-%type<s> ip referer agent agent_list request
+%type<s> ip referer agent agent_list method qstr_list
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
 %type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
+%type<req> request
 
 %start line
 
@@ -224,9 +227,51 @@ ip
     | IPV6
     ;
 
+method
+    : METHOD        { $$ = $1; }
+    ;
+
+qstr_list
+    : QSTR                  { $$ = $1; }
+    | qstr_list SPACE QSTR  { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    ;
+
 request
-    : QUOTE QSTR QUOTE              { $$ = $2; }
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    : QUOTE method SPACE qstr_list SPACE VERS QUOTE
+    {
+        EMPTY_TSTR($$.server);
+        $$.method = $2;
+        $$.path   = $4;
+        $$.vers   = $6;
+    }
+    | QUOTE method SPACE qstr_list SPACE QUOTE
+    {
+        EMPTY_TSTR($$.server);
+        $$.method = $2;
+        $$.path   = $4;
+        EMPTY_TSTR($$.vers);
+    }
+    | QUOTE method SPACE qstr_list QUOTE
+    {
+        EMPTY_TSTR($$.server);
+        $$.method = $2;
+        $$.path   = $4;
+        EMPTY_TSTR($$.vers);
+    }
+    | QUOTE method QUOTE 
+    {
+        EMPTY_TSTR($$.server);
+        $$.method = $2;
+        EMPTY_TSTR($$.path);
+        EMPTY_TSTR($$.vers);
+    }
+    | DASH                          
+    {
+        EMPTY_TSTR($$.server);
+        EMPTY_TSTR($$.method);
+        EMPTY_TSTR($$.path);
+        EMPTY_TSTR($$.vers);
+    }
     ;
 
 result_code
@@ -235,7 +280,7 @@ result_code
     ;
 
 referer
-    : QUOTE QSTR QUOTE              { $$ = $2; }
+    : QUOTE qstr_list QUOTE         { $$ = $2; }
     | DASH                          { $$.p = NULL; $$.n = 0; }
     | STR
     | STR1
