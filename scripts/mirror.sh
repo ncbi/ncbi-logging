@@ -33,11 +33,9 @@ echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YEST
 case "$PROVIDER" in
     S3)
         export PARSER="aws"
-        export MIRROR="$HOME/S3.all"
         ;;
     GS)
         export PARSER="gcp"
-        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
         ;;
     OP)
         export PARSER="op"
@@ -55,23 +53,26 @@ echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Processing $LOG_BUCKET"
 
-    mkdir -p "$MIRROR"
-    cd "$MIRROR" || exit
-
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
-    echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
 
     if [ "$PROVIDER" = "GS" ]; then
+        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
+        mkdir -p "$MIRROR"
+        cd "$MIRROR" || exit
         TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
         export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
         export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
         gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
+        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
         gsutil -m rsync "gs://$LOG_BUCKET/" .
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
+        MIRROR="$HOME/S3.all"
+        mkdir -p "$MIRROR"
+        cd "$MIRROR" || exit
         TGZ="$HOME/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
 #        if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
 #            cp "$PANFS"/s3_prod/"$YESTERDAY".src.combine.gz .
@@ -79,11 +80,13 @@ for LOG_BUCKET in $buckets; do
 #            cp "$PANFS"/s3_prod/"$YESTERDAY".combine.gz .
 #        fi
 
+        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
         WILDCARD="${YESTERDAY_DASH}-*"
 #        gsutil -m rsync "s3://$LOG_BUCKET/" .
 #        gunzip ./*combine.gz
 #        WILDCARD="*.combine"
     fi
+
 
     mkdir -p "$(dirname "$TGZ")"
     echo "rsynced to $MIRROR, tarring $WILDCARD to $TGZ ..."
