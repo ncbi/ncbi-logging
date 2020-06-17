@@ -33,7 +33,7 @@ renice +19 -p $$ > /dev/null 2>&1
 SQLCACHE="$RAMDISK/${USER}_${DATE}"
 SQLCACHE="$RAMDISK/${USER}"
 mkdir -p "$SQLCACHE"
-if [ ! -e "$SQLCACHE/buckets.db" ]; then
+if [ ! -s "$SQLCACHE/buckets.db" ]; then
     echo "Refreshing sqlite cache"
     export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
     gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
