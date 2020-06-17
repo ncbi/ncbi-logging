@@ -199,7 +199,8 @@ req_time
     ;
 
 referer
-    : QUOTE QSTR QUOTE              { $$ = $2; }
+    : QUOTE QSTR QUOTE          { $$ = $2; }
+    | QUOTE QUOTE               { EMPTY_TSTR($$); }
     ;
 
 agent

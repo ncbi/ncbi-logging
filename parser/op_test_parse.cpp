@@ -352,6 +352,13 @@ TEST_F ( TestParseFixture, OnPremise_rejected_unparsed_set )
     check_rejected( InputLine );
 }
 
+TEST_F ( TestParseFixture, OnPremise_EmptyReferrer )
+{   
+    const char * InputLine =
+"192.12.184.6 - - [27/Aug/2018:00:40:03 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET /traces/sra6/SRR/000166/SRR170543 HTTP/1.1\" 200 10262285 0.427 \"\" \"Mozilla/5.0\" \"-\" port=443 rl=136";
+    check_accepted( InputLine );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
