@@ -174,7 +174,7 @@ update buckets
     immutable="true",
     scope='private',
     storage_class='hot'
-    where bucket_name like 'sra-ca-%';
+    where bucket_name like '%-ca-%';
 
 update buckets
     set format='ETL + BQS'
@@ -193,7 +193,7 @@ update buckets
     where bucket_name like 'sra-ca-src-%' and bucket_name!='sra-ca-src-1';
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
     select
         'GS',
         bucket_name,
@@ -203,7 +203,8 @@ insert into buckets (cloud_provider, bucket_name, description,
         service_account,
         immutable,
         format,
-        storage_class
+        storage_class,
+        scope
         from buckets
         where cloud_provider='S3'
         and bucket_name like 'sra-pub-%' or bucket_name like 'sra-ca-%' or bucket_name like '%-zq-%';
