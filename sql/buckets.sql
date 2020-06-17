@@ -25,9 +25,8 @@ insert into formats values ('nginx log');
 insert into formats values ('apache log');
 insert into formats values ('cloudian log');
 insert into formats values ('S3 log');
-insert into formats values ('ETL');
-insert into formats values ('BQS');
 insert into formats values ('ETL + BQS');
+insert into formats values ('ETL - BQS');
 insert into formats values ('Original');
 insert into formats values ('fastq');
 insert into formats values ('metadata');
@@ -161,7 +160,7 @@ update buckets
     where bucket_name like 'sra-pub-%';
 
 update buckets
-    set format='EQL & BQS'
+    set format='EQL + BQS'
     where bucket_name like 'sra-pub-run-%' and bucket_name not like '%log%';
 
 update buckets
@@ -178,12 +177,16 @@ update buckets
     where bucket_name like 'sra-ca-%';
 
 update buckets
-    set format='ETL & BQS'
-    where bucket_name like 'sra-ca-run-%';
+    set format='ETL + BQS'
+    where bucket_name like 'sra-ca-run-%' or bucket_name like 'sra-pub-run-%';
+
+update buckets
+    set format='ETL - BQS'
+    where bucket_name like '%-zq-%';
 
 update buckets
     set format='Original'
-    where bucket_name like 'sra-ca-src-%';
+    where bucket_name like '%-src-%';
 
 update buckets
     set storage_class='cold'
@@ -203,7 +206,11 @@ insert into buckets (cloud_provider, bucket_name, description,
         storage_class
         from buckets
         where cloud_provider='S3'
-        and bucket_name like 'sra-pub-%' or bucket_name like 'sra-ca-%';
+        and bucket_name like 'sra-pub-%' or bucket_name like 'sra-ca-%' or bucket_name like '%-zq-%';
+
+update buckets
+    set format='GS bucket'
+    where cloud_provider='GS' and format='S3 bucket';
 
 update buckets set log_bucket='sra-pub-logs-1',
     owner='nih-sra-datastore'
@@ -465,4 +472,3 @@ select * from buckets order by cloud_provider, bucket_name;
 .mode csv
 .output buckets.csv
 select * from buckets order by cloud_provider, bucket_name;
-
