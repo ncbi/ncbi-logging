@@ -5,7 +5,7 @@
 
 type -a aws
 
-buckets=$(sqlcmd "select bucket_name from buckets where cloud_provider='GS' and format not like '%log%' order by service_account desc")
+buckets=$(sqlcmd "select bucket_name from buckets where cloud_provider='GS' and scope = 'public' and format not like '%log%' order by service_account desc")
 
 echo "buckets is '$buckets'"
 

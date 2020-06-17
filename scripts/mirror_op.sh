@@ -6,7 +6,7 @@
 #YESTERDAY="20200605"
 # /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/sra_prod/20200607
 # gsutil -m rsync -r "$LOGDIR"/sra_prod gs://strides_analytics/sra_prod
-buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='GS' order by log_bucket desc")
+buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='GS' and scope='public' order by log_bucket desc")
 buckets="sra_prod"
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do

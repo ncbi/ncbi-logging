@@ -5,7 +5,7 @@
 
 type -a aws
 
-buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='S3' order by log_bucket")
+buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='S3' and scope='public' order by log_bucket")
 
 #YESTERDAY="20200530"
 #YESTERDAY_DASH="2020-05-30"

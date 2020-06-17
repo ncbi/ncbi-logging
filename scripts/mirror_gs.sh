@@ -3,7 +3,7 @@
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
 
-buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='GS' order by log_bucket desc")
+buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='GS' and scope='public' order by log_bucket desc")
 
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
