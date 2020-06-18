@@ -232,7 +232,7 @@ method
 
 qstr_list
     : QSTR                  { $$ = $1; }
-    | qstr_list SPACE QSTR  { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    | qstr_list SPACE QSTR  { $$ = $1; $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
     ;
 
 request
@@ -286,8 +286,8 @@ agent
 
 agent_list
     : QSTR                          { $$ = $1; }
-    | agent_list QSTR               { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
-    | agent_list SPACE              { $$.n += 1;    $$.escaped = $1.escaped; }    
+    | agent_list QSTR               { $$ = $1; $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
+    | agent_list SPACE              { $$ = $1; $$.n += 1;    $$.escaped = $1.escaped; }    
     ;
 
 time

@@ -113,7 +113,7 @@ server
 
 qstr_list
     : QSTR                  { $$ = $1; }
-    | qstr_list SPACE QSTR  { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    | qstr_list SPACE QSTR  { $$ = $1; $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
     ;
 
 request
@@ -174,9 +174,9 @@ quoted_list_elem
 
 quoted_list_body
     : quoted_list_elem                          { $$ = $1; }
-    | quoted_list_body SPACE quoted_list_elem   { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
-    | quoted_list_body SPACE METHOD             { $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
-    | quoted_list_body METHOD                   { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
+    | quoted_list_body SPACE quoted_list_elem   { $$ = $1; $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    | quoted_list_body SPACE                    { $$ = $1; $$.n += 1; }
+    | quoted_list_body METHOD                   { $$ = $1; $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
     ;
 
 result_code
@@ -203,8 +203,8 @@ agent
 
 agent_list
     : QSTR                { $$ = $1; }
-    | agent_list QSTR     { $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
-    | agent_list SPACE    { $$.n += 1;    $$.escaped = $1.escaped; }
+    | agent_list QSTR     { $$ = $1; $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
+    | agent_list SPACE    { $$ = $1; $$.n += 1;    $$.escaped = $1.escaped; }
     ;
 
 forwarded
