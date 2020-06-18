@@ -29,7 +29,11 @@ namespace NCBI
             t_str path;
             t_str params;
             t_str vers;
+            t_str accession;
+            t_str extension;
         } t_request;
+
+        inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }        
 
         struct CommonLogEvent
         {
@@ -37,6 +41,7 @@ namespace NCBI
             t_str       referer;
             t_str       agent;
             t_str       unparsed;
+            t_request   request;
 
             CommonLogEvent()
             {
@@ -44,6 +49,7 @@ namespace NCBI
                 referer . n = 0;
                 agent . n = 0;
                 unparsed . n = 0;                
+                InitRequest( request );
             }
         };
 
@@ -57,7 +63,6 @@ namespace NCBI
             int64_t     port;
             int64_t     req_len;
 
-            t_request   request;
             int64_t     res_code;
             int64_t     res_len;
 
@@ -70,7 +75,6 @@ namespace NCBI
                 port  = 0;
                 req_len = 0;
 
-                memset( &request, 0, sizeof request );
                 res_code = 0;
                 res_len = 0;
             }
@@ -91,7 +95,6 @@ namespace NCBI
             t_str       request_id;
             t_str       operation;
             t_str       bucket;
-            t_request   request;
 
             LogGCPEvent()
             {
@@ -119,7 +122,6 @@ namespace NCBI
             t_str       request_id;
             t_str       operation;
             t_str       key;
-            t_request   request;
             t_str       res_code;
             t_str       error;
             t_str       res_len;

@@ -111,6 +111,13 @@ struct cmnLogLines
 
         if ( mem_options . print_line_nr )
             j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
+
+        j -> addValue( "method",    ToJsonString( e.request.method ) );
+        j -> addValue( "path",      ToJsonString( e.request.path ) );
+        j -> addValue( "vers",      ToJsonString( e.request.vers ) );
+        j -> addValue( "accession", ToJsonString( e.request.accession ) );
+        j -> addValue( "extension", ToJsonString( e.request.extension ) );
+        // e.request.server is only output for OP
     }
 
     void print_json( JSONObjectRef j )
@@ -201,32 +208,32 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     void print_direct ( const LogOPEvent & e, bool accepted )
     {
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
+        mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"extension\":" << e.request.extension;
         mem_os << ",\"forwarded\":" << e.forwarded;
         mem_os << ",\"ip\":" << e.ip;
         if ( mem_options . print_line_nr )
+        {
             mem_os << ",\"line_nr\":" << line_nr;
+        }
+        mem_os << ",\"method\":" << e.request.method;
+        mem_os << ",\"path\":" << e.request.path;
         mem_os << ",\"port\":" << e.port;
         mem_os << ",\"referer\":" << e.referer;
         mem_os << ",\"req_len\":" << e.req_len;
         mem_os << ",\"req_time\":" << e.req_time;
-
-        mem_os << ",\"request\":{";
-            mem_os << "\"method\":" << e.request.method;
-            mem_os << ",\"path\":" << e.request.path;
-            mem_os << ",\"server\":" << e.request.server;
-            mem_os << ",\"vers\":" << e.request.vers;
-
-        mem_os << "},\"res_code\":" << e.res_code;
+        mem_os << ",\"res_code\":" << e.res_code;
         mem_os << ",\"res_len\":" << e.res_len;
+        mem_os << ",\"server\":" << e.request.server;
         mem_os << ",\"source\":\"NCBI\"";
         mem_os << ",\"time\":" << e.time;
-
         if ( !accepted )
         {
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
         mem_os << ",\"user\":" << e.user;
+        mem_os << ",\"vers\":" << e.request.vers;
         mem_os << "}" <<endl;
     }
 
@@ -237,15 +244,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
         MakeCmnJson( j, e, accepted );
         j -> addValue( "source", JSON::makeString("NCBI") );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
-        {
-            JSONObjectRef req = JSON::makeObject();
-            req -> addValue("server",   ToJsonString( e.request.server ) );
-            req -> addValue("method",   ToJsonString( e.request.method ) );
-            req -> addValue("path",     ToJsonString( e.request.path ) );
-            req -> addValue("vers",     ToJsonString( e.request.vers ) );
-            JSONValueRef rv( req.release() );
-            j -> addValue( "request", rv );
-        }
+        j -> addValue( "server",   ToJsonString( e.request.server ) );
         j -> addValue( "res_code", JSON::makeInteger( e.res_code ) );
         j -> addValue( "res_len", JSON::makeInteger( e.res_len ) );
         j -> addValue( "user", ToJsonString( e.user ) );
@@ -298,28 +297,28 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
     void print_direct ( const LogAWSEvent & e, bool accepted )
     {
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
+        mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
         mem_os << ",\"auth_type\":" << e.auth_type;
         mem_os << ",\"bucket\":" << e.bucket;
         mem_os << ",\"cipher_suite\":" << e.cipher_suite;
         mem_os << ",\"error\":" << e.error;
+        mem_os << ",\"extension\":" << e.request.extension;
         mem_os << ",\"host_header\":" << e.host_header;
         mem_os << ",\"host_id\":" << e.host_id;
         mem_os << ",\"ip\":" << e.ip;
         mem_os << ",\"key\":" << e.key;
         if ( mem_options . print_line_nr )
+        {
             mem_os << ",\"line_nr\":" << line_nr;
+        }
+        mem_os << ",\"method\":" << e.request.method;
         mem_os << ",\"obj_size\":" << e.obj_size;
         mem_os << ",\"operation\":" << e.operation;
         mem_os << ",\"owner\":" << e.owner;
+        mem_os << ",\"path\":" << e.request.path;
         mem_os << ",\"referer\":" << e.referer;
-
-        mem_os << ",\"request\":{";
-            mem_os << "\"method\":" << e.request.method;
-            mem_os << ",\"path\":" << e.request.path;
-            mem_os << ",\"vers\":" << e.request.vers;
-
-        mem_os << "},\"request_id\":" << e.request_id;
+        mem_os << ",\"request_id\":" << e.request_id;
         mem_os << ",\"requester\":" << e.requester;
         mem_os << ",\"res_code\":" << e.res_code;
         mem_os << ",\"res_len\":" << e.res_len;
@@ -332,6 +331,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         {
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
+        mem_os << ",\"vers\":" << e.request.vers;
         mem_os << ",\"version_id\":" << e.version_id;
 
         mem_os << "}" <<endl;
@@ -360,14 +360,6 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         j -> addValue( "host_header", ToJsonString( e.host_header ) );
         j -> addValue( "tls_version", ToJsonString( e.tls_version ) );
         j -> addValue( "time", JSON::makeString( FormatTime( e.time ) ) );
-        {
-            JSONObjectRef req = JSON::makeObject();
-            req -> addValue("method",   ToJsonString( e.request.method ) );
-            req -> addValue("path",     ToJsonString( e.request.path ) );
-            req -> addValue("vers",     ToJsonString( e.request.vers ) );
-            JSONValueRef rv( req.release() );
-            j -> addValue( "request", rv );
-        }
         j -> addValue( "res_code", ToJsonString( e.res_code ) );
         j -> addValue( "res_len", ToJsonString( e.res_len ) );
         return j;
@@ -419,23 +411,23 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     void print_direct ( const LogGCPEvent & e, bool accepted )
     {
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
+        mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
         mem_os << ",\"bucket\":" << e.bucket;
+        mem_os << ",\"extension\":" << e.request.extension;
         mem_os << ",\"host\":" << e.host;
         mem_os << ",\"ip\":" << e.ip;
         mem_os << ",\"ip_region\":" << e.ip_region;
         mem_os << ",\"ip_type\":" << e.ip_type;
         if ( mem_options . print_line_nr )
+        {
             mem_os << ",\"line_nr\":" << line_nr;
+        }
+        mem_os << ",\"method\":" << e.request.method;
         mem_os << ",\"operation\":" << e.operation;
+        mem_os << ",\"path\":" << e.request.path;
         mem_os << ",\"referer\":" << e.referer;
-
-        mem_os << ",\"request\":{";
-            mem_os << "\"method\":" << e.request.method;
-            mem_os << ",\"path\":" << e.request.path;
-            mem_os << ",\"vers\":" << e.request.vers;
-
-        mem_os << "},\"request_bytes\":" << e.request_bytes;
+        mem_os << ",\"request_bytes\":" << e.request_bytes;
         mem_os << ",\"request_id\":" << e.request_id;
         mem_os << ",\"result_bytes\":" << e.result_bytes;
         mem_os << ",\"source\":\"GS\"";
@@ -447,6 +439,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         {
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
+        mem_os << ",\"vers\":" << e.request.vers;
 
         mem_os << "}" <<endl;
     }
@@ -469,14 +462,6 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         j -> addValue( "request_id", ToJsonString( e.request_id ) );
         j -> addValue( "operation", ToJsonString( e.operation ) );
         j -> addValue( "bucket", ToJsonString( e.bucket ) );
-        {
-            JSONObjectRef req = JSON::makeObject();
-            req -> addValue("method",   ToJsonString( e.request.method ) );
-            req -> addValue("path",     ToJsonString( e.request.path ) );
-            req -> addValue("vers",     ToJsonString( e.request.vers ) );
-            JSONValueRef rv( req.release() );
-            j -> addValue( "request", rv );
-        }
         return j;
     }
 

@@ -21,7 +21,6 @@ using namespace std;
 using namespace NCBI::Logging;
 
 void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* msg );
-#define EMPTY_TSTR(t) do { t.p = NULL; t.n = 0; } while (false)
 
 %}
 
@@ -239,38 +238,32 @@ qstr_list
 request
     : QUOTE method SPACE qstr_list SPACE VERS QUOTE
     {
-        EMPTY_TSTR($$.server);
+        InitRequest( $$ );
         $$.method = $2;
         $$.path   = $4;
         $$.vers   = $6;
     }
     | QUOTE method SPACE qstr_list SPACE QUOTE
     {
-        EMPTY_TSTR($$.server);
+        InitRequest( $$ );
         $$.method = $2;
         $$.path   = $4;
         EMPTY_TSTR($$.vers);
     }
     | QUOTE method SPACE qstr_list QUOTE
     {
-        EMPTY_TSTR($$.server);
+        InitRequest( $$ );
         $$.method = $2;
         $$.path   = $4;
-        EMPTY_TSTR($$.vers);
     }
     | QUOTE method QUOTE 
     {
-        EMPTY_TSTR($$.server);
+        InitRequest( $$ );
         $$.method = $2;
-        EMPTY_TSTR($$.path);
-        EMPTY_TSTR($$.vers);
     }
     | DASH                          
     {
-        EMPTY_TSTR($$.server);
-        EMPTY_TSTR($$.method);
-        EMPTY_TSTR($$.path);
-        EMPTY_TSTR($$.vers);
+        InitRequest( $$ );
     }
     ;
 

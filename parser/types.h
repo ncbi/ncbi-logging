@@ -8,4 +8,6 @@ typedef struct t_str
     bool escaped;
 } t_str;
 
+#define EMPTY_TSTR(t) do { t.p = NULL; t.n = 0; t.escaped; } while (false)
+
 #endif

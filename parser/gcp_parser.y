@@ -21,7 +21,6 @@ using namespace std;
 using namespace NCBI::Logging;
 
 void gcp_error( yyscan_t locp, NCBI::Logging::GCP_LogLines * lib, const char* msg );
-#define EMPTY_TSTR(t) do { t.p = NULL; t.n = 0; } while (false)
 
 %}
 
@@ -108,10 +107,9 @@ log_gcp
         ev . operation = $29;
         ev . bucket = $31;
 
+        InitRequest( ev . request );
         ev . request . method = $9;
         ev . request . path = $33;
-        EMPTY_TSTR( ev . request . server );
-        EMPTY_TSTR( ev . request . vers );
 
         lib -> acceptLine( ev );
     }
