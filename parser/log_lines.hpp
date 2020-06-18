@@ -33,7 +33,8 @@ namespace NCBI
             t_str extension;
         } t_request;
 
-        inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }        
+        inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }
+        void extract_acc_ext( t_request & r );
 
         struct CommonLogEvent
         {
@@ -45,10 +46,10 @@ namespace NCBI
 
             CommonLogEvent()
             {
-                ip . n = 0;
-                referer . n = 0;
-                agent . n = 0;
-                unparsed . n = 0;                
+                EMPTY_TSTR( ip );
+                EMPTY_TSTR( referer );
+                EMPTY_TSTR( agent );
+                EMPTY_TSTR( unparsed );
                 InitRequest( request );
             }
         };
@@ -69,12 +70,11 @@ namespace NCBI
             LogOPEvent() : CommonLogEvent()
             {
                 memset( &time, 0, sizeof time );
-                user . n = 0;
-                req_time . n = 0;
-                forwarded . n = 0;
+                EMPTY_TSTR( user );
+                EMPTY_TSTR( req_time );
+                EMPTY_TSTR( forwarded );
                 port  = 0;
                 req_len = 0;
-
                 res_code = 0;
                 res_len = 0;
             }
@@ -100,16 +100,16 @@ namespace NCBI
             {
                 time = 0;
                 ip_type = 0;
-                ip_region . n = 0;
-                uri . n = 0;
+                EMPTY_TSTR( ip_region );
+                EMPTY_TSTR( uri );
                 status = 0;
                 request_bytes = 0;
                 result_bytes = 0;
                 time_taken = 0;
-                host . n = 0;
-                request_id . n = 0;
-                operation . n = 0;
-                bucket . n = 0;
+                EMPTY_TSTR( host );
+                EMPTY_TSTR( request_id );
+                EMPTY_TSTR( operation );
+                EMPTY_TSTR( bucket );
             }
         };
 
@@ -137,24 +137,25 @@ namespace NCBI
 
             LogAWSEvent()
             {
-                owner . n = 0;
-                bucket . n = 0;
-                requester . n = 0;
-                request_id . n = 0;
-                operation . n = 0;
-                key . n = 0;
-                res_code . n = 0;
-                error . n = 0;
-                res_len . n = 0;
-                obj_size . n = 0;
-                total_time . n = 0;
-                turnaround_time . n = 0;
-                version_id . n = 0;
-                host_id . n = 0;
-                cipher_suite . n = 0;
-                auth_type . n = 0;
-                host_header . n = 0;
-                tls_version . n = 0;
+                EMPTY_TSTR( owner );
+                EMPTY_TSTR( bucket );
+                memset( &time, 0, sizeof time );
+                EMPTY_TSTR( requester );
+                EMPTY_TSTR( request_id );
+                EMPTY_TSTR( operation );
+                EMPTY_TSTR( key );
+                EMPTY_TSTR( res_code );
+                EMPTY_TSTR( error );
+                EMPTY_TSTR( res_len );
+                EMPTY_TSTR( obj_size );
+                EMPTY_TSTR( total_time );
+                EMPTY_TSTR( turnaround_time );
+                EMPTY_TSTR( version_id );
+                EMPTY_TSTR( host_id );
+                EMPTY_TSTR( cipher_suite );
+                EMPTY_TSTR( auth_type );
+                EMPTY_TSTR( host_header );
+                EMPTY_TSTR( tls_version );
             }
         };
 
@@ -240,7 +241,6 @@ namespace NCBI
             GCP_LogLines &  m_lines;
             std::istream &  m_input;
         };
-
 
     }
 }
