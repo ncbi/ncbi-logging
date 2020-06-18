@@ -13,7 +13,8 @@ bq query \
     --destination_table strides_analytics.objects_uniq \
     "select distinct * except (now, md5) from strides_analytics.objects"
 
-
+# TODO: Add first_appearance_accession_provider that ignores accession.version
+# [DES]R[RZ][0-9]{4,17}
 bq rm -f -t strides_analytics.object_delta || true
 bq query \
     --destination_table strides_analytics.object_delta \

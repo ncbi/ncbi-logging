@@ -62,7 +62,7 @@ for LOG_BUCKET in $buckets; do
     gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
     export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-    PARSE_DEST="$RAMDISK/$PROVIDER/$LOG_BUCKET"
+    PARSE_DEST="$TMP/$PROVIDER/$LOG_BUCKET"
 
     TGZ="$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
 
@@ -108,20 +108,21 @@ for LOG_BUCKET in $buckets; do
     if [ "$unrecwc" -eq "0" ]; then
         echo "Gzipping..."
         find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
-        gzip -v -9 ./*.jsonl
+        gzip -f -v -9 ./*.jsonl
 
         ls -la
 
         echo "Uploading..."
 
+        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/ncbi-logmon.json
         export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
         gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-        gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
         gsutil cp ./*.jsonl.gz "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
+        #gsutil ls -lh "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
 
-        gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
-        export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
-        gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/logs_gs_public/"
+        #gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
+        #export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
+        #gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/logs_gs_public/"
         #gsutil ls "gs://strides_analytics_logs_parsed/logs_gs_public/"
         cd ..
         rm -rf "$PARSE_DEST"
