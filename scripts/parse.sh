@@ -114,10 +114,13 @@ for LOG_BUCKET in $buckets; do
 
         echo "Uploading..."
 
+        export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+        gcloud config set account 253716305623-compute@developer.gserviceaccount.com
         gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
         gsutil cp ./*.jsonl.gz "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
 
         gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
+        export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
         gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/logs_gs_public/"
         #gsutil ls "gs://strides_analytics_logs_parsed/logs_gs_public/"
         cd ..
