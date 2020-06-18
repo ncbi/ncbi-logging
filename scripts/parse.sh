@@ -1,27 +1,44 @@
 #!/bin/bash
 
 USAGE="Usage: $0 {S3,GS,OP} YYYY_MM_DD"
-if [ "$#" -ne 2 ]; then
-    echo "$USAGE"
-    exit 1
-fi
-
-PROVIDER=$1
-DATE_UNDER=$2
-PROVIDER_LC=${PROVIDER,,}
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
 
+case "$#" in
+    0)
+        echo "$USAGE"
+        exit 1
+        ;;
+    1)
+        PROVIDER=$1
+        YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d") #_%H%
+        ;;
+    2)
+        PROVIDER=$1
+        YESTERDAY_UNDER=$2
+        ;;
+    *)
+        echo "$USAGE"
+        exit 1
+        ;;
+esac
+
+PROVIDER_LC=${PROVIDER,,}
+YESTERDAY=${YESTERDAY_UNDER//_}
+YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
+
+echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
+
 case "$PROVIDER" in
     S3)
-        PARSER="aws"
+        export PARSER="aws"
         ;;
     GS)
-        PARSER="gcp"
+        export PARSER="gcp"
         ;;
     OP)
-        PARSER="op"
+        export PARSER="op"
         ;;
     *)
         echo "Invalid provider $PROVIDER"
@@ -29,14 +46,11 @@ case "$PROVIDER" in
         exit 1
 esac
 
-if [[ ${#DATE_UNDER} -ne 10 ]]; then
-    echo "Invalid date: $DATE_UNDER"
+if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
+    echo "Invalid date: $YESTERDAY_UNDER"
     echo "$USAGE"
     exit 2
 fi
-
-DATE=${DATE_UNDER//_}
-export DATE_DASH=${DATE_UNDER//_/-}
 
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' order by log_bucket desc")
 
@@ -50,7 +64,7 @@ for LOG_BUCKET in $buckets; do
 
     PARSE_DEST="$RAMDISK/$PROVIDER/$LOG_BUCKET"
 
-    TGZ="$PROVIDER.$LOG_BUCKET.$DATE.tar.gz"
+    TGZ="$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
 
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
@@ -63,33 +77,33 @@ for LOG_BUCKET in $buckets; do
     echo "Counting $TGZ"
     totalwc=$(tar -xaOf "$TGZ" | wc -l | cut -f1 -d' ')
     echo "Parsing $TGZ, $totalwc lines"
-    touch "$DATE.${LOG_BUCKET}.json"
+    touch "$YESTERDAY.${LOG_BUCKET}.json"
 
     tar -xaOf "$TGZ" | \
         time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
-        "$DATE.${LOG_BUCKET}.json" \
+        "$YESTERDAY.${LOG_BUCKET}.json" \
         2> "$TGZ.err"
-    #newwc=$(wc -l "$DATE"."${LOG_BUCKET}".json | cut -f1 -d' ')
+    #newwc=$(wc -l "$YESTERDAY"."${LOG_BUCKET}".json | cut -f1 -d' ')
 
     head -v ./*.err
     echo
 
     set +e
-    grep "{\"unrecognized\":\"" "$DATE.${LOG_BUCKET}.json" > \
-        "unrecognized.$DATE.${LOG_BUCKET}.jsonl"
-    grep -v "{\"unrecognized\":\"" "$DATE.${LOG_BUCKET}.json" > \
-        "recognized.$DATE.${LOG_BUCKET}.jsonl"
+    grep "{\"unrecognized\":\"" "$YESTERDAY.${LOG_BUCKET}.json" > \
+        "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
+    grep -v "{\"unrecognized\":\"" "$YESTERDAY.${LOG_BUCKET}.json" > \
+        "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
     set -e
 
-    unrecwc=$(wc -l "unrecognized.$DATE.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
-    recwc=$(wc -l "recognized.$DATE.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
+    unrecwc=$(wc -l "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
+    recwc=$(wc -l "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
 
     printf "Recognized lines:   %8d\n" "$recwc"
     printf "Unrecognized lines: %8d\n" "$unrecwc"
 
     echo "Verifying JSON..."
-    jq -e -c . < "recognized.$DATE.${LOG_BUCKET}.jsonl" > /dev/null
-    jq -e -c . < "unrecognized.$DATE.${LOG_BUCKET}.jsonl" > /dev/null
+    jq -e -c . < "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
+    jq -e -c . < "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
 
     if [ "$unrecwc" -eq "0" ]; then
         echo "Gzipping..."
