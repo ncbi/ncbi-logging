@@ -78,6 +78,7 @@ struct Options
     bool print_line_nr = false;
     bool debug = false;
     bool jsonlib = false;
+    bool path_only = false;
 };
 
 struct cmnLogLines
@@ -173,6 +174,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
+        if ( mem_options . path_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -207,6 +209,14 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
 
     void print_direct ( const LogOPEvent & e, bool accepted )
     {
+        if ( mem_options . path_only )
+        {
+            if ( e. request . path . n > 0 )
+            {
+                mem_os << e.request.path << endl;
+            }
+            return;
+        }
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
@@ -263,6 +273,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
+        if ( mem_options . path_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -296,6 +307,14 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 
     void print_direct ( const LogAWSEvent & e, bool accepted )
     {
+        if ( mem_options . path_only )
+        {
+            if ( e. request . path . n > 0 )
+            {
+                mem_os << e.request.path << endl;
+            }
+            return;
+        }
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
@@ -372,6 +391,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
+        if ( mem_options . path_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -410,6 +430,14 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 
     void print_direct ( const LogGCPEvent & e, bool accepted )
     {
+        if ( mem_options . path_only )
+        {
+            if ( e. request . path . n > 0 )
+            {
+                mem_os << e.request.path << endl;
+            }
+            return;
+        }
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
@@ -542,7 +570,8 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addOption( options . debug, "d", "debug", "parse with debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
         args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
-        args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );        
+        args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );
+        args . addOption( options . path_only, "a", "path-only", "print only the path found ( not json )" );
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
 
@@ -573,6 +602,11 @@ int main ( int argc, char * argv [], const char * envp []  )
     catch( const exception & e)
     {
         cerr << "Exception caught: " << e.what() << endl;
+        return 1;
+    }
+    catch( const ncbi::InvalidArgument & e)
+    {
+        cerr << "Invalid Argument: " << e.what() << endl;
         return 1;
     }
     catch(...)
