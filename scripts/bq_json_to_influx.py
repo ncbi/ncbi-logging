@@ -39,25 +39,25 @@ def main():
         reccount += 1
         rec = json.loads(line)
 
-        if "city_name" in rec:
+        if "accession" in rec:
             outrec = {
-                "measurement": "summary",
+                "measurement": "summary_gs_v0",
                 "tags": {
-                    "remote_ip": rec["remote_ip"],
                     "host": rec["host"],
-                    "source": "S3",
+                    "source": rec["source"],
+                    "bucket": rec["bucket"],
                 },
                 "time": parsedt(rec["start_ts"]),
                 "fields": {
+                    "remote_ip": rec["remote_ip"],
                     "num_requests": rec["num_requests"],
                     "end_ts": parsedt(rec["end_ts"]),
                     "http_operations": rec["http_operations"],
-                    "request_uri": rec["request_uri"],
+                    "accession": rec["accession"],
                     "http_statuses": rec["http_statuses"],
                     "bytes_sent": rec["bytes_sent"],
                     "referers": rec["referers"],
                     "user_agent": rec["user_agent"],
-                    "bucket": rec["bucket"],
                     "city_name": rec["city_name"],
                     "country": rec["country"],
                     "region": rec["region"],
@@ -112,7 +112,8 @@ def main():
             }
         else:
             print(f"Unknown record type {rec}", file=sys.stderr)
-            sys.exit(1)
+            continue
+            # sys.exit(1)
 
         # print(outrec)
         # sys.exit(1)

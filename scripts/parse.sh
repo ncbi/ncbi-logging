@@ -121,8 +121,6 @@ for LOG_BUCKET in $buckets; do
         echo "Gzipping..."
         gzip -f -v -9 ./recognized."$YESTERDAY.${LOG_BUCKET}"*.jsonl
 
-        ls -la
-
         echo "Uploading..."
 
         export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json

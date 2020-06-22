@@ -31,7 +31,7 @@ export YESTERDAY_UNDER
 renice +19 -p $$ > /dev/null 2>&1
 
 SQLCACHE="$RAMDISK/${USER}_${DATE}"
-SQLCACHE="$RAMDISK/${USER}"
+#SQLCACHE="$RAMDISK/${USER}"
 mkdir -p "$SQLCACHE"
 if [ ! -s "$SQLCACHE/buckets.db" ]; then
     echo "Refreshing sqlite cache"
