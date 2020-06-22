@@ -41,14 +41,12 @@ def main():
 
         if "accession" in rec:
             outrec = {
-                "measurement": "summary_gs_v0",
-                "tags": {
-                    "host": rec["host"],
-                    "source": rec["source"],
-                    "bucket": rec["bucket"],
-                },
+                "measurement": "summary_gs_v011",
+                "tags": {"source": rec["source"],},
                 "time": parsedt(rec["start_ts"]),
                 "fields": {
+                    "bucket": rec["bucket"],
+                    "host": rec["host"],
                     "remote_ip": rec["remote_ip"],
                     "num_requests": rec["num_requests"],
                     "end_ts": parsedt(rec["end_ts"]),
