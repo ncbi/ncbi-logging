@@ -52,7 +52,7 @@ if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
     exit 2
 fi
 
-buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' order by log_bucket desc")
+buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='public' order by log_bucket desc")
 
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
