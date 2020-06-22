@@ -74,8 +74,8 @@ case
     WHEN regexp_contains(bucket, r'-zq-') THEN bucket || ' (ETL - BQS)'
     WHEN regexp_contains(bucket, r'-src-') THEN bucket || ' (Original)'
     WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
-    ELSE bucket
-    END as bucket,
+ELSE bucket || ' (Unknown)'
+END as bucket,
 source as source,
 current_datetime() as export_time
 FROM \\\`ncbi-logmon.strides_analytics.gs_parsed\\\`
