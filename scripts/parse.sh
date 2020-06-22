@@ -84,31 +84,42 @@ for LOG_BUCKET in $buckets; do
         "$YESTERDAY.${LOG_BUCKET}.json" \
         2> "$TGZ.err"
     #newwc=$(wc -l "$YESTERDAY"."${LOG_BUCKET}".json | cut -f1 -d' ')
+    head "$TGZ.err"
 
-    head -v ./*.err
     echo
 
     set +e
-    grep "{\"unrecognized\":\"" "$YESTERDAY.${LOG_BUCKET}.json" > \
+    grep "\"accepted\":false," "$YESTERDAY.${LOG_BUCKET}.json" > \
         "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
-    grep -v "{\"unrecognized\":\"" "$YESTERDAY.${LOG_BUCKET}.json" > \
+    grep "\"accepted\":true," "$YESTERDAY.${LOG_BUCKET}.json" > \
         "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
     set -e
 
+    # "accepted": true,
     unrecwc=$(wc -l "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
     recwc=$(wc -l "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
 
     printf "Recognized lines:   %8d\n" "$recwc"
     printf "Unrecognized lines: %8d\n" "$unrecwc"
 
-    echo "Verifying JSON..."
-    jq -e -c . < "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
-    jq -e -c . < "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
+#    echo "Verifying JSON..."
+#    jq -e -c . < "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
+#    jq -e -c . < "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
 
     if [ "$unrecwc" -eq "0" ]; then
+        #find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
+
+        if [ "$recwc" -gt 10000000 ]; then
+            echo "jsonl too large, splitting"
+            split -d -e -l 10000000 --additional-suffix=.jsonl \
+                - "recognized.$YESTERDAY.${LOG_BUCKET}." \
+                < "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
+
+            rm -f "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
+        fi
+
         echo "Gzipping..."
-        find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
-        gzip -f -v -9 ./*.jsonl
+        gzip -f -v -9 ./recognized."$YESTERDAY.${LOG_BUCKET}"*.jsonl
 
         ls -la
 
@@ -117,7 +128,8 @@ for LOG_BUCKET in $buckets; do
         export GOOGLE_APPLICATION_CREDENTIALS=$HOME/ncbi-logmon.json
         export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
         gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-        gsutil cp ./*.jsonl.gz "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
+#        gsutil cp ./*.jsonl.gz "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
+        gsutil cp ./recognized."$YESTERDAY.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
         #gsutil ls -lh "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
 
         #gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
@@ -125,6 +137,6 @@ for LOG_BUCKET in $buckets; do
         #gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/logs_gs_public/"
         #gsutil ls "gs://strides_analytics_logs_parsed/logs_gs_public/"
         cd ..
-        rm -rf "$PARSE_DEST"
+        #rm -rf "$PARSE_DEST"
     fi
 done

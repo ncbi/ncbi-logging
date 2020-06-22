@@ -74,6 +74,7 @@ for bucket in $BUCKETS; do
 
     echo "Uploading..."
     gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
+    gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed_us/$bucket/"
     gsutil ls -l "gs://${PREFIX}_logs_parsed/$bucket/"
     rm -rf "$DEST"
 done

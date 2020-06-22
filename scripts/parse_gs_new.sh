@@ -70,6 +70,7 @@ for YESTERDAY in $MISSING; do
 
             echo "Uploading..."
             gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed/$bucket/"
+            gsutil cp ./*.jsonl.gz "gs://${PREFIX}_logs_parsed_us/$bucket/"
             cd ..
             rm -rf "$DEST"
         fi

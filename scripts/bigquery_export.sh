@@ -3,22 +3,92 @@
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
 
-export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
-gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
-export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
+export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
-#YESTERDAY="20200610"
-#DATE="20200610"
+gsutil ls -lR gs://logmon_logs_parsed_us/
 
-gsutil ls  -lR gs://strides_analytics_logs_parsed/
+cat << EOF > gs_schema.json
+{ "schema": { "fields": [
+    { "name" : "accepted", "type": "BOOLEAN" },
+    { "name" : "accession", "type": "STRING" },
+    { "name" : "agent", "type": "STRING" },
+    { "name" : "extension", "type": "STRING" },
+    { "name" : "forwarded", "type": "STRING" },
+    { "name" : "ip", "type": "STRING" },
+    { "name" : "method", "type": "STRING" },
+    { "name" : "path", "type": "STRING" },
+    { "name" : "port", "type": "INTEGER" },
+    { "name" : "referer", "type": "STRING" },
+    { "name" : "req_len", "type": "INTEGER" },
+    { "name" : "req_time", "type": "STRING" },
+    { "name" : "res_code", "type": "INTEGER" },
+    { "name" : "res_len", "type": "INTEGER" },
+    { "name" : "server", "type": "STRING" },
+    { "name" : "source", "type": "STRING" },
+    { "name" : "time", "type": "STRING" },
+    { "name" : "user", "type": "STRING" },
+    { "name" : "vers", "type": "STRING" }
+    ]
+  },
+  "sourceFormat": "NEWLINE_DELIMITED_JSON",
+  "sourceUris": [ "gs://logmon_logs_parsed_us/logs_gs_public/recognized.*" ]
+}
+EOF
+
+jq -c -e . < gs_schema.json
+
+bq rm -f strides_analytics.gs_parsed
+bq mk --external_table_definition=gs_schema.json strides_analytics.gs_parsed
+
+
+
+cat << EOF > s3_schema.json
+{ "schema": { "fields": [
+    { "name" : "accepted", "type": "BOOLEAN" },
+    { "name" : "accession", "type": "STRING" },
+    { "name" : "agent", "type": "STRING" },
+    { "name" : "auth_type", "type": "STRING" },
+    { "name" : "bucket", "type": "STRING" },
+    { "name" : "cipher_suite", "type": "STRING" },
+    { "name" : "error", "type": "STRING" },
+    { "name" : "extension", "type": "STRING" },
+    { "name" : "host_header", "type": "STRING" },
+    { "name" : "host_id", "type": "STRING" },
+    { "name" : "ip", "type": "STRING" },
+    { "name" : "key", "type": "STRING" },
+    { "name" : "method", "type": "STRING" },
+    { "name" : "obj_size", "type": "STRING" },
+    { "name" : "operation", "type": "STRING" },
+    { "name" : "owner", "type": "STRING" },
+    { "name" : "path", "type": "STRING" },
+    { "name" : "referer", "type": "STRING" },
+    { "name" : "request_id", "type": "STRING" },
+    { "name" : "requester", "type": "STRING" },
+    { "name" : "res_code", "type": "STRING" },
+    { "name" : "res_len", "type": "STRING" },
+    { "name" : "source", "type": "STRING" },
+    { "name" : "time", "type": "STRING" },
+    { "name" : "tls_version", "type": "STRING" },
+    { "name" : "total_time", "type": "STRING" },
+    { "name" : "turnaround_time", "type": "STRING" },
+    { "name" : "vers", "type": "STRING" },
+    { "name" : "version_id", "type": "STRING" }
+    ]
+  },
+  "sourceFormat": "NEWLINE_DELIMITED_JSON",
+  "sourceUris": [ "gs://logmon_logs_parsed_us/logs_s3_public/20*" ]
+}
+EOF
+
+jq -c -e . < s3_schema.json
+
+
+bq rm -f strides_analytics.s3_parsed
+bq mk --external_table_definition=s3_schema.json strides_analytics.s3_parsed
+
 
 if [[ "$DATE" == "false" ]]; then
-    bq rm  -f strides_analytics.s3_test
-    bq mk \
-        --table \
-        strides_analytics.s3_test \
-        accepted:BOOLEAN,agent:STRING,auth_type:STRING,bucket:STRING,cipher_suite:STRING,error:STRING,host_header:STRING,host_id:STRING,ip:STRING,key:STRING,obj_size:INTEGER,operation:STRING,owner:STRING,referer:STRING,request:STRING,request_id:STRING,requester:STRING,res_code:INTEGER,res_len:INTEGER,source:STRING,time:STRING,tls_version:STRING,total_time:INTEGER,turnaround_time:INTEGER,version_id:STRING
-
     cat << EOF > op_test_schema.json
     [
     { "name": "accepted", "type": "BOOLEAN", "mode": "NULLABLE" },
@@ -45,25 +115,31 @@ if [[ "$DATE" == "false" ]]; then
     { "name": "user", "type": "STRING", "mode": "NULLABLE" }
     ]
 EOF
+        bq rm  -f strides_analytics.s3_test
+        bq mk \
+            --table \
+            strides_analytics.s3_test \
+            accepted:BOOLEAN,agent:STRING,auth_type:STRING,bucket:STRING,cipher_suite:STRING,error:STRING,host_header:STRING,host_id:STRING,ip:STRING,key:STRING,obj_size:INTEGER,operation:STRING,owner:STRING,referer:STRING,request:STRING,request_id:STRING,requester:STRING,res_code:INTEGER,res_len:INTEGER,source:STRING,time:STRING,tls_version:STRING,total_time:INTEGER,turnaround_time:INTEGER,version_id:STRING
 
-    jq -e -c . < op_test_schema.json
-    bq rm  -f strides_analytics.op_test
-    bq mk \
-        --table strides_analytics.op_test \
-        ./op_test_schema.json
+
+        jq -e -c . < op_test_schema.json
+        bq rm  -f strides_analytics.op_test
+        bq mk \
+            --table strides_analytics.op_test \
+            ./op_test_schema.json
+
+
+    bq load \
+        --autodetect \
+        --source_format=NEWLINE_DELIMITED_JSON \
+        strides_analytics.s3_test \
+        "gs://strides_analytics_logs_parsed/logs_s3_public/recognized.${YESTERDAY}.jsonl.gz"
+
+    bq load \
+        --source_format=NEWLINE_DELIMITED_JSON \
+        strides_analytics.op_test \
+        "gs://strides_analytics_logs_parsed/sra_prod/recognized.${YESTERDAY}.jsonl.gz"
 fi
-
-
-bq load \
-    --autodetect \
-    --source_format=NEWLINE_DELIMITED_JSON \
-    strides_analytics.s3_test \
-    "gs://strides_analytics_logs_parsed/logs_s3_public/recognized.${YESTERDAY}.jsonl.gz"
-
-bq load \
-    --source_format=NEWLINE_DELIMITED_JSON \
-    strides_analytics.op_test \
-    "gs://strides_analytics_logs_parsed/sra_prod/recognized.${YESTERDAY}.jsonl.gz"
 
 
 
@@ -72,26 +148,21 @@ QUERY=$(cat <<-ENDOFQUERY
 SELECT
   ip as remote_ip,
   parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
-  datetime_add(parse_datetime('%d.%m.%Y:%H:%M:%S 0', time), interval total_time millisecond) as end_ts,
+  datetime_add(parse_datetime('%d.%m.%Y:%H:%M:%S 0', time), interval cast (total_time as int64) millisecond) as end_ts,
   case
       WHEN regexp_contains(agent, r'-head') THEN 'HEAD'
-      ELSE split(request, ' ')[offset (0)]
+      ELSE method
       END as http_operation,
-  split(request, ' ')[offset (1)] as request_uri,
+      path as request_uri,
   cast(res_code as string) as http_status,
-  ifnull(res_len, 0) as bytes_sent,
+  ifnull(res_len, '0') as bytes_sent,
   referer as referer,
   replace(agent, '-head', '') as user_agent,
   host_header as host,
   bucket as bucket,
   source as source,
   current_datetime() as export_time
-  FROM \\\`ncbi-sandbox-blast.strides_analytics.s3_parsed\\\`
-  WHERE
-    parse_datetime('%d.%m.%Y:%H:%M:%S 0', time)
-  between
-    datetime_sub(parse_datetime('%Y%m%d', '$YESTERDAY'), interval 1 day) AND
-    parse_datetime('%Y%m%d', '$YESTERDAY')
+  FROM \\\`strides_analytics.s3_parsed\\\`
 ENDOFQUERY
 )
 
@@ -134,7 +205,7 @@ SELECT
     "TBD: country" as country,
     "TBD: region" as region,
     "TBD: example.com" as domain
-  FROM \\\`ncbi-sandbox-blast.strides_analytics.detail_export\\\`
+  FROM \\\`strides_analytics.detail_export\\\`
   GROUP BY request_uri, user_agent, remote_ip, host, bucket, source
   HAVING bytes_sent > 0
 ENDOFQUERY
@@ -178,13 +249,11 @@ bq rm -f strides_analytics.summary_export
 mkdir -p "$PANFS/detail"
 cd "$PANFS/detail" || exit
 rm -f "$PANFS"/detail/detail."$DATE".* || true
-gsutil ls -p ncbi-sandbox-blast "gs://strides_analytics/detail/detail.$DATE.*"
 gsutil  cp -r "gs://strides_analytics/detail/detail.$DATE.*" "$PANFS/detail/"
 
 mkdir -p "$PANFS/summary"
 cd "$PANFS/summary" || exit
 rm -f "$PANFS"/summary/summary."$DATE".* || true
-gsutil ls -p ncbi-sandbox-blast "gs://strides_analytics/summary/summary.$DATE.*"
 gsutil  cp -r "gs://strides_analytics/summary/summary.$DATE.*" "$PANFS/summary/"
 
 date
