@@ -125,7 +125,7 @@ for LOG_BUCKET in $buckets; do
 
         echo "Uploading..."
 
-        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/ncbi-logmon.json
+        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
         export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
         gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 #        gsutil cp ./*.jsonl.gz "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
