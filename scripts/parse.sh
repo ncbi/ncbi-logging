@@ -106,7 +106,7 @@ for LOG_BUCKET in $buckets; do
 #    jq -e -c . < "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
 #    jq -e -c . < "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
 
-    if [ "$unrecwc" -eq "0" ]; then
+#    if [ "$unrecwc" -eq "0" ]; then
         #find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
 
         if [ "$recwc" -gt 10000000 ]; then
@@ -138,5 +138,5 @@ for LOG_BUCKET in $buckets; do
         #gsutil ls "gs://strides_analytics_logs_parsed/logs_gs_public/"
         cd ..
         #rm -rf "$PARSE_DEST"
-    fi
+#    fi
 done
