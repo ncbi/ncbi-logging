@@ -16,6 +16,8 @@ struct SRequest
     string method;
     string path;
     string vers;
+    string accession;
+    string extension;
 
     SRequest& operator= ( const t_request &req )
     {
@@ -23,6 +25,8 @@ struct SRequest
        method = ToString( req.method );
        path = ToString( req.path );
        vers = ToString( req.vers );
+       accession = ToString( req.accession );
+       extension = ToString( req.extension );
        return *this;
     }
 };
@@ -126,7 +130,7 @@ public:
 
     TestLogLines m_lines;
 };
-
+#if 0
 TEST_F ( TestParseFixture, Empty )
 {
     std::istringstream input ( "" );
@@ -245,6 +249,22 @@ TEST_F ( TestParseFixture, GCP_UnparsedInput_WhenRejected )
         ASSERT_EQ ( string (InputLine), m_lines.m_rejected.front().unparsed);
         ASSERT_EQ ( 0, m_lines.m_accepted.size() ); 
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
+    }
+}
+#endif
+TEST_F ( TestParseFixture, GCP_Object )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/qwe.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/qwe.2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( ".2", e . request . extension );
     }
 }
 

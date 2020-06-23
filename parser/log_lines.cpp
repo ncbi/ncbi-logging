@@ -403,6 +403,8 @@ void GCP_Parser :: parse()
     yyscan_t sc;
     gcp_lex_init( &sc );
 
+    gcp_set_debug( gcp_debug, sc );
+
     while( getline( m_input, line ) )
     {
         YY_BUFFER_STATE bs = gcp_scan_reset( line.c_str(), sc );

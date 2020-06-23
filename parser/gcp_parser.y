@@ -30,6 +30,8 @@ void gcp_error( yyscan_t locp, NCBI::Logging::GCP_LogLines * lib, const char* ms
 #include "log_lines.hpp"
 
 extern void gcp_get_scanner_input( void * yyscanner, t_str & str );
+extern void gcp_start_URL( void * yyscanner );
+extern void gcp_stop_URL( void * yyscanner );
 
 using namespace NCBI::Logging;
 
@@ -38,14 +40,16 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
+    t_request req;
 }
 
-%token<s> IPV4 IPV6 QSTR I64
-%token QUOTE COMMA UNRECOGNIZED
+%token<s> IPV4 IPV6 QSTR I64 PATHSTR PATHEXT ACCESSION 
+%token QUOTE COMMA UNRECOGNIZED SLASH
 
 %type<s> ip ip_region method uri host referrer agent
-%type<s> req_id operation bucket object hdr_item hdr_item_text
+%type<s> req_id operation bucket hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
+%type<req> object
 
 %start line
 
@@ -87,7 +91,10 @@ hdr_item
 log_gcp
     : time COMMA ip COMMA ip_type COMMA ip_region COMMA method COMMA uri COMMA
       status COMMA req_bytes COMMA res_bytes COMMA time_taken COMMA host COMMA
-      referrer COMMA agent COMMA req_id COMMA operation COMMA bucket COMMA object
+      referrer COMMA agent COMMA req_id COMMA operation COMMA bucket COMMA 
+      { gcp_start_URL( scanner ); } 
+      object
+      { gcp_stop_URL( scanner ); } 
     {
         LogGCPEvent ev;
         ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
@@ -107,9 +114,8 @@ log_gcp
         ev . operation = $29;
         ev . bucket = $31;
 
-        InitRequest( ev . request );
+        ev . request = $34;
         ev . request . method = $9;
-        ev . request . path = $33;
 
         lib -> acceptLine( ev );
     }
@@ -191,8 +197,20 @@ bucket
     ;
 
 object
-    : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    : QUOTE ACCESSION SLASH PATHSTR PATHEXT QUOTE 
+         { 
+             InitRequest( $$ );
+             
+             $$.path . p = $2 . p;
+             $$.path . n = $2 . n + 1 + $4 . n + $5 . n;
+
+             $$.accession = $2;
+             $$.extension = $5;
+         }
+    | QUOTE QUOTE 
+         { 
+             InitRequest( $$ );
+         }
     ;
 
 q_i64
