@@ -15,6 +15,7 @@ namespace NCBI
             std::string path;
             std::string vers;
             std::string accession;
+            std::string filename;
             std::string extension;
 
             SRequest& operator= ( const t_request &req )
@@ -24,6 +25,7 @@ namespace NCBI
                 path = ToString( req.path );
                 vers = ToString( req.vers );
                 accession = ToString( req.accession );
+                filename = ToString( req.filename );
                 extension = ToString( req.extension );
                 return *this;
             }

@@ -46,7 +46,8 @@ using namespace NCBI::Logging;
 %token<s> IPV4 IPV6 QSTR I64 PATHSTR PATHEXT ACCESSION 
 %token QUOTE COMMA UNRECOGNIZED SLASH
 
-%type<s> ip ip_region method uri host referrer agent
+%type<s> ip ip_region method uri host referrer agent 
+%type<s> ext_opt file_opt url_token url_list
 %type<s> req_id operation bucket hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
 %type<req> object
@@ -128,7 +129,7 @@ time
 ip
     : QUOTE IPV4 QUOTE      { $$ = $2; }
     | QUOTE IPV6 QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 ip_type
@@ -137,7 +138,7 @@ ip_type
 
 ip_region
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 method
@@ -146,7 +147,7 @@ method
 
 uri
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 status
@@ -167,55 +168,84 @@ time_taken
 
 host
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 referrer
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 agent
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 req_id
     : QUOTE QSTR QUOTE      { $$ = $2; }
     | QUOTE I64 QUOTE       { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 operation
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 bucket
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
+    ;
+
+ext_opt
+    : PATHEXT   { $$ = $1; }
+    |           { EMPTY_TSTR($$); }
+    ;
+
+file_opt
+    : ACCESSION { $$ = $1; }
+    | PATHSTR   { $$ = $1; }
+    |           { EMPTY_TSTR($$); }
+    ;
+
+url_list
+    : url_token             { $$ = $1; }    
+    | url_list url_token    { $$ = $1; $$ . n += $2 . n; }
+    | url_list ACCESSION    { $$ = $1; $$ . n += $2 . n; }
+    ;
+
+url_token
+    : SLASH     { $$ . p = "/", $$ . n = 1; }
+    | PATHSTR   { $$ = $1; }
+    | PATHEXT   { $$ = $1; }
     ;
 
 object
-    : QUOTE ACCESSION SLASH PATHSTR PATHEXT QUOTE 
-         { 
-             InitRequest( $$ );
+    : QUOTE ACCESSION SLASH file_opt ext_opt QUOTE 
+        { 
+            InitRequest( $$ );
              
-             $$.path . p = $2 . p;
-             $$.path . n = $2 . n + 1 + $4 . n + $5 . n;
+            $$.path . p = $2 . p;
+            $$.path . n = $2 . n + 1 + $4 . n + $5 . n;
 
-             $$.accession = $2;
-             $$.extension = $5;
-         }
+            $$.accession = $2;
+            $$.filename  = $4;
+            $$.extension = $5;
+        }
+    | QUOTE url_list QUOTE
+        { 
+            InitRequest( $$ );
+            $$.path = $2;
+        }
     | QUOTE QUOTE 
-         { 
+        { 
              InitRequest( $$ );
-         }
+        }
     ;
 
 q_i64
     : QUOTE I64 QUOTE       { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 %%

@@ -5,26 +5,10 @@
 
 #include "log_lines.hpp"
 #include "helper.hpp"
+#include "test_helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
-
-struct SRequest
-{
-    string server;
-    string method;
-    string path;
-    string vers;
-
-    SRequest& operator= ( const t_request &req )
-    {
-       server = ToString( req.server );
-       method = ToString( req.method );
-       path = ToString( req.path );
-       vers = ToString( req.vers );
-       return *this;
-    }
-};
 
 struct SLogAWSEvent
 {

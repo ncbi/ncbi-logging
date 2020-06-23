@@ -133,12 +133,11 @@ TEST_F ( GCP_TestFlexFixture, Path_StateReturn )
     const char * input = "\"a\",";
     gcp__scan_string( input, sc );
     //gcp_set_debug ( 1, sc );
+    gcp_start_URL( sc ); // send scanner into PATH state
     ASSERT_EQ( QUOTE, Scan() );
-    gcp_start_URL( sc );
     ASSERT_EQ( PATHSTR, Scan() ); ASSERT_EQ( "a", Token() );
     ASSERT_EQ( QUOTE, Scan() );
-    gcp_stop_URL( sc ); // back to QUOTED
-    gcp_stop_URL( sc ); // back to INITIAL
+    gcp_stop_URL( sc ); // back to INITIAL state
     ASSERT_EQ( COMMA, Scan() );
 }
 

@@ -5,31 +5,10 @@
 
 #include "log_lines.hpp"
 #include "helper.hpp"
+#include "test_helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
-
-//TODO: promote to a shared place 
-struct SRequest
-{
-    string server;
-    string method;
-    string path;
-    string vers;
-    string accession;
-    string extension;
-
-    SRequest& operator= ( const t_request &req )
-    {
-       server = ToString( req.server );
-       method = ToString( req.method );
-       path = ToString( req.path );
-       vers = ToString( req.vers );
-       accession = ToString( req.accession );
-       extension = ToString( req.extension );
-       return *this;
-    }
-};
 
 struct SLogGCPEvent
 {
@@ -130,7 +109,7 @@ public:
 
     TestLogLines m_lines;
 };
-#if 0
+
 TEST_F ( TestParseFixture, Empty )
 {
     std::istringstream input ( "" );
@@ -179,6 +158,9 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( "storage.objects.get", e . operation );
     ASSERT_EQ( "sra-pub-src-9", e . bucket );
     ASSERT_EQ( "SRR1371108/CGAG_2.1.fastq.gz", e . request . path );
+    ASSERT_EQ( "SRR1371108", e . request . accession );
+    ASSERT_EQ( "CGAG_2", e . request . filename );
+    ASSERT_EQ( ".1.fastq.gz", e . request . extension );
 }
 
 TEST_F ( TestParseFixture, GCP_EmptyAgent )
@@ -251,8 +233,8 @@ TEST_F ( TestParseFixture, GCP_UnparsedInput_WhenRejected )
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
     }
 }
-#endif
-TEST_F ( TestParseFixture, GCP_Object )
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc_File_Ext )
 {
     const char * InputLine =
     "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
@@ -264,9 +246,81 @@ TEST_F ( TestParseFixture, GCP_Object )
         SLogGCPEvent e = parse_gcp( InputLine );
         ASSERT_EQ( "SRR002994/qwe.2", e . request . path );
         ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "qwe", e . request . filename );
         ASSERT_EQ( ".2", e . request . extension );
     }
 }
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc_Acc_Ext )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/SRR002994.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/SRR002994.2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "SRR002994", e . request . filename );
+        ASSERT_EQ( ".2", e . request . extension );
+    }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc__Ext )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/.2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "", e . request . filename );
+        ASSERT_EQ( ".2", e . request . extension );
+    }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc_File_ )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "2", e . request . filename );
+        ASSERT_EQ( "", e . request . extension );
+    }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_NoAccession )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"qwe.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "qwe.2", e . request . path );
+        ASSERT_EQ( "", e . request . accession );
+        ASSERT_EQ( "", e . request . filename );
+        ASSERT_EQ( "", e . request . extension );
+    }
+}
+//TODO no accession, starts with /
+//TODO no accession, has / inside
+//TODO no accession, has multiple / inside
 
 extern "C"
 {

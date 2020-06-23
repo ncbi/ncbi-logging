@@ -30,11 +30,11 @@ namespace NCBI
             t_str params;
             t_str vers;
             t_str accession;
+            t_str filename;
             t_str extension;
         } t_request;
 
         inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }
-        void extract_acc_ext( t_request & r );
 
         struct CommonLogEvent
         {

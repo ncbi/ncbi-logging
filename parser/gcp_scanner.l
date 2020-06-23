@@ -33,12 +33,15 @@ IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_
 
 I64     [-+]?[0-9]+
 
-QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]? ^{}]+
-QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]? ^{}])+
+CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]? ^{}]
+QCHARS      \.|\/|{CHARS}
+
+QSTR        {QCHARS}+
+QSTR_ESC    (\\\"|{QCHARS})+
 
 ACCESSION   [DES]R[RZ][0-9]{6,9}
-PATHSTR     [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]? ^{}]+
-PATHEXT     \.{PATHSTR}*
+PATHSTR     {CHARS}+
+PATHEXT     \.(\.|{PATHSTR})*
 
 SPACE   " "
 
