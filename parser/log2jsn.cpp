@@ -28,15 +28,8 @@ static JSONValueRef ToJsonString( const t_str & in )
 
 static String FormatTime( const t_timepoint & t )
 {
-    ostringstream ret;
-    ret << (int)t.day << "."
-        << (int)t.month <<"."
-        << (int)t.year <<":"
-        << (int)t.hour <<":"
-        << (int)t.minute <<":"
-        << (int)t.second <<" "
-        << (int)t.offset;
-    return String(ret.str());
+    std::string s( ToString( t ) );
+    return String( s );
 }
 
 ostream& operator<< (ostream& os, const t_str & s)
@@ -59,15 +52,7 @@ ostream& operator<< (ostream& os, const t_str & s)
 
 ostream& operator<< (ostream& os, const t_timepoint & t)
 {
-    os << "\"";
-    os << (int)t.day << "."
-        << (int)t.month <<"."
-        << (int)t.year <<":"
-        << (int)t.hour <<":"
-        << (int)t.minute <<":"
-        << (int)t.second <<" "
-        << (int)t.offset;
-    os << "\"";
+    os << "\"" << ToString( t ) << "\"";
     return os;
 }
 
@@ -79,7 +64,7 @@ struct Options
     bool parser_debug = false;
     bool jsonlib = false;
     bool path_only = false;
-    U32 selected_line = 0;
+    unsigned long int selected_line = 0;
 };
 
 struct cmnLogLines
@@ -583,7 +568,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );
         args . addOption( options . path_only, "a", "path-only", "print only the path found ( not json )" );
 
-        args . addOption( options . selected_line, "l", "line-to-select", "select only this line from input (1-based)" );
+        args . addOption( options . selected_line, nullptr, "l", "line-to-select", "line-nr", "select only this line from input (1-based)" );
 
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
