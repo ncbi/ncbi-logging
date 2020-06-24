@@ -22,7 +22,7 @@ function prof
 function rel
 {
     #zcat $1 | head -n $LINES | $TOOL_REL op > /dev/null
-    zcat $1 | $TOOL_REL op | grep false | head -n 10 > rejected.txt
+    zcat $1 | $TOOL_REL aws | grep false | head -n 10 > rejected.txt
 }
 
 function just_zcat
@@ -51,9 +51,9 @@ function just_look
 }
 
 #prof $SRC5
-#rel $SRC7
+rel $SRC8
 #just_zcat $SRC5
 #just_path_op $SRC5
 #just_path_gcp $SRC4
 #just_path_aws $SRC8
-just_look $SRC8
+#just_look $SRC8
