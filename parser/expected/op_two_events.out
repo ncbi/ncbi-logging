@@ -1,0 +1,167 @@
+{
+    "accepted"  : true,
+    "agent"     : "linux64 sra-toolkit fastq-dump.2.9.1",
+    "forwarded" : "-",
+    "ip"        : "158.111.236.250",
+    "port"      : 443,
+    "referer"   : "-",
+    "req_len"   : 293,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "GET",
+        "params" : "",
+        "path"   : "/traces/sra34/SRR/003923/SRR4017927",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 206,
+    "res_len"   : 32768,
+    "source"    : "NCBI",
+    "time"      : "1.1.2020:2:50:24 -500",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
+    "forwarded" : "-",
+    "ip"        : "139.80.16.229",
+    "port"      : 443,
+    "referer"   : "-",
+    "req_len"   : 293,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "GET",
+        "params" : "",
+        "path"   : "/traces/sra32/SRR/005807/SRR5946882",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 206,
+    "res_len"   : 32768,
+    "source"    : "NCBI",
+    "time"      : "1.1.2020:2:50:24 -500",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
+    "forwarded" : "-",
+    "ip"        : "139.80.16.229",
+    "port"      : 443,
+    "referer"   : "-",
+    "req_len"   : 293,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "GET",
+        "params" : "",
+        "path"   : "/traces/sra32/SRR/005807/SRR5946882",
+        "server" : "sra-download.ncbi.nlm.nih.gov",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 206,
+    "res_len"   : 32768,
+    "source"    : "NCBI",
+    "time"      : "1.1.2020:2:50:24 -500",
+    "user"      : ""
+}
+{
+    "accepted"  : true,
+    "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
+    "forwarded" : "-",
+    "ip"        : "139.80.16.229",
+    "port"      : 443,
+    "referer"   : "-",
+    "req_len"   : 293,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "GET",
+        "params" : "",
+        "path"   : "/traces/sra32/SRR/005807/SRR5946882",
+        "server" : "",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 206,
+    "res_len"   : 32768,
+    "source"    : "NCBI",
+    "time"      : "1.1.2020:2:50:24 -500",
+    "user"      : ""
+}
+{
+    "unrecognized" : "nonesense nonesense"
+}
+{
+    "accepted"  : true,
+    "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
+    "forwarded" : "-",
+    "ip"        : "139.80.16.229",
+    "port"      : 443,
+    "referer"   : "-",
+    "req_len"   : 293,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "GET",
+        "params" : "",
+        "path"   : "/traces/sra32/SRR/005807/SRR000006",
+        "server" : "",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 206,
+    "res_len"   : 32768,
+    "source"    : "NCBI",
+    "time"      : "1.1.2020:2:50:24 -500",
+    "user"      : ""
+}
+{
+    "unrecognized" : "blah 139.80.16.229 - - [01/Jan/2020:02:50:24 -0500] \"GET /traces/sra32/SRR/005807/SRR000007 HTTP/1.1\" 206 32768 0.000 \"-\" \"linux64 sra-toolkit fastq-dump.2.9.3\" \"-\" port=443 rl=293"
+}
+{
+    "accepted"  : true,
+    "agent"     : "linux64 sra-toolkit fastq-dump.2.9.3",
+    "forwarded" : "-",
+    "ip"        : "139.80.16.229",
+    "port"      : 443,
+    "referer"   : "-",
+    "req_len"   : 293,
+    "req_time"  : "0.000",
+    "request" :
+    {
+        "method" : "GET",
+        "params" : "a=b",
+        "path"   : "/traces/sra32/SRR/005807/SRR00008",
+        "server" : "",
+        "vers"   : "HTTP/1.1"
+    },
+    "res_code"  : 206,
+    "res_len"   : 32768,
+    "source"    : "NCBI",
+    "time"      : "1.1.2020:2:50:24 -500",
+    "user"      : ""
+}
+{
+    "accepted"  : false,
+    "agent"     : "",
+    "forwarded" : "",
+    "ip"        : "139.80.16.229",
+    "port"      : 0,
+    "referer"   : "",
+    "req_len"   : 0,
+    "req_time"  : "",
+    "request" :
+    {
+        "method" : "",
+        "params" : "",
+        "path"   : "",
+        "server" : "",
+        "vers"   : ""
+    },
+    "res_code"  : 0,
+    "res_len"   : 0,
+    "source"    : "NCBI",
+    "time"      : "0.0.0:0:0:0 0",
+    "user"      : ""
+}

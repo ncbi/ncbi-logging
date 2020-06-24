@@ -1,0 +1,20 @@
+obj
+bin
+lib
+*.output
+actual
+gmon.out
+
+#do not exclude op_scanner.* etc. that would exclude [op|aws]_scanner.[y|l] too!
+op_scanner.cpp
+op_scanner.hpp
+op_parser.cpp
+op_parser.hpp
+aws_scanner.cpp
+aws_scanner.hpp
+aws_parser.cpp
+aws_parser.hpp
+gcp_scanner.cpp
+gcp_scanner.hpp
+gcp_parser.cpp
+gcp_parser.hpp
