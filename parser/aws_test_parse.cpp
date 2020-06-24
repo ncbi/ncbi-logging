@@ -115,7 +115,30 @@ struct TestLogLines : public AWS_LogLines
 TEST ( TestParse, InitDestroy )
 {
     TestLogLines lines;
-    AWS_Parser p( lines );
+
+    AWS_Parser p( lines, cin );
+}
+
+TEST ( TestParse, LineRejecting )
+{
+    const char * input = "line1\nline2\nline3\n";
+    std::istringstream inputstream( input );
+    TestLogLines lines;
+    AWS_Parser p( lines, inputstream );
+    p.parse();
+    ASSERT_EQ( 3, lines.m_rejected.size() );
+}
+
+TEST ( TestParse, LineFilter )
+{
+    const char * input = "line1\nline2\nline3\n";
+    std::istringstream inputstream( input );
+    TestLogLines lines;
+    AWS_Parser p( lines, inputstream );
+    p . setLineFilter( 2 );
+    p . parse();
+    ASSERT_EQ( 1, lines . m_rejected.size() );
+    ASSERT_EQ( "line2", lines . m_rejected . front() . unparsed );
 }
 
 class TestParseFixture : public ::testing::Test

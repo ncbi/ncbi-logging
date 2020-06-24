@@ -302,11 +302,6 @@ OP_Parser :: OP_Parser( OP_LogLines & p_lines, std::istream & p_input )
 {
 }
 
-OP_Parser :: OP_Parser( OP_LogLines & p_lines )
-: m_lines ( p_lines ), m_input ( cin )
-{
-}
-
 void OP_Parser :: setDebug( bool on )
 {
     #ifdef YYDEBUG
@@ -314,16 +309,32 @@ void OP_Parser :: setDebug( bool on )
     #endif
 }
 
+void OP_Parser :: setLineFilter( unsigned long int line_nr )
+{
+    line_filter = line_nr;
+}
+
 void OP_Parser :: parse()
 {
     string line;
     yyscan_t sc;
     op_lex_init( &sc );
+    unsigned long int line_nr = 0;
 
     op_set_debug( op_debug, sc );
 
     while( getline( m_input, line ) )
     {
+        line_nr++;
+
+        if ( line_filter > 0 )
+        {
+            if ( line_nr < line_filter )
+                continue;
+            else if ( line_nr > line_filter )
+                break;
+        }
+
         YY_BUFFER_STATE bs = op_scan_reset( line.c_str(), sc );
 
         if ( op_parse( sc, & m_lines ) != 0 )
@@ -344,11 +355,6 @@ AWS_Parser :: AWS_Parser( AWS_LogLines & p_lines, std::istream & p_input )
 {
 }
 
-AWS_Parser :: AWS_Parser( AWS_LogLines & p_lines )
-: m_lines ( p_lines ), m_input ( cin )
-{
-}
-
 void AWS_Parser :: setDebug( bool on )
 {
     #ifdef YYDEBUG
@@ -356,16 +362,33 @@ void AWS_Parser :: setDebug( bool on )
     #endif
 }
 
+void AWS_Parser :: setLineFilter( unsigned long int line_nr )
+{
+    line_filter = line_nr;
+}
+
 void AWS_Parser :: parse()
 {
     string line;
     yyscan_t sc;
+    unsigned long int line_nr = 0;
+
     aws_lex_init( &sc );
 
     aws_set_debug( aws_debug, sc );
 
     while( getline( m_input, line ) )
     {
+        line_nr++;
+
+        if ( line_filter > 0 )
+        {
+            if ( line_nr < line_filter )
+                continue;
+            else if ( line_nr > line_filter )
+                break;
+        }
+
         YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
         if ( aws_parse( sc, & m_lines ) != 0 )
@@ -385,11 +408,6 @@ GCP_Parser :: GCP_Parser( GCP_LogLines & p_lines, std::istream & p_input )
 {
 }
 
-GCP_Parser :: GCP_Parser( GCP_LogLines & p_lines )
-: m_lines ( p_lines ), m_input ( cin )
-{
-}
-
 void GCP_Parser :: setDebug( bool on )
 {
     #ifdef YYDEBUG
@@ -397,14 +415,30 @@ void GCP_Parser :: setDebug( bool on )
     #endif
 }
 
+void GCP_Parser :: setLineFilter( unsigned long int line_nr )
+{
+    line_filter = line_nr;
+}
+
 void GCP_Parser :: parse()
 {
     string line;
     yyscan_t sc;
     gcp_lex_init( &sc );
-
+    unsigned long int line_nr = 0;
+   
     while( getline( m_input, line ) )
     {
+        line_nr++;
+
+        if ( line_filter > 0 )
+        {
+            if ( line_nr < line_filter )
+                continue;
+            else if ( line_nr > line_filter )
+                break;
+        }
+
         YY_BUFFER_STATE bs = gcp_scan_reset( line.c_str(), sc );
 
         if ( gcp_parse( sc, & m_lines ) != 0 )

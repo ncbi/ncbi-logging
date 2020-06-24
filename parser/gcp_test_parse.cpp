@@ -103,7 +103,29 @@ struct TestLogLines : public GCP_LogLines
 TEST ( TestParse, InitDestroy )
 {
     TestLogLines lines;
-    GCP_Parser p( lines );
+    GCP_Parser p( lines, cin );
+}
+
+TEST ( TestParse, LineRejecting )
+{
+    const char * input = "\"1\"\n\"2\"\n\"3\"\n";
+    std::istringstream inputstream( input );
+    TestLogLines lines;
+    GCP_Parser p( lines, inputstream );
+    p.parse();
+    ASSERT_EQ( 3, lines.m_rejected.size() );
+}
+
+TEST ( TestParse, LineFilter )
+{
+    const char * input = "\"1\"\n\"2\"\n\"3\"\n";
+    std::istringstream inputstream( input );
+    TestLogLines lines;
+    GCP_Parser p( lines, inputstream );
+    p . setLineFilter( 2 );
+    p . parse();
+    ASSERT_EQ( 1, lines . m_rejected.size() );
+    ASSERT_EQ( "\"2\"", lines . m_rejected . front() . unparsed );
 }
 
 class TestParseFixture : public ::testing::Test
