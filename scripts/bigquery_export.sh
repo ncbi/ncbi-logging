@@ -296,7 +296,7 @@ ENDOFQUERY
 
     bq show --schema strides_analytics.detail_export
 
-###### summary_export
+###### summary_grouped
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     accession,
@@ -319,22 +319,36 @@ ENDOFQUERY
     "TBD: example.com" as domain
     FROM \\\`strides_analytics.detail_export\\\`
     WHERE start_ts > '2020-01-01'
-    GROUP BY accession, user_agent, remote_ip, host, bucket, source
+    GROUP BY accession, user_agent, remote_ip, host, bucket, source,
+    case
+        WHEN http_operation in ('GET', 'HEAD') THEN 0
+        WHEN http_operation='POST' THEN 1
+        WHEN http_operation='PUT' THEN 2
+        WHEN http_operation='DELETE' THEN 3
+        WHEN http_operation='PATCH' THEN 4
+        WHEN http_operation='OPTIONS' THEN 5
+        WHEN http_operation='TRACE' THEN 6
+        WHEN http_operation='CONNECT' THEN 7
+    ELSE 99
+    END
     HAVING bytes_sent > 0
 ENDOFQUERY
     )
 
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f strides_analytics.summary_export
+    bq rm --project_id ncbi-logmon -f strides_analytics.summary_grouped
     # shellcheck disable=SC2016
     bq query \
-    --destination_table strides_analytics.summary_export \
+    --destination_table strides_analytics.summary_grouped \
     --use_legacy_sql=false \
     --batch=true \
     "$QUERY"
 
     bq show --schema strides_analytics.summary_export
+
+###### summary_joined
+###### summary_export
 
 
 ###### export to GS
