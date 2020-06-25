@@ -39,3 +39,10 @@ bq load \
         --autodetect \
         strides_analytics.iplookup \
         "gs://logmon_cfg/iplookup.jsonl.gz"
+
+
+bq load \
+        --source_format=NEWLINE_DELIMITED_JSON \
+        --autodetect \
+        strides_analytics.rdns\
+        "gs://logmon_cfg/rdns.jsonl.gz"

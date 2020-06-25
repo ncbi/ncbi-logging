@@ -240,7 +240,6 @@ EOF
         --table strides_analytics.op_test \
         ./op_test_schema.json
 
-exit 0
 ####### detail_export
     QUERY=$(cat <<-ENDOFQUERY
 SELECT
@@ -312,11 +311,7 @@ ENDOFQUERY
     string_agg(distinct http_status order by http_status) as http_statuses,
     string_agg(distinct referer) as referers,
     sum(bytes_sent) as bytes_sent,
-    current_datetime() as export_time,
-    "TBD: city" as city_name,
-    "TBD: country" as country,
-    "TBD: region" as region,
-    "TBD: example.com" as domain
+    current_datetime() as export_time
     FROM \\\`strides_analytics.detail_export\\\`
     WHERE start_ts > '2020-01-01'
     GROUP BY accession, user_agent, remote_ip, host, bucket, source,
@@ -345,10 +340,48 @@ ENDOFQUERY
     --batch=true \
     "$QUERY"
 
-    bq show --schema strides_analytics.summary_export
+    bq show --schema strides_analytics.summary_grouped
 
-###### summary_joined
 ###### summary_export
+    QUERY=$(cat <<-ENDOFQUERY
+    SELECT
+    accession,
+    user_agent,
+    remote_ip,
+    host,
+    bucket,
+    source,
+    num_requests,
+    start_ts,
+    end_ts,
+    http_operations,
+    http_statuses,
+    referers,
+    bytes_sent,
+    current_datetime() as export_time,
+    rdns.domain,
+    region_name,
+    country_code,
+    city_name
+    FROM \\\`strides_analytics.summary_grouped\\\` grouped
+    LEFT JOIN \\\`strides_analytics.iplookup\\\` iplookup
+        ON remote_ip=iplookup.ip
+    LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
+        ON remote_ip=rdns.ip
+ENDOFQUERY
+    )
+
+    QUERY="${QUERY//\\/}"
+
+    bq rm --project_id ncbi-logmon -f strides_analytics.summary_export
+    # shellcheck disable=SC2016
+    bq query \
+    --destination_table strides_analytics.summary_export \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+    bq show --schema strides_analytics.summary_export
 
 
 ###### export to GS
