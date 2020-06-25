@@ -46,3 +46,9 @@ bq load \
         --autodetect \
         strides_analytics.rdns\
         "gs://logmon_cfg/rdns.jsonl.gz"
+
+bq load \
+    --source_format=CSV \
+    strides_analytics.ip2location \
+    /home/vartanianmh/IP2LOCATION-LITE-DB11.CSV.gz \
+    ip_from:INTEGER,ip_to:INTEGER,country_code:STRING,country_name:STRING,region_name:STRING,city_name:STRING,latitude:STRING,longitude:STRING,zip_code:STRING,time_zone:STRING

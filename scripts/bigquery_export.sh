@@ -8,6 +8,8 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 #gsutil ls -lR gs://logmon_logs_parsed_us/
 
+# TODO: Partition/cluster large tables for incremental inserts and retrievals
+# TODO: Materialized views that automatically refresh
 
 ####### gs_parsed
 cat << EOF > gs_schema.json
@@ -342,12 +344,51 @@ ENDOFQUERY
 
     bq show --schema strides_analytics.summary_grouped
 
+###### iplookup_new
+RUN="no"
+if [ "$RUN" = "yes" ]; then
+# Only needs to be running when a lot of new IP addresses appear
+    QUERY=$(cat <<-ENDOFQUERY
+    SELECT DISTINCT remote_ip, net.ipv4_to_int64(net.safe_ip_from_string(remote_ip)) as ipint,
+    FROM \\\`ncbi-logmon.strides_analytics.summary_export\\\`
+    WHERE remote_ip like '%.%'
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq rm --project_id ncbi-logmon -f strides_analytics.uniq_ips
+    # shellcheck disable=SC2016
+    bq query \
+    --destination_table strides_analytics.uniq_ips \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+    QUERY=$(cat <<-ENDOFQUERY
+    SELECT remote_ip, ipint,
+    country_code, region_name, city_name
+    FROM \\\`ncbi-logmon.strides_analytics.ip2location\\\`
+    JOIN \\\`ncbi-logmon.strides_analytics.uniq_ips\\\`
+    ON (ipint >= ip_from and ipint <= ip_to)
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq rm --project_id ncbi-logmon -f strides_analytics.iplookup_new
+    # shellcheck disable=SC2016
+    bq query \
+    --destination_table strides_analytics.iplookup_new \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+fi
+
 ###### summary_export
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     accession,
     user_agent,
-    remote_ip,
+    grouped.remote_ip,
     host,
     bucket,
     source,
@@ -364,10 +405,10 @@ ENDOFQUERY
     country_code,
     city_name
     FROM \\\`strides_analytics.summary_grouped\\\` grouped
-    LEFT JOIN \\\`strides_analytics.iplookup\\\` iplookup
-        ON remote_ip=iplookup.ip
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
-        ON remote_ip=rdns.ip
+        ON grouped.remote_ip=rdns.ip
+    LEFT JOIN \\\`strides_analytics.iplookup_new\\\` iplookup_new
+        ON grouped.remote_ip=iplookup_new.remote_ip
 ENDOFQUERY
     )
 
