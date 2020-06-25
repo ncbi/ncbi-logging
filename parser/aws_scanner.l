@@ -37,8 +37,9 @@ MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"|"PROPFIND"
 VERS    [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
 I64     [-+]?[0-9]+
-QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?]+
-QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?])+
+
+QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?\\]+
+QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?\\])+
 
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
@@ -61,6 +62,7 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
+<QUOTED>.           { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 \[                  { yy_push_state( TIMEFMT, yyscanner ); return OB; }
 <TIMEFMT>\]         { yy_pop_state( yyscanner ); return CB; }
