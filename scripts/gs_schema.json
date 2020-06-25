@@ -1,4 +1,4 @@
-{ "schema": { "fields": [
+    { "schema": { "fields": [
     { "name" : "accepted", "type": "BOOLEAN" },
     { "name" : "accession", "type": "STRING" },
     { "name" : "agent", "type": "STRING" },
