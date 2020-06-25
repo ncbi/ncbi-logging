@@ -33,18 +33,26 @@ IPV6_11     ::(ffff(:0{1,4}){0,1}:){0,1}{IPV4ADDR}
 IPV6_12     ({IPV6SEG}:){1,4}:{IPV4ADDR}
 IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_8}|{IPV6_9}|{IPV6_10}|{IPV6_11}|{IPV6_12}
 
-MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
-METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"|"PROPFIND"
-VERS    [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
-I64     [-+]?[0-9]+
-QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?]+
-QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?])+
+MONTH       "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
+METHOD      "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"|"PROPFIND"
+VERS        [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
+I64         [-+]?[0-9]+
+SPACE       " "
 
-SPACE   " "
+CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]?^{}]
+QCHARS      ${SPACE}|\.|\/|{CHARS}
+
+QSTR        {QCHARS}+
+QSTR_ESC    (\\\"|{QCHARS})+
+
+ACCESSION   [DES]R[RZ][0-9]{6,9}
+PATHSTR     {CHARS}+
+PATHEXT     \.(\.|{PATHSTR})*
+
 STR     [.\-a-zA-Z0-9_]+
 STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 
-%x QUOTED TIMEFMT
+%x QUOTED TIMEFMT PATH
 
 %%
 
@@ -71,6 +79,13 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 <TIMEFMT>{MONTH}    { MAKE_STR(); return MONTH; }
 <TIMEFMT>.          { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
+<PATH>{SPACE}       { yy_pop_state( yyscanner ); return SPACE; }
+<PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
+<PATH>\/            { return SLASH; };
+<PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
+<PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
+<PATH>.             { return yytext[0]; };
+
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {MONTH}         { MAKE_STR(); return MONTH; }
@@ -96,4 +111,14 @@ void aws_get_scanner_input( yyscan_t yyscanner, t_str & str )
     const char * input = (const char*) ( yyg -> yyextra_r );
     str . p = input;
     str . n = strlen( input ); // looks wasteful but only happens when we report errors 
+}
+
+void aws_start_URL( yyscan_t yyscanner )
+{
+    yy_push_state( PATH, yyscanner ); 
+}
+
+void aws_stop_URL( yyscan_t yyscanner )
+{
+    yy_pop_state( yyscanner ); 
 }

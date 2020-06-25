@@ -157,7 +157,7 @@ TEST_F ( TestParseFixture, AWS )
     "TLSv1.2";
     "\n";
 
-    SLogAWSEvent e = parse_aws( InputLine, false );
+    SLogAWSEvent e = parse_aws( InputLine );
 
     ASSERT_EQ( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37", e.owner );
     ASSERT_EQ( "sra-pub-src-14", e.bucket );
@@ -180,6 +180,9 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "PUT", e.request.method );
     ASSERT_EQ( "/SRR9612637/DRGHT.TC.307_interleaved.fq.1?partNumber=1&uploadId=rl6yL37lb4xUuIa9RvC0ON4KgDqJNvtwLoquo_cALj95v4njBOTUHpISyEjOaMG30lVYAo5eR_UEXo4dVJjUJA3SfjJtKjg30rvVEpg._Z9DZZo8S6oUjXHGDCW15EVzLZcJMgRG6N7J8d.42.lMAw--", 
                 e.request.path );
+    ASSERT_EQ( "SRR9612637", e.request.accession );
+    ASSERT_EQ( "DRGHT", e.request.filename );
+    ASSERT_EQ( ".TC.307_interleaved.fq.1", e.request.extension );
     ASSERT_EQ( "HTTP/1.1", e.request.vers );
 
     ASSERT_EQ( "200", e.res_code );
@@ -270,6 +273,8 @@ TEST_F ( TestParseFixture, AWS_UnparsedInput_WhenRejected )
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
     }
 }
+
+... TODO: paths with multiple accessions, filenames, extensions
 
 //TODO: rejected lines with more than IP recognized
 

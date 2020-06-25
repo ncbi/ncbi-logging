@@ -30,6 +30,8 @@ void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* ms
 #include "log_lines.hpp"
 
 extern void aws_get_scanner_input( void * yyscanner, t_str & str );
+extern void aws_start_URL( void * yyscanner );
+extern void aws_stop_URL( void * yyscanner );
 
 using namespace NCBI::Logging;
 }
@@ -42,15 +44,16 @@ using namespace NCBI::Logging;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR DASH I64
+%token<s> PATHSTR PATHEXT ACCESSION 
 %token DOT SLASH COLON QUOTE OB CB PORT RL CR LF SPACE QMARK
 %token UNRECOGNIZED
 
 %type<tp> time
-%type<s> ip referer agent agent_list method qstr_list
-%type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_key aws_error
+%type<s> ip referer agent agent_list method qstr_list 
+%type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
 %type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
-%type<req> request
+%type<req> request aws_key url_token
 
 %start line
 
@@ -69,7 +72,7 @@ log_aws
       aws_requester SPACE
       aws_request_id SPACE
       aws_operation SPACE
-      aws_key SPACE
+      { aws_start_URL( scanner ); } aws_key SPACE
       request SPACE
       result_code SPACE
       aws_error SPACE
@@ -94,22 +97,29 @@ log_aws
         ev . requester = $9;
         ev . request_id = $11;
         ev . operation = $13;
-        ev . key = $15;
-        ev . request = $17;
-        ev . res_code = $19;
-        ev . error = $21;
-        ev . res_len = $23;
-        ev . obj_size = $25;
-        ev . total_time = $27;
-        ev . turnaround_time = $29;
-        ev . referer = $31;
-        ev . agent = $33;
-        ev . version_id = $35;
-        ev . host_id = $37;
-        ev . cipher_suite = $39;
-        ev . auth_type = $41;
-        ev . host_header = $43;
-        ev . tls_version = $45;
+
+        // combine data from aws_key and request
+        ev . key = $16 . path;
+        ev . request = $18;
+        ev . request . accession = $16 . accession;
+        ev . request . filename  = $16 . filename;
+        ev . request . extension = $16 . extension;
+
+        ev . res_code           = $20;
+        ev . error              = $22;
+        ev . res_len            = $24;
+        ev . obj_size           = $26;
+        ev . total_time         = $28;
+        ev . turnaround_time    = $30;
+        ev . referer            = $32;
+        ev . agent              = $34;
+        ev . version_id         = $36;
+        ev . host_id            = $38;
+        ev . cipher_suite       = $40;
+        ev . auth_type          = $42;
+        ev . host_header        = $44;
+        ev . tls_version        = $46;
+        
         lib -> acceptLine( ev );
     }
     ;
@@ -151,10 +161,42 @@ aws_operation
     | DASH                          { $$.p = NULL; $$.n = 0; }
     ;
 
+url_token
+    : SLASH     
+        { 
+            InitRequest( $$ );
+            $$ . path . p = "/", $$ . path . n = 1; 
+        }
+    | ACCESSION  
+        { 
+            InitRequest( $$ );
+            $$ . path = $1; 
+            $$ . accession = $1; 
+        }
+    | PATHSTR   
+        { 
+            InitRequest( $$ );
+            $$ . path = $1; 
+            $$ . filename = $1; 
+        }
+    | PATHEXT
+        { 
+            InitRequest( $$ );
+            $$ . path = $1; 
+            $$ . extension = $1; 
+        }
+    ;
+
 aws_key
-    : STR
-    | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    : url_token             { $$ = $1; }    
+    | aws_key url_token    
+        { 
+            $$ . path . n += $2 . path . n;
+            // take the 1st instance each of accession, filename and extension
+            if ( $$ . accession . n == 0 ) $$ . accession = $2 . accession;
+            if ( $$ . filename . n  == 0 ) $$ . filename  = $2 . filename;
+            if ( $$ . extension . n == 0 ) $$ . extension = $2 . extension;
+        }
     ;
 
 aws_error
@@ -248,18 +290,12 @@ request
         InitRequest( $$ );
         $$.method = $2;
         $$.path   = $4;
-        EMPTY_TSTR($$.vers);
-    }
+     }
     | QUOTE method SPACE qstr_list QUOTE
     {
         InitRequest( $$ );
         $$.method = $2;
         $$.path   = $4;
-    }
-    | QUOTE method QUOTE 
-    {
-        InitRequest( $$ );
-        $$.method = $2;
     }
     | DASH                          
     {

@@ -33,6 +33,14 @@ public:
         return aws_lex( & token, sc );
     }
 
+    int StartPath(const char * input, bool debug = false )
+    {
+        aws__scan_string( input, sc );
+        aws_set_debug ( debug, sc );
+        aws_start_URL( sc );
+        return aws_lex( & token, sc );
+    }
+
     int Scan()
     {
         return aws_lex( & token, sc );
@@ -128,6 +136,34 @@ TEST_F ( AWS_TestFlexFixture, IPV6_11_3 )   { TestIPV6 ( "::ffff:0000:1.2.3.4" )
 TEST_F ( AWS_TestFlexFixture, IPV6_12_1 )   { TestIPV6 ( "cdef::1.2.3.4" ); }
 TEST_F ( AWS_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1.2.3.4" ); }
 
+TEST_F ( AWS_TestFlexFixture, Path_State )
+{
+    ASSERT_EQ( PATHSTR, StartPath( "a" ) ); 
+    ASSERT_EQ( "a", Token() );
+}
+
+TEST_F ( AWS_TestFlexFixture, Path_StateReturn )
+{
+    const char * input = "\"a\" ";
+    aws__scan_string( input, sc );
+    //aws_set_debug ( 1, sc );
+    aws_start_URL( sc ); // send scanner into PATH state
+    ASSERT_EQ( QUOTE, Scan() );
+    ASSERT_EQ( PATHSTR, Scan() ); ASSERT_EQ( "a", Token() );
+    ASSERT_EQ( QUOTE, Scan() );
+    aws_stop_URL( sc ); // back to INITIAL state
+    ASSERT_EQ( SPACE, Scan() );
+}
+
+TEST_F ( AWS_TestFlexFixture, Path_Accesssion )
+{
+    const char * input = "/SRR9154112/%2A.fastq%2A";
+    ASSERT_EQ( SLASH, StartPath( input ) ); 
+    ASSERT_EQ( ACCESSION, Scan() ); ASSERT_EQ( "SRR9154112", Token() );
+    ASSERT_EQ( SLASH, Scan( ) ); 
+    ASSERT_EQ( PATHSTR, Scan() ); ASSERT_EQ( "%2A", Token() );
+    ASSERT_EQ( PATHEXT, Scan() ); ASSERT_EQ( ".fastq%2A", Token() );
+}
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

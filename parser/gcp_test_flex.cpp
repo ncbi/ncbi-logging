@@ -5,8 +5,6 @@
 #include "gcp_parser.hpp"
 #include "gcp_scanner.hpp"
 
-extern void gcp_start_URL( yyscan_t yyscanner );
-
 using namespace std;
 
 TEST ( TestFlex, InitDestroy )
