@@ -110,7 +110,7 @@ TEST_F ( OP_TestFlexFixture, QuotedNonAscii )
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedEscapedQuote )
-{   // skip non-ascii characters
+{   
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
     ASSERT_EQ( QSTR, Scan() ); 
     ASSERT_TRUE ( token . s . escaped );
