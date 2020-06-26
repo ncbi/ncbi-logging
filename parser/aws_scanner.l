@@ -40,7 +40,7 @@ I64         [-+]?[0-9]+
 SPACE       " "
 
 CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]?^{}]
-QCHARS      ${SPACE}|\.|\/|{CHARS}
+QCHARS      ${SPACE}|\.|\/|\\|{CHARS}
 
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
@@ -69,6 +69,7 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
+<QUOTED>.           { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 \[                  { yy_push_state( TIMEFMT, yyscanner ); return OB; }
 <TIMEFMT>\]         { yy_pop_state( yyscanner ); return CB; }
@@ -118,7 +119,7 @@ void aws_start_URL( yyscan_t yyscanner )
     yy_push_state( PATH, yyscanner ); 
 }
 
-void aws_stop_URL( yyscan_t yyscanner )
-{
-    yy_pop_state( yyscanner ); 
-}
+// void aws_stop_URL( yyscan_t yyscanner )
+// {
+//     yy_pop_state( yyscanner ); 
+// }

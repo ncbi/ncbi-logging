@@ -25,10 +25,14 @@ export CLOUDSDK_CORE_PROJECT="research-sra-cloud-pipeline"
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 mkdir -p "$PANFS/gs_prod/objects"
-for x in $(seq 7); do
+for x in $(seq 14); do
     "$HOME/strides/gs_lister.py" "sra-pub-run-$x" | \
         gzip -9 -c > \
         "$PANFS/gs_prod/objects/$DATE.objects-$x.gz"
+
+    "$HOME/strides/gs_lister.py" "sra-pub-src-$x" | \
+        gzip -9 -c > \
+        "$PANFS/gs_prod/objects/$DATE.objects-src-$x.gz"
 done
 
 

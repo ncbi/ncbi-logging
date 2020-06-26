@@ -28,15 +28,8 @@ static JSONValueRef ToJsonString( const t_str & in )
 
 static String FormatTime( const t_timepoint & t )
 {
-    ostringstream ret;
-    ret << (int)t.day << "."
-        << (int)t.month <<"."
-        << (int)t.year <<":"
-        << (int)t.hour <<":"
-        << (int)t.minute <<":"
-        << (int)t.second <<" "
-        << (int)t.offset;
-    return String(ret.str());
+    std::string s( ToString( t ) );
+    return String( s );
 }
 
 ostream& operator<< (ostream& os, const t_str & s)
@@ -59,15 +52,7 @@ ostream& operator<< (ostream& os, const t_str & s)
 
 ostream& operator<< (ostream& os, const t_timepoint & t)
 {
-    os << "\"";
-    os << (int)t.day << "."
-        << (int)t.month <<"."
-        << (int)t.year <<":"
-        << (int)t.hour <<":"
-        << (int)t.minute <<":"
-        << (int)t.second <<" "
-        << (int)t.offset;
-    os << "\"";
+    os << "\"" << ToString( t ) << "\"";
     return os;
 }
 
@@ -76,9 +61,10 @@ struct Options
     bool readable = false;
     bool report = true;
     bool print_line_nr = false;
-    bool debug = false;
+    bool parser_debug = false;
     bool jsonlib = false;
     bool path_only = false;
+    unsigned long int selected_line = 0;
 };
 
 struct cmnLogLines
@@ -168,7 +154,7 @@ struct cmnLogLines
     unsigned long int num_rejected = 0;
     unsigned long int num_headers = 0;
     unsigned long int num_unrecognized = 0;
-    unsigned long int line_nr = 1;
+    unsigned long int line_nr = 0;
 };
 
 struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
@@ -182,6 +168,8 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
     virtual void acceptLine( const LogOPEvent & e )
     {
         num_accepted ++;
+        line_nr ++;
+
         if ( mem_options . jsonlib )
         {
             print_json( MakeJson(e, true) );
@@ -190,13 +178,13 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
         {
             print_direct(e, true);
         }
-        
-        line_nr ++;
     }
 
     virtual void rejectLine( const LogOPEvent & e )
     {
         num_rejected ++;
+        line_nr ++;
+
         if ( mem_options . jsonlib )
         {
             print_json( MakeJson( e, false) );
@@ -205,7 +193,6 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
         {
             print_direct(e, false);
         }
-        line_nr ++;
     }
 
     void print_direct ( const LogOPEvent & e, bool accepted )
@@ -282,6 +269,8 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
     virtual void acceptLine( const LogAWSEvent & e )
     {
         num_accepted ++;
+        line_nr ++;
+
         if ( mem_options . jsonlib )
         {
             print_json( MakeJson( e, true ) );
@@ -290,12 +279,13 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         {
             print_direct(e, true );
         }
-        line_nr ++;
     }
 
     virtual void rejectLine( const LogAWSEvent & e )
     {
         num_rejected ++;
+        line_nr ++;
+
         if ( mem_options . jsonlib )
         {
             print_json( MakeJson( e, false) );
@@ -304,7 +294,6 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         {
             print_direct(e, false);
         }
-        line_nr ++;
     }
 
     void print_direct ( const LogAWSEvent & e, bool accepted )
@@ -401,6 +390,8 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
     virtual void acceptLine( const LogGCPEvent & e )
     {
         num_accepted ++;
+        line_nr ++;
+
         if ( mem_options . jsonlib )
         {
             print_json( MakeJson( e, true) );
@@ -409,12 +400,13 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         {
             print_direct(e, true);
         }
-        line_nr ++;
     }
 
     virtual void rejectLine( const LogGCPEvent & e )
     {
         num_rejected ++;
+        line_nr ++;
+
         if ( mem_options . jsonlib )
         {
             print_json( MakeJson( e, false) );
@@ -422,7 +414,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         else
         {
             print_direct(e, false);
-        }        line_nr ++;
+        }
     }
 
     virtual void headerLine()
@@ -506,7 +498,8 @@ static void handle_on_prem( const Options & options )
     cerr << "converting on-premise format" << endl;
     OpToJsonLogLines event_receiver( cout, options );
     OP_Parser p( event_receiver, cin );
-    p . setDebug( options . debug );
+    p . setDebug( options . parser_debug );
+    p . setLineFilter( options . selected_line );
     p . parse();
     if ( options . report )
         event_receiver.report();
@@ -517,7 +510,8 @@ static void handle_aws( const Options & options )
     cerr << "converting AWS format" << endl;
     AWSToJsonLogLines event_receiver( cout, options );
     AWS_Parser p( event_receiver, cin );
-    p . setDebug( options . debug );
+    p . setDebug( options . parser_debug );
+    p . setLineFilter( options . selected_line );
     p . parse();
     if ( options . report )
         event_receiver.report();
@@ -528,7 +522,8 @@ static void handle_gcp( const Options & options )
     cerr << "converting GCP format" << endl;
     GCPToJsonLogLines event_receiver( cout, options );
     GCP_Parser p( event_receiver, cin );
-    p . setDebug( options . debug );
+    p . setDebug( options . parser_debug );
+    p . setLineFilter( options . selected_line );
     p . parse();
     if ( options . report )
         event_receiver.report();
@@ -571,11 +566,14 @@ int main ( int argc, char * argv [], const char * envp []  )
 
         ncbi::Cmdline args( argc, argv );
         args . addOption( options . readable, "r", "readable", "pretty print json output ( only with -j )" );
-        args . addOption( options . debug, "d", "debug", "parse with debug-output" );
+        args . addOption( options . parser_debug, "d", "debug", "run with parser-debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
         args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
         args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );
         args . addOption( options . path_only, "a", "path-only", "print only the path found ( not json )" );
+
+        args . addOption( options . selected_line, nullptr, "l", "line-to-select", "line-nr", "select only this line from input (1-based)" );
+
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
 

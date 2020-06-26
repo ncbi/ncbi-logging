@@ -31,7 +31,7 @@ void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* ms
 
 extern void aws_get_scanner_input( void * yyscanner, t_str & str );
 extern void aws_start_URL( void * yyscanner );
-extern void aws_stop_URL( void * yyscanner );
+//extern void aws_stop_URL( void * yyscanner );
 
 using namespace NCBI::Logging;
 }
@@ -146,19 +146,19 @@ aws_bucket
 aws_requester
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_request_id
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }    
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_operation
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 url_token
@@ -200,72 +200,73 @@ aws_key
     ;
 
 aws_error
-    : DASH                          { $$.p = NULL; $$.n = 0; }
-    | STR
+    : STR
     | STR1
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_bytes_sent
     : STR
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_obj_size
     : STR
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_total_time
     : STR
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_turnaround_time
     : STR
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_version_id
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_host_id
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_cipher
-    : STR SPACE STR    { $$ = $1; $$.n += ( $3.n + 1 ); }
-    | STR1 SPACE STR   { $$ = $1; $$.n += ( $3.n + 1 ); }
-    | STR SPACE STR1   { $$ = $1; $$.n += ( $3.n + 1 ); }
-    | STR1 SPACE STR1  { $$ = $1; $$.n += ( $3.n + 1 ); }   
-    | DASH             { $$.p = NULL; $$.n = 0; } 
+    : STR SPACE STR     { $$ = $1; $$.n += ( $3.n + 1 ); }
+    | STR1 SPACE STR    { $$ = $1; $$.n += ( $3.n + 1 ); }
+    | STR SPACE STR1    { $$ = $1; $$.n += ( $3.n + 1 ); }
+    | STR1 SPACE STR1   { $$ = $1; $$.n += ( $3.n + 1 ); }   
+    | DASH              { EMPTY_TSTR($$); }
     ;
 
 aws_auth
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_host_hdr
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_tls_vers
     : STR
     | STR1
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 ip
     : IPV4
     | IPV6
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 method
@@ -297,6 +298,16 @@ request
         $$.method = $2;
         $$.path   = $4;
     }
+    | QUOTE method QUOTE 
+    {
+        InitRequest( $$ );
+        $$.method = $2;
+    }
+    | QUOTE qstr_list QUOTE
+    {
+        InitRequest( $$ );
+        $$.path = $2;
+    }
     | DASH                          
     {
         InitRequest( $$ );
@@ -305,19 +316,19 @@ request
 
 result_code
     : STR
-    | DASH                          { $$.p = NULL; $$.n = 0; }    
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 referer
-    : QUOTE qstr_list QUOTE         { $$ = $2; }
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    : QUOTE qstr_list QUOTE { $$ = $2; }
     | STR
     | STR1
+    | DASH                  { EMPTY_TSTR($$); }
     ;
 
 agent
     : QUOTE agent_list QUOTE        { $$ = $2; }
-    | DASH                          { $$.p = NULL; $$.n = 0; }
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 agent_list
@@ -336,7 +347,7 @@ time
         $$.minute = atoi( $10.p );
         $$.second = atoi( $12.p );
         $$.offset = atoi( $13.p );
-    }
+    } 
     ;
 
 %%

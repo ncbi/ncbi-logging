@@ -33,7 +33,7 @@ public:
         return aws_lex( & token, sc );
     }
 
-    int StartPath(const char * input, bool debug = false )
+    int StartScanInURL_State(const char * input, bool debug = false )
     {
         aws__scan_string( input, sc );
         aws_set_debug ( debug, sc );
@@ -41,17 +41,17 @@ public:
         return aws_lex( & token, sc );
     }
 
-    int Scan()
+    int NextTokenType()
     {
         return aws_lex( & token, sc );
     }
 
-    string Token() const { return string( token . s . p, token . s . n ); }
+    string TokenValue() const { return string( token . s . p, token . s . n ); }
 
     void TestIPV6 ( const char * addr )
     {
         ASSERT_EQ( IPV6, StartScan(addr) );
-        ASSERT_EQ( addr, Token() );
+        ASSERT_EQ( addr, TokenValue() );
     }
 
     yyscan_t sc;
@@ -69,30 +69,30 @@ TEST_F ( AWS_TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\
 TEST_F ( AWS_TestFlexFixture, STR )
 {
     ASSERT_EQ( STR, StartScan("abcdefghijklmnopqrstuvw") );
-    ASSERT_EQ( "abcdefghijklmnopqrstuvw", Token() );
+    ASSERT_EQ( "abcdefghijklmnopqrstuvw", TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, Quotes )
 {
     ASSERT_EQ( QUOTE, StartScan("\"\"") );
-    ASSERT_EQ( QUOTE, Scan() );
-    ASSERT_EQ( 0, Scan() );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( 0, NextTokenType() );
 }
 TEST_F ( AWS_TestFlexFixture, QuotedSpace )
 {
     ASSERT_EQ( QUOTE, StartScan("\" \"") );
-    ASSERT_EQ( SPACE, Scan() );
+    ASSERT_EQ( SPACE, NextTokenType() );
 }
 TEST_F ( AWS_TestFlexFixture, QuotedQuestion )
 {
     ASSERT_EQ( QUOTE, StartScan("\"?\"") );
-    ASSERT_EQ( QSTR, Scan() );
+    ASSERT_EQ( QSTR, NextTokenType() );
 }
 TEST_F ( AWS_TestFlexFixture, QuotedString )
 {
     #define str ".Bl0-_~!*'();:@&=+$,/%#[]"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
-    ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );
+    ASSERT_EQ( QSTR, NextTokenType() ); ASSERT_EQ( str, TokenValue() );
     ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     #undef str
 }
@@ -100,23 +100,23 @@ TEST_F ( AWS_TestFlexFixture, QuotedNonAscii )
 {   // skip non-ascii characters
     #define str "и"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
-    ASSERT_EQ( QUOTE, Scan() );
+    ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str
 }
 TEST_F ( AWS_TestFlexFixture, QuotedEscapedQuote )
 {   // skip non-ascii characters
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
-    ASSERT_EQ( QSTR, Scan() ); 
+    ASSERT_EQ( QSTR, NextTokenType() ); 
     ASSERT_TRUE ( token . s . escaped );
-    ASSERT_EQ( "\\\"", Token() ); // needs to be unescaped later
-    ASSERT_EQ( QUOTE, Scan() );
+    ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
+    ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str
 }
 
 TEST_F ( AWS_TestFlexFixture, IPV4 )
 {
     const char * addr = "255.24.110.9";
-    ASSERT_EQ( IPV4, StartScan(addr) ); ASSERT_EQ( addr, Token() );
+    ASSERT_EQ( IPV4, StartScan(addr) ); ASSERT_EQ( addr, TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, IPV6_1 )      { TestIPV6 ( "1:22:333:4444:5:6:7:8" ); }
@@ -138,31 +138,28 @@ TEST_F ( AWS_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1
 
 TEST_F ( AWS_TestFlexFixture, Path_State )
 {
-    ASSERT_EQ( PATHSTR, StartPath( "a" ) ); 
-    ASSERT_EQ( "a", Token() );
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) ); 
+    ASSERT_EQ( "a", TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, Path_StateReturn )
 {
-    const char * input = "\"a\" ";
-    aws__scan_string( input, sc );
-    //aws_set_debug ( 1, sc );
-    aws_start_URL( sc ); // send scanner into PATH state
-    ASSERT_EQ( QUOTE, Scan() );
-    ASSERT_EQ( PATHSTR, Scan() ); ASSERT_EQ( "a", Token() );
-    ASSERT_EQ( QUOTE, Scan() );
-    aws_stop_URL( sc ); // back to INITIAL state
-    ASSERT_EQ( SPACE, Scan() );
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a b" ) ); 
+    ASSERT_EQ( "a", TokenValue() ); 
+    // " " sends us back to the default state
+    ASSERT_EQ( SPACE, NextTokenType() );
+    // now should be back in the default state
+    ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "b", TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, Path_Accesssion )
 {
     const char * input = "/SRR9154112/%2A.fastq%2A";
-    ASSERT_EQ( SLASH, StartPath( input ) ); 
-    ASSERT_EQ( ACCESSION, Scan() ); ASSERT_EQ( "SRR9154112", Token() );
-    ASSERT_EQ( SLASH, Scan( ) ); 
-    ASSERT_EQ( PATHSTR, Scan() ); ASSERT_EQ( "%2A", Token() );
-    ASSERT_EQ( PATHEXT, Scan() ); ASSERT_EQ( ".fastq%2A", Token() );
+    ASSERT_EQ( SLASH, StartScanInURL_State( input ) ); 
+    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
+    ASSERT_EQ( SLASH, NextTokenType( ) ); 
+    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%2A", TokenValue() );
+    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
 }
 extern "C"
 {

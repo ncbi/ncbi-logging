@@ -201,45 +201,48 @@ namespace NCBI
         {
         public:
             OP_Parser( OP_LogLines &loglines, std::istream &input );
-            OP_Parser( OP_LogLines &loglines ); // uses cin for input
 
             void parse(); 
 
             void setDebug( bool on );
+            void setLineFilter( unsigned long int line_nr );
 
         private:
             OP_LogLines &   m_lines;
             std::istream &  m_input;
+            unsigned long int line_filter = 0;
         };
 
         class AWS_Parser
         {
         public:
             AWS_Parser( AWS_LogLines &loglines, std::istream &input );
-            AWS_Parser( AWS_LogLines &loglines ); // uses cin for input
 
             void parse(); 
 
             void setDebug( bool on );
+            void setLineFilter( unsigned long int line_nr );
 
         private:
             AWS_LogLines &  m_lines;
             std::istream &  m_input;
+            unsigned long int line_filter = 0;            
         };
 
         class GCP_Parser
         {
         public:
             GCP_Parser( GCP_LogLines &loglines, std::istream &input );
-            GCP_Parser( GCP_LogLines &loglines ); // uses cin for input
 
             void parse(); 
 
             void setDebug( bool on );
+            void setLineFilter( unsigned long int line_nr );
 
         private:
             GCP_LogLines &  m_lines;
             std::istream &  m_input;
+            unsigned long int line_filter = 0;
         };
 
     }

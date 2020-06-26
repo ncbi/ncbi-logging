@@ -104,13 +104,15 @@ $(LIBDIR)/liblogparse-rel.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_REL_OBJ))
 $(LIBDIR)/liblogparse-prof.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_PROF_OBJ))
 	ar r $@ $+
 
-lib liblogparse: mkdir $(LIBDIR)/liblogparse-dbg.a $(LIBDIR)/liblogparse-rel.a
+lib: mkdir $(LIBDIR)/liblogparse-dbg.a $(LIBDIR)/liblogparse-rel.a
+
+.PHONY: lib
 
 #################################################
 # tests
 # assume that Googletests is installed and accessible
 
-runtests: liblogparse run_ut test2jsn
+runtests: run_ut test2jsn
 
 #build all test-binaries
 tests: \
@@ -365,6 +367,16 @@ test2jsn: log2jsn_
 	cat data/op_unrecognized.log  | $(LOG2JSON) op -p -j --readable >./actual/op_unrecognized_pretty.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized_pretty.out ./actual/op_unrecognized_pretty.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
+	cat data/op_unrecognized.log | $(LOG2JSON) op -l2 > ./actual/op_filtered.out 2>./actual/op_filtered.err \
+						&& diff ./expected/op_filtered.out ./actual/op_filtered.out \
+						&& diff ./expected/op_filtered.err ./actual/op_filtered.err 
+	cat data/aws_unrecognized.log | $(LOG2JSON) aws -l2 > ./actual/aws_filtered.out 2>./actual/aws_filtered.err \
+						&& diff ./expected/aws_filtered.out ./actual/aws_filtered.out \
+						&& diff ./expected/aws_filtered.err ./actual/aws_filtered.err 
+	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp -l2 > ./actual/gcp_filtered.out 2>./actual/gcp_filtered.err \
+						&& diff ./expected/gcp_filtered.out ./actual/gcp_filtered.out \
+						&& diff ./expected/gcp_filtered.err ./actual/gcp_filtered.err 
+
 	@ echo "test2json passed"
 	@ rm -rf actual/run2jsn*
 
