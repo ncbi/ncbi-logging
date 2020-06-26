@@ -327,7 +327,68 @@ TEST_F ( TestParseFixture, AWS_Request_QuotedDash )
     ASSERT_EQ ( string (), e.request.vers);
 }
 
+TEST_F ( TestParseFixture, AWS_multiple_valid_accessions_in_key )
+{
+    const char * InputLine =
+"7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRX123456/ERR792423/5141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ ( string ("SRX123456/ERR792423/5141526_s1_p0.bas.h5.1"), e.key );
+    ASSERT_EQ ( string ("ERR792423"), e.request.accession );
+    ASSERT_EQ ( string ("5141526_s1_p0"), e.request.filename );
+    ASSERT_EQ ( string (".bas.h5.1"), e.request.extension );
+}
+
+TEST_F ( TestParseFixture, AWS_no_valid_accessions_in_key )
+{
+    const char * InputLine =
+"7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT abc.12/5141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ ( string ("abc.12/5141526_s1_p0.bas.h5.1"), e.key );
+    ASSERT_EQ ( string (), e.request.accession );
+    ASSERT_EQ ( string (), e.request.filename );
+    ASSERT_EQ ( string (), e.request.extension );
+}
+
+TEST_F ( TestParseFixture, AWS_valid_accessions_with_multiple_path_segments_in_key )
+{
+    const char * InputLine =
+"7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456/abc.12/5141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ ( string ("SRR123456/abc.12/5141526_s1_p0.bas.h5.1"), e.key );
+    ASSERT_EQ ( string ("SRR123456"), e.request.accession );
+    ASSERT_EQ ( string ("5141526_s1_p0"), e.request.filename );
+    ASSERT_EQ ( string (".bas.h5.1"), e.request.extension );
+}
+
+TEST_F ( TestParseFixture, AWS_valid_accessions_no_extension_in_key )
+{
+    const char * InputLine =
+"7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456/abc.12/5141526_s1_p0 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ ( string ("SRR123456/abc.12/5141526_s1_p0"), e.key );
+    ASSERT_EQ ( string ("SRR123456"), e.request.accession );
+    ASSERT_EQ ( string ("5141526_s1_p0"), e.request.filename );
+    ASSERT_EQ ( string (""), e.request.extension );
+}
+
+TEST_F ( TestParseFixture, AWS_valid_accessions_only_extension_in_key )
+{
+    const char * InputLine =
+"7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456/abc.12/.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ ( string ("SRR123456/abc.12/.bas.h5.1"), e.key );
+    ASSERT_EQ ( string ("SRR123456"), e.request.accession );
+    ASSERT_EQ ( string (""), e.request.filename );
+    ASSERT_EQ ( string (".bas.h5.1"), e.request.extension );
+}
+
 // ... TODO: paths with multiple accessions, filenames, extensions
+// leaf has only extension
 
 //TODO: rejected lines with more than IP recognized
 

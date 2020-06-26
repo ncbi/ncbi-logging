@@ -45,7 +45,7 @@ QCHARS      ${SPACE}|\.|\/|\\|{CHARS}
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
 
-ACCESSION   [DES]R[RZ][0-9]{6,9}
+ACCESSION   [DES]R[RZXP][0-9]{6,9}
 PATHSTR     {CHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
 

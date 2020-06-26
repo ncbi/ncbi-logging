@@ -98,12 +98,15 @@ log_aws
         ev . request_id = $11;
         ev . operation = $13;
 
+        ev . request = $18; // this has to happen before we use the key-decomposition
         // combine data from aws_key and request
         ev . key = $16 . path;
-        ev . request = $18;
-        ev . request . accession = $16 . accession;
-        ev . request . filename  = $16 . filename;
-        ev . request . extension = $16 . extension;
+        if ( $16 . accession . n > 0 )
+        {
+            ev . request . accession = $16 . accession;
+            ev . request . filename  = $16 . filename;
+            ev . request . extension = $16 . extension;
+        }
 
         ev . res_code           = $20;
         ev . error              = $22;
@@ -165,7 +168,7 @@ url_token
     : SLASH     
         { 
             InitRequest( $$ );
-            $$ . path . p = "/", $$ . path . n = 1; 
+            $$ . path . p = "/", $$ . path . n = 1;
         }
     | ACCESSION  
         { 
@@ -192,10 +195,23 @@ aws_key
     | aws_key url_token    
         { 
             $$ . path . n += $2 . path . n;
-            // take the 1st instance each of accession, filename and extension
-            if ( $$ . accession . n == 0 ) $$ . accession = $2 . accession;
-            if ( $$ . filename . n  == 0 ) $$ . filename  = $2 . filename;
-            if ( $$ . extension . n == 0 ) $$ . extension = $2 . extension;
+            // clear the filename and extension after every slash - to make sure we catch only the last
+            // filename and extension in case of middle segments existing
+            if ( $2 . path . n == 1 && $2 . path . p[ 0 ] == '/' )
+            {
+                $$ . filename . n = 0;
+                $$ . extension . n = 0;
+            }
+            else
+            {
+                if ( $2 . accession . n > 0 ) $$ . accession = $2 . accession; // we will use the last non-empty accession-looking token
+                if ( $2 . filename . n > 0 )
+                {
+                    $$ . filename  = $2 . filename;
+                    $$ . extension . n = 0;
+                }
+                if ( $2 . extension . n > 0 ) $$ . extension = $2 . extension;
+            }
         }
     ;
 
