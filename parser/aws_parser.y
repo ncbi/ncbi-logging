@@ -262,6 +262,11 @@ request
         InitRequest( $$ );
         $$.method = $2;
     }
+    | QUOTE qstr_list QUOTE
+    {
+        InitRequest( $$ );
+        $$.path = $2;
+    }
     | DASH                          
     {
         InitRequest( $$ );
