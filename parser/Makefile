@@ -104,7 +104,9 @@ $(LIBDIR)/liblogparse-rel.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_REL_OBJ))
 $(LIBDIR)/liblogparse-prof.a: $(addprefix  $(OBJDIR)/,$(LOGLIB_PROF_OBJ))
 	ar r $@ $+
 
-lib liblogparse: mkdir $(LIBDIR)/liblogparse-dbg.a $(LIBDIR)/liblogparse-rel.a
+lib: mkdir $(LIBDIR)/liblogparse-dbg.a $(LIBDIR)/liblogparse-rel.a
+
+.PHONY: lib
 
 #################################################
 # tests
