@@ -391,7 +391,7 @@ fi
     grouped.remote_ip,
     host,
     bucket,
-    source,
+    grouped.source,
     num_requests,
     start_ts,
     end_ts,
@@ -403,12 +403,17 @@ fi
     rdns.domain,
     region_name,
     country_code,
-    city_name
+    city_name,
+    ScientificName,
+    cast (size_mb as int64) as accession_size_mb
+
     FROM \\\`strides_analytics.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
         ON grouped.remote_ip=rdns.ip
     LEFT JOIN \\\`strides_analytics.iplookup_new\\\` iplookup_new
         ON grouped.remote_ip=iplookup_new.remote_ip
+    LEFT JOIN \\\`strides_analytics.public_fix\\\`
+        ON accession=run
 ENDOFQUERY
     )
 
@@ -439,6 +444,14 @@ ENDOFQUERY
     --compression GZIP \
     'strides_analytics.summary_export' \
     "gs://logmon_export/summary/summary.$DATE.*.json.gz"
+
+    gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*.json.gz"
+    bq extract \
+    --destination_format NEWLINE_DELIMITED_JSON \
+    --compression GZIP \
+    'strides_analytics.uniq_ips' \
+    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.json.gz"
+
 
 
 ###### copy to filesystem
