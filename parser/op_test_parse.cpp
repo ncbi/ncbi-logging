@@ -372,6 +372,18 @@ TEST_F ( TestParseFixture, OnPremise_one_more_problem )
     check_accepted( InputLine );
 }
 
+/*
+TEST_F ( TestParseFixture, OnPremise_acc_filename_and_ext )
+{   
+    const char * InputLine =
+"159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GETD /srapub/SRR5385591.sra HTTP/1.1\" 404 0 0.000 \"-\" \"linux64 sra-toolkit test-sra.2.8.2\" \"-\" port=443 rl=164";
+
+    SLogOPEvent e = parse_str( InputLine );
+    ASSERT_EQ( "SRR5385591", e . request . accession );
+
+}
+*/
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

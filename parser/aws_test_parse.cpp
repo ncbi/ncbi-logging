@@ -14,7 +14,7 @@ struct SLogAWSEvent
 {
     string      ip;
     t_timepoint time;
-    SRequest      request;
+    SRequest    request;
     string      res_code;
     string      res_len;
     string      referer;
@@ -387,8 +387,17 @@ TEST_F ( TestParseFixture, AWS_valid_accessions_only_extension_in_key )
     ASSERT_EQ ( string (".bas.h5.1"), e.request.extension );
 }
 
-// ... TODO: paths with multiple accessions, filenames, extensions
-// leaf has only extension
+TEST_F ( TestParseFixture, AWS_accessions_is_also_filename )
+{
+    const char * InputLine =
+"7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ ( string ("SRR123456.1"), e.key );
+    ASSERT_EQ ( string ("SRR123456"), e.request.accession );
+    ASSERT_EQ ( string ("SRR123456"), e.request.filename );
+    ASSERT_EQ ( string (".1"), e.request.extension );
+}
 
 //TODO: rejected lines with more than IP recognized
 

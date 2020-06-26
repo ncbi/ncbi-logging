@@ -191,7 +191,14 @@ url_token
     ;
 
 aws_key
-    : url_token             { $$ = $1; }    
+    : url_token
+        {
+            $$ = $1;
+            if ( $1 . accession . n > 0 )
+            {
+                $$ . filename  = $1 . accession;
+            }
+        }    
     | aws_key url_token    
         { 
             $$ . path . n += $2 . path . n;
@@ -202,15 +209,20 @@ aws_key
                 $$ . filename . n = 0;
                 $$ . extension . n = 0;
             }
-            else
+            else if ( $2 . accession . n > 0 )
             {
-                if ( $2 . accession . n > 0 ) $$ . accession = $2 . accession; // we will use the last non-empty accession-looking token
-                if ( $2 . filename . n > 0 )
-                {
-                    $$ . filename  = $2 . filename;
-                    $$ . extension . n = 0;
-                }
-                if ( $2 . extension . n > 0 ) $$ . extension = $2 . extension;
+                // we will use the last non-empty accession-looking token
+                $$ . accession = $2 . accession;
+                $$ . filename  = $2 . accession;
+            }
+            else if ( $2 . filename . n > 0 )
+            {
+                $$ . filename  = $2 . filename;
+                $$ . extension . n = 0;
+            }
+            else if ( $2 . extension . n > 0 )
+            {
+                $$ . extension = $2 . extension;
             }
         }
     ;
