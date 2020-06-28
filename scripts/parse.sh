@@ -58,20 +58,18 @@ echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Parsing $LOG_BUCKET..."
 
-    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
-    gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
-    export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
-
     PARSE_DEST="$TMP/$PROVIDER/$LOG_BUCKET"
-
-    TGZ="$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
-
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
     df -HT .
 
     echo "Copying $TGZ to $PARSE_DEST"
-    gsutil cp "gs://strides_analytics_logs_${PROVIDER_LC}_public/$TGZ" "$TGZ"
+    SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
+    TGZ="$YESTERDAY.$LOG_BUCKET.tar.gz"
+
+    export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+    gcloud config set account 253716305623-compute@developer.gserviceaccount.com
+    gsutil cp "${SRC_BUCKET}{$TGZ}" .
     ls -l "$TGZ"
 
     echo "Counting $TGZ"
@@ -126,14 +124,8 @@ for LOG_BUCKET in $buckets; do
         export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
         export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
         gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-#        gsutil cp ./*.jsonl.gz "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
         gsutil cp ./recognized."$YESTERDAY.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-        #gsutil ls -lh "gs://logmon_logs_parsed/logs_${PROVIDER_LC}_public/"
-
-        #gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
-        #export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
-        #gsutil cp ./*.jsonl.gz "gs://strides_analytics_logs_parsed/logs_gs_public/"
-        #gsutil ls "gs://strides_analytics_logs_parsed/logs_gs_public/"
+        gsutil cp ./"$TGZ.err" "gs://logmon/logs_parsed_us/logs_${PROVIDER_LC}_public/"
         cd ..
         #rm -rf "$PARSE_DEST"
 #    fi

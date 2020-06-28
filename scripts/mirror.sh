@@ -55,14 +55,15 @@ for LOG_BUCKET in $buckets; do
 
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
 
+    TGZ="$YESTERDAY.$LOG_BUCKET.tar.gz"
+
     if [ "$PROVIDER" = "GS" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
-        TGZ="$PANFS/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
-        export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/nih-sra-datastore-c9b0ec6d9244.json
-        export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
-        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+
+        export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+        gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
         echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
         gsutil -m rsync "gs://$LOG_BUCKET/" .
@@ -70,43 +71,32 @@ for LOG_BUCKET in $buckets; do
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        MIRROR="$HOME/S3.all"
+        MIRROR="$HOME/$PROVIDER/$LOG_BUCKET/"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
-        TGZ="$HOME/$PROVIDER/$LOG_BUCKET/$PROVIDER.$LOG_BUCKET.$YESTERDAY.tar.gz"
-#        if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
-#            cp "$PANFS"/s3_prod/"$YESTERDAY".src.combine.gz .
-#        else
-#            cp "$PANFS"/s3_prod/"$YESTERDAY".combine.gz .
-#        fi
 
         echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
         WILDCARD="${YESTERDAY_DASH}-*"
-#        gsutil -m rsync "s3://$LOG_BUCKET/" .
-#        gunzip ./*combine.gz
-#        WILDCARD="*.combine"
+
+        aws sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD"
     fi
 
 
-    mkdir -p "$(dirname "$TGZ")"
     echo "rsynced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
-    find . -name "$WILDCARD" -print0| tar -caf "$TGZ" --null --files-from -
+    find . -name "$WILDCARD" -print0 | tar -caf "$TGZ" --null --files-from -
     echo "Tarred"
     ls -l "$TGZ"
 
-    DEST_BUCKET="gs://strides_analytics_logs_${PROVIDER_LC}_public/"
+    DEST_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
 
-    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
-    gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
-    export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
+    export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+    gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
     echo "Copying $TGZ to $DEST_BUCKET"
     gsutil cp "$TGZ" "$DEST_BUCKET"
+    # cp "$TGZ" "$PANFS/$PROVIDER/"
     echo "Done with $LOG_BUCKET"
 done
-
-#cd "$TMP"/GS || exit
-#tar -czf "$PANFS"/GS."$YESTERDAY".tar.gz . &
 
 echo "Done"
