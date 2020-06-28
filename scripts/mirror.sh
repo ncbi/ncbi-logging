@@ -62,8 +62,8 @@ for LOG_BUCKET in $buckets; do
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
-        export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
-        gcloud config set account 253716305623-compute@developer.gserviceaccount.com
+        export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
+        gcloud config set account strides-analytics@nih-sra-datastore.iam.gserviceaccount.com
 
         echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
         gsutil -m rsync "gs://$LOG_BUCKET/" .
