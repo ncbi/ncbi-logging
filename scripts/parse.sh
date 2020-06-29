@@ -58,44 +58,43 @@ echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Parsing $LOG_BUCKET..."
 
-    PARSE_DEST="$TMP/$PROVIDER/$LOG_BUCKET"
+    PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET"
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
     df -HT .
 
-    echo "Copying $TGZ to $PARSE_DEST"
     SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
+    echo "Copying $TGZ to $PARSE_DEST"
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil cp "${SRC_BUCKET}{$TGZ}" .
-    ls -l "$TGZ"
+    gsutil cp "${SRC_BUCKET}${TGZ}" .
+    ls -hl "$TGZ"
 
-    echo "Counting $TGZ"
+    echo "Counting $TGZ ..."
     totalwc=$(tar -xaOf "$TGZ" | wc -l | cut -f1 -d' ')
-    echo "Parsing $TGZ, $totalwc lines"
-    touch "$YESTERDAY.${LOG_BUCKET}.json"
+    echo "Parsing $TGZ, $totalwc lines ..."
+    touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
     tar -xaOf "$TGZ" | \
         time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
-        "$YESTERDAY.${LOG_BUCKET}.json" \
+        "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
         2> "$TGZ.err"
-    #newwc=$(wc -l "$YESTERDAY"."${LOG_BUCKET}".json | cut -f1 -d' ')
     head "$TGZ.err"
 
     echo
 
     set +e
-    grep "\"accepted\":false," "$YESTERDAY.${LOG_BUCKET}.json" > \
-        "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
-    grep "\"accepted\":true," "$YESTERDAY.${LOG_BUCKET}.json" > \
-        "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
+    grep "\"accepted\":false," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
+        "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+    grep "\"accepted\":true," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
+        "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
     set -e
 
     # "accepted": true,
-    unrecwc=$(wc -l "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
-    recwc=$(wc -l "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
+    unrecwc=$(wc -l "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
+    recwc=$(wc -l "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
 
     printf "Recognized lines:   %8d\n" "$recwc"
     printf "Unrecognized lines: %8d\n" "$unrecwc"
@@ -110,22 +109,27 @@ for LOG_BUCKET in $buckets; do
         if [ "$recwc" -gt 10000000 ]; then
             echo "jsonl too large, splitting"
             split -d -e -l 10000000 --additional-suffix=.jsonl \
-                - "recognized.$YESTERDAY.${LOG_BUCKET}." \
-                < "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
+                - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
+                < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
-            rm -f "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl"
+            rm -f "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+        fi
+
+        if [ ! -s "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" ]; then
+            rm -f "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
         fi
 
         echo "Gzipping..."
-        gzip -f -v -9 ./recognized."$YESTERDAY.${LOG_BUCKET}"*.jsonl
+        gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl
+        ls -lh
 
         echo "Uploading..."
 
         export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
         export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
         gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-        gsutil cp ./recognized."$YESTERDAY.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-        gsutil cp ./"$TGZ.err" "gs://logmon/logs_parsed_us/logs_${PROVIDER_LC}_public/"
+        gsutil cp ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
+        gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
         cd ..
         #rm -rf "$PARSE_DEST"
 #    fi
