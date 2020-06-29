@@ -55,7 +55,7 @@ for LOG_BUCKET in $buckets; do
 
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
 
-    TGZ="$YESTERDAY.$LOG_BUCKET.tar.gz"
+    TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
     if [ "$PROVIDER" = "GS" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
@@ -71,14 +71,21 @@ for LOG_BUCKET in $buckets; do
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        MIRROR="$HOME/$PROVIDER/$LOG_BUCKET/"
+        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
         echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
+        if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
+            export AWS_PROFILE="opendata"
+        fi
+
+        if [ "$LOG_BUCKET" = "sra-pub-run-1-logs" ]; then
+            export AWS_PROFILE="strides-analytics"
+        fi
         WILDCARD="${YESTERDAY_DASH}-*"
 
-        aws sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD"
+        aws s3 sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD"
     fi
 
 

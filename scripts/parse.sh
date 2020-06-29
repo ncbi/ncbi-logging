@@ -65,7 +65,7 @@ for LOG_BUCKET in $buckets; do
 
     echo "Copying $TGZ to $PARSE_DEST"
     SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
-    TGZ="$YESTERDAY.$LOG_BUCKET.tar.gz"
+    TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
