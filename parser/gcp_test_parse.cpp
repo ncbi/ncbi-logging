@@ -191,7 +191,7 @@ TEST_F ( TestParseFixture, GCP_EmptyAgent )
     "\"1591118933830501\",\"35.202.252.53\",\"1\",\"\",\"GET\",\"/sra-pub-run-8/SRR10303547/SRR10303547.1?GoogleAccessId=data-access-service%40nih-sra-datastore.iam.gserviceaccount.com&Expires=1591478828&userProject=nih-sra-datastore&Signature=ZNzj62MP4PWwSVvtkmsB97Lu33wQq4cFGLyWRJTcb%2F8h1BvVXi3lokOoT16ihScR%0At2EHti%2FgQ80VVMv9BGpAY%2FQ9HTqXeq57N53tMcjXQQMKFVttyXgIW89OLWO0UC0h%0AZdFq5AcKZywgnZql8z3RoaQi%2FPKdrdMO803tW%2Bxe%2Boy8sCd%2FyCXcG9jBrkGbdqPc%0A3xnyuycW1Va4LHIh4muGGdFSIqBk7oaLjkjLV54L8e4InzFMD3Kx0Q5raIlNadxx%0AIX%2B2hoPJuCdSh6IxEikrvUri%2Fd6i9Nqo%2BkZ%2BPSGtvlah9I9AafXrs3EAlwZkvc%2Bp%0AnjssKH8zalZQ5SmPpfHImQ%3D%3D%0A\",\"206\",\"0\",\"262144\",\"31000\",\"storage.googleapis.com\",\"\",\"\",\"AAANsUnhN-04LMubyLe-H4MQzIYbbqFwxT85S0jQpptnyQoxcHZP2JsKPbvPI9OK7TJkHIZRBcc4vvt6atty7aj6UoY\",\"GET_Object\",\"sra-pub-run-8\",\"SRR10303547/SRR10303547.1\""
     "\n";
 
-    SLogGCPEvent e = parse_gcp( InputLine );
+    SLogGCPEvent e = parse_gcp( InputLine, true );
     ASSERT_EQ( "", e . agent );
 }
 
@@ -332,7 +332,6 @@ TEST_F ( TestParseFixture, GCP_Object_URL_NoAccession )
 
     std::istringstream inputstream( InputLine );
     {
-        GCP_Parser p( m_lines, inputstream );
         SLogGCPEvent e = parse_gcp( InputLine );
         ASSERT_EQ( "qwe.2", e . request . path );
         ASSERT_EQ( "", e . request . accession );
@@ -340,6 +339,19 @@ TEST_F ( TestParseFixture, GCP_Object_URL_NoAccession )
         ASSERT_EQ( "", e . request . extension );
     }
 }
+
+TEST_F ( TestParseFixture, GCP_object_empty_and_accession_in_path_parameters )
+{
+    const char * InputLine =
+    "\"1589021828012489\",\"35.186.177.30\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&maxResults=1000&delimiter=%2F&alt=json\",\"200\",\"0\",\"3\",\"27000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUm2OYFw_ABbdF3IlhsUe5t4NuypE_5950pi4Ox34TnnKVjsaHA7cvogPp3T5-ePgGqCBLiMsai2BLhDcRhZ95E\",\"\",\"sra-pub-src-8\",\"\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&maxResults=1000&delimiter=%2F&alt=json", e . request . path );
+    ASSERT_EQ( "SRR1755353", e . request . accession );
+    ASSERT_EQ( "Metazome_Annelida_timecourse_sample_0097", e . request . filename );
+    ASSERT_EQ( ".fastq.gz", e . request . extension );
+}
+
 //TODO no accession, starts with /
 //TODO no accession, has / inside
 //TODO no accession, has multiple / inside

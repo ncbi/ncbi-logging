@@ -33,8 +33,8 @@ IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_
 
 I64     [-+]?[0-9]+
 
-CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]? ^{}]
-QCHARS      \.|\/|{CHARS}
+CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\] ^{}]
+QCHARS      [.?&=%/]|{CHARS}
 
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
@@ -64,7 +64,12 @@ SPACE   " "
 
 <PATH>\"            { return QUOTE; }
 <PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
-<PATH>\/            { return SLASH; };
+<PATH>\/            { MAKE_STR(); return SLASH; };
+<PATH>=             { MAKE_STR(); return EQUAL; };
+<PATH>&             { MAKE_STR(); return AMPERSAND; };
+<PATH>\?            { MAKE_STR(); return QMARK; };
+<PATH>%2F           { MAKE_STR(); return SLASH; };
+<PATH>%             { MAKE_STR(); return PERCENT; };
 <PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; };

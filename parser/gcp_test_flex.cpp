@@ -183,6 +183,17 @@ TEST_F ( GCP_TestFlexFixture, Path_NameSlashAccesssionSlashFilename_Ext )
     ASSERT_EQ( PATHEXT, Scan() ); ASSERT_EQ( ".ff", Token() );
 }
 
+TEST_F ( GCP_TestFlexFixture, Path_NameSlashAccesssionSlashFilename_Ext_v2 )
+{
+    const char * input = "SRP123456%2FERR4080068%2Fqwe.ff";
+    ASSERT_EQ( PATHSTR, StartPath( input ) ); ASSERT_EQ( "SRP123456", Token() );
+    ASSERT_EQ( SLASH, Scan() );
+    ASSERT_EQ( ACCESSION, Scan() ); ASSERT_EQ( "ERR4080068", Token() );
+    ASSERT_EQ( SLASH, Scan() );
+    ASSERT_EQ( PATHSTR, Scan() ); ASSERT_EQ( "qwe", Token() );
+    ASSERT_EQ( PATHEXT, Scan() ); ASSERT_EQ( ".ff", Token() );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
