@@ -161,6 +161,7 @@ TEST_F ( AWS_TestFlexFixture, Path_Accesssion )
     ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%2A", TokenValue() );
     ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
 }
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

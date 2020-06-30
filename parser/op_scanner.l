@@ -38,15 +38,20 @@ VERS    [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
 
-STR_CHARS   [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]?\\<>|`{}^]
+CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]<>|`{}^\\]
+STR_CHARS   "?"|"\."|"\/"|{CHARS}
 
 QSTR        {STR_CHARS}+
 QSTR_ESC    (\\\"|{STR_CHARS})+
 
+ACCESSION   [DES]R[RZXP][0-9]{6,9}
+PATHSTR     {CHARS}+
+PATHEXT     \.(\.|{PATHSTR})*
+
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
 
-%x QUOTED
+%x QUOTED PATH
 
 %%
 
@@ -66,12 +71,21 @@ STR     [.\-a-zA-Z0-9_]+
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
-<QUOTED>{SPACE}     { return SPACE; }
+<QUOTED>{SPACE}     { MAKE_STR(); return SPACE; }
 <QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
 <QUOTED>.           ;                                               /* TODO: include in the output token */
+
+<PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
+<PATH>{SPACE}       { MAKE_STR(); return SPACE; }
+<PATH>\"            { return QUOTE; }
+<PATH>\?            { MAKE_STR(); return QMARK; }
+<PATH>\/            { MAKE_STR(); return SLASH; };
+<PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
+<PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
+<PATH>.             { return yytext[0]; };
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
@@ -99,4 +113,14 @@ void op_get_scanner_input( yyscan_t yyscanner, t_str & str )
     const char * input = (const char*) ( yyg -> yyextra_r );
     str . p = input;
     str . n = strlen( input ); // looks wasteful but only happens when we report errors 
+}
+
+void op_start_URL( yyscan_t yyscanner )
+{
+    yy_push_state( PATH, yyscanner ); 
+}
+
+void op_pop_state( yyscan_t yyscanner )
+{
+    yy_pop_state( yyscanner ); 
 }

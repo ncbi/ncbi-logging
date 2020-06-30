@@ -33,17 +33,25 @@ public:
         return op_lex( & token, sc );
     }
 
-    int Scan()
+    int StartScanInURL_State(const char * input, bool debug = false )
+    {
+        op__scan_string( input, sc );
+        op_set_debug ( debug, sc );
+        op_start_URL( sc );
+        return op_lex( & token, sc );
+    }
+
+    int NextTokenType()
     {
         return op_lex( & token, sc );
     }
 
-    string Token() const { return string( token . s . p, token . s . n ); }
+    string TokenValue() const { return string( token . s . p, token . s . n ); }
 
     void TestIPV6 ( const char * addr )
     {
         ASSERT_EQ( IPV6, StartScan(addr) );
-        ASSERT_EQ( addr, Token() );
+        ASSERT_EQ( addr, TokenValue() );
     }
 
     void TestQuotedToken( int token_type, const char * token )
@@ -52,8 +60,8 @@ public:
         quoted += token;
         quoted += "\"";
         ASSERT_EQ( QUOTE, StartScan( quoted.c_str() ) );
-        ASSERT_EQ( token_type, Scan() );
-        ASSERT_EQ( string( token ), Token() );
+        ASSERT_EQ( token_type, NextTokenType() );
+        ASSERT_EQ( string( token ), TokenValue() );
     }
     yyscan_t sc;
     YYSTYPE token;
@@ -79,12 +87,12 @@ TEST_F ( OP_TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"
 TEST_F ( OP_TestFlexFixture, Quotes )
 {
     ASSERT_EQ( QUOTE, StartScan("\"\"") );
-    ASSERT_EQ( QUOTE, Scan() );ASSERT_EQ( 0, Scan() );
+    ASSERT_EQ( QUOTE, NextTokenType() );ASSERT_EQ( 0, NextTokenType() );
 }
 TEST_F ( OP_TestFlexFixture, QuotedSpace )
 {
     ASSERT_EQ( QUOTE, StartScan("\" \"") );
-    ASSERT_EQ( SPACE, Scan() );
+    ASSERT_EQ( SPACE, NextTokenType() );
 }
 TEST_F ( OP_TestFlexFixture, QuotedMethod )         { TestQuotedToken( METHOD, "OPTIONS" ); }
 TEST_F ( OP_TestFlexFixture, PropfindMethod )       { TestQuotedToken( METHOD, "PROPFIND" ); }
@@ -98,7 +106,7 @@ TEST_F ( OP_TestFlexFixture, QuotedString )
 {
     #define str ".Bl0-_~!*'();:@&=+$,/%#[]?\\<>|`{}^"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
-    ASSERT_EQ( QSTR, Scan() ); ASSERT_EQ( str, Token() );
+    ASSERT_EQ( QSTR, NextTokenType() ); ASSERT_EQ( str, TokenValue() );
     ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     #undef str
 }
@@ -106,23 +114,23 @@ TEST_F ( OP_TestFlexFixture, QuotedNonAscii )
 {   // skip non-ascii characters
     #define str "и"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
-    ASSERT_EQ( QUOTE, Scan() );
+    ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedEscapedQuote )
 {   
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
-    ASSERT_EQ( QSTR, Scan() ); 
+    ASSERT_EQ( QSTR, NextTokenType() ); 
     ASSERT_TRUE ( token . s . escaped );
-    ASSERT_EQ( "\\\"", Token() ); // needs to be unescaped later
-    ASSERT_EQ( QUOTE, Scan() );
+    ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
+    ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str
 }
 
 TEST_F ( OP_TestFlexFixture, IPV4 )
 {
     const char * addr = "255.24.110.9";
-    ASSERT_EQ( IPV4, StartScan(addr) ); ASSERT_EQ( addr, Token() );
+    ASSERT_EQ( IPV4, StartScan(addr) ); ASSERT_EQ( addr, TokenValue() );
 }
 
 TEST_F ( OP_TestFlexFixture, IPV6_1 )      { TestIPV6 ( "1:22:333:4444:5:6:7:8" ); }
@@ -141,6 +149,33 @@ TEST_F ( OP_TestFlexFixture, IPV6_11_2 )   { TestIPV6 ( "::ffff:1.2.3.4" ); }
 TEST_F ( OP_TestFlexFixture, IPV6_11_3 )   { TestIPV6 ( "::ffff:0000:1.2.3.4" ); }
 TEST_F ( OP_TestFlexFixture, IPV6_12_1 )   { TestIPV6 ( "cdef::1.2.3.4" ); }
 TEST_F ( OP_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1.2.3.4" ); }
+
+TEST_F ( OP_TestFlexFixture, Path_State )
+{
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) ); 
+    ASSERT_EQ( "a", TokenValue() );
+}
+
+TEST_F ( OP_TestFlexFixture, Path_StateReturn )
+{   // scanner state manipulation
+    op__scan_string( "a b", sc );
+    op_start_URL( sc ); // into PATH state
+    ASSERT_EQ( PATHSTR, NextTokenType() ); 
+    ASSERT_EQ( "a", TokenValue() ); 
+    op_pop_state( sc );    // back to the default state
+    // the default state skips spaces
+    ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "b", TokenValue() );
+}
+
+TEST_F ( OP_TestFlexFixture, Path_Accesssion )
+{
+    const char * input = "/SRR9154112/%2A.fastq%2A";
+    ASSERT_EQ( SLASH, StartScanInURL_State( input ) ); 
+    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
+    ASSERT_EQ( SLASH, NextTokenType( ) ); 
+    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%2A", TokenValue() );
+    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
+}
 
 extern "C"
 {
