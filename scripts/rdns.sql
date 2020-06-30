@@ -1,3 +1,5 @@
+-- sqlite3 rdns.db < rdns.sql
+
 drop table if exists imp;
 drop table if exists rdns;
 create table imp (line text);
@@ -9,7 +11,7 @@ drop table imp;
 .mode column
 .width 20 20
 select count(*) from rdns;
-select * from rdns limit 5;
+--select * from rdns limit 5;
 
 
 UPDATE RDNS
@@ -1102,4 +1104,4 @@ where IP in (
 
 select domain, count(*) as cnt from rdns group by domain order by cnt desc limit 20;
 
-select substr(ip,0,10) as sub, count(*) from rdns where domain='Unknown' group by sub order by count(*) desc limit 10;
+select substr(ip,0,12) as sub, count(*) from rdns where domain='Unknown' group by sub order by count(*) desc limit 10;

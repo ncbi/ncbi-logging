@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
@@ -48,7 +48,7 @@ EOF
 
     #bq mk --external_table_definition=gs_schema_only.son strides_analytics.gs_parsed
 
-    gsutil ls -lR gs://logmon_logs_parsed_us/logs_gs_public/recognized.*
+    gsutil ls -lR "gs://logmon_logs_parsed_us/logs_gs_public/recognized.*"
 
     bq rm -f strides_analytics.gs_parsed
     bq load \
@@ -101,7 +101,7 @@ EOF
     jq -c -e . < s3_schema.json > /dev/null
     jq -c .schema.fields < s3_schema.json > s3_schema_only.json
 
-    gsutil ls -lR gs://logmon_logs_parsed_us/logs_s3_public/recognized.*
+    gsutil ls -lR "gs://logmon_logs_parsed_us/logs_s3_public/recognized.*"
 
     bq rm -f strides_analytics.s3_parsed
     bq load \
@@ -110,6 +110,7 @@ EOF
         strides_analytics.s3_parsed \
         "gs://logmon_logs_parsed_us/logs_s3_public/recognized.*" \
         s3_schema_only.json
+
     bq show --schema strides_analytics.s3_parsed
 
 
@@ -156,6 +157,7 @@ ENDOFQUERY
     --use_legacy_sql=false \
     --batch=true \
     "$QUERY"
+
     bq show --schema strides_analytics.gs_fixed
 
 
@@ -204,12 +206,13 @@ ENDOFQUERY
     --use_legacy_sql=false \
     --batch=true \
     "$QUERY"
+
     bq show --schema strides_analytics.s3_fixed
 
 
 ####### op_parsed
-    cat << EOF > op_test_schema.json
-    [
+    cat << EOF > op_schema.json
+    { "schema": { "fields": [
     { "name": "accepted", "type": "BOOLEAN" },
     { "name": "agent", "type": "STRING" },
     { "name": "forwarded", "type": "STRING" },
@@ -233,14 +236,18 @@ ENDOFQUERY
     { "name": "time", "type": "STRING" },
     { "name": "user", "type": "STRING" }
     ]
+    },
+    "sourceFormat": "NEWLINE_DELIMITED_JSON",
+    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recogn*" ]
+    }
 EOF
 
-    jq -e -c . < op_test_schema.json > /dev/null
+    jq -e -c . < op_schema.json > /dev/null
     jq -c .schema.fields < op_schema.json > op_schema_only.json
     bq rm  -f strides_analytics.op_test
     bq mk \
         --table strides_analytics.op_test \
-        ./op_test_schema.json
+        ./op_schema.json
 
 ####### detail_export
     QUERY=$(cat <<-ENDOFQUERY
@@ -316,7 +323,7 @@ ENDOFQUERY
     current_datetime() as export_time
     FROM \\\`strides_analytics.detail_export\\\`
     WHERE start_ts > '2020-01-01'
-    GROUP BY accession, user_agent, remote_ip, host, bucket, source,
+    GROUP BY accession, user_agent, remote_ip, host, bucket, source, datetime_trunc(start_ts, day),
     case
         WHEN http_operation in ('GET', 'HEAD') THEN 0
         WHEN http_operation='POST' THEN 1
@@ -406,7 +413,6 @@ fi
     city_name,
     ScientificName,
     cast (size_mb as int64) as accession_size_mb
-
     FROM \\\`strides_analytics.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
         ON grouped.remote_ip=rdns.ip
@@ -414,6 +420,8 @@ fi
         ON grouped.remote_ip=iplookup_new.remote_ip
     LEFT JOIN \\\`strides_analytics.public_fix\\\`
         ON accession=run
+    WHERE
+        accession IS NOT NULL AND accession != ""
 ENDOFQUERY
     )
 

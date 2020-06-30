@@ -85,7 +85,7 @@ for LOG_BUCKET in $buckets; do
         fi
         WILDCARD="${YESTERDAY_DASH}-*"
 
-        aws s3 sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD"
+        aws s3 sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD" --quiet
     fi
 
 
