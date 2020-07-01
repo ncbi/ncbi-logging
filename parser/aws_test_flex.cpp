@@ -61,7 +61,6 @@ public:
 TEST_F ( AWS_TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan("") ); }
 TEST_F ( AWS_TestFlexFixture, SkipSpace )       { ASSERT_EQ( SPACE, StartScan("   ") ); }
 TEST_F ( AWS_TestFlexFixture, SkipTab )         { ASSERT_EQ( SPACE, StartScan(" \t ") ); }
-TEST_F ( AWS_TestFlexFixture, CR_LF )           { ASSERT_EQ( LF,    StartScan("\r\n") ); }
 TEST_F ( AWS_TestFlexFixture, Dash )            { ASSERT_EQ( DASH,  StartScan("-") ); }
 TEST_F ( AWS_TestFlexFixture, OpenBracket )     { ASSERT_EQ( OB,    StartScan("[") ); }
 TEST_F ( AWS_TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") ); }
@@ -154,12 +153,13 @@ TEST_F ( AWS_TestFlexFixture, Path_StateReturn )
 
 TEST_F ( AWS_TestFlexFixture, Path_Accesssion )
 {
-    const char * input = "/SRR9154112/%2A.fastq%2A";
+    const char * input = "/SRR9154112%2F%2A.fastq";
     ASSERT_EQ( SLASH, StartScanInURL_State( input ) ); 
     ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
     ASSERT_EQ( SLASH, NextTokenType( ) ); 
-    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%2A", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
+    ASSERT_EQ( PERCENT, NextTokenType() ); ASSERT_EQ( "%", TokenValue() );
+    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "2A", TokenValue() );
+    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq", TokenValue() );
 }
 
 extern "C"

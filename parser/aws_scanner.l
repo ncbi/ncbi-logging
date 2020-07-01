@@ -39,8 +39,8 @@ VERS        [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
 I64         [-+]?[0-9]+
 SPACE       " "
 
-CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]?^{}]
-QCHARS      ${SPACE}|\.|\/|\\|{CHARS}
+CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\]^{}]
+QCHARS      ${SPACE}|[.?&=%/\\]|{CHARS}
 
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
@@ -57,10 +57,8 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 %%
 
 [ \t]+          { return SPACE; }
-\r\n            { return LF; }
-\n              { return LF; }
-\r              { return CR; }
 -               { MAKE_STR(); return DASH; }
+\"-\"           { MAKE_STR(); return DASH; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
@@ -81,8 +79,14 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 <TIMEFMT>.          { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 <PATH>{SPACE}       { yy_pop_state( yyscanner ); return SPACE; }
+<PATH>\"            { yy_pop_state( yyscanner ); return QUOTE; }
 <PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
-<PATH>\/            { return SLASH; };
+<PATH>\/            { MAKE_STR(); return SLASH; };
+<PATH>=             { MAKE_STR(); return EQUAL; };
+<PATH>&             { MAKE_STR(); return AMPERSAND; };
+<PATH>\?            { MAKE_STR(); return QMARK; };
+<PATH>%2F           { MAKE_STR(); return SLASH; };
+<PATH>%             { MAKE_STR(); return PERCENT; };
 <PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; };

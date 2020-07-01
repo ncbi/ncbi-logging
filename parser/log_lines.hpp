@@ -22,16 +22,20 @@ namespace NCBI
 
         std::string ToString( const t_timepoint& t ); // [dd/Mon/yyyy:hh:mm:ss (-|+)oooo]
 
+        typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
+
         typedef struct t_request
         {
-            t_str server;
             t_str method;
             t_str path;
-            t_str params;
             t_str vers;
             t_str accession;
             t_str filename;
             t_str extension;
+
+            t_str server; // only used in OP
+
+            eAccessionMode accession_mode; // private to the AWS parser
         } t_request;
 
         inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }

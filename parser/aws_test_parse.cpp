@@ -214,7 +214,7 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "8388608", e.obj_size );
     ASSERT_EQ( "557", e.total_time );
     ASSERT_EQ( "12", e.turnaround_time );
-    ASSERT_EQ( "-", e.referer );
+    ASSERT_EQ( "", e.referer );
     ASSERT_EQ( "aws-cli/1.16.102 \"Python\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent );
     ASSERT_EQ( "", e.version_id );
     ASSERT_EQ( "fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg=", e.host_id );
@@ -237,7 +237,7 @@ TEST_F ( TestParseFixture, AWS_turnaround_time_is_dash )
     ASSERT_EQ( "1318480", e.obj_size );
     ASSERT_EQ( "30", e.total_time );
     ASSERT_EQ( "", e.turnaround_time );
-    ASSERT_EQ( "-", e.referer );
+    ASSERT_EQ( "", e.referer );
 }
 
 TEST_F ( TestParseFixture, AWS_SpaceInReferrer )
@@ -303,7 +303,7 @@ TEST_F ( TestParseFixture, AWS_StrayBackslashes )
 "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
     std::istringstream inputstream( InputLine );
-    SLogAWSEvent e = parse_aws( InputLine, false );
+    SLogAWSEvent e = parse_aws( InputLine );
     ASSERT_EQ ( string ("win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li"), e.agent);
 }
 
@@ -322,7 +322,7 @@ TEST_F ( TestParseFixture, AWS_Request_QuotedDash )
 "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
     SLogAWSEvent e = parse_aws( InputLine );
-    ASSERT_EQ ( string ("-"), e.request.path);
+    ASSERT_EQ ( string (), e.request.path);
     ASSERT_EQ ( string (), e.request.method);
     ASSERT_EQ ( string (), e.request.vers);
 }
@@ -396,6 +396,18 @@ TEST_F ( TestParseFixture, AWS_accessions_is_also_filename )
     ASSERT_EQ ( string ("SRR123456.1"), e.key );
     ASSERT_EQ ( string ("SRR123456"), e.request.accession );
     ASSERT_EQ ( string ("SRR123456"), e.request.filename );
+    ASSERT_EQ ( string (".1"), e.request.extension );
+}
+
+TEST_F ( TestParseFixture, AWS_empty_key )
+{   // when the key is empty, parse the request field
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-5 [09/Mar/2020:22:53:57 +0000] 35.172.121.21 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04a6132b8172af805 479B09DC662E4B67 REST.GET.BUCKET - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" 200 - 325 - 14 14 \"-\" \"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.154-99.181.amzn1.x86_64 botocore/1.12.92\" - 4588JL1XJI30m/MURh3Xoz4qVakHYt/u1JwJ/u4BvxAUCOFUfvPJAG/utO0+cBgipDArBig9kL4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-5.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ ( string ("-"), e.key );
+    ASSERT_EQ ( string ("SRR11060177"), e.request.accession );
+    ASSERT_EQ ( string ("filename"), e.request.filename );
     ASSERT_EQ ( string (".1"), e.request.extension );
 }
 
