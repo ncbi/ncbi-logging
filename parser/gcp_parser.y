@@ -48,10 +48,10 @@ using namespace NCBI::Logging;
 %token QUOTE COMMA UNRECOGNIZED
 
 %type<s> ip ip_region method host referrer agent 
-%type<s> ext_opt file_opt url_token
+%type<s> ext_opt file_opt 
 %type<s> req_id operation bucket hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
-%type<req> object uri url_list url_list_comp
+%type<req> object uri url_list url_list_comp url_token url_list_tail
 
 %start line
 
@@ -119,16 +119,20 @@ log_gcp
         ev . operation = $31;
         ev . bucket = $33;
 
-        if ( $36 . path . n > 0 )
-        {
-            // the cloud did populate the object-field
+        if ( $36 . accession . n > 0 )
+        {   // the cloud did populate the object-field
             ev . request = $36;
         }
         else
-        {
-            // accession, file-name and extension may be found in parameters of uri ($12)
+        {   // no accession found in the object field, use the results of parsing the request field
             ev . request = $12;
         }
+
+        if ( ev . request . filename . n == 0 && ev . request . extension . n == 0 )
+        {   // reuse the accession as the filename
+            ev . request . filename = ev . request . accession;
+        }
+
         ev . request . method = $9;
 
         lib -> acceptLine( ev );
@@ -244,35 +248,64 @@ url_list_comp
         MERGE_TSTR( $$ . path, $2 );
         MERGE_TSTR( $$ . path, $3 . path );        
         $$ . accession = $2;
-        // TODO: catch filename/extension
+        $$ . filename  = $3 . filename;
+        $$ . extension = $3 . extension;
     }
     ;
 
 url_list
     : url_token
     {
-        InitRequest( $$ );
-        $$ . path = $1;
+        $$ = $1;
     }
     | url_list url_token
     {
         $$ = $1;
-        MERGE_TSTR( $$ . path, $2 );
+        MERGE_TSTR( $$ . path, $2 . path );
     }
     ;
 
+ /* This is a collection of url tokens and accessions. 
+    we are looking for the file-name and the extension.*/
 url_list_tail
-    : this is a collection of url tokens and accessions
-    TODO: we are looking for the file-name and the extension.
+    :  url_token               { $$ = $1; }
+    |  ACCESSION               
+        { 
+            InitRequest( $$ );
+            MERGE_TSTR( $$ . path, $1 );
+        }
+    |  url_list_tail url_token
+        { 
+            $$ = $1; 
+            MERGE_TSTR( $$ . path, $2 . path );
+            if ( $$ . filename . n == 0 )
+            {
+                $$ . filename  = $2 . filename;
+            }
+            if ( $$ . extension . n == 0 )
+            {
+                $$ . extension = $2 . extension;
+            }            
+        }
+    |  url_list_tail ACCESSION
+        {   /* we are suppressing accessions after the first one */
+            $$ = $1; 
+            MERGE_TSTR( $$ . path, $2 );
+            if ( $$ . filename . n == 0 )
+            {
+                $$ . filename  = $2;
+            }
+        }
+    ;
 
 url_token
-    : SLASH         { $$ = $1; }
-    | PATHSTR       { $$ = $1; }
-    | PATHEXT       { $$ = $1; }
-    | EQUAL         { $$ = $1; }
-    | AMPERSAND     { $$ = $1; }
-    | QMARK         { $$ = $1; }
-    | PERCENT       { $$ = $1; }
+    : SLASH         { InitRequest( $$ ); $$ . path = $1; }
+    | PATHSTR       { InitRequest( $$ ); $$ . path = $1; $$ . filename = $1; }
+    | PATHEXT       { InitRequest( $$ ); $$ . path = $1; $$ . extension = $1; }
+    | EQUAL         { InitRequest( $$ ); $$ . path = $1; }
+    | AMPERSAND     { InitRequest( $$ ); $$ . path = $1; }
+    | QMARK         { InitRequest( $$ ); $$ . path = $1; }
+    | PERCENT       { InitRequest( $$ ); $$ . path = $1; }
     ;
 
 object
