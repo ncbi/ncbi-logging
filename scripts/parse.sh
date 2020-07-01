@@ -85,6 +85,9 @@ for LOG_BUCKET in $buckets; do
 
     echo
 
+    echo "Record format is:"
+    head -1 "$YESTERDAY_DASH.${LOG_BUCKET}.json" | jq -SM .
+
     set +e
     grep "\"accepted\":false," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
         "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
