@@ -11,7 +11,7 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 # TODO: Partition/cluster large tables for incremental inserts and retrievals
 # TODO: Materialized views that automatically refresh
 
-####### gs_parsed
+echo " #### gs_parsed"
 cat << EOF > gs_schema.json
     { "schema": { "fields": [
     { "name" : "accepted", "type": "BOOLEAN" },
@@ -60,7 +60,7 @@ EOF
 
 
 
-####### s3_parsed
+echo " #### s3_parsed"
     cat << EOF > s3_schema.json
     { "schema": { "fields": [
         { "name" : "accepted", "type": "BOOLEAN" },
@@ -114,10 +114,10 @@ EOF
     bq show --schema strides_analytics.s3_parsed
 
 
-####### op_parsed
+echo " #### op_parsed"
 
 
-####### gs_fixed
+echo " #### gs_fixed"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     ip as remote_ip,
@@ -161,7 +161,7 @@ ENDOFQUERY
     bq show --schema strides_analytics.gs_fixed
 
 
-####### s3_fixed
+echo " #### s3_fixed"
     # LOGMON-1: Remove multiple -heads from agent for S3
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
@@ -210,7 +210,7 @@ ENDOFQUERY
     bq show --schema strides_analytics.s3_fixed
 
 
-####### op_parsed
+echo " ##### op_parsed"
     cat << EOF > op_schema.json
     { "schema": { "fields": [
     { "name": "accepted", "type": "BOOLEAN" },
@@ -249,7 +249,7 @@ EOF
         --table strides_analytics.op_test \
         ./op_schema.json
 
-####### detail_export
+echo " ##### detail_export"
     QUERY=$(cat <<-ENDOFQUERY
 SELECT
     accession as accession,
@@ -304,7 +304,7 @@ ENDOFQUERY
 
     bq show --schema strides_analytics.detail_export
 
-###### summary_grouped
+echo " ###  summary_grouped"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     accession,
@@ -351,7 +351,7 @@ ENDOFQUERY
 
     bq show --schema strides_analytics.summary_grouped
 
-###### iplookup_new
+echo " ###  iplookup_new"
 RUN="no"
 if [ "$RUN" = "yes" ]; then
 # Only needs to be running when a lot of new IP addresses appear
@@ -390,7 +390,7 @@ ENDOFQUERY
     "$QUERY"
 fi
 
-###### summary_export
+echo " ###  summary_export"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     accession,
@@ -442,7 +442,7 @@ ENDOFQUERY
     bq show --schema strides_analytics.summary_export
 
 
-###### export to GS
+echo " ###  export to GS"
     gsutil rm -f "gs://strides_analytics/detail/detail.$DATE.*.json.gz"
     bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
@@ -466,7 +466,7 @@ ENDOFQUERY
 
 
 
-###### copy to filesystem
+echo " ###  copy to filesystem"
     mkdir -p "$PANFS/detail"
     cd "$PANFS/detail" || exit
     rm -f "$PANFS"/detail/detail."$DATE".* || true
