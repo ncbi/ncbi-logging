@@ -48,10 +48,10 @@ using namespace NCBI::Logging;
 %token QUOTE COMMA UNRECOGNIZED
 
 %type<s> ip ip_region method host referrer agent 
-%type<s> ext_opt file_opt 
+%type<s> ext_opt file_opt object_token object_list
 %type<s> req_id operation bucket hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
-%type<req> object uri url_list url_list_comp url_token url_list_tail
+%type<req> object url url_list url_token
 
 %start line
 
@@ -93,7 +93,7 @@ hdr_item
 log_gcp
     : time COMMA ip COMMA ip_type COMMA ip_region COMMA method COMMA
       { gcp_start_URL( scanner ); } 
-      uri
+      url
       { gcp_stop_URL( scanner ); }
       COMMA status COMMA req_bytes COMMA res_bytes COMMA time_taken COMMA host COMMA
       referrer COMMA agent COMMA req_id COMMA operation COMMA bucket COMMA 
@@ -162,17 +162,6 @@ method
     : QUOTE QSTR QUOTE      { $$ = $2; }
     ;
 
-uri
-    : QUOTE url_list_comp QUOTE
-    {
-        $$ = $2;
-    }
-    | QUOTE QUOTE
-    {
-        InitRequest( $$ );
-    }
-    ;
-
 status
     : q_i64
     ;
@@ -231,81 +220,111 @@ file_opt
     |           { EMPTY_TSTR($$); }
     ;
 
-url_list_comp
-    : url_list
-    {
-        $$ = $1;
-    }
-    | url_list ACCESSION
-    {
-        $$ = $1;
-        MERGE_TSTR( $$ . path, $2 );
-        $$ . accession = $2;
-    }
-    | url_list ACCESSION url_list_tail
-    {
-        $$ = $1;
-        MERGE_TSTR( $$ . path, $2 );
-        MERGE_TSTR( $$ . path, $3 . path );        
-        $$ . accession = $2;
-        $$ . filename  = $3 . filename;
-        $$ . extension = $3 . extension;
-    }
-    ;
+/* 
+    typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode; (defined in log_lines.hpp)
 
-url_list
-    : url_token
-    {
-        $$ = $1;
-    }
-    | url_list url_token
-    {
-        $$ = $1;
-        MERGE_TSTR( $$ . path, $2 . path );
-    }
-    ;
+        for a url_token node, set to 
+            'acc_inside' if it is an ACCESSION
+            'acc_after'  if it is a delimiter
 
- /* This is a collection of url tokens and accessions. 
-    we are looking for the file-name and the extension.*/
-url_list_tail
-    :  url_token               { $$ = $1; }
-    |  ACCESSION               
-        { 
-            InitRequest( $$ );
-            MERGE_TSTR( $$ . path, $1 );
-        }
-    |  url_list_tail url_token
-        { 
-            $$ = $1; 
-            MERGE_TSTR( $$ . path, $2 . path );
-            if ( $$ . filename . n == 0 )
-            {
-                $$ . filename  = $2 . filename;
-            }
-            if ( $$ . extension . n == 0 )
-            {
-                $$ . extension = $2 . extension;
-            }            
-        }
-    |  url_list_tail ACCESSION
-        {   /* we are suppressing accessions after the first one */
-            $$ = $1; 
-            MERGE_TSTR( $$ . path, $2 );
-            if ( $$ . filename . n == 0 )
-            {
-                $$ . filename  = $2;
-            }
-        }
-    ;
+        for a url_list node, describes the state of URL parsing:
+            'acc_before' - no accession has been seen yet
+            'acc_inside' - we are between the first accession and the following delimiter,
+                            capture the filename and extension tokens
+            'acc_after'  - we are past delimiter following an accession, 
+                            no further action necessary
+ */
 
 url_token
     : SLASH         { InitRequest( $$ ); $$ . path = $1; }
+    | EQUAL         { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
+    | AMPERSAND     { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
+    | QMARK         { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
+    | PERCENT       { InitRequest( $$ ); $$ . path = $1; }
+    | ACCESSION     
+        { 
+            InitRequest( $$ ); 
+            $$ . path = $1; 
+            $$ . accession = $1; 
+            $$ . accession_mode = acc_inside; 
+        }
     | PATHSTR       { InitRequest( $$ ); $$ . path = $1; $$ . filename = $1; }
     | PATHEXT       { InitRequest( $$ ); $$ . path = $1; $$ . extension = $1; }
-    | EQUAL         { InitRequest( $$ ); $$ . path = $1; }
-    | AMPERSAND     { InitRequest( $$ ); $$ . path = $1; }
-    | QMARK         { InitRequest( $$ ); $$ . path = $1; }
-    | PERCENT       { InitRequest( $$ ); $$ . path = $1; }
+    ;
+
+ /* This is a collection of url tokens and accessions. 
+    We are looking for the first accession and filename/extension that follow it.*/
+url_list
+    :  url_token               
+        { 
+            $$ = $1; 
+            if ( $1 . accession_mode == acc_after )            
+            {   /* a delimiter seen before an accession */
+                $$ . accession_mode = acc_before;
+            }
+        }
+    |  url_list url_token
+        { 
+            $$ = $1; 
+            MERGE_TSTR( $$ . path, $2 . path );
+            switch ( $$.accession_mode )
+            {
+            case acc_before:
+                if ( $2.accession_mode == acc_inside )
+                {
+                    $$ . accession = $2 . accession;
+                    $$ . accession_mode = acc_inside;
+                }
+                break;
+            case acc_inside:
+                switch ( $2 . accession_mode )
+                {
+                case acc_inside:
+                    $$ . filename  = $2 . accession;
+                    break;
+                case acc_after:
+                    $$ . accession_mode = acc_after;
+                    break;
+                default:
+                    if ( $2 . filename . n > 0 )    $$ . filename  = $2 . filename;
+                    if ( $2 . extension . n > 0 )   $$ . extension = $2 . extension;
+                }
+                break;
+            }
+        }
+    ;
+
+url
+    : QUOTE url_list QUOTE
+        {
+            $$ = $2;
+        }
+    | QUOTE QUOTE
+    {
+        InitRequest( $$ );
+    }
+    ;
+
+object_token
+    : SLASH         { $$ = $1; }
+    | PATHSTR       { $$ = $1; }
+    | PATHEXT       { $$ = $1; }
+    | EQUAL         { $$ = $1; }
+    | AMPERSAND     { $$ = $1; }
+    | QMARK         { $$ = $1; }
+    | PERCENT       { $$ = $1; }
+    ;
+
+object_list
+    : object_token
+    {
+        $$ = $1;
+    }
+    | object_list object_token
+    {
+        $$ = $1;
+        MERGE_TSTR( $$, $2 );
+    }
     ;
 
 object
@@ -320,9 +339,10 @@ object
             $$.filename  = $4;
             $$.extension = $5;
         }
-    | QUOTE url_list QUOTE
+    | QUOTE object_list QUOTE
         { 
-            $$ = $2;
+            InitRequest( $$ );
+            $$ . path = $2;
         }
     | QUOTE QUOTE 
         { 

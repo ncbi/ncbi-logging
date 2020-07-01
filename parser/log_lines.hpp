@@ -35,7 +35,7 @@ namespace NCBI
 
             t_str server; // only used in OP
 
-            eAccessionMode accession_mode; // private to the AWS parser
+            eAccessionMode accession_mode; // private to the GCP and AWS parser
         } t_request;
 
         inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }
