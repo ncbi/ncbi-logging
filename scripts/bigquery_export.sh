@@ -407,7 +407,11 @@ fi
     referers,
     bytes_sent,
     current_datetime() as export_time,
-    rdns.domain,
+    case
+        WHEN rdns.domain is null or rdns.domain='' or rdns.domain='Unknown' or rdns.domain='unknown'
+            THEN 'Unknown (' || country_code || ')'
+        ELSE rdns.domain
+    END as domain,
     region_name,
     country_code,
     city_name,

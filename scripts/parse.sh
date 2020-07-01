@@ -121,7 +121,6 @@ for LOG_BUCKET in $buckets; do
 
         echo "Gzipping..."
         gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl
-        ls -lh
 
         echo "Uploading..."
 
@@ -133,4 +132,5 @@ for LOG_BUCKET in $buckets; do
         cd ..
         #rm -rf "$PARSE_DEST"
 #    fi
+echo
 done
