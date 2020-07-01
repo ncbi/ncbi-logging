@@ -112,7 +112,7 @@ lib: mkdir $(LIBDIR)/liblogparse-dbg.a $(LIBDIR)/liblogparse-rel.a
 # tests
 # assume that Googletests is installed and accessible
 
-runtests: liblogparse run_ut test2jsn
+runtests: run_ut test2jsn
 
 #build all test-binaries
 tests: \
