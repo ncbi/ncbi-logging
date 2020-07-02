@@ -48,7 +48,7 @@ using namespace NCBI::Logging;
 %token QUOTE COMMA UNRECOGNIZED
 
 %type<s> ip ip_region method host referrer agent 
-%type<s> ext_opt file_opt object_token object_list
+%type<s> ext_opt ext_list ext_elem file_opt file_list file_elem object_token object_list
 %type<s> req_id operation bucket hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
 %type<req> object url url_list url_token
@@ -209,17 +209,6 @@ bucket
     | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
-ext_opt
-    : PATHEXT   { $$ = $1; }
-    |           { EMPTY_TSTR($$); }
-    ;
-
-file_opt
-    : ACCESSION { $$ = $1; }
-    | PATHSTR   { $$ = $1; }
-    |           { EMPTY_TSTR($$); }
-    ;
-
 /* 
     typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode; (defined in log_lines.hpp)
 
@@ -307,6 +296,7 @@ url
 
 object_token
     : SLASH         { $$ = $1; }
+    | ACCESSION     { $$ = $1; }
     | PATHSTR       { $$ = $1; }
     | PATHEXT       { $$ = $1; }
     | EQUAL         { $$ = $1; }
@@ -325,6 +315,43 @@ object_list
         $$ = $1;
         MERGE_TSTR( $$, $2 );
     }
+    ;
+
+file_opt
+    : file_list     { $$ = $1; }
+    |               { EMPTY_TSTR($$); }
+    ;
+
+file_list
+    : file_elem             { $$ = $1; }
+    | file_list file_elem   { $$ = $1; MERGE_TSTR( $$, $2 ); }
+    ;
+
+file_elem
+    : ACCESSION     { $$ = $1; }
+    | PATHSTR       { $$ = $1; }
+    | EQUAL         { $$ = $1; }
+    | AMPERSAND     { $$ = $1; }
+    | PERCENT       { $$ = $1; }
+    ;
+    
+ext_opt
+    : ext_list      { $$ = $1; }
+    |               { EMPTY_TSTR($$); }
+    ;
+
+ext_list
+    : ext_elem             { $$ = $1; }
+    | ext_list ext_elem    { $$ = $1; MERGE_TSTR( $$, $2 ); }
+    ;
+
+ext_elem
+    : ACCESSION     { $$ = $1; }
+    | PATHSTR       { $$ = $1; }
+    | PATHEXT       { $$ = $1; }
+    | EQUAL         { $$ = $1; }
+    | AMPERSAND     { $$ = $1; }
+    | PERCENT       { $$ = $1; }
     ;
 
 object

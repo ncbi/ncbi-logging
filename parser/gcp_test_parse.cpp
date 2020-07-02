@@ -363,6 +363,50 @@ TEST_F ( TestParseFixture, GCP_object_empty_only_accession_in_request )
     ASSERT_EQ( "", e . request . extension );
 }
 
+TEST_F ( TestParseFixture, GCP_object_filename_has_equal_sign )
+{
+    const char * InputLine =
+    "\"1589943868942178\",\"35.199.59.195\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-10/o/SRR11453435%2Frun1912_lane2_read1_indexN705-S506%3D122016_Cell94-F12.fastq.gz.1?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"387\",\"29000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUkOJYv3sKNYJZeo1FanJIcIecdxEsYa4TBKKLK88UHXdQa6nlqSjqzqMZJ7nJlD7QBNKdJwEHvmXpyVam9Kwak\",\"storage.objects.get\",\"sra-pub-src-10\",\"SRR11453435/run1912_lane2_read1_indexN705-S506=122016_Cell94-F12.fastq.gz.1\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "SRR11453435", e . request . accession );
+    ASSERT_EQ( "run1912_lane2_read1_indexN705-S506=122016_Cell94-F12", e . request . filename );
+    ASSERT_EQ( ".fastq.gz.1", e . request . extension );
+}
+
+TEST_F ( TestParseFixture, GCP_object_ext_has_equal_sign )
+{
+    const char * InputLine =
+    "\"1589943868942178\",\"35.199.59.195\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-10/o/SRR11453435%2Frun1912_lane2_read1_indexN705-S506%3D122016_Cell94-F12.fastq.gz.1?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"387\",\"29000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUkOJYv3sKNYJZeo1FanJIcIecdxEsYa4TBKKLK88UHXdQa6nlqSjqzqMZJ7nJlD7QBNKdJwEHvmXpyVam9Kwak\",\"storage.objects.get\",\"sra-pub-src-10\",\"SRR11453435/run1912_lane2_read1_indexN705-S506_122016_Cell94-F12.fastq.gz=1\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "SRR11453435", e . request . accession );
+    ASSERT_EQ( "run1912_lane2_read1_indexN705-S506_122016_Cell94-F12", e . request . filename );
+    ASSERT_EQ( ".fastq.gz=1", e . request . extension );
+}
+
+TEST_F ( TestParseFixture, GCP_object_filename_has_spaces_and_ampersands )
+{
+    const char * InputLine =
+    "\"1589988801294070\",\"34.86.94.122\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-12/o/SRR11509941%2FLZ017%26LZ018%26LZ019_2%20sample%20taq.fastq.gz.1?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"343\",\"24000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUloSsCf-idOT-SgYBGO8s8SdXw4zhnQtvdmCtC-ctONXnJ59iRUMEE5ToS7MhsA3Rh38QNfoGSckZswCZLSmrM\",\"storage.objects.get\",\"sra-pub-src-12\",\"SRR11509941/LZ017&LZ018&LZ019_2 sample taq.fast&q.gz.1\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "SRR11509941", e . request . accession );
+    ASSERT_EQ( "LZ017&LZ018&LZ019_2 sample taq", e . request . filename );
+    ASSERT_EQ( ".fast&q.gz.1", e . request . extension );
+}
+
+TEST_F ( TestParseFixture, GCP_another_problem )
+{
+    const char * InputLine =
+    "\"1590718096562025\",\"130.14.28.7\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-sars-cov2/o/sra-src%2FSRR004257%2FSRR004257?fields=updated%2Cname%2CtimeCreated%2Csize&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"297\",\"40000\",\"storage.googleapis.com\",\"\",\"apitools gsutil/4.46 Python/2.7.5 (linux2) google-cloud-sdk/274.0.1 analytics/disabled,gzip(gfe)\",\"AAANsUl0Ofxs9M0aVz_qBWEFs-oNbk42zNRcrU6KXN5hGz3odbZ9v3_Hr_XAMIkNgsd-iYKmTR3RnQqr37E8jeEFJsE\",\"storage.objects.get\",\"sra-pub-sars-cov2\",\"sra-src/SRR004257/SRR004257\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine, true );
+    ASSERT_EQ( "SRR004257", e . request . accession );
+    ASSERT_EQ( "SRR004257", e . request . filename );
+    ASSERT_EQ( "", e . request . extension );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

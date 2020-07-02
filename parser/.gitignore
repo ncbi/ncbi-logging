@@ -4,6 +4,9 @@ lib
 *.output
 actual
 gmon.out
+1.sh
+2.sh
+rejected.txt
 
 #do not exclude op_scanner.* etc. that would exclude [op|aws]_scanner.[y|l] too!
 op_scanner.cpp
