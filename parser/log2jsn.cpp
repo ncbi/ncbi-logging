@@ -103,6 +103,7 @@ struct cmnLogLines
         j -> addValue( "path",      ToJsonString( e.request.path ) );
         j -> addValue( "vers",      ToJsonString( e.request.vers ) );
         j -> addValue( "accession", ToJsonString( e.request.accession ) );
+        j -> addValue( "filename", ToJsonString( e.request.filename ) );
         j -> addValue( "extension", ToJsonString( e.request.extension ) );
         // e.request.server is only output for OP
     }
@@ -208,6 +209,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
         mem_os << ",\"extension\":" << e.request.extension;
+        mem_os << ",\"filename\":" << e.request.filename;
         mem_os << ",\"forwarded\":" << e.forwarded;
         mem_os << ",\"ip\":" << e.ip;
         if ( mem_options . print_line_nr )
@@ -312,6 +314,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         mem_os << ",\"cipher_suite\":" << e.cipher_suite;
         mem_os << ",\"error\":" << e.error;
         mem_os << ",\"extension\":" << e.request.extension;
+        mem_os << ",\"filename\":" << e.request.filename;
         mem_os << ",\"host_header\":" << e.host_header;
         mem_os << ",\"host_id\":" << e.host_id;
         mem_os << ",\"ip\":" << e.ip;
@@ -435,6 +438,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         mem_os << ",\"agent\":" << e.agent;
         mem_os << ",\"bucket\":" << e.bucket;
         mem_os << ",\"extension\":" << e.request.extension;
+        mem_os << ",\"filename\":" << e.request.filename;
         mem_os << ",\"host\":" << e.host;
         mem_os << ",\"ip\":" << e.ip;
         mem_os << ",\"ip_region\":" << e.ip_region;

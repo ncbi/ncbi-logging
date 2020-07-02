@@ -5,27 +5,10 @@
 
 #include "log_lines.hpp"
 #include "helper.hpp"
+#include "test_helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
-
-//TODO: promote to a shared place 
-struct SRequest
-{
-    string server;
-    string method;
-    string path;
-    string vers;
-
-    SRequest& operator= ( const t_request &req )
-    {
-       server = ToString( req.server );
-       method = ToString( req.method );
-       path = ToString( req.path );
-       vers = ToString( req.vers );
-       return *this;
-    }
-};
 
 struct SLogGCPEvent
 {
@@ -197,6 +180,9 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( "storage.objects.get", e . operation );
     ASSERT_EQ( "sra-pub-src-9", e . bucket );
     ASSERT_EQ( "SRR1371108/CGAG_2.1.fastq.gz", e . request . path );
+    ASSERT_EQ( "SRR1371108", e . request . accession );
+    ASSERT_EQ( "CGAG_2", e . request . filename );
+    ASSERT_EQ( ".1.fastq.gz", e . request . extension );
 }
 
 TEST_F ( TestParseFixture, GCP_EmptyAgent )
@@ -268,6 +254,113 @@ TEST_F ( TestParseFixture, GCP_UnparsedInput_WhenRejected )
         ASSERT_EQ ( 0, m_lines.m_accepted.size() ); 
         ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
     }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc_File_Ext )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/qwe.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/qwe.2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "qwe", e . request . filename );
+        ASSERT_EQ( ".2", e . request . extension );
+    }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc_Acc_Ext )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/SRR002994.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/SRR002994.2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "SRR002994", e . request . filename );
+        ASSERT_EQ( ".2", e . request . extension );
+    }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc__Ext )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/.2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/.2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "", e . request . filename );
+        ASSERT_EQ( ".2", e . request . extension ); // an explicitly empty filename, so do not use the accession to populate it
+    }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_Acc_File_ )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"SRR002994/2\"";
+
+    std::istringstream inputstream( InputLine );
+    {
+        GCP_Parser p( m_lines, inputstream );
+        SLogGCPEvent e = parse_gcp( InputLine );
+        ASSERT_EQ( "SRR002994/2", e . request . path );
+        ASSERT_EQ( "SRR002994", e . request . accession );
+        ASSERT_EQ( "2", e . request . filename );
+        ASSERT_EQ( "", e . request . extension );
+    }
+}
+
+TEST_F ( TestParseFixture, GCP_Object_URL_NoAccession )
+{
+    const char * InputLine =
+    "\"1554306916471623\",\"35.245.218.83\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"0\",\"42000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"19919634438459959682894277668675\",\"storage.objects.get\",\"sra-pub-run-1\","
+    "\"qwe.2222222\"";
+
+    std::istringstream inputstream( InputLine );
+    SLogGCPEvent e = parse_gcp( InputLine );
+    // no accession in the object field ("qwe.2"), so we parse the original request
+    ASSERT_EQ( "/storage/v1/b/sra-pub-run-1/o/SRR002994%2FSRR002994.2?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl", e . request . path ); 
+    ASSERT_EQ( "SRR002994", e . request . accession );
+    ASSERT_EQ( "SRR002994", e . request . filename );
+    ASSERT_EQ( ".2", e . request . extension ); // not .2222222 from the object field
+}
+
+TEST_F ( TestParseFixture, GCP_object_empty_and_accession_in_path_parameters )
+{
+    const char * InputLine =
+    "\"1589021828012489\",\"35.186.177.30\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&anothrPrefix=SRR77777777&maxResults=1000&delimiter=%2F&alt=json\",\"200\",\"0\",\"3\",\"27000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUm2OYFw_ABbdF3IlhsUe5t4NuypE_5950pi4Ox34TnnKVjsaHA7cvogPp3T5-ePgGqCBLiMsai2BLhDcRhZ95E\",\"\",\"sra-pub-src-8\",\"\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&anothrPrefix=SRR77777777&maxResults=1000&delimiter=%2F&alt=json", e . request . path );
+    ASSERT_EQ( "SRR1755353", e . request . accession );
+    ASSERT_EQ( "Metazome_Annelida_timecourse_sample_0097", e . request . filename );
+    ASSERT_EQ( ".fastq.gz", e . request . extension );
+}
+
+TEST_F ( TestParseFixture, GCP_object_empty_only_accession_in_request )
+{
+    const char * InputLine =
+    "\"1589021828012489\",\"35.186.177.30\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353\",\"200\",\"0\",\"3\",\"27000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUm2OYFw_ABbdF3IlhsUe5t4NuypE_5950pi4Ox34TnnKVjsaHA7cvogPp3T5-ePgGqCBLiMsai2BLhDcRhZ95E\",\"\",\"sra-pub-src-8\",\"\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353", e . request . path );
+    ASSERT_EQ( "SRR1755353", e . request . accession );
+    ASSERT_EQ( "SRR1755353", e . request . filename );
+    ASSERT_EQ( "", e . request . extension );
 }
 
 extern "C"

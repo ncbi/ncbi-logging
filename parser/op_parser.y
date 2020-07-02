@@ -29,6 +29,8 @@ void op_error( yyscan_t locp, NCBI::Logging::OP_LogLines * lib, const char* msg 
 #include "helper.hpp"
 
 extern void op_get_scanner_input( void * yyscanner, t_str & str );
+extern void op_start_URL( void * yyscanner );
+extern void op_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 }
@@ -41,15 +43,17 @@ using namespace NCBI::Logging;
     t_request req;
 }
 
-%token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC
+%token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC SPACE SLASH QMARK
 %token<i64> I64
-%token DOT DASH SLASH COLON QUOTE OB CB PORT RL CR LF SPACE  
-%token UNRECOGNIZED
+%token DOT DASH COLON QUOTE OB CB PORT RL CR LF    
+%token UNRECOGNIZED 
+%token<s> PATHSTR PATHEXT ACCESSION 
 
 %type<tp> time
-%type<req> server_and_request request
+%type<req> server_and_request request url url_token url_entry 
+%type<req> request_tail_elem request_tail url_with_optional_params
 %type<s> ip user req_time referer agent agent_list forwarded method server
-%type<s> quoted_list quoted_list_body quoted_list_elem qstr_list
+%type<s> quoted_list quoted_list_body quoted_list_elem url_params
 %type<i64> result_code result_len port req_len
 
 %start line
@@ -111,30 +115,159 @@ server
     | STR               { $$ = $1; }
     ;
 
-qstr_list
-    : QSTR                  { $$ = $1; }
-    | qstr_list SPACE QSTR  { $$ = $1; $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+url_token
+    : SLASH     
+        { 
+            InitRequest( $$ );
+            $$ . path = $1; 
+        }
+    | ACCESSION  
+        { 
+            InitRequest( $$ );
+            $$ . path = $1; 
+            $$ . accession = $1; 
+        }
+    | PATHSTR   
+        { 
+            InitRequest( $$ );
+            $$ . path = $1; 
+            $$ . filename = $1; 
+        }
+    | PATHEXT
+        { 
+            InitRequest( $$ );
+            $$ . path = $1; 
+            $$ . extension = $1; 
+        }
+    ;
+
+url_params 
+    : QMARK                 { $$ = $1; }
+    | url_params SLASH      { $$ = $1; $$ . n += $2 . n; }
+    | url_params ACCESSION  { $$ = $1; $$ . n += $2 . n; }
+    | url_params PATHSTR    { $$ = $1; $$ . n += $2 . n; }
+    | url_params PATHEXT    { $$ = $1; $$ . n += $2 . n; }
+    ; 
+
+url
+    : url_token
+        {
+            $$ = $1;
+            if ( $1 . accession . n > 0 )
+            {
+                $$ . filename  = $1 . accession;
+            }
+        }    
+    | url url_token    
+        { 
+            $$ = $1;
+            $$ . path . n += $2 . path . n;
+
+            // clear the filename and extension after every slash - to make sure we catch only the last
+            // filename and extension in case of middle segments existing
+            if ( $2 . path . n == 1 && $2 . path . p[ 0 ] == '/' )
+            {
+                $$ . filename . n = 0;
+                $$ . extension . n = 0;
+            }
+            else if ( $2 . accession . n > 0 )
+            {
+                // we will use the last non-empty accession-looking token
+                $$ . accession = $2 . accession;
+                $$ . filename  = $2 . accession;
+            }
+            else if ( $2 . filename . n > 0 )
+            {
+                $$ . filename  = $2 . filename;
+                $$ . extension . n = 0;
+            }
+            else if ( $2 . extension . n > 0 )
+            {
+                $$ . extension = $2 . extension;
+            }
+        }
+    ;
+
+url_with_optional_params
+    : url 
+        { 
+            $$ = $1; 
+        }
+    | url url_params 
+        { 
+            $$ = $1;
+            $$ . path . n += $2 . n;
+        }
+    ;
+
+url_entry
+    : SPACE { op_start_URL ( scanner ); } url_with_optional_params 
+        { 
+            $$ = $3; 
+            op_pop_state ( scanner );
+        }
+    ;
+
+request_tail_elem
+    : VERS      
+        {
+            InitRequest( $$ );
+            $$ . path = $1;
+            $$ . vers = $1;
+        }
+    | QSTR
+        {
+            InitRequest( $$ );
+            $$ . path = $1;
+        }
+    | QSTR_ESC
+        {
+            InitRequest( $$ );
+            $$ . path = $1;
+        }
+    | METHOD  
+        {
+            InitRequest( $$ );
+            $$ . path = $1;
+        }
+    | SPACE   
+        {
+            InitRequest( $$ );
+            $$ . path = $1;
+        }
+    ;
+
+request_tail
+    : request_tail_elem  
+        { $$ = $1; }
+    | request_tail request_tail_elem   
+        { 
+            $$ = $1; 
+            $$ . path . n += $2 . path .n; 
+            $$ . path . escaped = $1 . path . escaped || $2 . path . escaped; 
+        }
     ;
 
 request
-    : QUOTE method SPACE qstr_list SPACE VERS QUOTE
+    : QUOTE method url_entry SPACE request_tail QUOTE
     {
-        InitRequest( $$ );
+        $$ = $3;
         $$.method = $2;
-        $$.path   = $4;
-        $$.vers   = $6;
+        $$.vers   = $5 . vers;
     }
-    | QUOTE method SPACE qstr_list SPACE QUOTE
+    | QUOTE method url_entry SPACE QUOTE
     {
-        InitRequest( $$ );
+        $$ = $3;
         $$.method = $2;
-        $$.path   = $4;
     }
-    | QUOTE method SPACE qstr_list QUOTE
+    | QUOTE method url_entry QUOTE
     {
-        InitRequest( $$ );
+        $$ = $3;
         $$.method = $2;
-        $$.path   = $4;
+
+        // the scanner was in the PATH state, consumed the closing QUOTE and popped the state, 
+        // returning to the QUOTED state which we should get out of as well
+        op_pop_state ( scanner );
     }
     | QUOTE method QUOTE
     {

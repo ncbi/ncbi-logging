@@ -202,7 +202,7 @@ run_$(PREFIX_OP)flextest: lib $(BINDIR)/$(PREFIX_OP)test_flex-dbg $(BINDIR)/$(PR
 	$(BINDIR)/$(PREFIX_OP)test_flex-dbg
 	$(BINDIR)/$(PREFIX_OP)test_flex-rel
 
-.PHONY: run_$(PREFIX_OP)test_flex 
+.PHONY: run_$(PREFIX_OP)flextest
 
 # AWS
 
@@ -223,7 +223,7 @@ run_$(PREFIX_AWS)flextest: lib $(BINDIR)/$(PREFIX_AWS)test_flex-dbg $(BINDIR)/$(
 	$(BINDIR)/$(PREFIX_AWS)test_flex-dbg
 	$(BINDIR)/$(PREFIX_AWS)test_flex-rel
 
-.PHONY: run_$(PREFIX_AWS)test_flex 
+.PHONY: run_$(PREFIX_AWS)flextest
 
 #GCP
 
@@ -244,7 +244,7 @@ run_$(PREFIX_GCP)flextest: lib $(BINDIR)/$(PREFIX_GCP)test_flex-dbg $(BINDIR)/$(
 	$(BINDIR)/$(PREFIX_GCP)test_flex-dbg
 	$(BINDIR)/$(PREFIX_GCP)test_flex-rel
 
-.PHONY: run_$(PREFIX_GCP)test_flex
+.PHONY: run_$(PREFIX_GCP)flextest
 
 #################################################
 # parser - tests

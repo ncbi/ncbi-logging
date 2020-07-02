@@ -11,6 +11,7 @@
 %option reentrant bison-bridge
 %option prefix="gcp_"
 %option stack
+%option debug
 
 IPV4SEG     (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])
 IPV4ADDR    ({IPV4SEG}\.){3,3}{IPV4SEG}
@@ -32,12 +33,20 @@ IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_
 
 I64     [-+]?[0-9]+
 
-QSTR              [.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]? ^{}]+
-QSTR_ESC    (\\\"|[.A-Za-z0-9\-_~!*'();:@&=+$,/%#\[\]? ^{}])+
+CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\] ^{}]
+QCHARS      [.?&=%/]|{CHARS}
+
+QSTR        {QCHARS}+
+QSTR_ESC    (\\\"|{QCHARS})+
+
+ACCESSION   [DES]R[RZ][0-9]{6,9}
+PATHSTR     {CHARS}+
+PATHEXT     \.(\.|{PATHSTR})*
 
 SPACE   " "
 
 %x QUOTED
+%x PATH
 
 %%
 
@@ -52,6 +61,18 @@ SPACE   " "
 <QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED(); return QSTR; }
 <QUOTED>.           ;
+
+<PATH>\"            { return QUOTE; }
+<PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
+<PATH>\/            { MAKE_STR(); return SLASH; };
+<PATH>=             { MAKE_STR(); return EQUAL; };
+<PATH>&             { MAKE_STR(); return AMPERSAND; };
+<PATH>\?            { MAKE_STR(); return QMARK; };
+<PATH>%2F           { MAKE_STR(); return SLASH; };
+<PATH>%             { MAKE_STR(); return PERCENT; };
+<PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
+<PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
+<PATH>.             { return yytext[0]; };
 
 .               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
@@ -72,4 +93,14 @@ void gcp_get_scanner_input( yyscan_t yyscanner, t_str & str )
     const char * input = (const char*) ( yyg -> yyextra_r );
     str . p = input;
     str . n = strlen( input ); // looks wasteful but only happens when we report errors 
+}
+
+void gcp_start_URL( yyscan_t yyscanner )
+{
+    yy_push_state( PATH, yyscanner ); 
+}
+
+void gcp_stop_URL( yyscan_t yyscanner )
+{
+    yy_pop_state( yyscanner ); 
 }

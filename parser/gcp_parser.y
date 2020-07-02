@@ -30,6 +30,8 @@ void gcp_error( yyscan_t locp, NCBI::Logging::GCP_LogLines * lib, const char* ms
 #include "log_lines.hpp"
 
 extern void gcp_get_scanner_input( void * yyscanner, t_str & str );
+extern void gcp_start_URL( void * yyscanner );
+extern void gcp_stop_URL( void * yyscanner );
 
 using namespace NCBI::Logging;
 
@@ -38,14 +40,18 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
+    t_request req;
 }
 
-%token<s> IPV4 IPV6 QSTR I64
+%token<s> IPV4 IPV6 QSTR I64 PATHSTR PATHEXT ACCESSION SLASH
+%token<s> EQUAL AMPERSAND QMARK PERCENT
 %token QUOTE COMMA UNRECOGNIZED
 
-%type<s> ip ip_region method uri host referrer agent
-%type<s> req_id operation bucket object hdr_item hdr_item_text
+%type<s> ip ip_region method host referrer agent 
+%type<s> ext_opt file_opt object_token object_list
+%type<s> req_id operation bucket hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
+%type<req> object url url_list url_token
 
 %start line
 
@@ -85,9 +91,15 @@ hdr_item
     ;
 
 log_gcp
-    : time COMMA ip COMMA ip_type COMMA ip_region COMMA method COMMA uri COMMA
-      status COMMA req_bytes COMMA res_bytes COMMA time_taken COMMA host COMMA
-      referrer COMMA agent COMMA req_id COMMA operation COMMA bucket COMMA object
+    : time COMMA ip COMMA ip_type COMMA ip_region COMMA method COMMA
+      { gcp_start_URL( scanner ); } 
+      url
+      { gcp_stop_URL( scanner ); }
+      COMMA status COMMA req_bytes COMMA res_bytes COMMA time_taken COMMA host COMMA
+      referrer COMMA agent COMMA req_id COMMA operation COMMA bucket COMMA 
+      { gcp_start_URL( scanner ); } 
+      object
+      { gcp_stop_URL( scanner ); } 
     {
         LogGCPEvent ev;
         ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
@@ -95,21 +107,33 @@ log_gcp
         ev . ip_type = ( $5 . p == nullptr ) ? 0 : atoi( $5 . p );
         ev . ip_region = $7;
         // $9 (method) goes into ev.request below
-        ev . uri = $11;
-        ev . status = ( $13 . p == nullptr ) ? 0 : atol( $13 . p );
-        ev . request_bytes = ( $15 . p == nullptr ) ? 0 : atol( $15 . p );
-        ev . result_bytes = ( $17 . p == nullptr ) ? 0 : atol( $17 . p );
-        ev . time_taken = ( $19 . p == nullptr ) ? 0 : atol( $19 . p );
-        ev . host = $21;
-        ev . referer = $23;
-        ev . agent = $25;
-        ev . request_id = $27;
-        ev . operation = $29;
-        ev . bucket = $31;
+        ev . uri = $12 . path;
+        ev . status = ( $15 . p == nullptr ) ? 0 : atol( $15 . p );
+        ev . request_bytes = ( $17 . p == nullptr ) ? 0 : atol( $17 . p );
+        ev . result_bytes = ( $19 . p == nullptr ) ? 0 : atol( $19 . p );
+        ev . time_taken = ( $21 . p == nullptr ) ? 0 : atol( $21 . p );
+        ev . host = $23;
+        ev . referer = $25;
+        ev . agent = $27;
+        ev . request_id = $29;
+        ev . operation = $31;
+        ev . bucket = $33;
 
-        InitRequest( ev . request );
+        if ( $36 . accession . n > 0 )
+        {   // the cloud did populate the object-field
+            ev . request = $36;
+        }
+        else
+        {   // no accession found in the object field, use the results of parsing the request field
+            ev . request = $12;
+        }
+
+        if ( ev . request . filename . n == 0 && ev . request . extension . n == 0 )
+        {   // reuse the accession as the filename
+            ev . request . filename = ev . request . accession;
+        }
+
         ev . request . method = $9;
-        ev . request . path = $33;
 
         lib -> acceptLine( ev );
     }
@@ -122,7 +146,7 @@ time
 ip
     : QUOTE IPV4 QUOTE      { $$ = $2; }
     | QUOTE IPV6 QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 ip_type
@@ -131,16 +155,11 @@ ip_type
 
 ip_region
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 method
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    ;
-
-uri
-    : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
     ;
 
 status
@@ -161,43 +180,179 @@ time_taken
 
 host
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 referrer
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 agent
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 req_id
     : QUOTE QSTR QUOTE      { $$ = $2; }
     | QUOTE I64 QUOTE       { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 operation
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 bucket
     : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
+    ;
+
+ext_opt
+    : PATHEXT   { $$ = $1; }
+    |           { EMPTY_TSTR($$); }
+    ;
+
+file_opt
+    : ACCESSION { $$ = $1; }
+    | PATHSTR   { $$ = $1; }
+    |           { EMPTY_TSTR($$); }
+    ;
+
+/* 
+    typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode; (defined in log_lines.hpp)
+
+        for a url_token node, set to 
+            'acc_inside' if it is an ACCESSION
+            'acc_after'  if it is a delimiter
+
+        for a url_list node, describes the state of URL parsing:
+            'acc_before' - no accession has been seen yet
+            'acc_inside' - we are between the first accession and the following delimiter,
+                            capture the filename and extension tokens
+            'acc_after'  - we are past delimiter following an accession, 
+                            no further action necessary
+ */
+
+url_token
+    : SLASH         { InitRequest( $$ ); $$ . path = $1; }
+    | EQUAL         { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
+    | AMPERSAND     { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
+    | QMARK         { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
+    | PERCENT       { InitRequest( $$ ); $$ . path = $1; }
+    | ACCESSION     
+        { 
+            InitRequest( $$ ); 
+            $$ . path = $1; 
+            $$ . accession = $1; 
+            $$ . accession_mode = acc_inside; 
+        }
+    | PATHSTR       { InitRequest( $$ ); $$ . path = $1; $$ . filename = $1; }
+    | PATHEXT       { InitRequest( $$ ); $$ . path = $1; $$ . extension = $1; }
+    ;
+
+ /* This is a collection of url tokens and accessions. 
+    We are looking for the first accession and filename/extension that follow it.*/
+url_list
+    :  url_token               
+        { 
+            $$ = $1; 
+            if ( $1 . accession_mode == acc_after )            
+            {   /* a delimiter seen before an accession */
+                $$ . accession_mode = acc_before;
+            }
+        }
+    |  url_list url_token
+        { 
+            $$ = $1; 
+            MERGE_TSTR( $$ . path, $2 . path );
+            switch ( $$.accession_mode )
+            {
+            case acc_before:
+                if ( $2.accession_mode == acc_inside )
+                {
+                    $$ . accession = $2 . accession;
+                    $$ . accession_mode = acc_inside;
+                }
+                break;
+            case acc_inside:
+                switch ( $2 . accession_mode )
+                {
+                case acc_inside:
+                    $$ . filename  = $2 . accession;
+                    break;
+                case acc_after:
+                    $$ . accession_mode = acc_after;
+                    break;
+                default:
+                    if ( $2 . filename . n > 0 )    $$ . filename  = $2 . filename;
+                    if ( $2 . extension . n > 0 )   $$ . extension = $2 . extension;
+                }
+                break;
+            }
+        }
+    ;
+
+url
+    : QUOTE url_list QUOTE
+        {
+            $$ = $2;
+        }
+    | QUOTE QUOTE
+    {
+        InitRequest( $$ );
+    }
+    ;
+
+object_token
+    : SLASH         { $$ = $1; }
+    | PATHSTR       { $$ = $1; }
+    | PATHEXT       { $$ = $1; }
+    | EQUAL         { $$ = $1; }
+    | AMPERSAND     { $$ = $1; }
+    | QMARK         { $$ = $1; }
+    | PERCENT       { $$ = $1; }
+    ;
+
+object_list
+    : object_token
+    {
+        $$ = $1;
+    }
+    | object_list object_token
+    {
+        $$ = $1;
+        MERGE_TSTR( $$, $2 );
+    }
     ;
 
 object
-    : QUOTE QSTR QUOTE      { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    : QUOTE ACCESSION SLASH file_opt ext_opt QUOTE 
+        { 
+            InitRequest( $$ );
+             
+            $$.path . p = $2 . p;
+            $$.path . n = $2 . n + 1 + $4 . n + $5 . n;
+
+            $$.accession = $2;
+            $$.filename  = $4;
+            $$.extension = $5;
+        }
+    | QUOTE object_list QUOTE
+        { 
+            InitRequest( $$ );
+            $$ . path = $2;
+        }
+    | QUOTE QUOTE 
+        { 
+             InitRequest( $$ );
+        }
     ;
 
 q_i64
     : QUOTE I64 QUOTE       { $$ = $2; }
-    | QUOTE QUOTE           { $$ . p = nullptr; $$ . n = 0; }
+    | QUOTE QUOTE           { EMPTY_TSTR($$); }
     ;
 
 %%
