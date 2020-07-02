@@ -296,6 +296,7 @@ url
 
 object_token
     : SLASH         { $$ = $1; }
+    | ACCESSION     { $$ = $1; }
     | PATHSTR       { $$ = $1; }
     | PATHEXT       { $$ = $1; }
     | EQUAL         { $$ = $1; }

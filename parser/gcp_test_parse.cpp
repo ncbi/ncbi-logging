@@ -396,6 +396,17 @@ TEST_F ( TestParseFixture, GCP_object_filename_has_spaces_and_ampersands )
     ASSERT_EQ( ".fast&q.gz.1", e . request . extension );
 }
 
+TEST_F ( TestParseFixture, GCP_another_problem )
+{
+    const char * InputLine =
+    "\"1590718096562025\",\"130.14.28.7\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-sars-cov2/o/sra-src%2FSRR004257%2FSRR004257?fields=updated%2Cname%2CtimeCreated%2Csize&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"297\",\"40000\",\"storage.googleapis.com\",\"\",\"apitools gsutil/4.46 Python/2.7.5 (linux2) google-cloud-sdk/274.0.1 analytics/disabled,gzip(gfe)\",\"AAANsUl0Ofxs9M0aVz_qBWEFs-oNbk42zNRcrU6KXN5hGz3odbZ9v3_Hr_XAMIkNgsd-iYKmTR3RnQqr37E8jeEFJsE\",\"storage.objects.get\",\"sra-pub-sars-cov2\",\"sra-src/SRR004257/SRR004257\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine, true );
+    ASSERT_EQ( "SRR004257", e . request . accession );
+    ASSERT_EQ( "SRR004257", e . request . filename );
+    ASSERT_EQ( "", e . request . extension );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
