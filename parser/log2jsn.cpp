@@ -64,6 +64,7 @@ struct Options
     bool parser_debug = false;
     bool jsonlib = false;
     bool path_only = false;
+    bool agent_only = false;
     unsigned long int selected_line = 0;
 };
 
@@ -161,7 +162,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        if ( mem_options . path_only ) return;
+        if ( mem_options . path_only || mem_options . agent_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -205,6 +206,14 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
             }
             return;
         }
+	else if ( mem_options . agent_only )
+        {
+            if ( e. agent . n > 0 )
+            {
+                mem_os << e.agent << endl;
+            }
+            return;
+	}
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
@@ -262,7 +271,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        if ( mem_options . path_only ) return;
+        if ( mem_options . path_only || mem_options . agent_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -306,6 +315,15 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
             }
             return;
         }
+        else if ( mem_options . agent_only )
+        {
+            if ( e. agent . n > 0 )
+            {
+                mem_os << e.agent << endl;
+            }
+            return;
+        }
+
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
@@ -383,7 +401,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        if ( mem_options . path_only ) return;
+        if ( mem_options . path_only || mem_options . agent_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -433,6 +451,15 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
             }
             return;
         }
+        else if ( mem_options . agent_only )
+        {
+            if ( e. agent . n > 0 )
+            {
+                mem_os << e.agent << endl;
+            }
+            return;
+        }
+
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent;
@@ -571,6 +598,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
         args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );
         args . addOption( options . path_only, "a", "path-only", "print only the path found ( not json )" );
+        args . addOption( options . agent_only, "g", "agent-only", "print only the agent found ( not json )" );
 
         args . addOption( options . selected_line, nullptr, "l", "line-to-select", "line-nr", "select only this line from input (1-based)" );
 
