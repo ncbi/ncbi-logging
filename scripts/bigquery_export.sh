@@ -141,6 +141,10 @@ echo " #### gs_fixed"
         WHEN regexp_contains(bucket, r'-zq-') THEN bucket || ' (ETL - BQS)'
         WHEN regexp_contains(bucket, r'-src-') THEN bucket || ' (Original)'
         WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
+        WHEN ends_with(bucket, '-cov2') and
+            regexp_contains(path, r'sra-src') THEN bucket || ' (Original)'
+        WHEN ends_with(bucket, '-cov2') and
+            regexp_contains(path, r'run') THEN bucket || ' (ETL + BQS)'
     ELSE bucket || ' (Unknown)'
     END as bucket,
     source as source,
@@ -195,6 +199,10 @@ echo " #### s3_fixed"
         WHEN regexp_contains(bucket, r'-zq-') THEN bucket || ' (ETL - BQS)'
         WHEN regexp_contains(bucket, r'-src-') THEN bucket || ' (Original)'
         WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
+        WHEN ends_with(bucket, '-cov2') and
+            regexp_contains(path, r'sra-src') THEN bucket || ' (Original)'
+        WHEN ends_with(bucket, '-cov2') and
+            regexp_contains(path, r'run') THEN bucket || ' (ETL + BQS)'
     ELSE bucket || ' (Unknown)'
     END as bucket,
     current_datetime() as fixed_time
