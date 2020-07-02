@@ -330,6 +330,7 @@ file_elem
     : ACCESSION     { $$ = $1; }
     | PATHSTR       { $$ = $1; }
     | EQUAL         { $$ = $1; }
+    | AMPERSAND     { $$ = $1; }
     | PERCENT       { $$ = $1; }
     ;
     
@@ -348,6 +349,7 @@ ext_elem
     | PATHSTR       { $$ = $1; }
     | PATHEXT       { $$ = $1; }
     | EQUAL         { $$ = $1; }
+    | AMPERSAND     { $$ = $1; }
     | PERCENT       { $$ = $1; }
     ;
 

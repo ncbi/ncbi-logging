@@ -385,6 +385,17 @@ TEST_F ( TestParseFixture, GCP_object_ext_has_equal_sign )
     ASSERT_EQ( ".fastq.gz=1", e . request . extension );
 }
 
+TEST_F ( TestParseFixture, GCP_object_filename_has_spaces_and_ampersands )
+{
+    const char * InputLine =
+    "\"1589988801294070\",\"34.86.94.122\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-12/o/SRR11509941%2FLZ017%26LZ018%26LZ019_2%20sample%20taq.fastq.gz.1?fields=name&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"343\",\"24000\",\"www.googleapis.com\",\"\",\"apitools gsutil/4.37 Python/2.7.13 (linux2) google-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)\",\"AAANsUloSsCf-idOT-SgYBGO8s8SdXw4zhnQtvdmCtC-ctONXnJ59iRUMEE5ToS7MhsA3Rh38QNfoGSckZswCZLSmrM\",\"storage.objects.get\",\"sra-pub-src-12\",\"SRR11509941/LZ017&LZ018&LZ019_2 sample taq.fast&q.gz.1\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "SRR11509941", e . request . accession );
+    ASSERT_EQ( "LZ017&LZ018&LZ019_2 sample taq", e . request . filename );
+    ASSERT_EQ( ".fast&q.gz.1", e . request . extension );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
