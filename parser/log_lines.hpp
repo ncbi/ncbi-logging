@@ -48,6 +48,12 @@ namespace NCBI
             t_str       unparsed;
             t_request   request;
 
+            t_str       vdb_os;
+            t_str       vdb_tool;
+            t_str       vdb_release;
+            t_str       vdb_phid;
+            t_str       vdb_libc;
+
             CommonLogEvent()
             {
                 EMPTY_TSTR( ip );
@@ -55,6 +61,11 @@ namespace NCBI
                 EMPTY_TSTR( agent );
                 EMPTY_TSTR( unparsed );
                 InitRequest( request );
+                EMPTY_TSTR( vdb_os );
+                EMPTY_TSTR( vdb_tool );
+                EMPTY_TSTR( vdb_release );
+                EMPTY_TSTR( vdb_phid );
+                EMPTY_TSTR( vdb_libc );
             }
         };
 

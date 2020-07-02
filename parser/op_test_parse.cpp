@@ -20,6 +20,12 @@ struct SLogOPEvent
     string      referer;
     string      agent;
 
+    string vdb_os;
+    string vdb_tool;
+    string vdb_release;
+    string vdb_phid;
+    string vdb_libc;    
+
     string      user;
     string      req_time;
     int64_t     port;
@@ -37,6 +43,12 @@ struct SLogOPEvent
         res_len     = ev . res_len;
         referer     = ToString( ev . referer );
         agent       = ToString( ev . agent );
+
+        vdb_os          = ToString( ev . vdb_os );
+        vdb_tool        = ToString( ev . vdb_tool );
+        vdb_release     = ToString( ev . vdb_release );
+        vdb_phid        = ToString( ev . vdb_phid );
+        vdb_libc        = ToString( ev . vdb_libc );    
 
         user        = ToString( ev . user );
         req_time    = ToString( ev . req_time );
@@ -396,6 +408,46 @@ TEST_F ( TestParseFixture, OnPremise_params_only )
     ASSERT_EQ( "", e . request . filename );
     ASSERT_EQ( "", e . request . extension );
     ASSERT_EQ( "HTTP/1.1", e . request . vers );
+}
+
+// User-Agent header parsing
+
+TEST_F ( TestParseFixture, OnPremise_empty_user_agent )
+{
+    const char * InputLine =
+"159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /?/srapub/SRR5385591.sra HTTP/1.1\" 404 0 0.000 \"-\" \"\" \"-\" port=443 rl=164";
+
+    SLogOPEvent e = parse_and_accept( InputLine );
+    ASSERT_EQ( "", e.agent );
+    ASSERT_EQ( "", e.vdb_os );
+    ASSERT_EQ( "", e.vdb_tool );
+    ASSERT_EQ( "", e.vdb_release );
+    ASSERT_EQ( "", e.vdb_phid );
+    ASSERT_EQ( "", e.vdb_libc );
+}
+
+TEST_F ( TestParseFixture, OnPremise_user_agent )
+{
+    const char * InputLine =
+"159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /?/srapub/SRR5385591.sra HTTP/1.1\" 404 0 0.000 \"-\" \"linux64 sra-toolkit test-sra.2.8.2\" \"-\" port=443 rl=164";
+
+    SLogOPEvent e = parse_and_accept( InputLine );
+    ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2", e.agent );
+    ASSERT_EQ( "linux64", e.vdb_os );
+    ASSERT_EQ( "test-sra", e.vdb_tool );
+    ASSERT_EQ( "2.8.2", e.vdb_release );
+    ASSERT_EQ( "", e.vdb_phid );
+    ASSERT_EQ( "", e.vdb_libc );
+}
+
+TEST_F ( TestParseFixture, OnPremise_user_agent_with_phid_and_libc )
+{
+    const char * InputLine =
+"159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /?/srapub/SRR5385591.sra HTTP/1.1\" 404 0 0.000 \"-\" \"linux64 ncbi-vdb.2.10.3 (phid=noc7737000,libc=2.17)\" \"-\" port=443 rl=164";
+
+    SLogOPEvent e = parse_and_accept( InputLine );
+    ASSERT_EQ( "noc7737000", e.vdb_phid );
+    ASSERT_EQ( "2.17", e.vdb_libc );
 }
 
 extern "C"

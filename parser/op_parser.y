@@ -30,6 +30,7 @@ void op_error( yyscan_t locp, NCBI::Logging::OP_LogLines * lib, const char* msg 
 
 extern void op_get_scanner_input( void * yyscanner, t_str & str );
 extern void op_start_URL( void * yyscanner );
+extern void op_start_UserAgent( void * yyscanner );
 extern void op_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
@@ -48,6 +49,7 @@ using namespace NCBI::Logging;
 %token DOT DASH COLON QUOTE OB CB PORT RL CR LF    
 %token UNRECOGNIZED 
 %token<s> PATHSTR PATHEXT ACCESSION 
+%token<s> OS SRA_TOOLKIT PHID LIBC VERSION3 VERSION2
 
 %type<tp> time
 %type<req> server_and_request request url url_token url_entry 
@@ -329,6 +331,7 @@ referer
     | QUOTE QUOTE               { EMPTY_TSTR($$); }
     ;
 
+    /*TODO: QUOTE OS { push_state(AGENT); } vdb_agent QUOTE */
 agent
     : QUOTE agent_list QUOTE    { $$ = $2; }
     | QUOTE QUOTE               { EMPTY_TSTR($$); }

@@ -51,7 +51,12 @@ PATHEXT     \.(\.|{PATHSTR})*
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
 
-%x QUOTED PATH
+AGENTSTR    ("?"|"\/"|{CHARS})+
+OS          "linux64"|"mac64"|"win64"
+VERSION3    [0-9]+\.[0-9]+\.[0-9]+
+VERSION2    [0-9]+\.[0-9]+
+
+%x QUOTED PATH AGENT
 
 %%
 
@@ -87,6 +92,16 @@ STR     [.\-a-zA-Z0-9_]+
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; };
 
+<AGENT>{OS}             { MAKE_STR(); return OS; }
+<AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
+<AGENT>"phid="          { MAKE_STR(); return PHID; }
+<AGENT>"libc="          { MAKE_STR(); return LIBC; }
+<AGENT>{VERSION3}       { MAKE_STR(); return VERSION3; }
+<AGENT>{VERSION2}       { MAKE_STR(); return VERSION2; }
+<AGENT>{SPACE}          { MAKE_STR(); return SPACE; }
+<AGENT>{AGENTSTR}       { MAKE_STR(); return QSTR; }
+<AGENT>.                { MAKE_STR(); return yytext[0]; };
+
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {FLOAT}         { MAKE_STR(); return FLOAT; }
@@ -118,6 +133,11 @@ void op_get_scanner_input( yyscan_t yyscanner, t_str & str )
 void op_start_URL( yyscan_t yyscanner )
 {
     yy_push_state( PATH, yyscanner ); 
+}
+
+void op_start_UserAgent( yyscan_t yyscanner )
+{
+    yy_push_state( AGENT, yyscanner ); 
 }
 
 void op_pop_state( yyscan_t yyscanner )
