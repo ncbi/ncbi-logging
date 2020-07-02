@@ -19,6 +19,7 @@ cat << EOF > gs_schema.json
     { "name" : "agent", "type": "STRING" },
     { "name" : "bucket", "type": "STRING" },
     { "name" : "extension", "type": "STRING" },
+    { "name" : "filename", "type": "STRING" },
     { "name" : "host", "type": "STRING" },
     { "name" : "ip", "type": "STRING" },
     { "name" : "ip_region", "type": "STRING" },
@@ -71,6 +72,7 @@ echo " #### s3_parsed"
         { "name" : "cipher_suite", "type": "STRING" },
         { "name" : "error", "type": "STRING" },
         { "name" : "extension", "type": "STRING" },
+        { "name" : "filename", "type": "STRING" },
         { "name" : "host_header", "type": "STRING" },
         { "name" : "host_id", "type": "STRING" },
         { "name" : "ip", "type": "STRING" },
@@ -144,6 +146,7 @@ echo " #### gs_fixed"
     source as source,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.strides_analytics.gs_parsed\\\`
+    WHERE accepted=true
 ENDOFQUERY
 )
 
@@ -161,13 +164,16 @@ ENDOFQUERY
     bq show --schema strides_analytics.gs_fixed
 
 
+
+    #parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
+    #[17/May/2019:23:19:24 +0000]
 echo " #### s3_fixed"
     # LOGMON-1: Remove multiple -heads from agent for S3
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     ip as remote_ip,
-    parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
-    datetime_add(parse_datetime('%d.%m.%Y:%H:%M:%S 0', time),
+    parse_datetime('[%d/%b/%Y:%H:%M:%s +0000]', time) as start_ts,
+    datetime_add(parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time),
         interval cast (
                 case when total_time='' THEN '0' ELSE total_time END
         as int64) millisecond) as end_ts,
@@ -322,7 +328,7 @@ echo " ###  summary_grouped"
     sum(bytes_sent) as bytes_sent,
     current_datetime() as export_time
     FROM \\\`strides_analytics.detail_export\\\`
-    WHERE start_ts > '2020-01-01'
+    WHERE start_ts > '2000-01-01'
     GROUP BY accession, user_agent, remote_ip, host, bucket, source, datetime_trunc(start_ts, day),
     case
         WHEN http_operation in ('GET', 'HEAD') THEN 0

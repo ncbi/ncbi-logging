@@ -4,6 +4,7 @@
     { "name" : "agent", "type": "STRING" },
     { "name" : "bucket", "type": "STRING" },
     { "name" : "extension", "type": "STRING" },
+    { "name" : "filename", "type": "STRING" },
     { "name" : "host", "type": "STRING" },
     { "name" : "ip", "type": "STRING" },
     { "name" : "ip_region", "type": "STRING" },

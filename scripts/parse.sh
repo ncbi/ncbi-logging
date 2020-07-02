@@ -1,9 +1,21 @@
 #!/bin/bash
 
+
+# Seed:
+# rm -f days
+# for d in $(seq 1 470); do
+# D=$(date -d "-$d days" "+%Y_%m_%d")
+# echo $D >> days
+# done
+# cat days | xargs -P 10 -I % ./parse.sh GS %
+
 USAGE="Usage: $0 {S3,GS,OP} YYYY_MM_DD"
+
+sleep $((RANDOM / 500))
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
+
 
 case "$#" in
     0)
@@ -69,7 +81,7 @@ for LOG_BUCKET in $buckets; do
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil cp "${SRC_BUCKET}${TGZ}" .
+    gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" .
     ls -hl "$TGZ"
 
     echo "Counting $TGZ ..."
@@ -135,5 +147,6 @@ for LOG_BUCKET in $buckets; do
         cd ..
         #rm -rf "$PARSE_DEST"
 #    fi
+echo "Done $LOG_BUCKET..."
 echo
 done

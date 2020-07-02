@@ -7,6 +7,7 @@
         { "name" : "cipher_suite", "type": "STRING" },
         { "name" : "error", "type": "STRING" },
         { "name" : "extension", "type": "STRING" },
+        { "name" : "filename", "type": "STRING" },
         { "name" : "host_header", "type": "STRING" },
         { "name" : "host_id", "type": "STRING" },
         { "name" : "ip", "type": "STRING" },

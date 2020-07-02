@@ -13,6 +13,16 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
+    "select source, accepted, count(*) from (select source, accepted from strides_analytics.gs_parsed union all select source, accepted from strides_analytics.s3_parsed) group by source, accepted"
+
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
+    "select count(*) as s3_unaccepted from strides_analytics.s3_parsed where accepted=false"
+
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
     "select source, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export where domain not like '%NLM%' group by source order by source "
 
 
