@@ -1,16 +1,29 @@
 -- sqlite3 rdns.db < rdns.sql
 
-drop table if exists imp;
-drop table if exists rdns;
-create table imp (line text);
-.import uniq_ips.20200626.json imp
-create table rdns as select json_extract(line, '$.remote_ip') as ip, 'Unknown' as domain from imp;
-drop table imp;
-
-.schema
+.headers on
 .mode column
 .width 40 20
-select count(*) from rdns;
+
+drop table if exists uniq_ips;
+create table uniq_ips (line text);
+.import /home/vartanianmh/ncbi-logging/scripts/uniq_ips.20200703.json uniq_ips
+select count(*) as uniq_ips_count from uniq_ips;
+
+drop table if exists rdns;
+create table rdns as select json_extract(line, '$.remote_ip') as ip, 'Unknown' as domain from uniq_ips;
+drop table uniq_ips;
+
+drop table if exists rdns_json;
+create table rdns_json (line text);
+.import /home/vartanianmh/ncbi-logging/scripts/rdns.jsonl rdns_json
+select count(*) as rdns_json_count from rdns_json;
+
+insert into rdns select json_extract(line, '$.ip') as ip, json_extract(line, '$.domain') as domain from rdns_json;
+drop table rdns_json;
+
+
+.schema
+select count(*) as rdns_count from rdns;
 --select * from rdns limit 5;
 
 
@@ -1150,3 +1163,9 @@ where IP in (
 select domain, count(*) as cnt from rdns group by domain order by cnt desc limit 20;
 
 select substr(ip,0,12) as sub, count(*) from rdns where domain='Unknown' group by sub order by count(*) desc limit 10;
+
+.headers off
+.output /tmp/rdns.jsonl
+select json(json_object('ip',ip,'domain',domain)) from rdns;
+
+-- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl

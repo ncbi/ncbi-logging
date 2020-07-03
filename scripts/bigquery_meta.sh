@@ -45,7 +45,7 @@ bq load \
         --source_format=NEWLINE_DELIMITED_JSON \
         --autodetect \
         strides_analytics.rdns\
-        "gs://logmon_cfg/rdns.jsonl.gz"
+        "gs://logmon_cfg/rdns.jsonl"
 
 bq load \
     --source_format=CSV \
