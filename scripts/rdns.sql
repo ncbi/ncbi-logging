@@ -133,7 +133,7 @@ WHERE IP LIKE '120.221.%';
 
 UPDATE RDNS
 SET DOMAIN = 'Chinamobile.com'
-WHERE IP LIKE '36.1%';
+WHERE IP LIKE '36.1%' or IP LIKE '223.10%';
 
 
 UPDATE RDNS
@@ -169,6 +169,9 @@ UPDATE RDNS
 SET DOMAIN = 'jhu.edu (Johns Hopkins Medical Institutions)'
 WHERE IP LIKE '162.129.%';
 
+UPDATE RDNS
+SET DOMAIN = 'jhuapl.edu (Johns Hopkints Applied Physics Laboratory)'
+WHERE IP LIKE '128.244.%';
 
 UPDATE RDNS
 SET DOMAIN = 'Chung-ang University'
@@ -451,11 +454,17 @@ UPDATE RDNS
 SET DOMAIN = 'IANA Reserved (ncbi.nlm.nih.gov)'
 WHERE IP LIKE '0.%'
   OR IP LIKE '10.%'
+  OR IP LIKE '100.64.%'
   OR IP LIKE '127.%'
   OR IP LIKE '169.254.%'
   OR IP LIKE '172.16.%'
+  OR IP LIKE '172.17.%'
+  OR IP LIKE '172.18.%'
+  OR IP LIKE '172.19.%'
+  OR IP LIKE '172.20.%'
+  OR IP LIKE '172.30.%'
+  OR IP LIKE '172.31.%'
   OR IP LIKE '192.0.%'
-  OR IP LIKE '172.31%'
   OR IP LIKE '192.168.%';
 
 UPDATE RDNS
@@ -966,6 +975,18 @@ SET DOMAIN='moffitt.org (H. Lee Moffitt Cancer Center & Research Institute, Inc)
 where IP LIKE '206.81.15$';
 
 UPDATE RDNS
+set DOMAIN='en.sbu.ac.ir (Shahid Beheshti University)'
+where ip like '94.184.11%';
+
+UPDATE RDNS
+set domain='uni-freiburg.ed (University of Freiburg)'
+where IP like '132.230.%';
+
+UPDATE RDNS
+set domain='shanxitele.com (Shanxi Telecom)'
+where ip like '123.174.%';
+
+UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'
   AND (IP LIKE '66.249.%'
@@ -1098,7 +1119,7 @@ where IP in (
 );
 
 update RDNS
-SET DOMAIN = domain || ' (nlm.nih.gov)'
+SET DOMAIN = 'NCBI Cloud (nlm.nih.gov)'
 where IP in (
     '10.50.0.101', '10.50.120.37', '10.50.120.38', '10.50.120.39', '10.50.120.41', '10.50.120.42', '10.50.120.43', '10.50.120.45', '10.50.120.46', '10.50.120.47', '10.50.120.48', '10.50.120.54', '10.50.120.57', '10.50.120.58', '10.50.120.60', '10.50.120.61', '10.50.120.90', '10.50.3.94', '10.65.8.12', '10.65.8.16', '10.65.8.17', '10.65.8.18', '10.65.8.23', '10.65.8.29', '10.65.8.3', '10.65.8.37', '10.65.8.4', '10.65.8.42', '10.65.8.43', '10.65.8.49', '10.65.8.51', '10.65.8.52', '10.65.8.60', '10.65.8.65', '10.65.8.66', '10.65.8.70', '10.65.8.9', '10.70.120.12', '10.70.120.14', '10.70.120.16', '10.70.120.18', '10.70.120.19', '10.70.120.22', '10.70.120.27', '10.70.120.29', '10.70.120.74', '10.70.120.77', '10.70.120.79', '10.70.120.90', '10.70.126.101', '10.70.126.11', '10.70.126.12', '10.70.126.13', '10.70.126.14', '10.70.126.6', '10.70.127.129', '10.70.2.199', '10.70.2.240', '10.70.2.41', '10.70.2.83', '10.70.5.53' ,
  '100.26.180.208', '100.26.196.198', '18.204.1.217', '18.207.243.246', '18.207.254.142',

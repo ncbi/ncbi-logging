@@ -176,7 +176,7 @@ echo " #### s3_fixed"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     ip as remote_ip,
-    parse_datetime('[%d/%b/%Y:%H:%M:%s +0000]', time) as start_ts,
+    parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time) as start_ts,
     datetime_add(parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time),
         interval cast (
                 case when total_time='' THEN '0' ELSE total_time END
@@ -259,9 +259,9 @@ EOF
     jq -e -c . < op_schema.json > /dev/null
     jq -c .schema.fields < op_schema.json > op_schema_only.json
     bq rm  -f strides_analytics.op_test
-    bq mk \
-        --table strides_analytics.op_test \
-        ./op_schema.json
+    #bq mk \
+    #   --table strides_analytics.op_test \
+    #    ./op_schema.json
 
 echo " ##### detail_export"
     QUERY=$(cat <<-ENDOFQUERY
@@ -366,12 +366,9 @@ ENDOFQUERY
     bq show --schema strides_analytics.summary_grouped
 
 echo " ###  iplookup_new"
-RUN="no"
-if [ "$RUN" = "yes" ]; then
-# Only needs to be running when a lot of new IP addresses appear
     QUERY=$(cat <<-ENDOFQUERY
     SELECT DISTINCT remote_ip, net.ipv4_to_int64(net.safe_ip_from_string(remote_ip)) as ipint,
-    FROM \\\`ncbi-logmon.strides_analytics.summary_export\\\`
+    FROM \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
     WHERE remote_ip like '%.%'
 ENDOFQUERY
 )
@@ -385,6 +382,9 @@ ENDOFQUERY
     --batch=true \
     "$QUERY"
 
+RUN="no"
+if [ "$RUN" = "yes" ]; then
+# Only needs to be running when a lot of new IP addresses appear
     QUERY=$(cat <<-ENDOFQUERY
     SELECT remote_ip, ipint,
     country_code, region_name, city_name
@@ -457,21 +457,21 @@ ENDOFQUERY
 
 
 echo " ###  export to GS"
-    gsutil rm -f "gs://strides_analytics/detail/detail.$DATE.*.json.gz"
+    gsutil rm -f "gs://logmon_export/detail/detail.$DATE.*.json.gz" || true
     bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
     'strides_analytics.detail_export' \
-    "gs://strides_analytics/detail/detail.$DATE.*.json.gz"
+    "gs://logmon_export/detail/detail.$DATE.*.json.gz"
 
-    gsutil rm -f "gs://logmon_export/summary/summary.$DATE.*.json.gz"
+    gsutil rm -f "gs://logmon_export/summary/summary.$DATE.*.json.gz" || true
     bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
     'strides_analytics.summary_export' \
     "gs://logmon_export/summary/summary.$DATE.*.json.gz"
 
-    gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*.json.gz"
+    gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*.json.gz" || true
     bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
@@ -484,11 +484,18 @@ echo " ###  copy to filesystem"
     mkdir -p "$PANFS/detail"
     cd "$PANFS/detail" || exit
     rm -f "$PANFS"/detail/detail."$DATE".* || true
-    gsutil  cp -r "gs://strides_analytics/detail/detail.$DATE.*" "$PANFS/detail/"
+    gsutil  cp -r "gs://logmon_export/detail/detail.$DATE.*" "$PANFS/detail/"
 
     mkdir -p "$PANFS/summary"
     cd "$PANFS/summary" || exit
     rm -f "$PANFS"/summary/summary."$DATE".* || true
-    gsutil  cp -r "gs://strides_analytics/summary/summary.$DATE.*" "$PANFS/summary/"
+    gsutil  cp -r "gs://logmon_export/summary/summary.$DATE.*" "$PANFS/summary/"
+
+    mkdir -p "$PANFS/uniq_ips"
+    cd "$PANFS/uniq_ips" || exit
+    rm -f "$PANFS"/uniq_ips/uniq_ips."$DATE".* || true
+    gsutil  cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*" "$PANFS/uniq_ips/"
+
+
 
 date
