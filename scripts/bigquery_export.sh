@@ -6,7 +6,11 @@
 export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
-#gsutil ls -lR gs://logmon_logs_parsed_us/
+
+gsutil du -s -h gs://logmon_logs/gs_public
+gsutil du -s -h gs://logmon_logs/s3_public
+gsutil du -s -h gs://logmon_logs_parsed_us/logs_gs_public/
+gsutil du -s -h gs://logmon_logs_parsed_us/logs_s3_public/
 
 # TODO: Partition/cluster large tables for incremental inserts and retrievals
 # TODO: Materialized views that automatically refresh
