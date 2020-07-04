@@ -449,6 +449,9 @@ ENDOFQUERY
 
     QUERY="${QUERY//\\/}"
 
+        #--project_id ncbi-logmon \
+    bq \
+        cp strides_analytics.summary_export "strides_analytics.summary_export_$YESTERDAY"
     bq rm --project_id ncbi-logmon -f strides_analytics.summary_export
     # shellcheck disable=SC2016
     bq query \
@@ -456,17 +459,20 @@ ENDOFQUERY
     --use_legacy_sql=false \
     --batch=true \
     "$QUERY"
-
     bq show --schema strides_analytics.summary_export
+
+    OLD=$(date -d "-5 days" "+%Y%m%d")
+    bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_$OLD"
+
 
 
 echo " ###  export to GS"
     gsutil rm -f "gs://logmon_export/detail/detail.$DATE.*.json.gz" || true
-    bq extract \
-    --destination_format NEWLINE_DELIMITED_JSON \
-    --compression GZIP \
-    'strides_analytics.detail_export' \
-    "gs://logmon_export/detail/detail.$DATE.*.json.gz"
+#    bq extract \
+#    --destination_format NEWLINE_DELIMITED_JSON \
+#    --compression GZIP \
+#    'strides_analytics.detail_export' \
+#    "gs://logmon_export/detail/detail.$DATE.*.json.gz"
 
     gsutil rm -f "gs://logmon_export/summary/summary.$DATE.*.json.gz" || true
     bq extract \
@@ -485,10 +491,10 @@ echo " ###  export to GS"
 
 
 echo " ###  copy to filesystem"
-    mkdir -p "$PANFS/detail"
-    cd "$PANFS/detail" || exit
-    rm -f "$PANFS"/detail/detail."$DATE".* || true
-    gsutil  cp -r "gs://logmon_export/detail/detail.$DATE.*" "$PANFS/detail/"
+#    mkdir -p "$PANFS/detail"
+#    cd "$PANFS/detail" || exit
+#    rm -f "$PANFS"/detail/detail."$DATE".* || true
+#    gsutil  cp -r "gs://logmon_export/detail/detail.$DATE.*" "$PANFS/detail/"
 
     mkdir -p "$PANFS/summary"
     cd "$PANFS/summary" || exit

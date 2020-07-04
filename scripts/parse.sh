@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sleep 600
 
 # Seed:
 # rm -f days
@@ -70,7 +71,7 @@ echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Parsing $LOG_BUCKET..."
 
-    PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET"
+    PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
     df -HT .
@@ -94,6 +95,7 @@ for LOG_BUCKET in $buckets; do
         "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
         2> "$TGZ.err"
     head "$TGZ.err"
+    rm -f "$TGZ"
 
     echo
 
@@ -105,6 +107,7 @@ for LOG_BUCKET in $buckets; do
         "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
     grep "\"accepted\":true," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
         "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+    rm -f "$YESTERDAY_DASH.${LOG_BUCKET}.json"
     set -e
 
     # "accepted": true,
@@ -121,9 +124,9 @@ for LOG_BUCKET in $buckets; do
 #    if [ "$unrecwc" -eq "0" ]; then
         #find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
 
-        if [ "$recwc" -gt 10000000 ]; then
+        if [ "$recwc" -gt 1000000 ]; then
             echo "jsonl too large, splitting"
-            split -d -e -l 10000000 --additional-suffix=.jsonl \
+            split -d -e -l 1000000 --additional-suffix=.jsonl \
                 - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
                 < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
@@ -147,6 +150,6 @@ for LOG_BUCKET in $buckets; do
         cd ..
         #rm -rf "$PARSE_DEST"
 #    fi
-echo "Done $LOG_BUCKET..."
+echo "Done $LOG_BUCKET for $YESTERDAY_DASH..."
 echo
 done
