@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sleep 600
-
 # Seed:
 # rm -f days
 # for d in $(seq 1 470); do
