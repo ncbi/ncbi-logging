@@ -126,9 +126,8 @@ echo " #### op_parsed"
 
 echo " #### Parsed results"
 bq -q query \
-    --format "$FORMAT" \
     --use_legacy_sql=false \
-    "select source, accepted, count(*) as parsed_count from (select source, accepted from strides_analytics.gs_parsed union all select source, accepted from strides_analytics.s3_parsed) group by source, accepted order by source"
+    "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from strides_analytics.gs_parsed union all select source, accepted, cast(time as string) as time from strides_analytics.s3_parsed) group by source, accepted order by source"
 
 echo " #### gs_fixed"
     QUERY=$(cat <<-ENDOFQUERY
