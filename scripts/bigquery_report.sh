@@ -13,7 +13,7 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
-    "select source, accepted, count(*) as parsed_count from (select source, accepted from strides_analytics.gs_parsed union all select source, accepted from strides_analytics.s3_parsed) group by source, accepted"
+    "select source, accepted, count(*) as parsed_count from (select source, accepted from strides_analytics.gs_parsed union all select source, accepted from strides_analytics.s3_parsed) group by source, accepted order by source"
 
 bq -q query \
     --format "$FORMAT" \
@@ -24,7 +24,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select source, count(*) as records, regexp_extract(bucket,r' \(.+\)') as format, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export where domain not like '%nih.gov%' group by source, format order by total_bytes_sent desc"
+    "select source, count(*) as records, regexp_extract(bucket,r' \(.+\)') as format, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export where domain not like '%nih.gov%' group by source, format order by source, format"
 
 
 bq -q query \
@@ -36,11 +36,6 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "select source, domain, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export group by source, domain order by total_bytes_sent desc limit 20"
-
-bq -q query \
-    --use_legacy_sql=false \
-    --format "$FORMAT" \
-    "select source, domain, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export where domain like '%AWS%' or domain like '%GCP%' or domain like '%.edu' or domain like '%.gov' or domain like '%.nih.gov' or domain like '%.nih.gov.nih.gov' group by source, domain order by total_bytes_sent desc"
 
 bq -q query \
     --use_legacy_sql=false \

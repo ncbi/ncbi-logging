@@ -386,7 +386,7 @@ ENDOFQUERY
     --batch=true \
     "$QUERY"
 
-RUN="no"
+RUN="yes"
 if [ "$RUN" = "yes" ]; then
 # Only needs to be running when a lot of new IP addresses appear
     QUERY=$(cat <<-ENDOFQUERY
