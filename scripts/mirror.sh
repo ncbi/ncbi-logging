@@ -55,8 +55,6 @@ for LOG_BUCKET in $buckets; do
 
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
 
-    TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
-
     if [ "$PROVIDER" = "GS" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
         mkdir -p "$MIRROR"
@@ -68,6 +66,25 @@ for LOG_BUCKET in $buckets; do
         echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
         gsutil -m rsync "gs://$LOG_BUCKET/" .
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
+    fi
+
+    if [ "$PROVIDER" = "OP" ]; then
+        if [ "$YESTERDAY" -lt "20180701" ]; then
+            files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
+        elif [ "$YESTERDAY" -gt "20200701" ]; then
+            files=$(find "$LOG_BUCKET" -type f -name "*$YESTERDAY*")
+        else
+            files=$(find "$PANFS/sra_prod/$YESTERDAY" -type f -name "*$YESTERDAY*")
+        fi
+        LOG_BUCKET="OP"
+        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/"
+        mkdir -p "$MIRROR"
+        cd "$MIRROR" || exit
+        for x in $files; do
+            gunzip "$x"
+        done
+
+        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
@@ -88,6 +105,7 @@ for LOG_BUCKET in $buckets; do
         aws s3 sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD" --quiet
     fi
 
+    TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
     echo "rsynced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
