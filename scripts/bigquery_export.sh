@@ -121,7 +121,14 @@ EOF
 
 
 echo " #### op_parsed"
+# TODO
 
+
+echo " #### Parsed results"
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
+    "select source, accepted, count(*) as parsed_count from (select source, accepted from strides_analytics.gs_parsed union all select source, accepted from strides_analytics.s3_parsed) group by source, accepted order by source"
 
 echo " #### gs_fixed"
     QUERY=$(cat <<-ENDOFQUERY
@@ -167,6 +174,7 @@ ENDOFQUERY
     --destination_table strides_analytics.gs_fixed \
     --use_legacy_sql=false \
     --batch=true \
+    --max_rows=10 \
     "$QUERY"
 
     bq show --schema strides_analytics.gs_fixed
@@ -223,6 +231,7 @@ ENDOFQUERY
     --destination_table strides_analytics.s3_fixed \
     --use_legacy_sql=false \
     --batch=true \
+    --max_rows=10 \
     "$QUERY"
 
     bq show --schema strides_analytics.s3_fixed
@@ -318,6 +327,7 @@ ENDOFQUERY
     --destination_table strides_analytics.detail_export \
     --use_legacy_sql=false \
     --batch=true \
+    --max_rows=10 \
     "$QUERY"
 
     bq show --schema strides_analytics.detail_export
@@ -365,6 +375,7 @@ ENDOFQUERY
     --destination_table strides_analytics.summary_grouped \
     --use_legacy_sql=false \
     --batch=true \
+    --max_rows=10 \
     "$QUERY"
 
     bq show --schema strides_analytics.summary_grouped
@@ -384,6 +395,7 @@ ENDOFQUERY
     --destination_table strides_analytics.uniq_ips \
     --use_legacy_sql=false \
     --batch=true \
+    --max_rows=10 \
     "$QUERY"
 
 RUN="yes"
@@ -405,6 +417,7 @@ ENDOFQUERY
     --destination_table strides_analytics.iplookup_new \
     --use_legacy_sql=false \
     --batch=true \
+    --max_rows=10 \
     "$QUERY"
 fi
 
@@ -458,6 +471,7 @@ ENDOFQUERY
     --destination_table strides_analytics.summary_export \
     --use_legacy_sql=false \
     --batch=true \
+    --max_rows=10 \
     "$QUERY"
     bq show --schema strides_analytics.summary_export
 
