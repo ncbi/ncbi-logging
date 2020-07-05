@@ -35,11 +35,10 @@ SQLCACHE="$RAMDISK/${USER}_${DATE}"
 mkdir -p "$SQLCACHE"
 if [ ! -s "$SQLCACHE/buckets.db" ]; then
     echo "Refreshing sqlite cache"
-    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
-    gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
-    export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
+    export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+    gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
-    gsutil cp gs://strides_analytics_cfg/buckets.db "$SQLCACHE/buckets.db"
+    gsutil cp gs://logmon_cfg/buckets.db "$SQLCACHE/buckets.db"
 fi
 
 # Usage: results=$(sqlcmd "select foo from bar")
