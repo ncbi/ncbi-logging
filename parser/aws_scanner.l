@@ -62,7 +62,8 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
-<QUOTED>{SPACE}     { return SPACE; }
+<QUOTED>{SPACE}     { MAKE_STR(); return SPACE; }
+<QUOTED>\t          { MAKE_STR(); return SPACE; }
 <QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }

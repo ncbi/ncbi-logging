@@ -79,8 +79,11 @@ TEST_F ( AWS_TestFlexFixture, Quotes )
 }
 TEST_F ( AWS_TestFlexFixture, QuotedSpace )
 {
-    ASSERT_EQ( QUOTE, StartScan("\" \"") );
-    ASSERT_EQ( SPACE, NextTokenType() );
+    ASSERT_EQ( QUOTE, StartScan("\" a\tb\"") );
+    ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
+    ASSERT_EQ( QSTR, NextTokenType() );  ASSERT_EQ( "a", TokenValue() );
+    ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( "\t", TokenValue() );
+    ASSERT_EQ( QSTR, NextTokenType() );  ASSERT_EQ( "b", TokenValue() );
 }
 TEST_F ( AWS_TestFlexFixture, QuotedQuestion )
 {
