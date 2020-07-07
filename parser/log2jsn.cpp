@@ -1,6 +1,7 @@
 #include "log_lines.hpp"
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 #include <ncbi/json.hpp>
@@ -42,9 +43,23 @@ ostream& operator<< (ostream& os, const t_str & s)
         case '\\':
         case '\"':
             os << '\\';
+            os << s.p[i];
+            break;
+        default:
+            if ( s.p[i] < 0x20 )
+            {
+               ostringstream temp;
+               temp << "\\u";
+               temp << hex << setfill('0') << setw(4);
+               temp << (int)s.p[i];
+               os << temp.str();
+            }
+            else
+            {
+                os << s.p[i];
+            }
             break;
         }
-        os << s.p[i];
     }
     os << "\"";
     return os;
