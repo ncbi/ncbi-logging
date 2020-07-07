@@ -114,7 +114,7 @@ log_gcp
         ev . time_taken = ( $21 . p == nullptr ) ? 0 : atol( $21 . p );
         ev . host = $23;
         ev . referer = $25;
-        ev . agent = $27;
+        ev . agent . original = $27;
         ev . request_id = $29;
         ev . operation = $31;
         ev . bucket = $33;

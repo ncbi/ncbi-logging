@@ -18,7 +18,8 @@ struct SLogAWSEvent
     string      res_code;
     string      res_len;
     string      referer;
-    string      agent;
+
+    string      agent; //TODO: convert to SAgent
 
     string      owner;
     string      bucket;
@@ -47,7 +48,7 @@ struct SLogAWSEvent
         res_code    = ToString( ev . res_code );
         res_len     = ToString( ev . res_len );
         referer     = ToString( ev . referer );
-        agent       = ToString( ev . agent );
+        agent       = ToString( ev . agent . original );
 
         owner       = ToString( ev . owner );
         bucket      = ToString( ev . bucket );

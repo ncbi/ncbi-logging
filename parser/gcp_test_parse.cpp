@@ -24,7 +24,7 @@ struct SLogGCPEvent
     int64_t     time_taken;
     string      host;
     string      referer;
-    string      agent;
+    string      agent; //TODO: convert to SAgent
     string      request_id;
     string      operation;
     string      bucket;
@@ -44,7 +44,7 @@ struct SLogGCPEvent
         time_taken  = ev. time_taken;
         host        = ToString( ev . host );
         referer     = ToString( ev . referer );
-        agent       = ToString( ev . agent );
+        agent       = ToString( ev . agent . original );
         request_id  = ToString( ev . request_id );
         operation   = ToString( ev . operation );
         bucket      = ToString( ev . bucket );

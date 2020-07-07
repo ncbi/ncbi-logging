@@ -110,7 +110,14 @@ struct cmnLogLines
         }
         j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "referer", ToJsonString( e.referer ) );
-        j -> addValue( "agent", ToJsonString( e.agent ) );
+
+        j -> addValue( "agent", ToJsonString( e.agent.original ) );
+        j -> addValue( "vdb_os", ToJsonString( e.agent.vdb_os ) );
+        j -> addValue( "vdb_tool", ToJsonString( e.agent.vdb_tool ) );
+        j -> addValue( "vdb_release", ToJsonString( e.agent.vdb_release ) );
+        j -> addValue( "vdb_phid", ToJsonString( e.agent.vdb_phid ) );
+        j -> addValue( "vdb_libc", ToJsonString( e.agent.vdb_libc ) );
+
 
         if ( mem_options . print_line_nr )
             j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
@@ -223,15 +230,15 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
         }
 	else if ( mem_options . agent_only )
         {
-            if ( e. agent . n > 0 )
+            if ( e. agent . original . n > 0 )
             {
-                mem_os << e.agent << endl;
+                mem_os << e.agent . original << endl;
             }
             return;
 	}
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
-        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"agent\":" << e.agent . original;
         mem_os << ",\"extension\":" << e.request.extension;
         mem_os << ",\"filename\":" << e.request.filename;
         mem_os << ",\"forwarded\":" << e.forwarded;
@@ -256,6 +263,13 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
         mem_os << ",\"user\":" << e.user;
+
+        mem_os << ",\"vdb_libc\":" << e.agent.vdb_libc;
+        mem_os << ",\"vdb_os\":" << e.agent.vdb_os;
+        mem_os << ",\"vdb_phid\":" << e.agent.vdb_phid;
+        mem_os << ",\"vdb_release\":" << e.agent.vdb_release;
+        mem_os << ",\"vdb_tool\":" << e.agent.vdb_tool;
+
         mem_os << ",\"vers\":" << e.request.vers;
         mem_os << "}" <<endl;
     }
@@ -332,16 +346,16 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         }
         else if ( mem_options . agent_only )
         {
-            if ( e. agent . n > 0 )
+            if ( e. agent . original . n > 0 )
             {
-                mem_os << e.agent << endl;
+                mem_os << e.agent . original << endl;
             }
             return;
         }
 
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
-        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"agent\":" << e.agent . original;
         mem_os << ",\"auth_type\":" << e.auth_type;
         mem_os << ",\"bucket\":" << e.bucket;
         mem_os << ",\"cipher_suite\":" << e.cipher_suite;
@@ -468,16 +482,16 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         }
         else if ( mem_options . agent_only )
         {
-            if ( e. agent . n > 0 )
+            if ( e. agent . original . n > 0 )
             {
-                mem_os << e.agent << endl;
+                mem_os << e.agent . original << endl;
             }
             return;
         }
 
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
-        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"agent\":" << e.agent . original;
         mem_os << ",\"bucket\":" << e.bucket;
         mem_os << ",\"extension\":" << e.request.extension;
         mem_os << ",\"filename\":" << e.request.filename;

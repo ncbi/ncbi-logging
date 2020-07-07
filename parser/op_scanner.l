@@ -51,10 +51,13 @@ PATHEXT     \.(\.|{PATHSTR})*
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
 
-AGENTSTR    ("?"|"\/"|{CHARS})+
-OS          "linux64"|"mac64"|"win64"
-VERSION3    [0-9]+\.[0-9]+\.[0-9]+
-VERSION2    [0-9]+\.[0-9]+
+AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/]
+AGENTDELIMS     [(),=\\]
+AGENTSTR        {AGENTCHARS}+
+OS              "linux64"|"mac64"|"win64"
+SRAVERSION      \.[0-9]+\.[0-9]+\.[0-9]+
+LIBCVERSION     [0-9]+(\.[0-9]+){1,2}
+SRATOOL         "abi-dump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kget"|"pileup-stats"|"prefetch"|"sam-dump"|"sff-dump"|"sra-pileup"|"sra-search"|"sra-stat"|"srapath"|"test-sra"|"vdb-copy"|"vdb-dump"|"vdb-validate"
 
 %x QUOTED PATH AGENT
 
@@ -96,11 +99,15 @@ VERSION2    [0-9]+\.[0-9]+
 <AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
 <AGENT>"phid="          { MAKE_STR(); return PHID; }
 <AGENT>"libc="          { MAKE_STR(); return LIBC; }
-<AGENT>{VERSION3}       { MAKE_STR(); return VERSION3; }
-<AGENT>{VERSION2}       { MAKE_STR(); return VERSION2; }
+<AGENT>{SRAVERSION}     { MAKE_STR(); return SRAVERSION; }
+<AGENT>{LIBCVERSION}    { MAKE_STR(); return LIBCVERSION; }
 <AGENT>{SPACE}          { MAKE_STR(); return SPACE; }
-<AGENT>{AGENTSTR}       { MAKE_STR(); return QSTR; }
-<AGENT>.                { MAKE_STR(); return yytext[0]; };
+<AGENT>\\\"             { MAKE_STR(); return AGENTSTR; }
+<AGENT>\"               { MAKE_STR(); return QUOTE; }
+<AGENT>{SRATOOL}        { MAKE_STR(); return SRATOOL; }
+<AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
+<AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
+<AGENT>.                { MAKE_STR(); return AGENTSTR; }; 
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }

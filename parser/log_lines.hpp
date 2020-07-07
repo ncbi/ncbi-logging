@@ -40,32 +40,38 @@ namespace NCBI
 
         inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }
 
-        struct CommonLogEvent
+        typedef enum { agt_none = 0, agt_tool, agt_phid, agt_libc } eAgentMode;
+
+        typedef struct t_agent
         {
-            t_str       ip;
-            t_str       referer;
-            t_str       agent;
-            t_str       unparsed;
-            t_request   request;
+            t_str       original;
 
             t_str       vdb_os;
             t_str       vdb_tool;
             t_str       vdb_release;
             t_str       vdb_phid;
-            t_str       vdb_libc;
+            t_str       vdb_libc;     
+
+            eAgentMode  agt_mode;       
+        } t_agent;
+
+        inline void InitAgent( t_agent & r ) { memset( & r, 0, sizeof ( r ) ); }
+
+        struct CommonLogEvent
+        {
+            t_str       ip;
+            t_str       referer;
+            t_agent     agent;
+            t_str       unparsed;
+            t_request   request;
 
             CommonLogEvent()
             {
                 EMPTY_TSTR( ip );
                 EMPTY_TSTR( referer );
-                EMPTY_TSTR( agent );
+                InitAgent( agent );
                 EMPTY_TSTR( unparsed );
                 InitRequest( request );
-                EMPTY_TSTR( vdb_os );
-                EMPTY_TSTR( vdb_tool );
-                EMPTY_TSTR( vdb_release );
-                EMPTY_TSTR( vdb_phid );
-                EMPTY_TSTR( vdb_libc );
             }
         };
 

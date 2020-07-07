@@ -115,7 +115,7 @@ log_aws
         ev . total_time         = $28;
         ev . turnaround_time    = $30;
         ev . referer            = $32;
-        ev . agent              = $34;
+        ev . agent . original   = $34;
         ev . version_id         = $36;
         ev . host_id            = $38;
         ev . cipher_suite       = $40;

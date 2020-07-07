@@ -42,6 +42,7 @@ using namespace NCBI::Logging;
     int64_t i64;
     t_timepoint tp;
     t_request req;
+    t_agent agent;
 }
 
 %token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC SPACE SLASH QMARK
@@ -49,13 +50,15 @@ using namespace NCBI::Logging;
 %token DOT DASH COLON QUOTE OB CB PORT RL CR LF    
 %token UNRECOGNIZED 
 %token<s> PATHSTR PATHEXT ACCESSION 
-%token<s> OS SRA_TOOLKIT PHID LIBC VERSION3 VERSION2
+%token<s> OS SRA_TOOLKIT PHID LIBC SRAVERSION LIBCVERSION AGENTSTR SRATOOL
+%token<s> PAREN_OPEN PAREN_CLOSE COMMA
 
 %type<tp> time
 %type<req> server_and_request request url url_token url_entry 
 %type<req> request_tail_elem request_tail url_with_optional_params
-%type<s> ip user req_time referer agent agent_list forwarded method server
-%type<s> quoted_list quoted_list_body quoted_list_elem url_params
+%type<s> ip user req_time referer forwarded method server
+%type<s> quoted_list quoted_list_body quoted_list_elem url_params 
+%type<agent> agent vdb_agent_token vdb_agent
 %type<i64> result_code result_len port req_len
 
 %start line
@@ -68,7 +71,11 @@ line
     ;
 
 log_onprem
-    : ip DASH user time server_and_request result_code result_len req_time referer agent forwarded port req_len
+    : ip DASH user time server_and_request result_code result_len req_time referer 
+    { op_start_UserAgent( scanner ); } 
+    SPACE agent 
+    { op_pop_state( scanner ); }
+    forwarded port req_len
     {
         LogOPEvent ev;
         ev . ip = $1;
@@ -79,10 +86,10 @@ log_onprem
         ev . res_len = $7;
         ev . req_time = $8;
         ev . referer = $9;
-        ev . agent = $10;
-        ev . forwarded = $11;
-        ev . port = $12;
-        ev . req_len = $13;
+        ev . agent = $12;
+        ev . forwarded = $14;
+        ev . port = $15;
+        ev . req_len = $16;
 
         lib -> acceptLine( ev );
     }
@@ -331,16 +338,79 @@ referer
     | QUOTE QUOTE               { EMPTY_TSTR($$); }
     ;
 
-    /*TODO: QUOTE OS { push_state(AGENT); } vdb_agent QUOTE */
-agent
-    : QUOTE agent_list QUOTE    { $$ = $2; }
-    | QUOTE QUOTE               { EMPTY_TSTR($$); }
+vdb_agent_token
+    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; } 
+    | SRAVERSION    
+        { 
+            InitAgent( $$ ); 
+            $$.original = $1; 
+            /* skip the leading '.' */
+            $$ . vdb_release . p = $1 . p + 1; 
+            $$ . vdb_release . n = $1 . n - 1; 
+        } 
+    | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; } 
+    | SPACE         { InitAgent( $$ ); $$.original = $1; } 
+    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; } 
+    | PHID          { InitAgent( $$ ); $$.original = $1; $$.agt_mode = agt_phid; } 
+    | LIBC          { InitAgent( $$ ); $$.original = $1; $$.agt_mode = agt_libc; } 
+    | SRATOOL       { InitAgent( $$ ); $$.original = $1; $$.agt_mode = agt_tool; } 
     ;
 
-agent_list
-    : QSTR                { $$ = $1; }
-    | agent_list QSTR     { $$ = $1; $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
-    | agent_list SPACE    { $$ = $1; $$.n += 1;    $$.escaped = $1.escaped; }
+vdb_agent
+    : vdb_agent_token           { $$ = $1; }
+    | vdb_agent vdb_agent_token 
+    { 
+        $$ = $1;
+        MERGE_TSTR( $$ . original, $2 . original );
+        switch ( $$ . agt_mode )
+        {
+        case agt_none:
+            $$ . agt_mode = $2 . agt_mode;
+            if ( $2 . agt_mode == agt_tool )
+            {
+                $$ . vdb_tool = $2 . original; 
+                $$ . agt_mode = agt_tool;
+            }
+            break;
+        case agt_tool:
+            if ( $2 . vdb_release . n > 0 )
+            {
+                $$ . vdb_release = $2 . vdb_release;
+            }
+            $$ . agt_mode = agt_none;
+            break;
+        case agt_phid:
+            $$ . vdb_phid = $2 . original;
+            $$ . agt_mode = agt_none;
+            break;
+        case agt_libc:
+            $$ . vdb_libc = $2 . vdb_libc;
+            $$ . agt_mode = agt_none;
+            break;
+        }
+    }
+    ;
+
+agent
+    : QUOTE OS vdb_agent QUOTE       
+        { 
+            t_agent temp;
+            InitAgent( temp ); 
+            temp . original = $2;
+            MERGE_TSTR( temp . original, $3 . original );
+            $$ = $3;
+            $$ . original = temp . original;
+
+            $$.vdb_os = $2;
+        }
+    | QUOTE vdb_agent QUOTE
+        { 
+            $$ = $2;
+        }
+    | QUOTE QUOTE                                           
+        { 
+            InitAgent( $$ ); 
+        }
     ;
 
 forwarded
