@@ -56,8 +56,15 @@ AGENTDELIMS     [(),=\\]
 AGENTSTR        {AGENTCHARS}+
 OS              "linux64"|"mac64"|"win64"
 SRAVERSION      \.[0-9]+\.[0-9]+\.[0-9]+
-LIBCVERSION     [0-9]+(\.[0-9]+){1,2}
+LIBCVERSION     "libc="[0-9]+(\.[0-9]+){1,2}
 SRATOOL         "abi-dump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kget"|"pileup-stats"|"prefetch"|"sam-dump"|"sff-dump"|"sra-pileup"|"sra-search"|"sra-stat"|"srapath"|"test-sra"|"vdb-copy"|"vdb-dump"|"vdb-validate"
+SRATOOLVERS     {SRATOOL}{SRAVERSION}
+
+PHIDCHAR        [0-9a-f]
+PHIDCE          "noc"|({PHIDCHAR}{3})
+PHIDGUID        "nog"|({PHIDCHAR}{4})
+PHIDSESS        "nos"|({PHIDCHAR}{3})
+PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 
 %x QUOTED PATH AGENT
 
@@ -97,14 +104,12 @@ SRATOOL         "abi-dump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kget"|"p
 
 <AGENT>{OS}             { MAKE_STR(); return OS; }
 <AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
-<AGENT>"phid="          { MAKE_STR(); return PHID; }
-<AGENT>"libc="          { MAKE_STR(); return LIBC; }
-<AGENT>{SRAVERSION}     { MAKE_STR(); return SRAVERSION; }
+<AGENT>{PHIDVALUE}      { MAKE_STR(); return PHIDVALUE; }
+<AGENT>{SRATOOLVERS}    { MAKE_STR(); return SRATOOLVERS; }
 <AGENT>{LIBCVERSION}    { MAKE_STR(); return LIBCVERSION; }
 <AGENT>{SPACE}          { MAKE_STR(); return SPACE; }
 <AGENT>\\\"             { MAKE_STR(); return AGENTSTR; }
 <AGENT>\"               { MAKE_STR(); return QUOTE; }
-<AGENT>{SRATOOL}        { MAKE_STR(); return SRATOOL; }
 <AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
 <AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
 <AGENT>.                { MAKE_STR(); return AGENTSTR; }; 

@@ -189,15 +189,14 @@ TEST_F ( OP_TestFlexFixture, Agent )
     ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
     ASSERT_EQ( SRA_TOOLKIT, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
     ASSERT_EQ( SPACE, NextTokenType() );
-    ASSERT_EQ( SRATOOL, NextTokenType() ); ASSERT_EQ( "fasterq-dump", TokenValue() );
-    ASSERT_EQ( SRAVERSION, NextTokenType() ); ASSERT_EQ( ".2.10.7", TokenValue() );
+
+    ASSERT_EQ( SRATOOLVERS, NextTokenType() ); ASSERT_EQ( "fasterq-dump.2.10.7", TokenValue() );
+
     ASSERT_EQ( SPACE, NextTokenType() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( "(", TokenValue() );
-    ASSERT_EQ( PHID, NextTokenType() ); ASSERT_EQ( "phid=", TokenValue() );
-    ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( "noc86d2998", TokenValue() );
+    ASSERT_EQ( PHIDVALUE, NextTokenType() ); ASSERT_EQ( "phid=noc86d2998", TokenValue() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ",", TokenValue() );
-    ASSERT_EQ( LIBC, NextTokenType() ); ASSERT_EQ( "libc=", TokenValue() );
-    ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "2.17", TokenValue() );
+    ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "libc=2.17", TokenValue() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ")", TokenValue() );
     ASSERT_EQ( QUOTE, NextTokenType() ); 
 }

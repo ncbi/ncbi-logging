@@ -115,9 +115,10 @@ struct cmnLogLines
         j -> addValue( "vdb_os", ToJsonString( e.agent.vdb_os ) );
         j -> addValue( "vdb_tool", ToJsonString( e.agent.vdb_tool ) );
         j -> addValue( "vdb_release", ToJsonString( e.agent.vdb_release ) );
-        j -> addValue( "vdb_phid", ToJsonString( e.agent.vdb_phid ) );
+        j -> addValue( "vdb_phid_compute_env", ToJsonString( e.agent.vdb_phid_compute_env ) );
+        j -> addValue( "vdb_phid_guid", ToJsonString( e.agent.vdb_phid_guid ) );
+        j -> addValue( "vdb_phid_session_ip", ToJsonString( e.agent.vdb_phid_session_id ) );
         j -> addValue( "vdb_libc", ToJsonString( e.agent.vdb_libc ) );
-
 
         if ( mem_options . print_line_nr )
             j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
@@ -266,7 +267,9 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
 
         mem_os << ",\"vdb_libc\":" << e.agent.vdb_libc;
         mem_os << ",\"vdb_os\":" << e.agent.vdb_os;
-        mem_os << ",\"vdb_phid\":" << e.agent.vdb_phid;
+        mem_os << ",\"vdb_phid_compute_env\":" << e.agent.vdb_phid_compute_env;
+        mem_os << ",\"vdb_phid_guid\":" << e.agent.vdb_phid_guid;
+        mem_os << ",\"vdb_phid_session_id\":" << e.agent.vdb_phid_session_id;
         mem_os << ",\"vdb_release\":" << e.agent.vdb_release;
         mem_os << ",\"vdb_tool\":" << e.agent.vdb_tool;
 
