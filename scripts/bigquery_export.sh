@@ -137,7 +137,7 @@ echo " #### gs_fixed"
     datetime_add(
         parse_datetime('%s', cast ( cast (time/1000000 as int64) as string) ),
         interval time_taken microsecond) as end_ts,
-    agent as user_agent,
+    replace(agent, '-head', '') as user_agent,
     cast (status as string) as http_status,
     host as host,
     method as http_operation,
@@ -173,7 +173,7 @@ ENDOFQUERY
     --destination_table strides_analytics.gs_fixed \
     --use_legacy_sql=false \
     --batch=true \
-    --max_rows=10 \
+    --max_rows=5 \
     "$QUERY"
 
     bq show --schema strides_analytics.gs_fixed
@@ -183,7 +183,7 @@ ENDOFQUERY
     #parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
     #[17/May/2019:23:19:24 +0000]
 echo " #### s3_fixed"
-    # LOGMON-1: Remove multiple -heads from agent for S3
+    # LOGMON-1: Remove multiple -heads from agent
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     ip as remote_ip,
@@ -230,7 +230,7 @@ ENDOFQUERY
     --destination_table strides_analytics.s3_fixed \
     --use_legacy_sql=false \
     --batch=true \
-    --max_rows=10 \
+    --max_rows=5 \
     "$QUERY"
 
     bq show --schema strides_analytics.s3_fixed
@@ -326,7 +326,7 @@ ENDOFQUERY
     --destination_table strides_analytics.detail_export \
     --use_legacy_sql=false \
     --batch=true \
-    --max_rows=10 \
+    --max_rows=5 \
     "$QUERY"
 
     bq show --schema strides_analytics.detail_export
@@ -374,12 +374,12 @@ ENDOFQUERY
     --destination_table strides_analytics.summary_grouped \
     --use_legacy_sql=false \
     --batch=true \
-    --max_rows=10 \
+    --max_rows=5 \
     "$QUERY"
 
     bq show --schema strides_analytics.summary_grouped
 
-echo " ###  iplookup_new"
+echo " ###  uniq_ips"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT DISTINCT remote_ip, net.ipv4_to_int64(net.safe_ip_from_string(remote_ip)) as ipint,
     FROM \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
@@ -394,15 +394,15 @@ ENDOFQUERY
     --destination_table strides_analytics.uniq_ips \
     --use_legacy_sql=false \
     --batch=true \
-    --max_rows=10 \
+    --max_rows=5 \
     "$QUERY"
 
-RUN="yes"
+RUN="no"
 if [ "$RUN" = "yes" ]; then
 # Only needs to be running when a lot of new IP addresses appear
+echo " ###  iplookup_new"
     QUERY=$(cat <<-ENDOFQUERY
-    SELECT remote_ip, ipint,
-    country_code, region_name, city_name
+    SELECT remote_ip, ipint, country_code, region_name, city_name
     FROM \\\`ncbi-logmon.strides_analytics.ip2location\\\`
     JOIN \\\`ncbi-logmon.strides_analytics.uniq_ips\\\`
     ON (ipint >= ip_from and ipint <= ip_to)
@@ -410,15 +410,39 @@ ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f strides_analytics.iplookup_new
+    bq rm --project_id ncbi-logmon -f strides_analytics.iplookup_new2
     # shellcheck disable=SC2016
     bq query \
-    --destination_table strides_analytics.iplookup_new \
+    --destination_table strides_analytics.iplookup_new2 \
     --use_legacy_sql=false \
     --batch=true \
-    --max_rows=10 \
+    --max_rows=5 \
     "$QUERY"
 fi
+
+echo " ### Find internal PUT/POST IPs"
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.rdns
+    SET DOMAIN="NCBI Cloud (nlm.nih.gov)"
+    WHERE ip in (
+    SELECT distinct  remote_ip
+    FROM \\\`ncbi-logmon.strides_analytics.summary_export\\\`
+    where http_operations like '%P%'
+    and http_statuses like '%200%'
+       UNION ALL
+    SELECT distinct ip FROM \\\`ncbi-logmon.strides_analytics.s3_parsed\\\`
+        WHERE requester like '%arn:aws:iam::783971887864%'
+        or requester like '%arn:aws:iam::018000097103%'
+        or requester like '%arn:aws:iam::867126678632%'
+        or requester like '%arn:aws:iam::651740271041%' )
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
 
 echo " ###  summary_export"
     QUERY=$(cat <<-ENDOFQUERY
@@ -445,32 +469,34 @@ echo " ###  summary_export"
     region_name,
     country_code,
     city_name,
-    ScientificName,
-    cast (size_mb as int64) as accession_size_mb
+    organism,
+    consent,
+    cast (mbytes as int64) as accession_size_mb
     FROM \\\`strides_analytics.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
         ON grouped.remote_ip=rdns.ip
-    LEFT JOIN \\\`strides_analytics.iplookup_new\\\` iplookup_new
-        ON grouped.remote_ip=iplookup_new.remote_ip
-    LEFT JOIN \\\`strides_analytics.public_fix\\\`
-        ON accession=run
+    LEFT JOIN \\\`strides_analytics.iplookup_new2\\\` iplookup
+        ON grouped.remote_ip=iplookup.remote_ip
+    LEFT JOIN \\\`nih-sra-datastore.sra.metadata\\\` metadata
+        ON accession=metadata.acc
     WHERE
         accession IS NOT NULL AND accession != ""
 ENDOFQUERY
     )
 
+#    LEFT JOIN \\\`strides_analytics.public_fix\\\`
     QUERY="${QUERY//\\/}"
 
-        #--project_id ncbi-logmon \
     bq \
         cp strides_analytics.summary_export "strides_analytics.summary_export_$YESTERDAY"
     bq rm --project_id ncbi-logmon -f strides_analytics.summary_export
+
     # shellcheck disable=SC2016
     bq query \
     --destination_table strides_analytics.summary_export \
     --use_legacy_sql=false \
     --batch=true \
-    --max_rows=10 \
+    --max_rows=5 \
     "$QUERY"
     bq show --schema strides_analytics.summary_export
 

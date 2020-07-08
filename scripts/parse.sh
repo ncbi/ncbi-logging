@@ -67,7 +67,7 @@ buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='
 
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
-    echo "Parsing $LOG_BUCKET..."
+    echo "  Parsing $LOG_BUCKET..."
 
     PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$PARSE_DEST"
@@ -76,16 +76,16 @@ for LOG_BUCKET in $buckets; do
 
     SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
-    echo "Copying $TGZ to $PARSE_DEST"
+    echo "  Copying $TGZ to $PARSE_DEST"
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
     gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" .
     ls -hl "$TGZ"
 
-    echo "Counting $TGZ ..."
+    echo "  Counting $TGZ ..."
     totalwc=$(tar -xaOf "$TGZ" | wc -l | cut -f1 -d' ')
-    echo "Parsing $TGZ, $totalwc lines ..."
+    echo "  Parsing $TGZ, $totalwc lines ..."
     touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
     tar -xaOf "$TGZ" | \
@@ -97,7 +97,7 @@ for LOG_BUCKET in $buckets; do
 
     echo
 
-    echo "Record format is:"
+    echo "  Record format is:"
     head -1 "$YESTERDAY_DASH.${LOG_BUCKET}.json" | jq -SM .
 
     set +e
@@ -122,23 +122,25 @@ for LOG_BUCKET in $buckets; do
 #    if [ "$unrecwc" -eq "0" ]; then
         #find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
 
-        if [ "$recwc" -gt 1000000 ]; then
-            echo "jsonl too large, splitting"
+#        if [ "$recwc" -gt 1000000 ]; then
+#            echo "jsonl too large, splitting"
+            echo "  splitting"
             split -d -e -l 1000000 --additional-suffix=.jsonl \
                 - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
                 < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
             rm -f "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-        fi
+#        fi
 
         if [ ! -s "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" ]; then
             rm -f "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
         fi
 
-        echo "Gzipping..."
-        gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl
+        echo "  Gzipping..."
+        gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl &
+        wait
 
-        echo "Uploading..."
+        echo "  Uploading..."
 
         export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
         export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
@@ -148,6 +150,6 @@ for LOG_BUCKET in $buckets; do
         cd ..
         #rm -rf "$PARSE_DEST"
 #    fi
-echo "Done $LOG_BUCKET for $YESTERDAY_DASH..."
+echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
 echo
 done

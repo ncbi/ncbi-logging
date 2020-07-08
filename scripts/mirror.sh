@@ -71,7 +71,7 @@ for LOG_BUCKET in $buckets; do
     if [ "$PROVIDER" = "OP" ]; then
         if [ "$YESTERDAY" -lt "20180701" ]; then
             files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
-        elif [ "$YESTERDAY" -gt "20200701" ]; then
+        elif [ "$YESTERDAY" -gt "20200704" ]; then
             files=$(find "$LOG_BUCKET" -type f -name "*$YESTERDAY*")
         else
             files=$(find "$PANFS/sra_prod/$YESTERDAY" -type f -name "*$YESTERDAY*")
@@ -85,6 +85,7 @@ for LOG_BUCKET in $buckets; do
         done
 
         echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
+        exit 0
     fi
 
     if [ "$PROVIDER" = "S3" ]; then

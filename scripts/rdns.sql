@@ -13,6 +13,8 @@ drop table if exists rdns;
 create table rdns as select json_extract(line, '$.remote_ip') as ip, 'Unknown' as domain from uniq_ips;
 drop table uniq_ips;
 
+create unique index ip_idx on rdns(ip);
+
 drop table if exists rdns_json;
 create table rdns_json (line text);
 .import /home/vartanianmh/ncbi-logging/scripts/rdns.jsonl rdns_json
@@ -1156,7 +1158,10 @@ where IP in (
  '35.245.45.168', '35.245.46.109', '35.245.50.229', '35.245.54.75', '35.245.57.231',
  '35.245.62.67', '35.245.63.74', '35.245.77.7', '35.245.87.54', '35.245.95.245',
  '18.207.224.226', '3.233.226.247', '34.204.176.41', '18.232.73.84', '3.234.243.33',
- '18.207.240.101', '18.207.135.85', '3.233.219.116'
+ '18.207.240.101', '18.207.135.85', '3.233.219.116',
+ '34.200.252.124', '35.188.243.156', '35.236.229.250', '35.245.77.223',
+ '34.226.204.124',
+ '35.172.18.176'
 );
 
 
