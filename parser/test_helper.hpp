@@ -37,7 +37,9 @@ namespace NCBI
             std::string vdb_os;
             std::string vdb_tool;
             std::string vdb_release;
-            std::string vdb_phid;
+            std::string vdb_phid_compute_env;
+            std::string vdb_phid_guid;
+            std::string vdb_phid_session_id;
             std::string vdb_libc;    
 
             SAgent& operator= ( const t_agent &agt )
@@ -46,7 +48,9 @@ namespace NCBI
                 vdb_os      = ToString ( agt . vdb_os );
                 vdb_tool    = ToString ( agt . vdb_tool );
                 vdb_release = ToString ( agt . vdb_release );
-                vdb_phid    = ToString ( agt . vdb_phid );
+                vdb_phid_compute_env    = ToString ( agt . vdb_phid_compute_env );
+                vdb_phid_guid           = ToString ( agt . vdb_phid_guid );
+                vdb_phid_session_id     = ToString ( agt . vdb_phid_session_id );
                 vdb_libc    = ToString ( agt . vdb_libc );    
 
                 return *this;

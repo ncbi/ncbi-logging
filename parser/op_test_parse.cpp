@@ -409,7 +409,9 @@ TEST_F ( TestParseFixture, OnPremise_empty_user_agent )
     ASSERT_EQ( "", e.agent.vdb_os );
     ASSERT_EQ( "", e.agent.vdb_tool );
     ASSERT_EQ( "", e.agent.vdb_release );
-    ASSERT_EQ( "", e.agent.vdb_phid );
+    ASSERT_EQ( "", e.agent.vdb_phid_compute_env );
+    ASSERT_EQ( "", e.agent.vdb_phid_guid );
+    ASSERT_EQ( "", e.agent.vdb_phid_session_id );
     ASSERT_EQ( "", e.agent.vdb_libc );
 }
 
@@ -423,7 +425,9 @@ TEST_F ( TestParseFixture, OnPremise_user_agent )
     ASSERT_EQ( "linux64", e.agent.vdb_os );
     ASSERT_EQ( "test-sra", e.agent.vdb_tool );
     ASSERT_EQ( "2.8.2", e.agent.vdb_release );
-    ASSERT_EQ( "", e.agent.vdb_phid );
+    ASSERT_EQ( "", e.agent.vdb_phid_compute_env );
+    ASSERT_EQ( "", e.agent.vdb_phid_guid );
+    ASSERT_EQ( "", e.agent.vdb_phid_session_id );
     ASSERT_EQ( "", e.agent.vdb_libc );
 }
 
@@ -433,7 +437,9 @@ TEST_F ( TestParseFixture, OnPremise_user_agent_with_phid_and_libc )
 "159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /?/srapub/SRR5385591.sra HTTP/1.1\" 404 0 0.000 \"-\" \"linux64 ncbi-vdb.2.10.3 (phid=noc7737000,libc=2.17)\" \"-\" port=443 rl=164";
 
     SLogOPEvent e = parse_and_accept( InputLine );
-    ASSERT_EQ( "noc7737000", e.agent.vdb_phid );
+    ASSERT_EQ( "noc", e.agent.vdb_phid_compute_env );
+    ASSERT_EQ( "7737", e.agent.vdb_phid_guid );
+    ASSERT_EQ( "000", e.agent.vdb_phid_session_id );
     ASSERT_EQ( "2.17", e.agent.vdb_libc );
 }
 

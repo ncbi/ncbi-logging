@@ -50,8 +50,8 @@ using namespace NCBI::Logging;
 %token DOT DASH COLON QUOTE OB CB PORT RL CR LF    
 %token UNRECOGNIZED 
 %token<s> PATHSTR PATHEXT ACCESSION 
-%token<s> OS SRA_TOOLKIT PHID LIBC SRAVERSION LIBCVERSION AGENTSTR SRATOOL
-%token<s> PAREN_OPEN PAREN_CLOSE COMMA
+%token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS
+%token<s> PAREN_OPEN PAREN_CLOSE COMMA PHIDVALUE
 
 %type<tp> time
 %type<req> server_and_request request url url_token url_entry 
@@ -340,20 +340,21 @@ referer
 
 vdb_agent_token
     : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; } 
-    | SRAVERSION    
+    | SRATOOLVERS
         { 
             InitAgent( $$ ); 
             $$.original = $1; 
-            /* skip the leading '.' */
-            $$ . vdb_release . p = $1 . p + 1; 
-            $$ . vdb_release . n = $1 . n - 1; 
+            const char * dot = strchr( $1 . p, '.' );
+            $$ . vdb_tool . p = $1 . p;
+            $$ . vdb_tool . n = dot - $1 . p;
+            /* skip the leading dot */
+            $$ . vdb_release . p = dot + 1; 
+            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1; 
         } 
-    | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; } 
+    | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; }
+    | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
     | SPACE         { InitAgent( $$ ); $$.original = $1; } 
     | AGENTSTR      { InitAgent( $$ ); $$.original = $1; } 
-    | PHID          { InitAgent( $$ ); $$.original = $1; $$.agt_mode = agt_phid; } 
-    | LIBC          { InitAgent( $$ ); $$.original = $1; $$.agt_mode = agt_libc; } 
-    | SRATOOL       { InitAgent( $$ ); $$.original = $1; $$.agt_mode = agt_tool; } 
     ;
 
 vdb_agent
@@ -362,31 +363,31 @@ vdb_agent
     { 
         $$ = $1;
         MERGE_TSTR( $$ . original, $2 . original );
-        switch ( $$ . agt_mode )
+        if ( $2 . vdb_phid_compute_env . n > 0 )
         {
-        case agt_none:
-            $$ . agt_mode = $2 . agt_mode;
-            if ( $2 . agt_mode == agt_tool )
-            {
-                $$ . vdb_tool = $2 . original; 
-                $$ . agt_mode = agt_tool;
-            }
-            break;
-        case agt_tool:
-            if ( $2 . vdb_release . n > 0 )
-            {
-                $$ . vdb_release = $2 . vdb_release;
-            }
-            $$ . agt_mode = agt_none;
-            break;
-        case agt_phid:
-            $$ . vdb_phid = $2 . original;
-            $$ . agt_mode = agt_none;
-            break;
-        case agt_libc:
-            $$ . vdb_libc = $2 . vdb_libc;
-            $$ . agt_mode = agt_none;
-            break;
+            $$ . vdb_phid_compute_env . p = $2 . vdb_phid_compute_env . p + 5;
+            $$ . vdb_phid_compute_env . n = 3;
+
+            /*
+                the whole token is either 14 or 15 chars long!
+                guid is either 3 or 4 chars long, the other parts have fixed length.
+            */
+            int guid_len = $2 . vdb_phid_compute_env . n - 11;
+            $$ . vdb_phid_guid . p = $2 . vdb_phid_compute_env . p + 8;
+            $$ . vdb_phid_guid . n = guid_len;
+
+            $$ . vdb_phid_session_id . p = $$ . vdb_phid_guid . p + guid_len;
+            $$ . vdb_phid_session_id . n = 3;
+        }
+        else if ( $2 . vdb_libc . n > 0 )
+        {
+            $$ . vdb_libc . p = $2 . vdb_libc . p + 5;
+            $$ . vdb_libc . n = $2 . vdb_libc . n - 5;
+        }
+        else if ( $2 . vdb_tool . n > 0 )
+        {
+            $$ . vdb_tool = $2 . vdb_tool;
+            $$ . vdb_release = $2 . vdb_release;
         }
     }
     ;
