@@ -469,7 +469,7 @@ echo " ###  summary_export"
     region_name,
     country_code,
     city_name,
-    organism,
+    organism as ScientificName,
     consent,
     cast (mbytes as int64) as accession_size_mb
     FROM \\\`strides_analytics.summary_grouped\\\` grouped
