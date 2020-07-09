@@ -80,6 +80,7 @@ echo " #### s3_parsed"
         { "name" : "agent", "type": "STRING" },
         { "name" : "auth_type", "type": "STRING" },
         { "name" : "bucket", "type": "STRING" },
+        { "name" : "sig_ver", "type": "STRING" },
         { "name" : "cipher_suite", "type": "STRING" },
         { "name" : "error", "type": "STRING" },
         { "name" : "extension", "type": "STRING" },
@@ -471,6 +472,33 @@ echo " ### Find internal IAMs IPs"
         or requester like '%arn:aws:iam::018000097103%'
         or requester like '%arn:aws:iam::867126678632%'
         or requester like '%arn:aws:iam::651740271041%' )
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+echo " ### Update RDNS"
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.rdns
+    SET DOMAIN="Unknown"
+    WHERE domain is null
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.rdns
+    SET DOMAIN="IPv6"
+    WHERE domain like '%:%'
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
