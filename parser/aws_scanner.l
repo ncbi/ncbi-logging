@@ -54,6 +54,23 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 
 %x QUOTED TIMEFMT PATH
 
+AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/]
+AGENTDELIMS     [(),=\\]
+AGENTSTR        {AGENTCHARS}+
+OS              "linux64"|"mac64"|"win64"
+SRAVERSION      \.[0-9]+\.[0-9]+\.[0-9]+
+LIBCVERSION     "libc="[0-9]+(\.[0-9]+){1,2}
+SRATOOL         "abi-dump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kget"|"pileup-stats"|"prefetch"|"sam-dump"|"sff-dump"|"sra-pileup"|"sra-search"|"sra-stat"|"srapath"|"test-sra"|"vdb-copy"|"vdb-dump"|"vdb-validate"
+SRATOOLVERS     {SRATOOL}{SRAVERSION}
+
+PHIDCHAR        [0-9a-f]
+PHIDCE          "noc"|({PHIDCHAR}{3})
+PHIDGUID        "nog"|({PHIDCHAR}{4})
+PHIDSESS        "nos"|({PHIDCHAR}{3})
+PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
+
+%x AGENT
+
 %%
 
 [ \t]+          { return SPACE; }
@@ -92,6 +109,19 @@ STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; };
 
+<AGENT>{OS}             { MAKE_STR(); return OS; }
+<AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
+<AGENT>{PHIDVALUE}      { MAKE_STR(); return PHIDVALUE; }
+<AGENT>{SRATOOLVERS}    { MAKE_STR(); return SRATOOLVERS; }
+<AGENT>{LIBCVERSION}    { MAKE_STR(); return LIBCVERSION; }
+<AGENT>{SPACE}          { MAKE_STR(); return SPACE; }
+<AGENT>-                { MAKE_STR(); return DASH; }
+<AGENT>\\\"             { MAKE_STR(); return AGENTSTR; }
+<AGENT>\"               { MAKE_STR(); return QUOTE; }
+<AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
+<AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
+<AGENT>.                { MAKE_STR(); return AGENTSTR; }; 
+
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {MONTH}         { MAKE_STR(); return MONTH; }
@@ -124,7 +154,12 @@ void aws_start_URL( yyscan_t yyscanner )
     yy_push_state( PATH, yyscanner ); 
 }
 
-// void aws_stop_URL( yyscan_t yyscanner )
-// {
-//     yy_pop_state( yyscanner ); 
-// }
+void aws_start_UserAgent( yyscan_t yyscanner )
+{
+    yy_push_state( AGENT, yyscanner ); 
+}
+
+void aws_pop_state( yyscan_t yyscanner )
+{
+    yy_pop_state( yyscanner ); 
+}

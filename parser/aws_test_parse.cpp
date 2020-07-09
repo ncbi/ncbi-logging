@@ -19,7 +19,7 @@ struct SLogAWSEvent
     string      res_len;
     string      referer;
 
-    string      agent; //TODO: convert to SAgent
+    SAgent      agent;
 
     string      owner;
     string      bucket;
@@ -48,7 +48,7 @@ struct SLogAWSEvent
         res_code    = ToString( ev . res_code );
         res_len     = ToString( ev . res_len );
         referer     = ToString( ev . referer );
-        agent       = ToString( ev . agent . original );
+        agent       = ev . agent;
 
         owner       = ToString( ev . owner );
         bucket      = ToString( ev . bucket );
@@ -216,7 +216,7 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "557", e.total_time );
     ASSERT_EQ( "12", e.turnaround_time );
     ASSERT_EQ( "", e.referer );
-    ASSERT_EQ( "aws-cli/1.16.102 \"Python\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent );
+    ASSERT_EQ( "aws-cli/1.16.102 \\\"Python\\\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent . original );
     ASSERT_EQ( "", e.version_id );
     ASSERT_EQ( "fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg=", e.host_id );
     ASSERT_EQ( "SigV4 ECDHE-RSA-AES128-GCM-SHA256", e.cipher_suite );
@@ -230,7 +230,7 @@ TEST_F ( TestParseFixture, AWS_turnaround_time_is_dash )
     const char * InputLine =
     "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
     
-    SLogAWSEvent e = parse_aws( InputLine, false );
+    SLogAWSEvent e = parse_aws( InputLine );
 
     ASSERT_EQ( "200", e.res_code );
     ASSERT_EQ( "", e.error );
@@ -305,7 +305,7 @@ TEST_F ( TestParseFixture, AWS_StrayBackslashes )
 
     std::istringstream inputstream( InputLine );
     SLogAWSEvent e = parse_aws( InputLine );
-    ASSERT_EQ ( string ("win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li"), e.agent);
+    ASSERT_EQ ( string ("win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li"), e.agent.original);
 }
 
 TEST_F ( TestParseFixture, AWS_NoIP )
@@ -410,6 +410,38 @@ TEST_F ( TestParseFixture, AWS_empty_key )
     ASSERT_EQ ( string ("SRR11060177"), e.request.accession );
     ASSERT_EQ ( string ("filename"), e.request.filename );
     ASSERT_EQ ( string (".1"), e.request.extension );
+}
+
+TEST_F ( TestParseFixture, AWS_empty_user_agent )
+{   
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-5 [09/Mar/2020:22:53:57 +0000] 35.172.121.21 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04a6132b8172af805 479B09DC662E4B67 REST.GET.BUCKET - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" 200 - 325 - 14 14 \"-\" - - 4588JL1XJI30m/MURh3Xoz4qVakHYt/u1JwJ/u4BvxAUCOFUfvPJAG/utO0+cBgipDArBig9kL4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-5.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ( "", e.agent.original );
+    ASSERT_EQ( "", e.agent.vdb_os );
+    ASSERT_EQ( "", e.agent.vdb_tool );
+    ASSERT_EQ( "", e.agent.vdb_release );
+    ASSERT_EQ( "", e.agent.vdb_phid_compute_env );
+    ASSERT_EQ( "", e.agent.vdb_phid_guid );
+    ASSERT_EQ( "", e.agent.vdb_phid_session_id );
+    ASSERT_EQ( "", e.agent.vdb_libc );
+}
+
+TEST_F ( TestParseFixture, AWS_user_agent )
+{   
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-5 [09/Mar/2020:22:53:57 +0000] 35.172.121.21 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04a6132b8172af805 479B09DC662E4B67 REST.GET.BUCKET - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" 200 - 325 - 14 14 \"-\" \"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\" - 4588JL1XJI30m/MURh3Xoz4qVakHYt/u1JwJ/u4BvxAUCOFUfvPJAG/utO0+cBgipDArBig9kL4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-5.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+    ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", e.agent.original );
+    ASSERT_EQ( "linux64", e.agent.vdb_os );
+    ASSERT_EQ( "test-sra", e.agent.vdb_tool );
+    ASSERT_EQ( "2.8.2", e.agent.vdb_release );
+    ASSERT_EQ( "noc", e.agent.vdb_phid_compute_env );
+    ASSERT_EQ( "7737", e.agent.vdb_phid_guid );
+    ASSERT_EQ( "000", e.agent.vdb_phid_session_id );
+    ASSERT_EQ( "2.17", e.agent.vdb_libc );
 }
 
 //TODO: rejected lines with more than IP recognized
