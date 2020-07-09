@@ -428,6 +428,21 @@ ENDOFQUERY
     "$QUERY"
 fi
 
+
+echo " ### Find new IP addresses"
+    QUERY=$(cat <<-ENDOFQUERY
+insert into strides_analytics.rdns (ip)
+select distinct remote_ip as ip from strides_analytics.summary_export where remote_ip not in (select distinct ip from strides_analytics.rdns
+)
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
 echo " ### Find internal PUT/POST IPs"
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
@@ -440,11 +455,6 @@ echo " ### Find internal PUT/POST IPs"
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
 
     bq query \
     --use_legacy_sql=false \
@@ -514,7 +524,7 @@ ENDOFQUERY
     QUERY="${QUERY//\\/}"
 
     bq \
-        cp strides_analytics.summary_export "strides_analytics.summary_export_$YESTERDAY"
+        cp -f strides_analytics.summary_export "strides_analytics.summary_export_$YESTERDAY"
     bq rm --project_id ncbi-logmon -f strides_analytics.summary_export
 
     # shellcheck disable=SC2016
