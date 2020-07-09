@@ -6,7 +6,14 @@
 export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
+skipload=false
+if [ "$#" -eq 1 ]; then
+    if [ "$1" = "skipload" ]; then
+        skipload=true
+    fi
+fi
 
+if [ "$skipload" = false ]; then
 gsutil du -s -h gs://logmon_logs/gs_public
 gsutil du -s -h gs://logmon_logs/s3_public
 gsutil du -s -h gs://logmon_logs_parsed_us/logs_gs_public/
@@ -128,6 +135,7 @@ echo " #### Parsed results"
 bq -q query \
     --use_legacy_sql=false \
     "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from strides_analytics.gs_parsed union all select source, accepted, cast(time as string) as time from strides_analytics.s3_parsed) group by source, accepted order by source"
+fi
 
 echo " #### gs_fixed"
     QUERY=$(cat <<-ENDOFQUERY
