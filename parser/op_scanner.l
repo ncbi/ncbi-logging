@@ -55,10 +55,13 @@ AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/]
 AGENTDELIMS     [(),=\\]
 AGENTSTR        {AGENTCHARS}+
 OS              "linux64"|"mac64"|"win64"
-SRAVERSION      \.[0-9]+\.[0-9]+\.[0-9]+
-LIBCVERSION     "libc="[0-9]+(\.[0-9]+){1,2}
-SRATOOL         "abi-dump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kget"|"pileup-stats"|"prefetch"|"sam-dump"|"sff-dump"|"sra-pileup"|"sra-search"|"sra-stat"|"srapath"|"test-sra"|"vdb-copy"|"vdb-dump"|"vdb-validate"
-SRATOOLVERS     {SRATOOL}{SRAVERSION}
+VERSION23       [0-9]+(\.[0-9]+){1,2}
+LIBCVERSION     "libc="{VERSION23}
+SRATOOL         "abi-dump"|"align-cache"|"align-info"|"dbgap-mount-tool"|"fastdump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kdb-meta"|"kget"|"pileup-stats"|"prefetch"|"sam-dump"|"sff-dump"|"sra-pileup"|"sra-search"|"sra-stat"|"srapath"|"test-dependencies"|"test-sra"|"vdb-copy"|"vdb-dump"|"vdb-validate"
+SRATOOLVERS     {SRATOOL}\.{VERSION23}
+    /* TODO */
+    /* UNKNOWNTOOLVERS      [a-z]([a-z\-])+{VERSION23} */
+    /* TESTVERS             test-([a-z\-])+{VERSION23} */
 
 PHIDCHAR        [0-9a-f]
 PHIDCE          "noc"|({PHIDCHAR}{3})

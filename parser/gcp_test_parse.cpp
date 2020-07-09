@@ -24,7 +24,7 @@ struct SLogGCPEvent
     int64_t     time_taken;
     string      host;
     string      referer;
-    string      agent; //TODO: convert to SAgent
+    SAgent      agent;
     string      request_id;
     string      operation;
     string      bucket;
@@ -44,7 +44,7 @@ struct SLogGCPEvent
         time_taken  = ev. time_taken;
         host        = ToString( ev . host );
         referer     = ToString( ev . referer );
-        agent       = ToString( ev . agent . original );
+        agent       = ev . agent;
         request_id  = ToString( ev . request_id );
         operation   = ToString( ev . operation );
         bucket      = ToString( ev . bucket );
@@ -175,7 +175,7 @@ TEST_F ( TestParseFixture, GCP )
     ASSERT_EQ( 27000, e . time_taken );
     ASSERT_EQ( "www.googleapis.com", e . host );
     ASSERT_EQ( "", e . referer );
-    ASSERT_EQ( "apitools gsutil/4.37 Python/2.7.13 (linux2) \"google\"-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)", e . agent );
+    ASSERT_EQ( "apitools gsutil/4.37 Python/2.7.13 (linux2) \\\"google\\\"-cloud-sdk/237.0.0 analytics/disabled,gzip(gfe)", e . agent . original);
     ASSERT_EQ( "AAANsUmaKBTw9gqOSHDOdr10MW802XI5jlNu87rTHuxhlRijModRQnNlwOd-Nxr0EHWq4iVXXEEn9LW4cHb7D6VK5gs", e . request_id );
     ASSERT_EQ( "storage.objects.get", e . operation );
     ASSERT_EQ( "sra-pub-src-9", e . bucket );
@@ -192,7 +192,14 @@ TEST_F ( TestParseFixture, GCP_EmptyAgent )
     "\n";
 
     SLogGCPEvent e = parse_gcp( InputLine );
-    ASSERT_EQ( "", e . agent );
+    ASSERT_EQ( "", e.agent.original );
+    ASSERT_EQ( "", e.agent.vdb_os );
+    ASSERT_EQ( "", e.agent.vdb_tool );
+    ASSERT_EQ( "", e.agent.vdb_release );
+    ASSERT_EQ( "", e.agent.vdb_phid_compute_env );
+    ASSERT_EQ( "", e.agent.vdb_phid_guid );
+    ASSERT_EQ( "", e.agent.vdb_phid_session_id );
+    ASSERT_EQ( "", e.agent.vdb_libc );
 }
 
 TEST_F ( TestParseFixture, GCP_EmptyIP_EmptyURI )
@@ -405,6 +412,35 @@ TEST_F ( TestParseFixture, GCP_double_accession )
     ASSERT_EQ( "SRR004257", e . request . accession );
     ASSERT_EQ( "SRR004257", e . request . filename );
     ASSERT_EQ( "", e . request . extension );
+}
+
+TEST_F ( TestParseFixture, GCP_bad_object )
+{
+    const char * InputLine =
+    "\"1590718096562025\",\"130.14.28.7\",\"1\",\"\",\"GET\",\"\",\"404\",\"0\",\"297\",\"40000\",\"storage.googleapis.com\",\"\",\"\",\"\",\"storage.objects.get\",\"sra-pub-sars-cov2\","
+    "\"SRR004257&\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "", e . request . path );
+    ASSERT_EQ( "", e . request . accession );
+    ASSERT_EQ( "", e . request . filename );
+    ASSERT_EQ( "", e . request . extension );
+}
+
+TEST_F ( TestParseFixture, GCP_user_agent )
+{   
+    const char * InputLine =
+    "\"1590718096562025\",\"130.14.28.7\",\"1\",\"\",\"GET\",\"/storage/v1/b/sra-pub-sars-cov2/o/sra-src%2FSRR004257%2FSRR004257?fields=updated%2Cname%2CtimeCreated%2Csize&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"404\",\"0\",\"297\",\"40000\",\"storage.googleapis.com\",\"\",\"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\",\"AAANsUl0Ofxs9M0aVz_qBWEFs-oNbk42zNRcrU6KXN5hGz3odbZ9v3_Hr_XAMIkNgsd-iYKmTR3RnQqr37E8jeEFJsE\",\"storage.objects.get\",\"sra-pub-sars-cov2\",\"sra-src/SRR004257/SRR004257\"";
+
+    SLogGCPEvent e = parse_gcp( InputLine );
+    ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", e.agent.original );
+    ASSERT_EQ( "linux64", e.agent.vdb_os );
+    ASSERT_EQ( "test-sra", e.agent.vdb_tool );
+    ASSERT_EQ( "2.8.2", e.agent.vdb_release );
+    ASSERT_EQ( "noc", e.agent.vdb_phid_compute_env );
+    ASSERT_EQ( "7737", e.agent.vdb_phid_guid );
+    ASSERT_EQ( "000", e.agent.vdb_phid_session_id );
+    ASSERT_EQ( "2.17", e.agent.vdb_libc );
 }
 
 extern "C"

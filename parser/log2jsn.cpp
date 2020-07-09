@@ -229,14 +229,14 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
             }
             return;
         }
-	else if ( mem_options . agent_only )
+	    else if ( mem_options . agent_only )
         {
             if ( e. agent . original . n > 0 )
             {
                 mem_os << e.agent . original << endl;
             }
             return;
-	}
+	    }
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
         mem_os << ",\"agent\":" << e.agent . original;
@@ -392,6 +392,15 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         {
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
+
+        mem_os << ",\"vdb_libc\":" << e.agent.vdb_libc;
+        mem_os << ",\"vdb_os\":" << e.agent.vdb_os;
+        mem_os << ",\"vdb_phid_compute_env\":" << e.agent.vdb_phid_compute_env;
+        mem_os << ",\"vdb_phid_guid\":" << e.agent.vdb_phid_guid;
+        mem_os << ",\"vdb_phid_session_id\":" << e.agent.vdb_phid_session_id;
+        mem_os << ",\"vdb_release\":" << e.agent.vdb_release;
+        mem_os << ",\"vdb_tool\":" << e.agent.vdb_tool;
+
         mem_os << ",\"vers\":" << e.request.vers;
         mem_os << ",\"version_id\":" << e.version_id;
 
@@ -522,6 +531,15 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         {
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
+
+        mem_os << ",\"vdb_libc\":" << e.agent.vdb_libc;
+        mem_os << ",\"vdb_os\":" << e.agent.vdb_os;
+        mem_os << ",\"vdb_phid_compute_env\":" << e.agent.vdb_phid_compute_env;
+        mem_os << ",\"vdb_phid_guid\":" << e.agent.vdb_phid_guid;
+        mem_os << ",\"vdb_phid_session_id\":" << e.agent.vdb_phid_session_id;
+        mem_os << ",\"vdb_release\":" << e.agent.vdb_release;
+        mem_os << ",\"vdb_tool\":" << e.agent.vdb_tool;
+
         mem_os << ",\"vers\":" << e.request.vers;
 
         mem_os << "}" <<endl;
