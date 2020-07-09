@@ -134,6 +134,7 @@ namespace NCBI
             t_str       turnaround_time;
             t_str       version_id;
             t_str       host_id;
+            t_str       sig_ver;
             t_str       cipher_suite;
             t_str       auth_type;
             t_str       host_header;
@@ -156,6 +157,7 @@ namespace NCBI
                 EMPTY_TSTR( turnaround_time );
                 EMPTY_TSTR( version_id );
                 EMPTY_TSTR( host_id );
+                EMPTY_TSTR( sig_ver );
                 EMPTY_TSTR( cipher_suite );
                 EMPTY_TSTR( auth_type );
                 EMPTY_TSTR( host_header );

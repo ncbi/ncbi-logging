@@ -348,6 +348,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         mem_os << ",\"requester\":" << e.requester;
         mem_os << ",\"res_code\":" << e.res_code;
         mem_os << ",\"res_len\":" << e.res_len;
+        mem_os << ",\"sig_ver\":" << e.sig_ver;
         mem_os << ",\"source\":\"S3\"";
         mem_os << ",\"time\":" << e.time;
         mem_os << ",\"tls_version\":" << e.tls_version;
@@ -381,6 +382,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         j -> addValue( "turnaround_time", ToJsonString( e.turnaround_time ) );
         j -> addValue( "version_id", ToJsonString( e.version_id ) );
         j -> addValue( "host_id", ToJsonString( e.host_id ) );
+        j -> addValue( "sig_ver", ToJsonString( e.sig_ver ) );
         j -> addValue( "cipher_suite", ToJsonString( e.cipher_suite ) );
         j -> addValue( "auth_type", ToJsonString( e.auth_type ) );
         j -> addValue( "host_header", ToJsonString( e.host_header ) );

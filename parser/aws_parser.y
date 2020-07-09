@@ -51,7 +51,7 @@ using namespace NCBI::Logging;
 %type<tp> time
 %type<s> ip referer agent agent_list method qstr_list 
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
-%type<s> aws_version_id aws_host_id aws_cipher aws_auth aws_host_hdr aws_tls_vers
+%type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
 %type<req> request aws_key url_token url_list url key_token
 
@@ -84,6 +84,7 @@ log_aws
       agent SPACE
       aws_version_id SPACE
       aws_host_id SPACE
+      aws_sig SPACE
       aws_cipher SPACE
       aws_auth SPACE
       aws_host_hdr SPACE
@@ -118,10 +119,11 @@ log_aws
         ev . agent              = $34;
         ev . version_id         = $36;
         ev . host_id            = $38;
-        ev . cipher_suite       = $40;
-        ev . auth_type          = $42;
-        ev . host_header        = $44;
-        ev . tls_version        = $46;
+        ev . sig_ver            = $40;
+        ev . cipher_suite       = $42;
+        ev . auth_type          = $44;
+        ev . host_header        = $46;
+        ev . tls_version        = $48;
         
         lib -> acceptLine( ev );
     }
@@ -251,12 +253,16 @@ aws_host_id
     | DASH  { EMPTY_TSTR($$); }
     ;
 
+aws_sig 
+    : STR
+    | STR1
+    | DASH  { EMPTY_TSTR($$); }
+    ;
+
 aws_cipher
-    : STR SPACE STR     { $$ = $1; $$.n += ( $3.n + 1 ); }
-    | STR1 SPACE STR    { $$ = $1; $$.n += ( $3.n + 1 ); }
-    | STR SPACE STR1    { $$ = $1; $$.n += ( $3.n + 1 ); }
-    | STR1 SPACE STR1   { $$ = $1; $$.n += ( $3.n + 1 ); }   
-    | DASH              { EMPTY_TSTR($$); }
+    : STR
+    | STR1
+    | DASH  { EMPTY_TSTR($$); }
     ;
 
 aws_auth

@@ -32,6 +32,7 @@ struct SLogAWSEvent
     string      turnaround_time;
     string      version_id;
     string      host_id;
+    string      sig_ver;
     string      cipher_suite;
     string      auth_type;
     string      host_header;
@@ -62,6 +63,7 @@ struct SLogAWSEvent
         version_id  = ToString( ev . version_id );
         host_id     = ToString( ev . host_id );
         cipher_suite = ToString( ev . cipher_suite );
+        sig_ver     = ToString( ev . sig_ver );
         auth_type   = ToString( ev . auth_type );
         host_header = ToString( ev . host_header );
         tls_version = ToString( ev . tls_version );
@@ -218,7 +220,8 @@ TEST_F ( TestParseFixture, AWS )
     ASSERT_EQ( "aws-cli/1.16.102 \"Python\"/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92", e.agent );
     ASSERT_EQ( "", e.version_id );
     ASSERT_EQ( "fV92QmqOf5ZNYPIj7KZeQWiqAOFqdFtMlOn82aRYjwQHt8QfsWfS3TTOft1Be+bY01d9TObk5Qg=", e.host_id );
-    ASSERT_EQ( "SigV4 ECDHE-RSA-AES128-GCM-SHA256", e.cipher_suite );
+    ASSERT_EQ( "SigV4", e.sig_ver );
+    ASSERT_EQ( "ECDHE-RSA-AES128-GCM-SHA256", e.cipher_suite );
     ASSERT_EQ( "AuthHeader", e.auth_type );
     ASSERT_EQ( "sra-pub-src-14.s3.amazonaws.com", e.host_header );
     ASSERT_EQ( "TLSv1.2", e.tls_version );
