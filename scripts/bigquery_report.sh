@@ -67,15 +67,13 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    --max_rows 10000 \
-"select day as missing_day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from strides_analytics.summary_export where domain not like '%nih.gov%' and  (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day having s3_requests < 2000 or gs_requests < 2000 order by day"
+ "SELECT source, domain as unknown_domain, remote_ip, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export where domain like '%known%'  group by source, domain, remote_ip order by num_accessions desc limit 10"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-"SELECT accession, public_fix.ScientificName, consent, bucket, export.source FROM strides_analytics.summary_export export, strides_analytics.public_fix public_fix WHERE accession=run and consent!='public' LIMIT 500"
-
+"select day as missing_day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from strides_analytics.summary_export where domain not like '%nih.gov%' and  (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day having s3_requests < 2000 or gs_requests < 2000 order by day"
 
 bq -q query \
     --use_legacy_sql=false \

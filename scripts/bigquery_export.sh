@@ -423,13 +423,31 @@ fi
 echo " ### Find internal PUT/POST IPs"
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
-    SET DOMAIN="NCBI Cloud (nlm.nih.gov)"
+    SET DOMAIN="NCBI Cloud (put.nlm.nih.gov)"
     WHERE ip in (
     SELECT distinct  remote_ip
     FROM \\\`ncbi-logmon.strides_analytics.summary_export\\\`
     where http_operations like '%P%'
-    and http_statuses like '%200%'
-       UNION ALL
+    and http_statuses like '%200%')
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+echo " ### Find internal IAMs IPs"
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.rdns
+    SET DOMAIN="NCBI Cloud (request.nlm.nih.gov)"
+    WHERE ip in (
     SELECT distinct ip FROM \\\`ncbi-logmon.strides_analytics.s3_parsed\\\`
         WHERE requester like '%arn:aws:iam::783971887864%'
         or requester like '%arn:aws:iam::018000097103%'
@@ -528,6 +546,7 @@ echo " ###  export to GS"
     "gs://logmon_export/uniq_ips/uniq_ips.$DATE.json.gz"
 
 
+exit 0
 
 echo " ###  copy to filesystem"
 #    mkdir -p "$PANFS/detail"
