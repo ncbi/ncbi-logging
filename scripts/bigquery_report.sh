@@ -67,7 +67,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
- "SELECT source, domain as unknown_domain, remote_ip, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export where domain like '%known%'  group by source, domain, remote_ip order by num_accessions desc limit 10"
+ "SELECT source, domain as unknown_domain, remote_ip, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export where domain like '%known%' or domain is null  group by source, domain, remote_ip order by num_accessions desc limit 10"
 
 bq -q query \
     --use_legacy_sql=false \

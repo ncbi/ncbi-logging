@@ -902,7 +902,8 @@ WHERE IP LIKE '141.22%';
 UPDATE RDNS
 SET DOMAIN='rr.com (Charter Communications)'
 WHERE IP LIKE '76.8%' OR
-IP LIKE '76.9%';
+IP LIKE '76.9%' OR
+IP LIKE '68.172.%';
 
 UPDATE RDNS
 SET DOMAIN='kumc.edu (University of Kansas Medical Center)'
