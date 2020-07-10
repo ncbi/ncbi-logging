@@ -185,7 +185,7 @@ SET DOMAIN = 'jhu.edu (Johns Hopkins Medical Institutions)'
 WHERE IP LIKE '162.129.%';
 
 UPDATE RDNS
-SET DOMAIN = 'jhuapl.edu (Johns Hopkints Applied Physics Laboratory)'
+SET DOMAIN = 'jhuapl.edu (Johns Hopkins Applied Physics Laboratory)'
 WHERE IP LIKE '128.244.%';
 
 UPDATE RDNS
@@ -995,7 +995,7 @@ set DOMAIN='en.sbu.ac.ir (Shahid Beheshti University)'
 where ip like '94.184.11%';
 
 UPDATE RDNS
-set domain='uni-freiburg.ed (University of Freiburg)'
+set domain='uni-freiburg.edu (University of Freiburg)'
 where IP like '132.230.%';
 
 UPDATE RDNS
