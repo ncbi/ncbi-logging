@@ -408,10 +408,104 @@ TEST_F ( TestParseFixture, AWS_empty_key )
 "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-5 [09/Mar/2020:22:53:57 +0000] 35.172.121.21 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04a6132b8172af805 479B09DC662E4B67 REST.GET.BUCKET - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" 200 - 325 - 14 14 \"-\" \"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.154-99.181.amzn1.x86_64 botocore/1.12.92\" - 4588JL1XJI30m/MURh3Xoz4qVakHYt/u1JwJ/u4BvxAUCOFUfvPJAG/utO0+cBgipDArBig9kL4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-5.s3.amazonaws.com TLSv1.2";
 
     SLogAWSEvent e = parse_aws( InputLine );
-    ASSERT_EQ ( string ("-"), e.key );
+    ASSERT_EQ ( string (""), e.key );
     ASSERT_EQ ( string ("SRR11060177"), e.request.accession );
     ASSERT_EQ ( string ("filename"), e.request.filename );
     ASSERT_EQ ( string (".1"), e.request.extension );
+}
+
+TEST_F ( TestParseFixture, AWS_every_field_is_quoted_dash )
+{   // when the key is empty, parse the request field
+    const char * InputLine =
+"\"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\"";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+
+    ASSERT_EQ( "", e.owner );
+    ASSERT_EQ( "", e.bucket );
+
+    ASSERT_EQ( 0, e.time.day );
+    ASSERT_EQ( 0, e.time.month );
+    ASSERT_EQ( 0, e.time.year );
+    ASSERT_EQ( 0, e.time.hour );
+    ASSERT_EQ( 0, e.time.minute );
+    ASSERT_EQ( 0, e.time.second );
+    ASSERT_EQ( 0, e.time.offset );
+
+    ASSERT_EQ( "", e.ip );
+    ASSERT_EQ( "", e.requester );
+    ASSERT_EQ( "", e.request_id );
+    ASSERT_EQ( "", e.operation );
+    ASSERT_EQ( "", e.key );
+    ASSERT_EQ( "", e.request.method );
+    ASSERT_EQ( "", e.request.path );
+    ASSERT_EQ( "", e.request.accession );
+    ASSERT_EQ( "", e.request.filename );
+    ASSERT_EQ( "", e.request.extension );
+    ASSERT_EQ( "", e.request.vers );
+
+    ASSERT_EQ( "", e.res_code );
+    ASSERT_EQ( "", e.error );
+    ASSERT_EQ( "", e.res_len );
+    ASSERT_EQ( "", e.obj_size );
+    ASSERT_EQ( "", e.total_time );
+    ASSERT_EQ( "", e.turnaround_time );
+    ASSERT_EQ( "", e.referer );
+    ASSERT_EQ( "", e.agent );
+    ASSERT_EQ( "", e.version_id );
+    ASSERT_EQ( "", e.host_id );
+    ASSERT_EQ( "", e.sig_ver );
+    ASSERT_EQ( "", e.cipher_suite );
+    ASSERT_EQ( "", e.auth_type );
+    ASSERT_EQ( "", e.host_header );
+    ASSERT_EQ( "", e.tls_version );
+}
+
+TEST_F ( TestParseFixture, AWS_every_field_is_justdash )
+{   // when the key is empty, parse the request field
+    const char * InputLine =
+"- - - - - - - - - - - - - - - - - - - - - - - -";
+
+    SLogAWSEvent e = parse_aws( InputLine );
+
+    ASSERT_EQ( "", e.owner );
+    ASSERT_EQ( "", e.bucket );
+
+    ASSERT_EQ( 0, e.time.day );
+    ASSERT_EQ( 0, e.time.month );
+    ASSERT_EQ( 0, e.time.year );
+    ASSERT_EQ( 0, e.time.hour );
+    ASSERT_EQ( 0, e.time.minute );
+    ASSERT_EQ( 0, e.time.second );
+    ASSERT_EQ( 0, e.time.offset );
+
+    ASSERT_EQ( "", e.ip );
+    ASSERT_EQ( "", e.requester );
+    ASSERT_EQ( "", e.request_id );
+    ASSERT_EQ( "", e.operation );
+    ASSERT_EQ( "", e.key );
+    ASSERT_EQ( "", e.request.method );
+    ASSERT_EQ( "", e.request.path );
+    ASSERT_EQ( "", e.request.accession );
+    ASSERT_EQ( "", e.request.filename );
+    ASSERT_EQ( "", e.request.extension );
+    ASSERT_EQ( "", e.request.vers );
+
+    ASSERT_EQ( "", e.res_code );
+    ASSERT_EQ( "", e.error );
+    ASSERT_EQ( "", e.res_len );
+    ASSERT_EQ( "", e.obj_size );
+    ASSERT_EQ( "", e.total_time );
+    ASSERT_EQ( "", e.turnaround_time );
+    ASSERT_EQ( "", e.referer );
+    ASSERT_EQ( "", e.agent );
+    ASSERT_EQ( "", e.version_id );
+    ASSERT_EQ( "", e.host_id );
+    ASSERT_EQ( "", e.sig_ver );
+    ASSERT_EQ( "", e.cipher_suite );
+    ASSERT_EQ( "", e.auth_type );
+    ASSERT_EQ( "", e.host_header );
+    ASSERT_EQ( "", e.tls_version );
 }
 
 //TODO: rejected lines with more than IP recognized

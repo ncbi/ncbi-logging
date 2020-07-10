@@ -49,11 +49,11 @@ using namespace NCBI::Logging;
 %token UNRECOGNIZED
 
 %type<tp> time
-%type<s> ip referer agent agent_list method qstr_list 
+%type<s> ip referer agent agent_list method qstr_list dash string_or_dash
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
 %type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
-%type<req> request aws_key url_token url_list url key_token
+%type<req> request aws_key url_token url_list url key_token aws_quoted_key
 
 %start line
 
@@ -72,7 +72,7 @@ log_aws
       aws_requester SPACE
       aws_request_id SPACE
       aws_operation SPACE
-      { aws_start_URL( scanner ); } aws_key SPACE
+      { aws_start_URL( scanner ); } aws_quoted_key SPACE
       request SPACE
       result_code SPACE
       aws_error SPACE
@@ -101,7 +101,18 @@ log_aws
 
         ev . request = $18; // this has to happen before we use the key-decomposition
         // combine data from aws_key and request
-        ev . key = $16 . path;
+        if ( $16 . path . n == 1 && $16 . path . p[ 0 ] == '-' )
+        {
+            EMPTY_TSTR( ev . key );
+        }
+        else if ( $16 . path . n == 3 && $16 . path . p[ 0 ] == '\"' && $16 . path . p[ 1 ] == '-' && $16 . path . p[ 2 ] == '\"' )
+        {
+            EMPTY_TSTR( ev . key );
+        }
+        else
+        {
+            ev . key = $16 . path;
+        }
         if ( $16 . accession . n > 0 )
         {
             ev . request . accession = $16 . accession;
@@ -129,6 +140,17 @@ log_aws
     }
     ;
 
+dash
+    : DASH                  { EMPTY_TSTR($$); }
+    | QUOTE DASH QUOTE      { EMPTY_TSTR($$); }
+    ;
+
+string_or_dash
+    : STR
+    | STR1
+    | dash
+    ;
+
 log_aws_err
     : aws_owner error
     {
@@ -139,32 +161,11 @@ log_aws_err
     }
     ;
 
-aws_owner
-    : STR
-    | STR1
-    ;
-
-aws_bucket
-    : STR
-    ;
-
-aws_requester
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_request_id
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_operation
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
+aws_owner : string_or_dash ;
+aws_bucket : string_or_dash ;
+aws_requester : string_or_dash ;
+aws_request_id : string_or_dash ;
+aws_operation : string_or_dash ;
 
 key_token
     : SLASH         { InitRequest( $$ ); $$ . path = $1; }
@@ -215,82 +216,50 @@ aws_key
         }
     ;
 
-aws_error
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
+aws_quoted_key
+    : aws_key
+    | QUOTE DASH QUOTE {  InitRequest( $$ ); }
     ;
+
+aws_error : string_or_dash ;
 
 aws_bytes_sent
     : STR
-    | DASH  { EMPTY_TSTR($$); }
+    | dash
     ;
 
 aws_obj_size
     : STR
-    | DASH  { EMPTY_TSTR($$); }
+    | dash
     ;
 
 aws_total_time
     : STR
-    | DASH  { EMPTY_TSTR($$); }
+    | dash
     ;
 
 aws_turnaround_time
     : STR
-    | DASH  { EMPTY_TSTR($$); }
+    | dash
     ;
 
-aws_version_id
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_host_id
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_sig 
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_cipher
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_auth
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_host_hdr
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
-
-aws_tls_vers
-    : STR
-    | STR1
-    | DASH  { EMPTY_TSTR($$); }
-    ;
+aws_version_id : string_or_dash ;
+aws_host_id : string_or_dash ;
+aws_sig : string_or_dash ;
+aws_cipher : string_or_dash ;
+aws_auth : string_or_dash ;
+aws_host_hdr : string_or_dash ;
+aws_tls_vers : string_or_dash ;
 
 ip
     : IPV4
     | IPV6
-    | DASH  { EMPTY_TSTR($$); }
+    | dash
     ;
 
 method
     : METHOD        { $$ = $1; }
+    | dash
     ;
 
 qstr_list
@@ -402,33 +371,28 @@ request
     {
         $$ = $3;
     }
-    | DASH                          
-    {
-        InitRequest( $$ );
-    }
+    | DASH { InitRequest( $$ );}
     ;
 
 result_code
     : STR
-    | DASH  { EMPTY_TSTR($$); }
+    | dash
     ;
 
 referer
     : QUOTE qstr_list QUOTE { $$ = $2; }
-    | STR
-    | STR1
-    | DASH                  { EMPTY_TSTR($$); }
-    ;
-
-agent
-    : QUOTE agent_list QUOTE        { $$ = $2; }
-    | DASH  { EMPTY_TSTR($$); }
+    | string_or_dash
     ;
 
 agent_list
     : QSTR                          { $$ = $1; }
     | agent_list QSTR               { $$ = $1; $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
     | agent_list SPACE              { $$ = $1; $$.n += 1;    $$.escaped = $1.escaped; }    
+    ;
+
+agent
+    : QUOTE agent_list QUOTE        { $$ = $2; }
+    | dash
     ;
 
 time
@@ -442,6 +406,7 @@ time
         $$.second = atoi( $12.p );
         $$.offset = atoi( $13.p );
     } 
+    | dash  { memset( &($$), 0, sizeof $$ ); }
     ;
 
 %%
