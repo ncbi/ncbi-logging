@@ -31,7 +31,8 @@ void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* ms
 
 extern void aws_get_scanner_input( void * yyscanner, t_str & str );
 extern void aws_start_URL( void * yyscanner );
-//extern void aws_stop_URL( void * yyscanner );
+extern void aws_start_UserAgent( void * yyscanner );
+extern void aws_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 }
@@ -41,19 +42,22 @@ using namespace NCBI::Logging;
     t_str s;
     t_timepoint tp;
     t_request req;
+    t_agent agent;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
 %token<s> PATHSTR PATHEXT ACCESSION SPACE 
 %token COLON QUOTE OB CB 
 %token UNRECOGNIZED
+%token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
 
 %type<tp> time
-%type<s> ip referer agent agent_list method qstr_list dash string_or_dash
+%type<s> ip referer method qstr_list dash string_or_dash
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
 %type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
-%type<req> request aws_key url_token url_list url key_token aws_quoted_key
+%type<req> request aws_key aws_quoted_key url_token url_list url key_token
+%type<agent> agent vdb_agent vdb_agent_token
 
 %start line
 
@@ -80,8 +84,11 @@ log_aws
       aws_obj_size SPACE
       aws_total_time SPACE
       aws_turnaround_time SPACE
-      referer SPACE
-      agent SPACE
+      referer 
+      { aws_start_UserAgent( scanner ); } 
+      SPACE agent 
+      { aws_pop_state( scanner ); }
+      SPACE
       aws_version_id SPACE
       aws_host_id SPACE
       aws_sig SPACE
@@ -127,14 +134,14 @@ log_aws
         ev . total_time         = $28;
         ev . turnaround_time    = $30;
         ev . referer            = $32;
-        ev . agent              = $34;
-        ev . version_id         = $36;
-        ev . host_id            = $38;
-        ev . sig_ver            = $40;
-        ev . cipher_suite       = $42;
-        ev . auth_type          = $44;
-        ev . host_header        = $46;
-        ev . tls_version        = $48;
+        ev . agent              = $35;
+        ev . version_id         = $38;
+        ev . host_id            = $40;
+        ev . sig_ver            = $42;
+        ev . cipher_suite       = $44;
+        ev . auth_type          = $46;
+        ev . host_header        = $48;
+        ev . tls_version        = $50;
         
         lib -> acceptLine( ev );
     }
@@ -384,15 +391,84 @@ referer
     | string_or_dash
     ;
 
-agent_list
-    : QSTR                          { $$ = $1; }
-    | agent_list QSTR               { $$ = $1; $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
-    | agent_list SPACE              { $$ = $1; $$.n += 1;    $$.escaped = $1.escaped; }    
+vdb_agent_token
+    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; } 
+    | SRATOOLVERS
+        { 
+            InitAgent( $$ ); 
+            $$.original = $1; 
+            const char * dot = strchr( $1 . p, '.' );
+            $$ . vdb_tool . p = $1 . p;
+            $$ . vdb_tool . n = dot - $1 . p;
+            /* skip the leading dot */
+            $$ . vdb_release . p = dot + 1; 
+            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1; 
+        } 
+    | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; }
+    | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
+    | SPACE         { InitAgent( $$ ); $$.original = $1; } 
+    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; } 
+    ;
+
+vdb_agent
+    : vdb_agent_token           { $$ = $1; }
+    | vdb_agent vdb_agent_token 
+    { 
+        $$ = $1;
+        MERGE_TSTR( $$ . original, $2 . original );
+        if ( $2 . vdb_phid_compute_env . n > 0 )
+        {
+            $$ . vdb_phid_compute_env . p = $2 . vdb_phid_compute_env . p + 5;
+            $$ . vdb_phid_compute_env . n = 3;
+
+            /*
+                the whole token is either 14 or 15 chars long!
+                guid is either 3 or 4 chars long, the other parts have fixed length.
+            */
+            int guid_len = $2 . vdb_phid_compute_env . n - 11;
+            $$ . vdb_phid_guid . p = $2 . vdb_phid_compute_env . p + 8;
+            $$ . vdb_phid_guid . n = guid_len;
+
+            $$ . vdb_phid_session_id . p = $$ . vdb_phid_guid . p + guid_len;
+            $$ . vdb_phid_session_id . n = 3;
+        }
+        else if ( $2 . vdb_libc . n > 0 )
+        {
+            $$ . vdb_libc . p = $2 . vdb_libc . p + 5;
+            $$ . vdb_libc . n = $2 . vdb_libc . n - 5;
+        }
+        else if ( $2 . vdb_tool . n > 0 )
+        {
+            $$ . vdb_tool = $2 . vdb_tool;
+            $$ . vdb_release = $2 . vdb_release;
+        }
+    }
     ;
 
 agent
-    : QUOTE agent_list QUOTE        { $$ = $2; }
-    | dash
+    : QUOTE OS vdb_agent QUOTE       
+        { 
+            t_agent temp;
+            InitAgent( temp ); 
+            temp . original = $2;
+            MERGE_TSTR( temp . original, $3 . original );
+            $$ = $3;
+            $$ . original = temp . original;
+
+            $$.vdb_os = $2;
+        }
+    | QUOTE vdb_agent QUOTE
+        { 
+            $$ = $2;
+        }
+    | QUOTE QUOTE                                           
+        { 
+            InitAgent( $$ ); 
+        }
+    | dash 
+        { 
+            InitAgent( $$ ); 
+        }
     ;
 
 time

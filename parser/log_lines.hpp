@@ -40,11 +40,26 @@ namespace NCBI
 
         inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }
 
+        typedef struct t_agent
+        {
+            t_str       original;
+
+            t_str       vdb_os;
+            t_str       vdb_tool;
+            t_str       vdb_release;
+            t_str       vdb_phid_compute_env;
+            t_str       vdb_phid_guid;
+            t_str       vdb_phid_session_id;
+            t_str       vdb_libc;     
+        } t_agent;
+
+        inline void InitAgent( t_agent & r ) { memset( & r, 0, sizeof ( r ) ); }
+
         struct CommonLogEvent
         {
             t_str       ip;
             t_str       referer;
-            t_str       agent;
+            t_agent     agent;
             t_str       unparsed;
             t_request   request;
 
@@ -52,7 +67,7 @@ namespace NCBI
             {
                 EMPTY_TSTR( ip );
                 EMPTY_TSTR( referer );
-                EMPTY_TSTR( agent );
+                InitAgent( agent );
                 EMPTY_TSTR( unparsed );
                 InitRequest( request );
             }

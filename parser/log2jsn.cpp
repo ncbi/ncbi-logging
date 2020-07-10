@@ -79,6 +79,7 @@ struct Options
     bool parser_debug = false;
     bool jsonlib = false;
     bool path_only = false;
+    bool agent_only = false;
     unsigned long int selected_line = 0;
 };
 
@@ -109,7 +110,15 @@ struct cmnLogLines
         }
         j -> addValue( "ip", ToJsonString( e.ip ) );
         j -> addValue( "referer", ToJsonString( e.referer ) );
-        j -> addValue( "agent", ToJsonString( e.agent ) );
+
+        j -> addValue( "agent", ToJsonString( e.agent.original ) );
+        j -> addValue( "vdb_os", ToJsonString( e.agent.vdb_os ) );
+        j -> addValue( "vdb_tool", ToJsonString( e.agent.vdb_tool ) );
+        j -> addValue( "vdb_release", ToJsonString( e.agent.vdb_release ) );
+        j -> addValue( "vdb_phid_compute_env", ToJsonString( e.agent.vdb_phid_compute_env ) );
+        j -> addValue( "vdb_phid_guid", ToJsonString( e.agent.vdb_phid_guid ) );
+        j -> addValue( "vdb_phid_session_ip", ToJsonString( e.agent.vdb_phid_session_id ) );
+        j -> addValue( "vdb_libc", ToJsonString( e.agent.vdb_libc ) );
 
         if ( mem_options . print_line_nr )
             j -> addValue( "line_nr", JSON::makeInteger( line_nr ) );
@@ -176,7 +185,7 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        if ( mem_options . path_only ) return;
+        if ( mem_options . path_only || mem_options . agent_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -220,9 +229,17 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
             }
             return;
         }
+	    else if ( mem_options . agent_only )
+        {
+            if ( e. agent . original . n > 0 )
+            {
+                mem_os << e.agent . original << endl;
+            }
+            return;
+	    }
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
-        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"agent\":" << e.agent . original;
         mem_os << ",\"extension\":" << e.request.extension;
         mem_os << ",\"filename\":" << e.request.filename;
         mem_os << ",\"forwarded\":" << e.forwarded;
@@ -247,6 +264,15 @@ struct OpToJsonLogLines : public OP_LogLines, public cmnLogLines
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
         mem_os << ",\"user\":" << e.user;
+
+        mem_os << ",\"vdb_libc\":" << e.agent.vdb_libc;
+        mem_os << ",\"vdb_os\":" << e.agent.vdb_os;
+        mem_os << ",\"vdb_phid_compute_env\":" << e.agent.vdb_phid_compute_env;
+        mem_os << ",\"vdb_phid_guid\":" << e.agent.vdb_phid_guid;
+        mem_os << ",\"vdb_phid_session_id\":" << e.agent.vdb_phid_session_id;
+        mem_os << ",\"vdb_release\":" << e.agent.vdb_release;
+        mem_os << ",\"vdb_tool\":" << e.agent.vdb_tool;
+
         mem_os << ",\"vers\":" << e.request.vers;
         mem_os << "}" <<endl;
     }
@@ -277,7 +303,7 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        if ( mem_options . path_only ) return;
+        if ( mem_options . path_only || mem_options . agent_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -321,9 +347,18 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
             }
             return;
         }
+        else if ( mem_options . agent_only )
+        {
+            if ( e. agent . original . n > 0 )
+            {
+                mem_os << e.agent . original << endl;
+            }
+            return;
+        }
+
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
-        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"agent\":" << e.agent . original;
         mem_os << ",\"auth_type\":" << e.auth_type;
         mem_os << ",\"bucket\":" << e.bucket;
         mem_os << ",\"cipher_suite\":" << e.cipher_suite;
@@ -358,6 +393,15 @@ struct AWSToJsonLogLines : public AWS_LogLines , public cmnLogLines
         {
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
+
+        mem_os << ",\"vdb_libc\":" << e.agent.vdb_libc;
+        mem_os << ",\"vdb_os\":" << e.agent.vdb_os;
+        mem_os << ",\"vdb_phid_compute_env\":" << e.agent.vdb_phid_compute_env;
+        mem_os << ",\"vdb_phid_guid\":" << e.agent.vdb_phid_guid;
+        mem_os << ",\"vdb_phid_session_id\":" << e.agent.vdb_phid_session_id;
+        mem_os << ",\"vdb_release\":" << e.agent.vdb_release;
+        mem_os << ",\"vdb_tool\":" << e.agent.vdb_tool;
+
         mem_os << ",\"vers\":" << e.request.vers;
         mem_os << ",\"version_id\":" << e.version_id;
 
@@ -400,7 +444,7 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
 {
     virtual void unrecognized( const t_str & text )
     {
-        if ( mem_options . path_only ) return;
+        if ( mem_options . path_only || mem_options . agent_only ) return;
         cmn_unrecognized( text );
     }
 
@@ -450,9 +494,18 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
             }
             return;
         }
+        else if ( mem_options . agent_only )
+        {
+            if ( e. agent . original . n > 0 )
+            {
+                mem_os << e.agent . original << endl;
+            }
+            return;
+        }
+
         mem_os << "{\"accepted\":" << (accepted ? "true":"false");
         mem_os << ",\"accession\":" << e.request.accession;
-        mem_os << ",\"agent\":" << e.agent;
+        mem_os << ",\"agent\":" << e.agent . original;
         mem_os << ",\"bucket\":" << e.bucket;
         mem_os << ",\"extension\":" << e.request.extension;
         mem_os << ",\"filename\":" << e.request.filename;
@@ -480,6 +533,15 @@ struct GCPToJsonLogLines : public GCP_LogLines , public cmnLogLines
         {
             mem_os << ",\"unparsed\":" << e.unparsed;
         }
+
+        mem_os << ",\"vdb_libc\":" << e.agent.vdb_libc;
+        mem_os << ",\"vdb_os\":" << e.agent.vdb_os;
+        mem_os << ",\"vdb_phid_compute_env\":" << e.agent.vdb_phid_compute_env;
+        mem_os << ",\"vdb_phid_guid\":" << e.agent.vdb_phid_guid;
+        mem_os << ",\"vdb_phid_session_id\":" << e.agent.vdb_phid_session_id;
+        mem_os << ",\"vdb_release\":" << e.agent.vdb_release;
+        mem_os << ",\"vdb_tool\":" << e.agent.vdb_tool;
+
         mem_os << ",\"vers\":" << e.request.vers;
 
         mem_os << "}" <<endl;
@@ -588,6 +650,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
         args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );
         args . addOption( options . path_only, "a", "path-only", "print only the path found ( not json )" );
+        args . addOption( options . agent_only, "g", "agent-only", "print only the agent found ( not json )" );
 
         args . addOption( options . selected_line, nullptr, "l", "line-to-select", "line-nr", "select only this line from input (1-based)" );
 

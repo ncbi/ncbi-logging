@@ -177,6 +177,30 @@ TEST_F ( OP_TestFlexFixture, Path_Accesssion )
     ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
 }
 
+TEST_F ( OP_TestFlexFixture, Agent )
+{
+    const char * input = "\"linux64 sra-toolkit fasterq-dump.2.10.7 (phid=noc86d2998,libc=2.17)\"";
+
+    op__scan_string( input, sc );
+    //op_set_debug ( 1, sc );
+    op_start_UserAgent( sc );
+    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( OS, NextTokenType() ); ASSERT_EQ( "linux64", TokenValue() );
+    ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
+    ASSERT_EQ( SRA_TOOLKIT, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
+    ASSERT_EQ( SPACE, NextTokenType() );
+
+    ASSERT_EQ( SRATOOLVERS, NextTokenType() ); ASSERT_EQ( "fasterq-dump.2.10.7", TokenValue() );
+
+    ASSERT_EQ( SPACE, NextTokenType() );
+    ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( "(", TokenValue() );
+    ASSERT_EQ( PHIDVALUE, NextTokenType() ); ASSERT_EQ( "phid=noc86d2998", TokenValue() );
+    ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ",", TokenValue() );
+    ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "libc=2.17", TokenValue() );
+    ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ")", TokenValue() );
+    ASSERT_EQ( QUOTE, NextTokenType() ); 
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
