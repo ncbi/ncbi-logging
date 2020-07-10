@@ -1,7 +1,5 @@
 converting AWS format
-Unexpected character '<' (3c)
-Unexpected character '>' (3e)
-total : 12
-accepted : 9
-rejected : 1
-unrecognized : 2
+total : 9
+accepted : 8
+rejected : 0
+unrecognized : 1

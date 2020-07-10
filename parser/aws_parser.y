@@ -52,7 +52,7 @@ using namespace NCBI::Logging;
 %type<s> ip referer agent agent_list method qstr_list dash string_or_dash
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
 %type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
-%type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
+%type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time empty_or_not
 %type<req> request aws_key url_token url_list url key_token aws_quoted_key
 
 %start line
@@ -88,8 +88,15 @@ log_aws
       aws_cipher SPACE
       aws_auth SPACE
       aws_host_hdr SPACE
-      aws_tls_vers
+      aws_tls_vers 
+      empty_or_not
     {
+        if ( $49 . n > 0 )
+        {   // there are extra tokens present, which is likely to mean that thye whole
+            // structure would be populated incorrectly
+            YYABORT; 
+        }
+
         LogAWSEvent ev;
         ev . owner = $1;
         ev . bucket = $3;
@@ -138,6 +145,11 @@ log_aws
         
         lib -> acceptLine( ev );
     }
+    ;
+
+empty_or_not
+    : %empty    { EMPTY_TSTR($$); }
+    | SPACE     { $$ . n = 1; $$ . p = " "; }
     ;
 
 dash
