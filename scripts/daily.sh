@@ -26,4 +26,5 @@ date; echo "bigquery_export"
 ./bigquery_export.sh | ts >> "$HOME"/bigquery_export.log 2>&1
 ./bigquery_report.sh | ts >> "$HOME"/bigquery_report.log 2>&1
 
+echo "--- Daily Processing Complete ---"
 date

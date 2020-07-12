@@ -4,6 +4,7 @@
         { "name" : "agent", "type": "STRING" },
         { "name" : "auth_type", "type": "STRING" },
         { "name" : "bucket", "type": "STRING" },
+        { "name" : "sig_ver", "type": "STRING" },
         { "name" : "cipher_suite", "type": "STRING" },
         { "name" : "error", "type": "STRING" },
         { "name" : "extension", "type": "STRING" },

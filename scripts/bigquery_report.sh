@@ -89,7 +89,7 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-"select day as missing_day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from strides_analytics.summary_export where domain not like '%nih.gov%' and  (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day having s3_requests < 2000 or gs_requests < 2000 order by day"
+"select day as missing_day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from strides_analytics.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day having s3_requests < 2000 or gs_requests < 2000 order by day"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -97,9 +97,21 @@ bq -q query \
     --max_rows 10000 \
 "select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, nih from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, domain like '%nih.gov%' as nih from strides_analytics.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day, nih order by day"
 
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    --max_rows 10000 \
+"select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from strides_analytics.summary_export where domain not like '%nih.gov%' and (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day order by day"
+
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
 "SELECT split(user_agent,' ')[safe_offset(0)] || split(user_agent,' ')[safe_offset(1)] || split(user_agent,' ')[safe_offset(2)] as trunc_agent, sum(num_requests) as sessions FROM strides_analytics.summary_export export where user_agent like '%toolkit%' group by trunc_agent order by sessions desc limit 50"
+
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "SELECT remote_ip as possible_mirror, domain, source, count(distinct accession) as uniq_accs  FROM ncbi-logmon.strides_analytics.summary_export where domain not like '%nih.gov%' and start_ts > '2020-05-01' group by remote_ip, source, domain order by uniq_accs desc limit 10"

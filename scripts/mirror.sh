@@ -71,21 +71,25 @@ for LOG_BUCKET in $buckets; do
     if [ "$PROVIDER" = "OP" ]; then
         if [ "$YESTERDAY" -lt "20180701" ]; then
             files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
-        elif [ "$YESTERDAY" -gt "20200704" ]; then
+        elif [ "$YESTERDAY" -gt "20200706" ]; then
             files=$(find "$LOG_BUCKET" -type f -name "*$YESTERDAY*")
         else
             files=$(find "$PANFS/sra_prod/$YESTERDAY" -type f -name "*$YESTERDAY*")
         fi
+        #echo "files is $files"
+        #echo "found ${#files[@]} files to mirror"
         LOG_BUCKET="OP"
-        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/"
+        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
         mkdir -p "$MIRROR"
+        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR ..."
         cd "$MIRROR" || exit
         for x in $files; do
-            gunzip "$x"
+            newfile=$(echo "$x" | tr '/' '+')
+            newfile=${newfile%".gz"}
+            echo "  $x -> $newfile"
+            zcat "$x" > "$newfile" || true # Some files are corrupt, continue
         done
-
-        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
-        exit 0
+        WILDCARD="+*"
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
@@ -93,7 +97,7 @@ for LOG_BUCKET in $buckets; do
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
-        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
+        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR ..."
         if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
             export AWS_PROFILE="opendata"
         fi
@@ -121,6 +125,12 @@ for LOG_BUCKET in $buckets; do
 
     echo "Copying $TGZ to $DEST_BUCKET"
     gsutil cp "$TGZ" "$DEST_BUCKET"
+
+    if [ "$PROVIDER" = "OP" ]; then
+        cd ..
+        rm -rf "$MIRROR"
+    fi
+
     # cp "$TGZ" "$PANFS/$PROVIDER/"
     echo "Done with $LOG_BUCKET"
 done
