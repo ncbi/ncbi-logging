@@ -64,6 +64,9 @@ if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
 fi
 
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='public' order by log_bucket desc")
+if [ "$PROVIDER" = "OP" ]; then
+    buckets="OP"
+fi
 
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
@@ -125,7 +128,7 @@ for LOG_BUCKET in $buckets; do
 #        if [ "$recwc" -gt 1000000 ]; then
 #            echo "jsonl too large, splitting"
             echo "  splitting"
-            split -d -e -l 1000000 --additional-suffix=.jsonl \
+            split -a 3 -d -e -l 1000000 --additional-suffix=.jsonl \
                 - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
                 < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 

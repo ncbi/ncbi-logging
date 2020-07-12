@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "--- Daily Processing Beginning ---"
+
 cd "$HOME/ncbi-logging/scripts" || exit
 
 # shellcheck source=strides_env.sh
