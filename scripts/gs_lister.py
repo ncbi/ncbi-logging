@@ -13,15 +13,14 @@ from google.cloud import storage
 
 
 def main():
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} bucket", file=sys.stderr)
+    if len(sys.argv) != 3:
+        print(f"Usage: {sys.argv[0]} bucket profile", file=sys.stderr)
         return 1
 
     bucket_name = sys.argv[1]
+    profile = sys.argv[2]
 
-    bucket = storage.Client().bucket(
-        bucket_name, user_project="research-sra-cloud-pipeline"
-    )
+    bucket = storage.Client().bucket(bucket_name, user_project=profile)
 
     log_files = bucket.list_blobs()
 
