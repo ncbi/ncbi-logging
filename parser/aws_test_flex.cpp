@@ -189,6 +189,17 @@ TEST_F ( AWS_TestFlexFixture, Agent )
     ASSERT_EQ( QUOTE, NextTokenType() ); 
 }
 
+TEST_F ( AWS_TestFlexFixture, TLS_Version )
+{
+    const char * input = "TLSv1.2";
+
+    aws__scan_string( input, sc );
+    //aws_set_debug ( 1, sc );
+    aws_start_TLS_vers( sc );
+    ASSERT_EQ( TLS_VERSION, NextTokenType() ); 
+    ASSERT_EQ( input, TokenValue() );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

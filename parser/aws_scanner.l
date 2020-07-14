@@ -74,6 +74,10 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 
 %x AGENT
 
+TLSVERSION     "TLSv"[0-9]+\.[0-9]+
+
+%x TLSVERSION
+
 %%
 
 [ \t]+          { return SPACE; }
@@ -102,15 +106,15 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 <PATH>{SPACE}       { yy_pop_state( yyscanner ); return SPACE; }
 <PATH>\"            { yy_pop_state( yyscanner ); return QUOTE; }
 <PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
-<PATH>\/            { MAKE_STR(); return SLASH; };
-<PATH>=             { MAKE_STR(); return EQUAL; };
-<PATH>&             { MAKE_STR(); return AMPERSAND; };
-<PATH>\?            { MAKE_STR(); return QMARK; };
-<PATH>%2F           { MAKE_STR(); return SLASH; };
-<PATH>%             { MAKE_STR(); return PERCENT; };
+<PATH>\/            { MAKE_STR(); return SLASH; }
+<PATH>=             { MAKE_STR(); return EQUAL; }
+<PATH>&             { MAKE_STR(); return AMPERSAND; }
+<PATH>\?            { MAKE_STR(); return QMARK; }
+<PATH>%2F           { MAKE_STR(); return SLASH; }
+<PATH>%             { MAKE_STR(); return PERCENT; }
 <PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
-<PATH>.             { return yytext[0]; };
+<PATH>.             { return yytext[0]; }
 
 <AGENT>{OS}             { MAKE_STR(); return OS; }
 <AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
@@ -123,7 +127,12 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 <AGENT>\"               { MAKE_STR(); return QUOTE; }
 <AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
 <AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
-<AGENT>.                { MAKE_STR(); return AGENTSTR; }; 
+<AGENT>.                { MAKE_STR(); return AGENTSTR; }
+
+<TLSVERSION>{TLSVERSION}    { MAKE_STR(); return TLS_VERSION; }
+<TLSVERSION>\"              { MAKE_STR(); return QUOTE; }
+<TLSVERSION>-               { MAKE_STR(); return DASH; }
+<TLSVERSION>.               { return yytext[0]; }
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
@@ -160,6 +169,11 @@ void aws_start_URL( yyscan_t yyscanner )
 void aws_start_UserAgent( yyscan_t yyscanner )
 {
     yy_push_state( AGENT, yyscanner ); 
+}
+
+void aws_start_TLS_vers( yyscan_t yyscanner )
+{
+    yy_push_state( TLSVERSION, yyscanner ); 
 }
 
 void aws_pop_state( yyscan_t yyscanner )

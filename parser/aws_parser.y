@@ -30,8 +30,11 @@ void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLines * lib, const char* ms
 #include "log_lines.hpp"
 
 extern void aws_get_scanner_input( void * yyscanner, t_str & str );
+
 extern void aws_start_URL( void * yyscanner );
 extern void aws_start_UserAgent( void * yyscanner );
+extern void aws_start_TLS_vers( void * yyscanner );
+
 extern void aws_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
@@ -46,7 +49,7 @@ using namespace NCBI::Logging;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
-%token<s> PATHSTR PATHEXT ACCESSION SPACE 
+%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION
 %token COLON QUOTE OB CB 
 %token UNRECOGNIZED
 %token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
@@ -57,7 +60,7 @@ using namespace NCBI::Logging;
 %type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
 %type<req> request aws_key aws_quoted_key url_token url_list url key_token
-%type<agent> agent vdb_agent vdb_agent_token
+%type<agent> agent vdb_agent vdb_agent_token 
 
 %start line
 
@@ -95,7 +98,7 @@ log_aws
       aws_cipher SPACE
       aws_auth SPACE
       aws_host_hdr SPACE
-      aws_tls_vers 
+      { aws_start_TLS_vers( scanner ); } aws_tls_vers { aws_pop_state( scanner ); }
     {
         LogAWSEvent ev;
         ev . owner = $1;
@@ -141,7 +144,7 @@ log_aws
         ev . cipher_suite       = $44;
         ev . auth_type          = $46;
         ev . host_header        = $48;
-        ev . tls_version        = $50;
+        ev . tls_version        = $51;
         
         lib -> acceptLine( ev );
     }
@@ -256,7 +259,10 @@ aws_sig : string_or_dash ;
 aws_cipher : string_or_dash ;
 aws_auth : string_or_dash ;
 aws_host_hdr : string_or_dash ;
-aws_tls_vers : string_or_dash ;
+
+aws_tls_vers 
+    : TLS_VERSION
+    | dash;
 
 ip
     : IPV4
@@ -265,7 +271,7 @@ ip
     ;
 
 method
-    : METHOD        { $$ = $1; }
+    : METHOD  
     | dash
     ;
 
