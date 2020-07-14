@@ -200,6 +200,19 @@ TEST_F ( AWS_TestFlexFixture, TLS_Version )
     ASSERT_EQ( input, TokenValue() );
 }
 
+TEST_F ( AWS_TestFlexFixture, Host_ID )
+{
+    const char * input = 
+"AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=";
+
+    aws__scan_string( input, sc );
+    //aws_set_debug ( 1, sc );
+    aws_start_host_id( sc );
+    ASSERT_EQ( X_AMZ_ID_2, NextTokenType() ); ASSERT_EQ( "AIDAISBTTLPGXGH6YFFAY", TokenValue() );
+    ASSERT_EQ( SPACE, NextTokenType() );
+    ASSERT_EQ( S3_EXT_REQ_ID, NextTokenType() ); ASSERT_EQ( "LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=", TokenValue() );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

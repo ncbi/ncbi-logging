@@ -34,6 +34,7 @@ extern void aws_get_scanner_input( void * yyscanner, t_str & str );
 extern void aws_start_URL( void * yyscanner );
 extern void aws_start_UserAgent( void * yyscanner );
 extern void aws_start_TLS_vers( void * yyscanner );
+extern void aws_start_host_id( void * yyscanner );
 
 extern void aws_pop_state( void * yyscanner );
 
@@ -49,7 +50,7 @@ using namespace NCBI::Logging;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
-%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION
+%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID
 %token COLON QUOTE OB CB 
 %token UNRECOGNIZED
 %token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
@@ -59,6 +60,7 @@ using namespace NCBI::Logging;
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
 %type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
+%type<s> x_amz_id_2
 %type<req> request aws_key aws_quoted_key url_token url_list url key_token
 %type<agent> agent vdb_agent vdb_agent_token 
 
@@ -93,7 +95,9 @@ log_aws
       { aws_pop_state( scanner ); }
       SPACE
       aws_version_id SPACE
-      aws_host_id SPACE
+      { aws_start_host_id( scanner ); } 
+      aws_host_id 
+      { aws_pop_state( scanner ); /* the following space is consumed by aws_host_id */ }
       aws_sig SPACE
       aws_cipher SPACE
       aws_auth SPACE
@@ -139,12 +143,12 @@ log_aws
         ev . referer            = $32;
         ev . agent              = $35;
         ev . version_id         = $38;
-        ev . host_id            = $40;
-        ev . sig_ver            = $42;
-        ev . cipher_suite       = $44;
-        ev . auth_type          = $46;
-        ev . host_header        = $48;
-        ev . tls_version        = $51;
+        ev . host_id            = $41;
+        ev . sig_ver            = $43;
+        ev . cipher_suite       = $45;
+        ev . auth_type          = $47;
+        ev . host_header        = $49;
+        ev . tls_version        = $52;
         
         lib -> acceptLine( ev );
     }
@@ -254,7 +258,30 @@ aws_turnaround_time
     ;
 
 aws_version_id : string_or_dash ;
-aws_host_id : string_or_dash ;
+
+x_amz_id_2: X_AMZ_ID_2 SPACE
+        { 
+            $$ = $1;
+            MERGE_TSTR( $$ , $2 );
+        }
+    ;
+
+aws_host_id 
+    : x_amz_id_2 S3_EXT_REQ_ID SPACE
+        { 
+            $$ = $1; // keep the space between the 2 parts of the Id
+            MERGE_TSTR( $$ , $2 );
+        }
+    | x_amz_id_2
+        {
+            $$ = $1;
+            // trim the trailing space
+            $$ . n --;
+        }
+    | S3_EXT_REQ_ID SPACE
+    | dash SPACE
+    ;
+
 aws_sig : string_or_dash ;
 aws_cipher : string_or_dash ;
 aws_auth : string_or_dash ;
