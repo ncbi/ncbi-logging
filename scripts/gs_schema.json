@@ -21,7 +21,14 @@
     { "name" : "time", "type": "INTEGER" },
     { "name" : "time_taken", "type": "INTEGER" },
     { "name" : "uri", "type": "STRING" },
-    { "name" : "vers", "type": "STRING" }
+    { "name" : "vers", "type": "STRING" } ,
+    { "name" : "vdb_libc", "type": "STRING" },
+    { "name" : "vdb_os", "type": "STRING" },
+    { "name" : "vdb_phid_compute_env", "type": "STRING" },
+    { "name" : "vdb_phid_guid", "type": "STRING" },
+    { "name" : "vdb_phid_session_id", "type": "STRING" },
+    { "name" : "vdb_release", "type": "STRING" },
+    { "name" : "vdb_tool", "type": "STRING" }
     ]
   },
   "sourceFormat": "NEWLINE_DELIMITED_JSON",

@@ -1003,6 +1003,10 @@ set domain='shanxitele.com (Shanxi Telecom)'
 where ip like '123.174.%';
 
 UPDATE RDNS
+set domain='sharcnet.ca (University of Waterloo)'
+where ip like '199.241.16%';
+
+UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'
   AND (IP LIKE '66.249.%'

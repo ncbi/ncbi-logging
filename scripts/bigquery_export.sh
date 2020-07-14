@@ -47,7 +47,14 @@ cat << EOF > gs_schema.json
     { "name" : "time", "type": "INTEGER" },
     { "name" : "time_taken", "type": "INTEGER" },
     { "name" : "uri", "type": "STRING" },
-    { "name" : "vers", "type": "STRING" }
+    { "name" : "vers", "type": "STRING" } ,
+    { "name" : "vdb_libc", "type": "STRING" },
+    { "name" : "vdb_os", "type": "STRING" },
+    { "name" : "vdb_phid_compute_env", "type": "STRING" },
+    { "name" : "vdb_phid_guid", "type": "STRING" },
+    { "name" : "vdb_phid_session_id", "type": "STRING" },
+    { "name" : "vdb_release", "type": "STRING" },
+    { "name" : "vdb_tool", "type": "STRING" }
     ]
   },
   "sourceFormat": "NEWLINE_DELIMITED_JSON",
@@ -55,8 +62,8 @@ cat << EOF > gs_schema.json
 }
 EOF
 
-    jq -c -e . < gs_schema.json > /dev/null
-    jq -c .schema.fields < gs_schema.json > gs_schema_only.json
+    jq -S -c -e . < gs_schema.json > /dev/null
+    jq -S -c .schema.fields < gs_schema.json > gs_schema_only.json
 
     #bq mk --external_table_definition=gs_schema_only.son strides_analytics.gs_parsed
 
@@ -105,15 +112,22 @@ echo " #### s3_parsed"
         { "name" : "total_time", "type": "STRING" },
         { "name" : "turnaround_time", "type": "STRING" },
         { "name" : "vers", "type": "STRING" },
-        { "name" : "version_id", "type": "STRING" }
+        { "name" : "version_id", "type": "STRING" },
+        { "name" : "vdb_libc", "type": "STRING" },
+        { "name" : "vdb_os", "type": "STRING" },
+        { "name" : "vdb_phid_compute_env", "type": "STRING" },
+        { "name" : "vdb_phid_guid", "type": "STRING" },
+        { "name" : "vdb_phid_session_id", "type": "STRING" },
+        { "name" : "vdb_release", "type": "STRING" },
+        { "name" : "vdb_tool", "type": "STRING" }
         ]
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
     "sourceUris": [ "gs://logmon_logs_parsed_us/logs_s3_public/recogn*" ]
     }
 EOF
-    jq -c -e . < s3_schema.json > /dev/null
-    jq -c .schema.fields < s3_schema.json > s3_schema_only.json
+    jq -S -c -e . < s3_schema.json > /dev/null
+    jq -S -c .schema.fields < s3_schema.json > s3_schema_only.json
 
     gsutil ls -lR "gs://logmon_logs_parsed_us/logs_s3_public/recognized.*"
 
@@ -151,28 +165,29 @@ echo " #### op_parsed"
         { "name" : "source", "type": "STRING" },
         { "name" : "time", "type": "STRING" },
         { "name" : "user", "type": "STRING" },
+        { "name" : "vers", "type": "STRING" },
         { "name" : "vdb_libc", "type": "STRING" },
         { "name" : "vdb_os", "type": "STRING" },
         { "name" : "vdb_phid_compute_env", "type": "STRING" },
         { "name" : "vdb_phid_guid", "type": "STRING" },
         { "name" : "vdb_phid_session_id", "type": "STRING" },
         { "name" : "vdb_release", "type": "STRING" },
-        { "name" : "vdb_tool", "type": "STRING" },
-        { "name" : "vers", "type": "STRING" },
+        { "name" : "vdb_tool", "type": "STRING" }
         ]
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
     "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recogn*" ]
     }
 EOF
-    jq -c -e . < op_schema.json > /dev/null
-    jq -c .schema.fields < op_schema.json > op_schema_only.json
+
+    jq -S -c -e . < op_schema.json > /dev/null
+    jq -S -c .schema.fields < op_schema.json > op_schema_only.json
 
     gsutil ls -lR "gs://logmon_logs_parsed_us/logs_op_public/recognized.*"
 
     bq rm -f strides_analytics.op_parsed
     bq load \
-        --max_bad_records 500 \
+        --max_bad_records 5000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         strides_analytics.op_parsed \
         "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
@@ -186,7 +201,7 @@ EOF
 echo " #### Parsed results"
 bq -q query \
     --use_legacy_sql=false \
-    "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from strides_analytics.gs_parsed union all select source, accepted, cast(time as string) as time from strides_analytics.s3_parsed) group by source, accepted order by source"
+    "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from strides_analytics.gs_parsed union all select source, accepted, cast(time as string) as time from strides_analytics.s3_parsed union all select source, accepted, time as time from strides_analytics.op_parsed) group by source, accepted order by source"
 fi
 
 echo " #### gs_fixed"
@@ -300,11 +315,13 @@ echo " #### op_fixed"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     ip as remote_ip,
-    parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time) as start_ts,
-    datetime_add(parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time),
-        interval cast (
-                case when req_time='' THEN '0' ELSE req_time END
-        as int64) second) as end_ts,
+    safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time) as start_ts,
+    datetime_add(
+        safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time),
+        interval
+            cast(1000*cast (req_time as float64) as int64)
+        millisecond
+        ) as end_ts,
     accession,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
     case
@@ -313,7 +330,7 @@ echo " #### op_fixed"
         END as http_operation,
     cast(res_code as string) as http_status,
     server as host,
-    cast (case WHEN res_len='' THEN '0' ELSE res_len END as int64) as bytes_sent,
+    res_len as bytes_sent,
     path as request_uri,
     referer as referer,
     replace(agent, '-head', '') as user_agent,
@@ -379,7 +396,7 @@ UNION ALL SELECT
     FROM \\\`strides_analytics.s3_fixed\\\`
 UNION ALL SELECT
     accession as accession,
-    bucket as bucket,
+    'NCBI (ETL + BQS)' as bucket,
     bytes_sent as bytes_sent,
     current_datetime() as export_time,
     end_ts,
@@ -473,6 +490,7 @@ echo " ###  op_sess"
     status, '', bytecount, current_datetime()
     FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
     WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
+    AND start > '2019-03-01'
 
 ENDOFQUERY
 )
