@@ -116,7 +116,7 @@ for LOG_BUCKET in $buckets; do
 
     find . -name "$WILDCARD" -print0 | tar -caf "$TGZ" --null --files-from -
     echo "Tarred"
-    ls -l "$TGZ"
+    ls -hl "$TGZ"
 
     DEST_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
 

@@ -130,6 +130,57 @@ EOF
 
 echo " #### op_parsed"
 # TODO
+    cat << EOF > op_schema.json
+    { "schema": { "fields": [
+        { "name" : "accepted", "type": "BOOLEAN" },
+        { "name" : "accession", "type": "STRING" },
+        { "name" : "agent", "type": "STRING" },
+        { "name" : "extension", "type": "STRING" },
+        { "name" : "filename", "type": "STRING" },
+        { "name" : "forwarded", "type": "STRING" },
+        { "name" : "ip", "type": "STRING" },
+        { "name" : "method", "type": "STRING" },
+        { "name" : "path", "type": "STRING" },
+        { "name" : "port", "type": "INTEGER" },
+        { "name" : "referer", "type": "STRING" },
+        { "name" : "req_len", "type": "INTEGER" },
+        { "name" : "req_time", "type": "STRING" },
+        { "name" : "res_code", "type": "INTEGER" },
+        { "name" : "res_len", "type": "INTEGER" },
+        { "name" : "server", "type": "STRING" },
+        { "name" : "source", "type": "STRING" },
+        { "name" : "time", "type": "STRING" },
+        { "name" : "user", "type": "STRING" },
+        { "name" : "vdb_libc", "type": "STRING" },
+        { "name" : "vdb_os", "type": "STRING" },
+        { "name" : "vdb_phid_compute_env", "type": "STRING" },
+        { "name" : "vdb_phid_guid", "type": "STRING" },
+        { "name" : "vdb_phid_session_id", "type": "STRING" },
+        { "name" : "vdb_release", "type": "STRING" },
+        { "name" : "vdb_tool", "type": "STRING" },
+        { "name" : "vers", "type": "STRING" },
+        ]
+    },
+    "sourceFormat": "NEWLINE_DELIMITED_JSON",
+    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recogn*" ]
+    }
+EOF
+    jq -c -e . < op_schema.json > /dev/null
+    jq -c .schema.fields < op_schema.json > op_schema_only.json
+
+    gsutil ls -lR "gs://logmon_logs_parsed_us/logs_op_public/recognized.*"
+
+    bq rm -f strides_analytics.op_parsed
+    bq load \
+        --max_bad_records 500 \
+        --source_format=NEWLINE_DELIMITED_JSON \
+        strides_analytics.op_parsed \
+        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
+        op_schema_only.json
+
+    bq show --schema strides_analytics.op_parsed
+
+
 
 
 echo " #### Parsed results"
@@ -244,45 +295,49 @@ ENDOFQUERY
 
     bq show --schema strides_analytics.s3_fixed
 
+echo " #### op_fixed"
+    # LOGMON-1: Remove multiple -heads from agent
+    QUERY=$(cat <<-ENDOFQUERY
+    SELECT
+    ip as remote_ip,
+    parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time) as start_ts,
+    datetime_add(parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time),
+        interval cast (
+                case when req_time='' THEN '0' ELSE req_time END
+        as int64) second) as end_ts,
+    accession,
+    substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
+    case
+        WHEN regexp_contains(agent, r'-head') THEN 'HEAD'
+        ELSE method
+        END as http_operation,
+    cast(res_code as string) as http_status,
+    server as host,
+    cast (case WHEN res_len='' THEN '0' ELSE res_len END as int64) as bytes_sent,
+    path as request_uri,
+    referer as referer,
+    replace(agent, '-head', '') as user_agent,
+    'OP' as source,
+    current_datetime() as fixed_time
+    FROM \\\`ncbi-logmon.strides_analytics.op_parsed\\\`
+    WHERE accepted=true
+ENDOFQUERY
+    )
 
-echo " ##### op_parsed"
-    cat << EOF > op_schema.json
-    { "schema": { "fields": [
-    { "name": "accepted", "type": "BOOLEAN" },
-    { "name": "agent", "type": "STRING" },
-    { "name": "forwarded", "type": "STRING" },
-    { "name": "ip", "type": "STRING" },
-    { "name": "port", "type": "INTEGER" },
-    { "name": "referer", "type": "STRING" },
-    { "name": "req_len", "type": "INTEGER" },
-    { "name": "req_time", "type": "STRING" },
-    { "name": "request", "type": "RECORD", "mode": "REPEATED",
-    "fields": [
-            { "name": "method", "type": "STRING" },
-            { "name": "params", "type": "STRING" },
-            { "name": "path", "type": "STRING" },
-            { "name": "server", "type": "STRING" },
-            { "name": "vers", "type": "STRING" }
-        ]
-    },
-    { "name": "res_code", "type": "INTEGER" },
-    { "name": "res_len", "type": "INTEGER" },
-    { "name": "source", "type": "STRING" },
-    { "name": "time", "type": "STRING" },
-    { "name": "user", "type": "STRING" }
-    ]
-    },
-    "sourceFormat": "NEWLINE_DELIMITED_JSON",
-    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recogn*" ]
-    }
-EOF
+    QUERY="${QUERY//\\/}"
+    bq rm --project_id ncbi-logmon -f strides_analytics.op_fixed
+    # shellcheck disable=SC2016
+    bq query \
+    --project_id ncbi-logmon \
+    --destination_table strides_analytics.op_fixed \
+    --use_legacy_sql=false \
+    --batch=true \
+    --max_rows=5 \
+    "$QUERY"
 
-    jq -e -c . < op_schema.json > /dev/null
-    jq -c .schema.fields < op_schema.json > op_schema_only.json
-    bq rm  -f strides_analytics.op_test
-    #bq mk \
-    #   --table strides_analytics.op_test \
-    #    ./op_schema.json
+    bq show --schema strides_analytics.op_fixed
+
+
 
 echo " ##### detail_export"
     QUERY=$(cat <<-ENDOFQUERY
@@ -322,6 +377,24 @@ UNION ALL SELECT
     user_agent as user_agent,
     version as version
     FROM \\\`strides_analytics.s3_fixed\\\`
+UNION ALL SELECT
+    accession as accession,
+    bucket as bucket,
+    bytes_sent as bytes_sent,
+    current_datetime() as export_time,
+    end_ts,
+    fixed_time as fixed_time,
+    host as host,
+    http_status as http_status,
+    remote_ip as remote_ip,
+    http_operation as http_operation,
+    request_uri as request_uri,
+    referer as referer,
+    source as source,
+    start_ts,
+    user_agent as user_agent,
+    version as version
+    FROM \\\`strides_analytics.op_fixed\\\`
 
 ENDOFQUERY
     )
@@ -388,6 +461,29 @@ ENDOFQUERY
 
     bq show --schema strides_analytics.summary_grouped
 
+echo " ###  op_sess"
+    QUERY=$(cat <<-ENDOFQUERY
+    INSERT INTO strides_analytics.summary_grouped
+    (accession, user_agent, remote_ip, host,
+    bucket, source, num_requests, start_ts, end_ts, http_operations,
+    http_statuses, referers, bytes_sent, export_time)
+    SELECT
+        acc, agent, ip, 'nginx',
+        domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime), cmds,
+    status, '', bytecount, current_datetime()
+    FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
+    WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
+
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+
 echo " ###  uniq_ips"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT DISTINCT remote_ip, net.ipv4_to_int64(net.safe_ip_from_string(remote_ip)) as ipint,
@@ -405,6 +501,9 @@ ENDOFQUERY
     --batch=true \
     --max_rows=5 \
     "$QUERY"
+
+
+
 
 RUN="no"
 if [ "$RUN" = "yes" ]; then

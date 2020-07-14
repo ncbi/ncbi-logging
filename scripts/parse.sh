@@ -86,6 +86,12 @@ for LOG_BUCKET in $buckets; do
     gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" .
     ls -hl "$TGZ"
 
+    #if [ "$PROVIDER" = "OP" ]; then
+    #    tarcmd="tar -xaOf "$TGZ" '*access*'"
+    #else
+    #    tarcmd="tar -xaOf "$TGZ"
+    #fi
+
     echo "  Counting $TGZ ..."
     totalwc=$(tar -xaOf "$TGZ" | wc -l | cut -f1 -d' ')
     echo "  Parsing $TGZ, $totalwc lines ..."
@@ -128,7 +134,7 @@ for LOG_BUCKET in $buckets; do
 #        if [ "$recwc" -gt 1000000 ]; then
 #            echo "jsonl too large, splitting"
             echo "  splitting"
-            split -a 3 -d -e -l 1000000 --additional-suffix=.jsonl \
+            split -a 3 -d -e -l 10000000 --additional-suffix=.jsonl \
                 - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
                 < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
@@ -151,7 +157,7 @@ for LOG_BUCKET in $buckets; do
         gsutil cp ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
         gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
         cd ..
-        #rm -rf "$PARSE_DEST"
+        rm -rf "$PARSE_DEST"
 #    fi
 echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
 echo

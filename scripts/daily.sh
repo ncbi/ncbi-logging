@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "--- Daily Processing Beginning ---"
+echo "    --- Daily Processing Beginning ---"
 
 cd "$HOME/ncbi-logging/scripts" || exit
 
@@ -22,11 +22,14 @@ date; echo "parse S3"
 ./parse.sh S3  | ts >> "$HOME"/parse_s3.log 2>&1
 date; echo "parse GS"
 ./parse.sh GS  | ts >> "$HOME"/parse_gs.log 2>&1
+date; echo "parse OP"
+./parse.sh OP  | ts >> "$HOME"/parse_op.log 2>&1
 date; echo "s3_lister"
+
 ./s3_lister.sh | ts >> "$HOME"/s3_lister.log 2>&1
 date; echo "bigquery_export"
 ./bigquery_export.sh | ts >> "$HOME"/bigquery_export.log 2>&1
 ./bigquery_report.sh | ts >> "$HOME"/bigquery_report.log 2>&1
 
-echo "--- Daily Processing Complete ---"
+echo "    --- Daily Processing Complete ---"
 date
