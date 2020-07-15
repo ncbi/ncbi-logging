@@ -396,7 +396,7 @@ UNION ALL SELECT
     FROM \\\`strides_analytics.s3_fixed\\\`
 UNION ALL SELECT
     accession as accession,
-    'NCBI (ETL + BQS)' as bucket,
+    domain as bucket,
     bytes_sent as bytes_sent,
     current_datetime() as export_time,
     end_ts,
@@ -482,15 +482,38 @@ echo " ###  op_sess"
     QUERY=$(cat <<-ENDOFQUERY
     INSERT INTO strides_analytics.summary_grouped
     (accession, user_agent, remote_ip, host,
-    bucket, source, num_requests, start_ts, end_ts, http_operations,
-    http_statuses, referers, bytes_sent, export_time)
+    bucket, source, num_requests, start_ts, end_ts,
+    http_operations,
+    http_statuses,
+    referers, bytes_sent, export_time)
     SELECT
-        acc, agent, ip, 'nginx',
-        domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime), cmds,
-    status, '', bytecount, current_datetime()
+        acc, agent, ip, domain,
+        domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
+        replace(cmds,' ',','),
+        replace(status,' ',','),
+        '', bytecount, current_datetime()
     FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
     WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
     AND start > '2019-03-01'
+
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+
+    bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
+
+echo " ###  fix op_sess"
+    QUERY=$(cat <<-ENDOFQUERY
+    update strides_analytics.summary_grouped
+    set
+    bucket=ifnull(bucket,'') || ' (ETL + BQS)',
+    http_operations=replace(http_operations,' ',','),
+    http_statuses=replace(http_statuses,' ',','),
+    user_agent=replace(user_agent, '-head', '')
+    where source='OP'
 
 ENDOFQUERY
 )

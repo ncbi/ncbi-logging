@@ -1007,6 +1007,14 @@ set domain='sharcnet.ca (University of Waterloo)'
 where ip like '199.241.16%';
 
 UPDATE RDNS
+set domain='ucdenver.edu (University of Colorado)'
+where ip like '140.226.%';
+
+update rdns
+set domain='iu.edu (Indiana University)'
+where ip like '149.165.%';
+
+UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'
   AND (IP LIKE '66.249.%'
