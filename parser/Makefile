@@ -355,6 +355,7 @@ LOG2JSON = $(BINDIR)/log2jsn-dbg
 
 test2jsn: log2jsn_
 	@ mkdir -p actual
+	jq -e . expected/*.out > /dev/null
 	cat data/op_unrecognized.log    | $(LOG2JSON) op -p >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized.out ./actual/op_unrecognized.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
