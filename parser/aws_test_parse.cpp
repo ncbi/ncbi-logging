@@ -575,6 +575,21 @@ TEST_F ( TestParseFixture, AWS_1_part_hostId_b )
     ASSERT_EQ( "LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=", e.host_id );
 }
 
+TEST_F ( TestParseFixture, AWS_unescaped_quotes )
+{   
+    const char * InputLine =
+"7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [07/May/2020:17:54:04 +0000] 155.130.133.78 - 9051A54D800E901B REST.GET.OBJECT SRR9201794/E15_5_R1.fastq.gz.1 \"GET /SRR9201794/E15_5_R1.fastq.gz.1 HTTP/1.1\" 200 - 9898557440 11674111891 251695 178 \"-\" \"pip/19.1 {\"ci\":null,\"cpu\":\"x86_64\",\"distro\":{\"id\":\"Core\",\"libc\":{\"lib\":\"glibc\",\"version\":\"2.17\"},\"name\":\"CentOS Linux\",\"version\":\"7\"},\"implementation\":{\"name\":\"CPython\",\"version\":\"3.6.7\"},\"installer\":{\"name\":\"pip\",\"version\":\"19.1\"},\"openssl_version\":\"OpenSSL 1.1.1b  26 Feb 2019\",\"python\":\"3.6.7\",\"setuptools_version\":\"41.0.1\",\"system\":{\"name\":\"Linux\",\"release\":\"3.10.0-514.10.2.el7.x86_64\"}}\" - KP+BPjI0RA4Nv1xBmBVFWMW/WdRamLN/2jbqsgdkLTZdzGF8i/DceLFmJJ7nzB15GQwwi9WKIts= - ECDHE-RSA-AES128-GCM-SHA256 - sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_reject( InputLine );
+}
+
+TEST_F ( TestParseFixture, AWS_missing_tokens )
+{   
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-3 [02/Oct/2019:02:25:33 +0000] - AmazonS3 125BA23426B965A1 S3.RESTORE.OBJECT data_check_loop.log \"-\" - - - 7803564 - - \"-\" \"-\" -";
+    SLogAWSEvent e = parse_reject( InputLine );
+}
+
 //TODO: rejected lines with more than IP recognized
 
 extern "C"
