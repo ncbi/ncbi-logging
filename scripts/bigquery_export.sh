@@ -495,6 +495,7 @@ echo " ###  op_sess"
     FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
     WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
     AND start > '2019-03-01'
+    AND domain not like '%amazon%'
 
 ENDOFQUERY
 )
@@ -523,7 +524,7 @@ ENDOFQUERY
 
 echo " ###  uniq_ips"
     QUERY=$(cat <<-ENDOFQUERY
-    SELECT DISTINCT remote_ip, net.ipv4_to_int64(net.safe_ip_from_string(remote_ip)) as ipint,
+    SELECT DISTINCT remote_ip as remote_ip, net.ipv4_to_int64(net.safe_ip_from_string(remote_ip)) as ipint,
     FROM \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
     WHERE remote_ip like '%.%'
 ENDOFQUERY
@@ -532,7 +533,12 @@ ENDOFQUERY
 
     bq rm --project_id ncbi-logmon -f strides_analytics.uniq_ips
     # shellcheck disable=SC2016
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+    bq query \
+    --destination_table strides_analytics.uniq_ips \
+    --use_legacy_sql=false \
+    --batch=true \
+    --max_rows=5 \
+    "$QUERY"
 
 
 RUN="no"

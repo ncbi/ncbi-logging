@@ -125,6 +125,11 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
+"SELECT source, domain, COUNT(DISTINCT accession) AS numacc FROM ncbi-logmon.strides_analytics.summary_export WHERE start_ts > '2019-03-01' and domain not like '%nih.gov%' GROUP BY source, domain ORDER BY numacc DESC LIMIT 100"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
 	"select source, datetime_trunc(start_ts, day) as day, remote_ip, domain, count(distinct accession) AS num_accessions_today FROM ncbi-logmon.strides_analytics.summary_export WHERE source!='OP' and start_ts > '2019-03-01' and domain not like '%nih.gov%' GROUP BY day, source, domain, remote_ip having num_accessions_today > 5000 ORDER BY day, source DESC LIMIT 1000"
 
 bq -q query \
