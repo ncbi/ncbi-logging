@@ -86,18 +86,18 @@ for LOG_BUCKET in $buckets; do
     gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" .
     ls -hl "$TGZ"
 
-    #if [ "$PROVIDER" = "OP" ]; then
-    #    tarcmd="tar -xaOf "$TGZ" '*access*'"
-    #else
-    #    tarcmd="tar -xaOf "$TGZ"
-    #fi
+    if [ "$PROVIDER" = "OP" ]; then
+        wildcard='*access*'
+    else
+        wildcard='*'
+    fi
 
     echo "  Counting $TGZ ..."
     totalwc=$(tar -xaOf "$TGZ" | wc -l | cut -f1 -d' ')
-    echo "  Parsing $TGZ, $totalwc lines ..."
+    echo "  Parsing $TGZ (pattern=$wildcard), $totalwc lines ..."
     touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
-    tar -xaOf "$TGZ" | \
+    tar -xaOf "$TGZ" "$wildcard" | \
         time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
         "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
         2> "$TGZ.err"

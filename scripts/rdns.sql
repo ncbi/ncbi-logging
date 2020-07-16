@@ -1014,6 +1014,10 @@ update rdns
 set domain='iu.edu (Indiana University)'
 where ip like '149.165.%';
 
+update rdns
+set domain='ku.edu (University of Kansas)'
+where ip like '129.237.%';
+
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'

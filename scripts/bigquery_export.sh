@@ -396,7 +396,7 @@ UNION ALL SELECT
     FROM \\\`strides_analytics.s3_fixed\\\`
 UNION ALL SELECT
     accession as accession,
-    domain as bucket,
+    host as bucket,
     bytes_sent as bytes_sent,
     current_datetime() as export_time,
     end_ts,

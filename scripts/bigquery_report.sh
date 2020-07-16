@@ -115,3 +115,19 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "SELECT remote_ip as possible_mirror, domain, source, count(distinct accession) as uniq_accs  FROM ncbi-logmon.strides_analytics.summary_export where domain not like '%nih.gov%' and start_ts > '2020-05-01' group by remote_ip, source, domain order by uniq_accs desc limit 10"
+
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+"SELECT source, domain, remote_ip, COUNT(DISTINCT accession) AS numacc FROM ncbi-logmon.strides_analytics.summary_export WHERE start_ts > '2019-03-01' and domain not like '%nih.gov%' GROUP BY source, domain, remote_ip ORDER BY numacc DESC LIMIT 100"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+	"select source, datetime_trunc(start_ts, day) as day, remote_ip, domain, count(distinct accession) AS num_accessions_today FROM ncbi-logmon.strides_analytics.summary_export WHERE source!='OP' and start_ts > '2019-03-01' and domain not like '%nih.gov%' GROUP BY day, source, domain, remote_ip having num_accessions_today > 5000 ORDER BY day, source DESC LIMIT 1000"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select source, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export WHERE start_ts > '2019-03-01' GROUP BY source, domain ORDER BY num_accessions desc limit 10"
