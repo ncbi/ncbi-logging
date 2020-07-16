@@ -230,6 +230,7 @@ echo " #### gs_fixed"
             regexp_contains(path, r'sra-src') THEN bucket || ' (Original)'
         WHEN ends_with(bucket, '-cov2') and
             regexp_contains(path, r'run') THEN bucket || ' (ETL + BQS)'
+        WHEN regexp_contains(bucket, r'sra-pub-assembly-1') THEN bucket || ' (ETL - BQS)'
     ELSE bucket || ' (Unknown)'
     END as bucket,
     source as source,
