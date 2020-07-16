@@ -443,6 +443,13 @@ TEST_F ( TestParseFixture, OnPremise_user_agent_with_phid_and_libc )
     ASSERT_EQ( "2.17", e.agent.vdb_libc );
 }
 
+TEST_F ( TestParseFixture, OnPremise_under_investigation )
+{
+    const char * InputLine =
+"66.189.43.90 - - [15/Jul/2020:01:40:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /traces/refseq/NC_004330.1 HTTP/1.1\" 200 0 0.000 \"-\" \"linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)\" \"-\" port=443 rl=288 tls=TLSv1.2";
+    SLogOPEvent e = parse_and_accept( InputLine );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
