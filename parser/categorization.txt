@@ -16,6 +16,7 @@ Broad categories (each is a method on the API)
 - unrecognized: failure to parse, report the source.
 
 These should probably go into separate output streams and have slightly different set of data per line.
+Make the summary Json as well.
 
 AWS
 
