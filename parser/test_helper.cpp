@@ -51,6 +51,18 @@ TEST (TestHelper, StringEscaped_NotEscapedCharacter)
     ASSERT_EQ( string("\\n"), ToString( s ) );
 }
 
+TEST (TestHelper, ToInt64_1)
+{
+    t_str s = { "123", 3, false };
+    ASSERT_EQ( 123, ToInt64( s ) );
+}
+
+TEST (TestHelper, ToInt64_2)
+{
+    t_str s = { "-123", 4, false };
+    ASSERT_EQ( -123, ToInt64( s ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

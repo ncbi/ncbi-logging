@@ -443,11 +443,18 @@ TEST_F ( TestParseFixture, OnPremise_user_agent_with_phid_and_libc )
     ASSERT_EQ( "2.17", e.agent.vdb_libc );
 }
 
-TEST_F ( TestParseFixture, OnPremise_under_investigation )
+TEST_F ( TestParseFixture, OnPremise_agent_doubled )
 {
     const char * InputLine =
 "66.189.43.90 - - [15/Jul/2020:01:40:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /traces/refseq/NC_004330.1 HTTP/1.1\" 200 0 0.000 \"-\" \"linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)\" \"-\" port=443 rl=288 tls=TLSv1.2";
     SLogOPEvent e = parse_and_accept( InputLine );
+}
+
+TEST_F ( TestParseFixture, OnPremise_time_is_not_float )
+{
+    const char * InputLine =
+"130.14.25.251 - - [15/Jul/2020:00:15:54 -0400] \"gap-sview.ncbi.nlm.nih.gov\" \"GET / HTTP/1.1\" 403 202 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" \"-\" -pct 1561 + \"NCBI-SID: -\" port=80 324 406 text/html";
+    check_rejected( InputLine, true );
 }
 
 extern "C"

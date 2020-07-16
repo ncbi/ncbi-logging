@@ -120,7 +120,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {FLOAT}         { MAKE_STR(); return FLOAT; }
-{I64}           { yylval -> i64 = atol( yytext ); return I64; }
+{I64}           { MAKE_STR(); return I64; }
 {MONTH}         { MAKE_STR(); return MONTH; }
 {STR}           { MAKE_STR(); return STR; }
 

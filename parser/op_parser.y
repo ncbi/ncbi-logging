@@ -39,14 +39,13 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
-    int64_t i64;
     t_timepoint tp;
     t_request req;
     t_agent agent;
 }
 
 %token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC SPACE SLASH QMARK
-%token<i64> I64
+%token<s> I64
 %token DOT DASH COLON QUOTE OB CB PORT RL CR LF    
 %token UNRECOGNIZED 
 %token<s> PATHSTR PATHEXT ACCESSION 
@@ -59,7 +58,7 @@ using namespace NCBI::Logging;
 %type<s> ip user req_time referer forwarded method server
 %type<s> quoted_list quoted_list_body quoted_list_elem url_params 
 %type<agent> agent vdb_agent_token vdb_agent
-%type<i64> result_code result_len port req_len
+%type<s> result_code result_len port req_len
 
 %start line
 
@@ -82,14 +81,14 @@ log_onprem
         ev . user = $3;
         ev . time = $4;
         ev . request = $5;
-        ev . res_code = $6;
-        ev . res_len = $7;
+        ev . res_code = ToInt64( $6 );
+        ev . res_len = ToInt64( $7 );
         ev . req_time = $8;
         ev . referer = $9;
         ev . agent = $12;
         ev . forwarded = $14;
-        ev . port = $15;
-        ev . req_len = $16;
+        ev . port = ToInt64( $15 );
+        ev . req_len = ToInt64( $16 );
 
         lib -> acceptLine( ev );
     }
@@ -331,6 +330,7 @@ result_len
 
 req_time
     : FLOAT
+    | I64
     ;
 
 referer
@@ -434,13 +434,13 @@ req_len
 time
     : OB I64 SLASH MONTH SLASH I64 COLON I64 COLON I64 COLON I64 I64 CB
     {
-        $$.day = $2;
+        $$.day = ToInt64( $2 );
         $$.month = month_int( &($4) );
-        $$.year = $6;
-        $$.hour = $8;
-        $$.minute = $10;
-        $$.second = $12;
-        $$.offset = $13;
+        $$.year = ToInt64( $6 );
+        $$.hour = ToInt64( $8 );
+        $$.minute = ToInt64( $10 );
+        $$.second = ToInt64( $12 );
+        $$.offset = ToInt64( $13 );
     }
     ;
 
