@@ -453,8 +453,26 @@ TEST_F ( TestParseFixture, OnPremise_agent_doubled )
 TEST_F ( TestParseFixture, OnPremise_time_is_not_float )
 {
     const char * InputLine =
-"130.14.25.251 - - [15/Jul/2020:00:15:54 -0400] \"gap-sview.ncbi.nlm.nih.gov\" \"GET / HTTP/1.1\" 403 202 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" \"-\" -pct 1561 + \"NCBI-SID: -\" port=80 324 406 text/html";
-    check_rejected( InputLine, true );
+"66.189.43.90 - - [15/Jul/2020:01:40:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /traces/refseq/NC_004330.1 HTTP/1.1\" 200 0 0 \"-\" \"linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)\" \"-\" port=443 rl=288 tls=TLSv1.2";
+    SLogOPEvent e = parse_and_accept( InputLine );
+    ASSERT_EQ( "0", e.req_time );
+}
+
+TEST_F ( TestParseFixture, OnPremise_pipe_symbol_in_path )
+{
+    const char * InputLine =
+"54.219.188.148 - - [15/Jul/2020:05:15:50 -0400] \"ftp.be-md.ncbi.nlm.nih.gov\" \"GET /notify?from=nessus\\\"|id\\\" HTTP/1.1\" 400 0 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=288";
+    SLogOPEvent e = parse_and_accept( InputLine, true );
+    ASSERT_EQ( "/notify?from=nessus\\\"|id\\\"", e.request.path );
+}
+
+
+TEST_F ( TestParseFixture, OnPremise_resultlen_is_dash )
+{
+    const char * InputLine =
+"54.219.188.148 - - [15/Jul/2020:05:15:50 -0400] \"ftp.be-md.ncbi.nlm.nih.gov\" \"GET /notify?from=nessus\\\"|id\\\" HTTP/1.1\" 400 - 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=288";
+    SLogOPEvent e = parse_and_accept( InputLine, true );
+    ASSERT_EQ( 0, e.res_len );
 }
 
 extern "C"

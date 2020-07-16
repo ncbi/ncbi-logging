@@ -326,6 +326,7 @@ result_code
 
 result_len
     : I64
+    | DASH                      { EMPTY_TSTR($$); }
     ;
 
 req_time

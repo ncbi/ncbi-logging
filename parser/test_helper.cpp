@@ -63,6 +63,12 @@ TEST (TestHelper, ToInt64_2)
     ASSERT_EQ( -123, ToInt64( s ) );
 }
 
+TEST (TestHelper, ToInt64_3)
+{
+    t_str s = { "", 0, false };
+    ASSERT_EQ( 0, ToInt64( s ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
