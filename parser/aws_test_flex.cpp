@@ -99,10 +99,12 @@ TEST_F ( AWS_TestFlexFixture, QuotedString )
     #undef str
 }
 TEST_F ( AWS_TestFlexFixture, QuotedNonAscii )
-{   // skip non-ascii characters
+{   // TODO properly address UTF-8 codepoints, 
     #define str "и"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
-    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( UNRECOGNIZED, NextTokenType() );
+    // TODO we cannot compare yet the proper TakenValue....
+    // ASSERT_EQ( str, TokenValue() );
     #undef str
 }
 TEST_F ( AWS_TestFlexFixture, QuotedEscapedQuote )
