@@ -57,7 +57,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select case when domain like '%nih.gov%' then 'internal (NCBI)' else 'external' end as user, source, http_operations, http_statuses, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export group by source, http_operations, http_statuses, user having records > 10000 order by user desc, total_bytes_sent desc limit 50"
+    "select case when domain like '%nih.gov%' then 'internal (NCBI)' else 'external' end as user, source, http_operations, http_statuses, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export group by source, http_operations, http_statuses, user having records > 10000 order by user desc, total_bytes_sent desc limit 100"
 
 
 bq -q query \

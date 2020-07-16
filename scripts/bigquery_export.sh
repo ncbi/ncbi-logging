@@ -519,11 +519,7 @@ ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
 
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
-
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ###  uniq_ips"
     QUERY=$(cat <<-ENDOFQUERY
@@ -536,14 +532,7 @@ ENDOFQUERY
 
     bq rm --project_id ncbi-logmon -f strides_analytics.uniq_ips
     # shellcheck disable=SC2016
-    bq query \
-    --destination_table strides_analytics.uniq_ips \
-    --use_legacy_sql=false \
-    --batch=true \
-    --max_rows=5 \
-    "$QUERY"
-
-
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 
 RUN="no"
@@ -578,11 +567,7 @@ select distinct remote_ip as ip from strides_analytics.summary_export where remo
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Find internal PUT/POST IPs"
     QUERY=$(cat <<-ENDOFQUERY
@@ -596,11 +581,7 @@ echo " ### Find internal PUT/POST IPs"
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Find internal IAMs IPs"
     QUERY=$(cat <<-ENDOFQUERY
@@ -615,11 +596,7 @@ echo " ### Find internal IAMs IPs"
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Update RDNS"
     QUERY=$(cat <<-ENDOFQUERY
@@ -629,11 +606,7 @@ echo " ### Update RDNS"
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
@@ -642,11 +615,16 @@ ENDOFQUERY
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.rdns
+    SET DOMAIN="IPv6 IANA Unicast (ncbi.nlm.nih.gov)"
+    WHERE domain like 'fda3%'
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ###  summary_export"
     QUERY=$(cat <<-ENDOFQUERY

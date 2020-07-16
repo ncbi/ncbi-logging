@@ -480,7 +480,8 @@ WHERE IP LIKE '0.%'
   OR IP LIKE '172.30.%'
   OR IP LIKE '172.31.%'
   OR IP LIKE '192.0.%'
-  OR IP LIKE '192.168.%';
+  OR IP LIKE '192.168.%'
+  OR IP LIKE 'fda3:%';
 
 UPDATE RDNS
 SET DOMAIN = 'ovh.com (OVH Cloud)'
