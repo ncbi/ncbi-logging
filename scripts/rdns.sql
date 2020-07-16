@@ -1028,13 +1028,16 @@ WHERE DOMAIN = 'Unknown'
        OR IP LIKE '34.7%'
        OR IP LIKE '34.8%'
        OR IP LIKE '34.9%'
-       OR IP LIKE '35.2%');
-
+       OR IP LIKE '35.2%'
+       OR IP LIKE '2600:%');
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'bc.googleusercontent.com (GCP)'
   OR DOMAIN = 'bc.googleusercontent.com';
+
+
+
 
 
 UPDATE RDNS
