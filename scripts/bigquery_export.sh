@@ -699,7 +699,7 @@ echo " ### fix summary_export for NIH"
     SET city_name='Bethesda',
     region_name='Maryland',
     country_code='US'
-    WHERE domain like '%nih.gov%' and city_name is null
+    WHERE domain like '%nih.gov%' and (city_name is null or city_name='Unknown')
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
