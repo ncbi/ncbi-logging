@@ -58,7 +58,7 @@ using namespace NCBI::Logging;
 %type<s> ip user req_time referer forwarded method server
 %type<s> quoted_list quoted_list_body quoted_list_elem url_params 
 %type<agent> agent vdb_agent_token vdb_agent
-%type<s> result_code result_len port req_len
+%type<s> result_code result_len port req_len referer_token referer_list
 
 %start line
 
@@ -335,8 +335,21 @@ req_time
     | I64
     ;
 
+referer_token
+    : QSTR
+    | SPACE
+    | VERS
+    | QSTR_ESC
+    | METHOD
+    ;
+
+referer_list
+    : referer_token
+    | referer_list referer_token    { $$ = $1; MERGE_TSTR( $$, $2 ); }
+    ;
+
 referer
-    : QUOTE QSTR QUOTE          { $$ = $2; }
+    : QUOTE referer_list QUOTE  { $$ = $2; }
     | QUOTE QUOTE               { EMPTY_TSTR($$); }
     ;
 
