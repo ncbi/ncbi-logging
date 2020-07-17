@@ -656,11 +656,11 @@ echo " ###  summary_export"
             THEN 'Unknown (' || country_code || ')'
         ELSE rdns.domain
     END as domain,
-    region_name,
-    country_code,
-    city_name,
-    organism as ScientificName,
-    consent,
+    ifnull(region_name,'Unknown'),
+    ifnull(country_code,'Unknown'),
+    ifnull(city_name,'Unknown'),
+    ifnull(organism as ScientificName,'Unknown'),
+    ifnull(consent,'Unknown'),
     cast (mbytes as int64) as accession_size_mb
     FROM \\\`strides_analytics.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
@@ -692,6 +692,18 @@ ENDOFQUERY
 
     OLD=$(date -d "-5 days" "+%Y%m%d")
     bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_$OLD"
+
+echo " ### fix summary_export for NIH"
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.summary_export
+    SET city_name='Bethesda',
+    region_name='Maryland',
+    country_code='US'
+    WHERE domain like '%nih.gov%' and city_name is null
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 
 

@@ -136,3 +136,8 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "select source, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export WHERE start_ts > '2019-03-01' GROUP BY source, domain ORDER BY num_accessions desc limit 10"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select source, bucket , count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export GROUP BY source, bucket ORDER BY num_accessions desc"
