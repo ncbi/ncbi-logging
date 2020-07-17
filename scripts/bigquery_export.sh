@@ -656,11 +656,11 @@ echo " ###  summary_export"
             THEN 'Unknown (' || country_code || ')'
         ELSE rdns.domain
     END as domain,
-    ifnull(region_name,'Unknown'),
-    ifnull(country_code,'Unknown'),
-    ifnull(city_name,'Unknown'),
-    ifnull(organism as ScientificName,'Unknown'),
-    ifnull(consent,'Unknown'),
+    ifnull(region_name,'Unknown') as region_name,
+    ifnull(country_code,'Unknown') as country_code,
+    ifnull(city_name,'Unknown') as city_name,
+    ifnull(organism, 'Unknown') as ScientificName,
+    ifnull(consent,'Unknown') as consent,
     cast (mbytes as int64) as accession_size_mb
     FROM \\\`strides_analytics.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
