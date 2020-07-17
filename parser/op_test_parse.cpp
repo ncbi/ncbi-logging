@@ -462,17 +462,30 @@ TEST_F ( TestParseFixture, OnPremise_pipe_symbol_in_path )
 {
     const char * InputLine =
 "54.219.188.148 - - [15/Jul/2020:05:15:50 -0400] \"ftp.be-md.ncbi.nlm.nih.gov\" \"GET /notify?from=nessus\\\"|id\\\" HTTP/1.1\" 400 0 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=288";
-    SLogOPEvent e = parse_and_accept( InputLine, true );
+    SLogOPEvent e = parse_and_accept( InputLine );
     ASSERT_EQ( "/notify?from=nessus\\\"|id\\\"", e.request.path );
 }
-
 
 TEST_F ( TestParseFixture, OnPremise_resultlen_is_dash )
 {
     const char * InputLine =
 "54.219.188.148 - - [15/Jul/2020:05:15:50 -0400] \"ftp.be-md.ncbi.nlm.nih.gov\" \"GET /notify?from=nessus\\\"|id\\\" HTTP/1.1\" 400 - 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=288";
-    SLogOPEvent e = parse_and_accept( InputLine, true );
+    SLogOPEvent e = parse_and_accept( InputLine );
     ASSERT_EQ( 0, e.res_len );
+}
+
+TEST_F ( TestParseFixture, OnPremise_multiple_questionmarks_in_url )
+{
+    const char * InputLine =
+"54.219.188.164 - - [15/Jul/2020:00:43:14 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET /CSCOnm/servlet/login/login.jsp?URL=CSCOnm/servlet/com.cisco.core.mice.main?command=</script><script>alert(document.cookie)</script> HTTP/1.1\" 404 548 0.000 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=447 tls=TLSv1.1";
+    SLogOPEvent e = parse_and_accept( InputLine );
+}
+
+TEST_F ( TestParseFixture, OnPremise_request_is_invalid_http )
+{
+    const char * InputLine =
+"185.216.140.251 - - [15/Jul/2020:15:53:34 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET  HTTP/1.1\" 400 150 0.082 \"-\" \"-\" \"-\" port=80 rl=0 tls=-";
+    check_rejected( InputLine );
 }
 
 extern "C"

@@ -155,6 +155,7 @@ url_params
     | url_params ACCESSION  { $$ = $1; $$ . n += $2 . n; }
     | url_params PATHSTR    { $$ = $1; $$ . n += $2 . n; }
     | url_params PATHEXT    { $$ = $1; $$ . n += $2 . n; }
+    | url_params QMARK      { $$ = $1; $$ . n += $2 . n; }    
     ; 
 
 url
