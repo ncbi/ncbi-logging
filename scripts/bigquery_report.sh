@@ -145,4 +145,4 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select remote_ip, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export where city_name='Unknown' or city_name is null GROUP BY remote_ip, domain ORDER BY num_accessions desc"
+    "select remote_ip as null_city_ip, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export where city_name='Unknown' or city_name is null GROUP BY remote_ip, domain ORDER BY num_accessions desc"
