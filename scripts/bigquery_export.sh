@@ -497,6 +497,7 @@ echo " ###  op_sess"
     WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
     AND start > '2019-03-01'
     AND domain not like '%amazon%'
+    AND domain not like '%gap%'
 
 ENDOFQUERY
 )
