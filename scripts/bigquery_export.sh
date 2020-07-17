@@ -619,7 +619,7 @@ ENDOFQUERY
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="IPv6"
-    WHERE domain like '%:%'
+    WHERE ip like '%:%'
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
@@ -628,7 +628,7 @@ ENDOFQUERY
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="IPv6 IANA Unicast (ncbi.nlm.nih.gov)"
-    WHERE domain like 'fda3%'
+    WHERE ip like 'fda3%'
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
