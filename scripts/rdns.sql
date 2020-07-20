@@ -24,6 +24,8 @@ create unique index ip_idx on rdns(ip);
 --drop table rdns_json;
 
 
+delete from rdns where length(ip) > 100 or length(domain) > 100;
+
 .schema
 select count(*) as rdns_count from rdns;
 --select * from rdns limit 5;
@@ -82,6 +84,15 @@ WHERE IP LIKE '134.192.%';
 UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
+  OR IP LIKE '116.16.%'
+  OR IP LIKE '116.17.%'
+  OR IP LIKE '116.17.%'
+  OR IP LIKE '116.18.%'
+  OR IP LIKE '116.19.%'
+  OR IP LIKE '116.2%'
+  OR IP LIKE '116.30.%'
+  OR IP LIKE '116.31.%'
+  OR IP LIKE '116.6.%'
   OR IP LIKE '218.9%'
   OR IP LIKE '59.50.85.%'
   OR IP LIKE '119.78.%'
@@ -104,8 +115,11 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '182.149.%'
   OR IP LIKE '182.150.%'
   OR IP LIKE '182.151.%'
+  OR IP LIKE '183.20.%'
+  OR IP LIKE '183.4%'
+  OR IP LIKE '183.5%'
+  OR IP LIKE '219.129.%'
   OR IP LIKE '14.23.%';
-
 
 UPDATE RDNS
 SET DOMAIN = 'pku.edu.cn'
@@ -154,12 +168,13 @@ OR IP LIKE '129.112.%';
 
 UPDATE RDNS
 SET DOMAIN = 'Chinamobile.com'
-WHERE IP LIKE '120.221.%';
-
-
-UPDATE RDNS
-SET DOMAIN = 'Chinamobile.com'
-WHERE IP LIKE '36.1%' or IP LIKE '223.10%';
+WHERE IP LIKE '36.1%'
+OR IP LIKE '120.221.%'
+OR IP LIKE '223.10%'
+OR IP LIKE '111.3%'
+OR IP LIKE '111.4%'
+OR IP LIKE '120.235%'
+OR IP LIKE '111.5%';
 
 
 UPDATE RDNS
@@ -172,6 +187,8 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '119.5.%'
   OR IP LIKE '119.6.%'
   OR IP LIKE '119.7.%'
+  OR IP LIKE '116.1%'
+  OR IP LIKE '221.206.%'
   OR IP LIKE '61.158.%'
   OR IP LIKE '60.12.%';
 
@@ -623,10 +640,6 @@ WHERE IP LIKE '161.64.%';
 UPDATE RDNS
 SET DOMAIN = 'bell.ca (Bell Canada)'
 WHERE IP LIKE '205.200.%';
-
-UPDATE RDNS
-SET DOMAIN = 'chinanet.cn.net'
-WHERE IP LIKE '116.6.%';
 
 UPDATE RDNS
 SET DOMAIN = 'csiro.au (Commonwealth Scientific and Industrial Research Organisation)'
@@ -1213,6 +1226,7 @@ order by count(*) desc
 limit 10;
 
 .headers off
+.width 500
 .output /tmp/rdns.jsonl
 select json(json_object('ip',ip,'domain',domain)) from rdns;
 

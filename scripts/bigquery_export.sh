@@ -538,6 +538,7 @@ echo " ###  uniq_ips"
             6
     end as ipint
     FROM \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
+    WHERE length(remote_ip) < 100
 ENDOFQUERY
 )
     #WHERE remote_ip like '%.%'
