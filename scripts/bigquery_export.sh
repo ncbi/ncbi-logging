@@ -631,6 +631,7 @@ ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="IPv6"
     WHERE ip like '%:%'
+    and domain='Unknown'
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
