@@ -730,7 +730,6 @@ echo " ###  export to GS"
     "gs://logmon_export/uniq_ips/uniq_ips.$DATE.json.gz"
 
 
-exit 0
 
 echo " ###  copy to filesystem"
 #    mkdir -p "$PANFS/detail"
@@ -738,16 +737,17 @@ echo " ###  copy to filesystem"
 #    rm -f "$PANFS"/detail/detail."$DATE".* || true
 #    gsutil cp -r "gs://logmon_export/detail/detail.$DATE.*" "$PANFS/detail/"
 
-    mkdir -p "$PANFS/summary"
-    cd "$PANFS/summary" || exit
-    rm -f "$PANFS"/summary/summary."$DATE".* || true
-    gsutil cp -r "gs://logmon_export/summary/summary.$DATE.*" "$PANFS/summary/"
+#    mkdir -p "$PANFS/summary"
+#    cd "$PANFS/summary" || exit
+#    rm -f "$PANFS"/summary/summary."$DATE".* || true
+#    gsutil cp -r "gs://logmon_export/summary/summary.$DATE.*" "$PANFS/summary/"
 
     mkdir -p "$PANFS/uniq_ips"
     cd "$PANFS/uniq_ips" || exit
     rm -f "$PANFS"/uniq_ips/uniq_ips."$DATE".* || true
     gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*" "$PANFS/uniq_ips/"
 
+exit 0
 
 
 date
