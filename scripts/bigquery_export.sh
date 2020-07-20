@@ -526,11 +526,21 @@ ENDOFQUERY
 
 echo " ###  uniq_ips"
     QUERY=$(cat <<-ENDOFQUERY
-    SELECT DISTINCT remote_ip as remote_ip, net.ipv4_to_int64(net.safe_ip_from_string(remote_ip)) as ipint,
+    SELECT DISTINCT remote_ip as remote_ip,
+        case when
+            regexp_contains(
+            remote_ip,
+                r'^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
+                )
+            then
+                net.ipv4_to_int64(net.safe_ip_from_string(remote_ip))
+        else
+            6
+    end as ipint
     FROM \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
-    WHERE remote_ip like '%.%'
 ENDOFQUERY
 )
+    #WHERE remote_ip like '%.%'
     QUERY="${QUERY//\\/}"
 
     bq rm --project_id ncbi-logmon -f strides_analytics.uniq_ips

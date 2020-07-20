@@ -146,3 +146,8 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "select remote_ip as null_city_ip, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.strides_analytics.summary_export where city_name='Unknown' or city_name is null GROUP BY remote_ip, domain ORDER BY num_accessions desc"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+"SELECT CASE WHEN key LIKE '%.cram%' THEN 'cram,crai' WHEN key LIKE '%.crai%' THEN 'cram,crai' WHEN key LIKE '%.bam%' THEN 'bam,bai' WHEN key LIKE '%.bai%' THEN 'bam,bai' WHEN key like '%.fastq.gz%' THEN 'fastq.gz' WHEN key like '%.fq.gz%' THEN 'fq.gz' WHEN key like '%.fastq.%' THEN 'fastq' ELSE 'other' END AS type, COUNT(*) AS cnt, AVG(size) AS average_size FROM strides_analytics.objects_uniq GROUP BY type order by cnt desc"

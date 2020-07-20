@@ -6,7 +6,7 @@
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /home/vartanianmh/ncbi-logging/scripts/uniq_ips.20200703.json uniq_ips
+.import uniq_ips.20200720.json uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -15,13 +15,13 @@ drop table uniq_ips;
 
 create unique index ip_idx on rdns(ip);
 
-drop table if exists rdns_json;
-create table rdns_json (line text);
-.import /home/vartanianmh/ncbi-logging/scripts/rdns.jsonl rdns_json
-select count(*) as rdns_json_count from rdns_json;
+--drop table if exists rdns_json;
+--create table rdns_json (line text);
+--.import /home/vartanianmh/ncbi-logging/scripts/rdns.jsonl rdns_json
+--select count(*) as rdns_json_count from rdns_json;
 
-insert into rdns select json_extract(line, '$.ip') as ip, json_extract(line, '$.domain') as domain from rdns_json;
-drop table rdns_json;
+--insert into rdns select json_extract(line, '$.ip') as ip, json_extract(line, '$.domain') as domain from rdns_json;
+--drop table rdns_json;
 
 
 .schema
@@ -93,6 +93,17 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '180.161.%'
   OR IP LIKE '101.81.%'
   OR IP LIKE '220.243.135.%'
+  OR IP LIKE '61.146.%'
+  OR IP LIKE '115.218.%'
+  OR IP LIKE '115.219.%'
+  OR IP LIKE '182.144.%'
+  OR IP LIKE '182.145.%'
+  OR IP LIKE '182.146.%'
+  OR IP LIKE '182.147.%'
+  OR IP LIKE '182.148.%'
+  OR IP LIKE '182.149.%'
+  OR IP LIKE '182.150.%'
+  OR IP LIKE '182.151.%'
   OR IP LIKE '14.23.%';
 
 
@@ -481,6 +492,7 @@ WHERE IP LIKE '0.%'
   OR IP LIKE '172.31.%'
   OR IP LIKE '192.0.%'
   OR IP LIKE '192.168.%'
+  OR IP LIKE '2002:%'
   OR IP LIKE 'fda3:%';
 
 UPDATE RDNS
@@ -1019,6 +1031,10 @@ update rdns
 set domain='ku.edu (University of Kansas)'
 where ip like '129.237.%';
 
+update rdns
+set domain='att.com (AT&T)'
+where ip like '2600:1700:%';
+
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'
@@ -1029,7 +1045,7 @@ WHERE DOMAIN = 'Unknown'
        OR IP LIKE '34.8%'
        OR IP LIKE '34.9%'
        OR IP LIKE '35.2%'
-       OR IP LIKE '2600:%');
+       OR IP LIKE '2600:1900:%');
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
@@ -1189,7 +1205,12 @@ where IP in (
 
 select domain, count(*) as cnt from rdns group by domain order by cnt desc limit 20;
 
-select substr(ip,0,12) as sub, count(*) from rdns where domain='Unknown' group by sub order by count(*) desc limit 10;
+select substr(ip,0,12) as unknown_sub, count(*)
+from rdns
+where domain='Unknown'
+group by unknown_sub
+order by count(*) desc
+limit 10;
 
 .headers off
 .output /tmp/rdns.jsonl
