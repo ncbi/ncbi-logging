@@ -605,17 +605,17 @@ for prefix in EC["prefixes"]:
     if service == "Ec2":
         service = "EC2"
     for ip in netaddr.IPNetwork(ip_prefix):
-        if ip in uniq_ips:
+        if str(ip) in uniq_ips:
             print(json.dumps({"ip": str(ip), "domain": f"amazon.com (AWS {service})"}))
 
 for ipr in AZURE_CIDRS.split(" "):
     for ip in netaddr.IPNetwork(ipr):
-        if ip in uniq_ips:
+        if str(ip) in uniq_ips:
             print(json.dumps({"ip": ip, "domain": "microsoft.com ()"}))
 
 for ipr in GCP_CIDRS.split(" "):
     if len(ipr) < 5:
         continue
     for ip in netaddr.IPNetwork(ipr):
-        if ip in uniq_ips:
+        if str(ip) in uniq_ips:
             print(json.dumps({"ip": ip, "domain": "googleusercontent.com (GCP)"}))

@@ -151,3 +151,8 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "SELECT CASE WHEN key LIKE '%.cram%' THEN 'cram,crai' WHEN key LIKE '%.crai%' THEN 'cram,crai' WHEN key LIKE '%.bam%' THEN 'bam,bai' WHEN key LIKE '%.bai%' THEN 'bam,bai' WHEN key like '%.fastq.gz%' THEN 'fastq.gz' WHEN key like '%.fq.gz%' THEN 'fq.gz' WHEN key like '%.fastq.%' THEN 'fastq' WHEN key like '%.sam%' THEN 'sam' ELSE 'other' END AS type, format('%\'d',COUNT(*)) AS cnt, format('%\'d', cast(AVG(size) as int64)) AS average_size FROM strides_analytics.objects_uniq GROUP BY type order by type"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "SELECT datetime_trunc(start_ts, month) as month, bucket_owner, user_location, SUM(bytes_sent) as total_bytes, COUNT(*) as num_accesses, count(distinct accession) as distinct_accessions FROM ( SELECT start_ts, accession, case when starts_with(bucket ,'sra-pub-src-1') then 'Public' when starts_with(bucket , 'sra-pub-src-2') then 'Public' else 'NCBI' end as bucket_owner, bytes_sent, CASE when domain like '%nih.gov%' THEN 'NCBI' WHEN domain LIKE '%AWS%' THEN 'AWS' ELSE 'External' END AS user_location FROM strides_analytics.summary_export WHERE source='S3' AND http_operations NOT LIKE '%P%' ) GROUP BY month, bucket_owner, user_location order by month, bucket_owner, user_location"
