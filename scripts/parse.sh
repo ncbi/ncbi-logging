@@ -149,6 +149,21 @@ for LOG_BUCKET in $buckets; do
         gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl &
         wait
 
+        echo "  Summarizing..."
+        {
+            printf "{"
+            printf '"log_bucket": "%s",' "$LOG_BUCKET"
+            printf '"provider": "%s",' "$PROVIDER"
+            printf '"log_date": "%s",' "$YESTERDAY"
+            printf '"parse_date": "%s",' "$DATE"
+            printf '"total_lines" : %d,' "$totalwc"
+            printf '"recognized_lines" : %d,' "$recwc"
+            printf '"unrecognized_lines" : %d'  "$unrecwc"
+            printf "}"
+        } > "$TGZ.json"
+        jq -S -c . < "$TGZ.json" > "summary.$TGZ.jsonl"
+        cat "summary.$TGZ.jsonl"
+
         echo "  Uploading..."
 
         export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
@@ -156,6 +171,7 @@ for LOG_BUCKET in $buckets; do
         gcloud config set account 253716305623-compute@developer.gserviceaccount.com
         gsutil cp ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
         gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
+        gsutil cp ./"summary.$TGZ.jsonl" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
         cd ..
         rm -rf "$PARSE_DEST"
 #    fi
