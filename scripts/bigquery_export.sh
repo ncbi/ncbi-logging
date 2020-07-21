@@ -202,7 +202,8 @@ echo " #### Parsed results"
 bq -q query \
     --use_legacy_sql=false \
     "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from strides_analytics.gs_parsed union all select source, accepted, cast(time as string) as time from strides_analytics.s3_parsed union all select source, accepted, time as time from strides_analytics.op_parsed) group by source, accepted order by source"
-fi
+
+fi # skipload
 
 echo " #### gs_fixed"
     QUERY=$(cat <<-ENDOFQUERY
@@ -575,7 +576,7 @@ ENDOFQUERY
     --batch=true \
     --max_rows=5 \
     "$QUERY"
-fi
+fi # RUN
 
 
 echo " ### Find new IP addresses"

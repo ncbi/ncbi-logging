@@ -585,6 +585,7 @@ AZURE_CIDRS = (
 )
 
 uniq_ips = set()
+already = set()
 
 # {"remote_ip":"18.212.9.218","ipint":"315886042"}
 ips = open(
@@ -605,17 +606,18 @@ for prefix in EC["prefixes"]:
     if service == "Ec2":
         service = "EC2"
     for ip in netaddr.IPNetwork(ip_prefix):
-        if str(ip) in uniq_ips:
+        if str(ip) in uniq_ips and str(ip) not in already:
             print(json.dumps({"ip": str(ip), "domain": f"amazon.com (AWS {service})"}))
+            already.add(str(ip))
 
 for ipr in AZURE_CIDRS.split(" "):
     for ip in netaddr.IPNetwork(ipr):
         if str(ip) in uniq_ips:
-            print(json.dumps({"ip": ip, "domain": "microsoft.com ()"}))
+            print(json.dumps({"ip": str(ip), "domain": "microsoft.com (Azure)"}))
 
 for ipr in GCP_CIDRS.split(" "):
     if len(ipr) < 5:
         continue
     for ip in netaddr.IPNetwork(ipr):
         if str(ip) in uniq_ips:
-            print(json.dumps({"ip": ip, "domain": "googleusercontent.com (GCP)"}))
+            print(json.dumps({"ip": str(ip), "domain": "googleusercontent.com (GCP)"}))

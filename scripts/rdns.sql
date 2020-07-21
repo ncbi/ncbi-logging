@@ -1,6 +1,7 @@
 -- sqlite3 rdns.db < rdns.sql
 
 .headers on
+.bail on
 .mode column
 .width 40 20
 
@@ -13,7 +14,25 @@ drop table if exists rdns;
 create table rdns as select json_extract(line, '$.remote_ip') as ip, 'Unknown' as domain from uniq_ips;
 drop table uniq_ips;
 
+select count(*) as rdns_count_loaded from rdns;
 create unique index ip_idx on rdns(ip);
+
+drop table if exists cloud_ips_json;
+create table cloud_ips_json(line text);
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/cloud_ips.jsonl cloud_ips_json
+
+drop table if exists cloud_ips;
+create table cloud_ips as
+select json_extract(line, '$.ip') as ip,
+       json_extract(line, '$.domain') as domain
+    from cloud_ips_json;
+select count(*) as cloud_ips from cloud_ips;
+create unique index cloud_ip_idx on cloud_ips(ip);
+
+delete from rdns where ip in (select ip from cloud_ips);
+select count(*) as rdns_count_cloud_ips_deleted from rdns;
+insert into rdns select ip, domain from cloud_ips;
+select count(*) as rdns_count_cloud_ips_inserted from rdns;
 
 --drop table if exists rdns_json;
 --create table rdns_json (line text);
@@ -30,6 +49,7 @@ delete from rdns where length(ip) > 100 or length(domain) > 100;
 select count(*) as rdns_count from rdns;
 --select * from rdns limit 5;
 
+select "running updates";
 
 UPDATE RDNS
 SET DOMAIN = 'lrz.de'
@@ -1218,6 +1238,13 @@ where IP in (
 
 select domain, count(*) as cnt from rdns group by domain order by cnt desc limit 20;
 
+select substr(ip,0,8) as unknown_sub, count(*)
+from rdns
+where domain='Unknown'
+group by unknown_sub
+order by count(*) desc
+limit 10;
+
 select substr(ip,0,12) as unknown_sub, count(*)
 from rdns
 where domain='Unknown'
@@ -1226,8 +1253,10 @@ order by count(*) desc
 limit 10;
 
 .headers off
-.width 500
+.width 200
 .output /tmp/rdns.jsonl
-select json(json_object('ip',ip,'domain',domain)) from rdns;
-
+select distinct json(json_object('ip',ip,'domain',domain)) from rdns;
 -- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
+select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
+-- bq rm strides_analytics.rdns
+-- bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns "gs://logmon_cfg/rdns.jsonl"
