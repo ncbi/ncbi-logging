@@ -1,0 +1,94 @@
+General
+
+Broad categories (each is a method on the API)
+
+- good
+    - full (accession - SRA only for now, filename, extension extracted/recognized)
+    - list or access to a file (add to the event: did the accession come from a pre-parsed field or from the original request)
+    - w/o accession
+
+- suspect (failure to classify; suspected format change). Report the first offending field;
+    annotate with the nature of offence. Mark other bad fields, maybe report the total.
+    Attach the source line.
+
+- garbage (recognized as garbage). Example: probing requests.
+
+- unrecognized: failure to parse, report the source.
+
+These should probably go into separate output streams and have slightly different set of data per line.
+Make the summary Json as well.
+
+AWS
+
+suspect:
+- with extra tokens at the end (saved in a new member)
+
+rejected with invalid field(s) ('-' is OK for all)
+- owner (sequence of lowercase hex digits)
+- bucket (string: alphanumeric? ASCII? UTF8?)
+- time (UTC [%d/%b/%Y:%H:%M:%S %z])
+- IP (IPV4, IPV6)
+- requester (sequence of lowercase hex digits)
+- request_id (sequence of uppercase hex digits)
+- request_operation (.-separated A-Z_ strings)
+- key (URL-encoded path)
+- request (method URL version)
+- result_code (decimal number)
+- aws_error (decimal number)
+- aws_bytes_sent  (decimal number)
+- aws_obj_size  (decimal number)
+- aws_total_time  (decimal number)
+- aws_turnaround_time  (decimal number)
+- referer (any characters, " escaped)
+- agent  (any characters, " escaped)
+- aws_version_id (alphanumeric string)
+- aws_host_id (ASCII string)
+- aws_sig (SigV2, SigV4)
+- aws_cipher  (ASCII string)
+- aws_auth (AuthHeader,  QueryString )
+- aws_host_hdr (URL)
+- TLS version (TLSv and 1- or 2- num version)
+
+GCP:
+accepted:
+- use header lines to identify fields of interest (now positional, headers ignored)
+    - report unknown headers/fields
+    - report changes in order
+
+rejected with invalid field(s) ('' is OK for all); source saved
+- time_micros (decimal)
+- ip  (IPV4, IPV6)
+- ip_type (1 or 2)
+- ip_region (any)
+- method (GET/HEAD/etc.)
+- uri ( URL )
+- status (3 digit decimal)
+- cs_bytes (decimal)
+- sc_bytes (decimal)
+- time_taken_micros (decimal)
+- host ( dot-separated Unicode? UTF8? Url-encoded?)
+- referer ( anything )
+- user_agent ( anything )
+- request_id ( anything )
+- operation ( anything, or a Google-provided vocabulary )
+- bucket (string: alphanumeric? ASCII? UTF8?)
+- object (path, possibly URL-encoded)
+
+OnPremises:
+- currently the default Apache and NGNX log format, at the mercy of the IT
+
+rejected with invalid field(s) ("-quoted or not; "" is OK for all); source saved
+- ip (IPV4, IPV6)
+- user ( - or any string? )
+- time (UTC [%d/%b/%Y:%H:%M:%S %z])
+- server ( dot-separated Unicode? UTF8? Url-encoded? )
+- request ( method URL version) 
+- result_code ( decimal )
+- result_len ( decimal )
+- req_time ( float )
+- referer ( anything )
+- agent ( anything )
+- forwarded ( anything )
+- port ( port=<decimal> )
+- req_len ( rl=<decimal> )
+
