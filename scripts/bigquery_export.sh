@@ -738,9 +738,9 @@ echo " ###  export to GS"
     gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*.json.gz" || true
     bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
-    --compression GZIP \
+    --compression NONE \
     'strides_analytics.uniq_ips' \
-    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.json.gz"
+    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.json"
 
 
 
@@ -759,8 +759,5 @@ echo " ###  copy to filesystem"
     cd "$PANFS/uniq_ips" || exit
     rm -f "$PANFS"/uniq_ips/uniq_ips."$DATE".* || true
     gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*" "$PANFS/uniq_ips/"
-
-exit 0
-
 
 date

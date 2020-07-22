@@ -7,7 +7,7 @@
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import uniq_ips.20200720.json uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20200722.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -194,6 +194,12 @@ OR IP LIKE '223.10%'
 OR IP LIKE '111.3%'
 OR IP LIKE '111.4%'
 OR IP LIKE '120.235%'
+OR IP LIKE '183.192.%'
+OR IP LIKE '183.209.%'
+OR IP LIKE '223.64.%'
+OR IP LIKE '223.65.%'
+OR IP LIKE '223.66.%'
+OR IP LIKE '223.67.%'
 OR IP LIKE '111.5%';
 
 
@@ -1263,11 +1269,12 @@ group by unknown_sub
 order by count(*) desc
 limit 10;
 
-.headers off
 .width 200
-.output /tmp/rdns.jsonl
-select distinct json(json_object('ip',ip,'domain',domain)) from rdns;
 -- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
 select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
--- bq rm strides_analytics.rdns
--- bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns "gs://logmon_cfg/rdns.jsonl"
+select "bq rm strides_analytics.rdns" as hint2;
+select "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl" as hint3;
+
+.headers off
+.output /tmp/rdns.jsonl
+select distinct json(json_object('ip',ip,'domain',domain)) from rdns;
