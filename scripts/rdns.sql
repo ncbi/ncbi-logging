@@ -332,7 +332,10 @@ WHERE DOMAIN LIKE '%georgetown.edu%';
 
 UPDATE RDNS
 SET DOMAIN = 'msu.edu (Michigan State University)'
-WHERE DOMAIN LIKE '%msu.edu%';
+WHERE DOMAIN LIKE '%msu.edu%'
+or IP LIKE '35.8.%'
+or IP LIKE '35.9.%'
+or IP LIKE '35.10.%';
 
 
 UPDATE RDNS
@@ -1067,6 +1070,14 @@ where ip like '129.237.%';
 update rdns
 set domain='att.com (AT&T)'
 where ip like '2600:1700:%';
+
+update rdns
+set domain='nih.go.jp (Japan National Institute of Infectious Diseases)'
+where ip like '202.241.%';
+
+update rdns
+set domain='cam.ac.uk (University of Cambridge)'
+where ip like '131.111.%';
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
