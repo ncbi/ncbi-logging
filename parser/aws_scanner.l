@@ -74,7 +74,8 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 
 %x AGENT
 
-TLSVERSION     "TLSv"[0-9]+\.[0-9]+
+TLSV           [0-9]+(\.[0-9]+){0,2}
+TLSVERSION     "TLSv"{TLSV}
 
 %x TLSVERSION
 

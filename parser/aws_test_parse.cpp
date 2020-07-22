@@ -590,6 +590,13 @@ TEST_F ( TestParseFixture, AWS_missing_tokens )
     SLogAWSEvent e = parse_reject( InputLine );
 }
 
+TEST_F ( TestParseFixture, AWS_one_part_TLS_version )
+{   
+    const char * InputLine =
+"7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-2 [16/Jul/2020:15:34:00 +0000] 218.75.25.6 - 34C7DF6E45B851B5 REST.GET.OBJECT ERR1676719/ecoli_er2925.pcr.r9.timp.061716.tar.gz.1 \"GET /ERR1676719/ecoli_er2925.pcr.r9.timp.061716.tar.gz.1 HTTP/1.1\" 206 - 4440619 400713583012 271245 140 \"https://sra-pub-src-2.s3.amazonaws.com/ERR1676719/\" \"Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko\" - Qhf7yUtlK7q9M4iGOqQTvY1ToRnmN045fBSW8WwtnPkO+cMmM+ONjuvA44sJLnMZsEVmVBoKFlE= - ECDHE-RSA-AES128-SHA - sra-pub-src-2.s3.amazonaws.com TLSv1";
+    SLogAWSEvent e = parse_accept( InputLine );
+}
+
 //TODO: rejected lines with more than IP recognized
 
 extern "C"
