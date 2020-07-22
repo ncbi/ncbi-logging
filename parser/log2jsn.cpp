@@ -33,44 +33,6 @@ static String FormatTime( const t_timepoint & t )
     return String( s );
 }
 
-ostream& operator<< (ostream& os, const t_str & s)
-{
-    os << "\"";
-    for ( auto i = 0; i < s.n; ++i )
-    {
-        switch ( s.p[i] )
-        {
-        case '\\':
-        case '\"':
-            os << '\\';
-            os << s.p[i];
-            break;
-        default:
-            if ( s.p[i] < 0x20 )
-            {
-               ostringstream temp;
-               temp << "\\u";
-               temp << hex << setfill('0') << setw(4);
-               temp << (int)s.p[i];
-               os << temp.str();
-            }
-            else
-            {
-                os << s.p[i];
-            }
-            break;
-        }
-    }
-    os << "\"";
-    return os;
-}
-
-ostream& operator<< (ostream& os, const t_timepoint & t)
-{
-    os << "\"" << ToString( t ) << "\"";
-    return os;
-}
-
 struct Options
 {
     bool readable = false;

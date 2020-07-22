@@ -310,18 +310,15 @@ run_$(PREFIX_GCP)parsetest: $(BINDIR)/$(PREFIX_GCP)test_parse-dbg $(BINDIR)/$(PR
 .PHONY: run_$(PREFIX_GCP)test_parse
 
 #################################################
-# minimal parser/Json: stdin(any format)->parsing->stdout(Json)
-
 # Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
 JWT_TOOL ?= ../../ncbi-vdb3/jwt-tool
 
-LOG2JSN_SRC = log2jsn.cpp
+CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/tool
+
+#################################################
+# VDB3 Command line parsing
 CMD_SRC_LOCATION = $(JWT_TOOL)/tool
 CMD_SRC = $(CMD_SRC_LOCATION)/cmdline.cpp
-
-LOG2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(LOG2JSN_SRC)))
-LOG2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(LOG2JSN_SRC)))
-LOG2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(LOG2JSN_SRC)))
 
 DBG_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
 REL_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
@@ -332,7 +329,14 @@ $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
-CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/tool
+#################################################
+# minimal parser/Json: stdin(any format)->parsing->stdout(Json)
+
+LOG2JSN_SRC = log2jsn.cpp
+
+LOG2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(LOG2JSN_SRC)))
+LOG2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(LOG2JSN_SRC)))
+LOG2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(LOG2JSN_SRC)))
 
 $(BINDIR)/log2jsn-dbg: $(LOG2JSN_DBG_OBJ) $(DBG_CMD_OBJ) $(LIBDIR)/liblogparse-dbg.a
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
@@ -381,6 +385,61 @@ test2jsn: log2jsn_
 	@ rm -rf actual/run2jsn*
 
 .PHONY: log2jsn_ log2jsn_prof test2jsn
+
+#################################################
+# stand alone AWS parser
+
+AWS2JSN_SRC = aws2jsn.cpp helper.cpp
+
+AWS2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS2JSN_SRC)))
+AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
+AWS2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(AWS2JSN_SRC)))
+
+$(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_CMD_OBJ)
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+
+$(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_CMD_OBJ) 
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-secure-rel -lutf8proc -lmbedcrypto
+
+$(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-secure-prof -lutf8proc -lmbedcrypto
+
+aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
+
+aws_prof: mkdir $(BINDIR)/log2jsn-prof
+
+AWS_TEST_IMPL_SRC = \
+	$(PREFIX_AWS)test_impl.cpp helper.cpp
+
+AWS_TEST_IMPL_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS_TEST_IMPL_SRC)))
+AWS_TEST_IMPL_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS_TEST_IMPL_SRC)))
+
+$(BINDIR)/$(PREFIX_AWS)test_impl-dbg: $(AWS_TEST_IMPL_DBG_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread
+
+$(BINDIR)/$(PREFIX_AWS)test_impl-rel: $(AWS_TEST_IMPL_REL_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread 
+
+run_$(PREFIX_AWS)impltest: $(BINDIR)/$(PREFIX_AWS)test_impl-dbg $(BINDIR)/$(PREFIX_AWS)test_impl-rel
+	$(BINDIR)/$(PREFIX_AWS)test_impl-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_impl-rel
+
+.PHONY: aws aws_prof run_$(PREFIX_AWS)test_impl 
+
+#################################################
+#################################################
+# acceptance 
+
+# which version to run for acceptance (uncomment one)
+AWS2JSON = $(BINDIR)/aws2jsn-dbg
+#AWS2JSON = $(BINDIR)/aws2jsn-rel
+
+test_aws: aws
+	@ mkdir -p actual
+	@ echo "test_aws passed"
+	@ rm -rf actual/aws2jsn*
+
+.PHONY: aws aws2jsn_prof test_aws
 
 #################################################
 # some valgrind checks...

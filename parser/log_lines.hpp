@@ -9,19 +9,6 @@ namespace NCBI
 {
     namespace Logging
     {
-        typedef struct t_timepoint
-        {
-            uint8_t day;
-            uint8_t month;
-            uint32_t year;
-            uint8_t hour;
-            uint8_t minute;
-            uint8_t second;
-            int32_t offset;
-        } t_timepoint;
-
-        std::string ToString( const t_timepoint& t ); // [dd/Mon/yyyy:hh:mm:ss (-|+)oooo]
-
         typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
 
         typedef struct t_request

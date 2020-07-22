@@ -1,7 +1,5 @@
 #include "log_lines.hpp"
 
-#include <sstream>
-#include <iomanip>
 #include <vector>
 
 #include "op_parser.hpp"
@@ -25,49 +23,6 @@ extern YY_BUFFER_STATE gcp_scan_reset( const char * input, yyscan_t yyscanner );
 
 using namespace std;
 using namespace NCBI::Logging;
-
-static
-string FormatMonth (uint8_t m)
-{
-    switch (m)
-    {
-    case 1: return "Jan";
-    case 2: return "Feb";
-    case 3: return "Mar";
-    case 4: return "Apr";
-    case 5: return "May";
-    case 6: return "Jun";
-    case 7: return "Jul";
-    case 8: return "Aug";
-    case 9: return "Sep";
-    case 10: return "Oct";
-    case 11: return "Nov";
-    case 12: return "Dec";
-    default: return "???";
-    }
-}
-
-string 
-NCBI::Logging::ToString( const t_timepoint & t ) 
-{
-    ostringstream out;
-    out << setfill ('0'); 
-
-    out << "[";
-    out << setw (2) << (int)t.day << "/";
-
-    out << FormatMonth( t.month )<<"/";
-
-    out << setw (4) << (int)t.year <<":";
-    out << setw (2) << (int)t.hour <<":";
-    out << setw (2) << (int)t.minute <<":";
-    out << setw (2) << (int)t.second <<" ";
-    out << ( t.offset < 0 ? "-" : "+" ); 
-    out << setw (4) << abs(t.offset);
-    out << "]";
-
-    return out.str();
-}
 
 OP_Parser :: OP_Parser( OP_LogLines & p_lines, std::istream & p_input )
 : m_lines ( p_lines ), m_input ( p_input )
