@@ -370,7 +370,6 @@ vdb_agent_token
     | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
     | SPACE         { InitAgent( $$ ); $$.original = $1; } 
     | AGENTSTR      { InitAgent( $$ ); $$.original = $1; } 
-    | OS            { InitAgent( $$ ); $$.original = $1; } 
     ;
 
 vdb_agent
