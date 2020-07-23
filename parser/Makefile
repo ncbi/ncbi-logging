@@ -361,25 +361,25 @@ LOG2JSON = $(BINDIR)/log2jsn-dbg
 test2jsn: log2jsn_
 	@ mkdir -p actual
 	jq -e . expected/*.out > /dev/null
-	cat data/op_unrecognized.log    | $(LOG2JSON) op -p >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
+	cat data/op_unrecognized.log    | $(LOG2JSON) op -p -t >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized.out ./actual/op_unrecognized.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
-	cat data/aws_unrecognized.log | $(LOG2JSON) aws >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \
+	cat data/aws_unrecognized.log | $(LOG2JSON) aws -t >./actual/aws_unrecognized.out 2>./actual/aws_unrecognized.err \
 						&& diff ./expected/aws_unrecognized.out ./actual/aws_unrecognized.out \
 						&& diff ./expected/aws_unrecognized.err ./actual/aws_unrecognized.err
-	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
+	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp -t >./actual/gcp_unrecognized.out 2>./actual/gcp_unrecognized.err \
 						&& diff ./expected/gcp_unrecognized.out ./actual/gcp_unrecognized.out \
 						&& diff ./expected/gcp_unrecognized.err ./actual/gcp_unrecognized.err
-	cat data/op_unrecognized.log  | $(LOG2JSON) op -p -j --readable >./actual/op_unrecognized_pretty.out 2>./actual/op_unrecognized.err \
+	cat data/op_unrecognized.log  | $(LOG2JSON) op -p -j -t --readable >./actual/op_unrecognized_pretty.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized_pretty.out ./actual/op_unrecognized_pretty.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 
-	cat data/op_unrecognized.log | $(LOG2JSON) op -l2 > ./actual/op_filtered.out 2>./actual/op_filtered.err \
+	cat data/op_unrecognized.log | $(LOG2JSON) op -l2 -t > ./actual/op_filtered.out 2>./actual/op_filtered.err \
 						&& diff ./expected/op_filtered.out ./actual/op_filtered.out \
 						&& diff ./expected/op_filtered.err ./actual/op_filtered.err 
-	cat data/aws_unrecognized.log | $(LOG2JSON) aws -l2 > ./actual/aws_filtered.out 2>./actual/aws_filtered.err \
+	cat data/aws_unrecognized.log | $(LOG2JSON) aws -l2 -t > ./actual/aws_filtered.out 2>./actual/aws_filtered.err \
 						&& diff ./expected/aws_filtered.out ./actual/aws_filtered.out \
 						&& diff ./expected/aws_filtered.err ./actual/aws_filtered.err 
-	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp -l2 > ./actual/gcp_filtered.out 2>./actual/gcp_filtered.err \
+	cat data/gcp_unrecognized.log | $(LOG2JSON) gcp -l2 -t > ./actual/gcp_filtered.out 2>./actual/gcp_filtered.err \
 						&& diff ./expected/gcp_filtered.out ./actual/gcp_filtered.out \
 						&& diff ./expected/gcp_filtered.err ./actual/gcp_filtered.err 
 
