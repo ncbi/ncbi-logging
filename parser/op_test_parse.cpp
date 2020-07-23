@@ -492,7 +492,7 @@ TEST_F ( TestParseFixture, OnPremise_unusual_tokens_in_referer )
 {
     const char * InputLine =
 "114.67.116.191 - - [15/Jul/2020:21:36:55 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"POST /%75%73%65%72%2e%70%68%70 HTTP/1.1\" 404 146 0.000 \"554fcae493e564ee0dc75bdf2ebf94caads|a:3:{s:2:\\x22id\\x22;s:3:\\x22'/*\\x22;s:3:\\x22num\\x22;s:141:\\x22*/ union select 1,0x272F2A,3,4,5,6,7,8,0x7b247b24524345275d3b6469652f2a2a2f286d6435284449524543544f52595f534550415241544f5229293b2f2f7d7d,0--\\x22;s:4:\\x22name\\x22;s:3:\\x22ads\\x22;}554fcae493e564ee0dc75bdf2ebf94ca\" \"Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0\" \"-\" port=80 rl=499 tls=-";
-    SLogOPEvent e = parse_and_accept( InputLine, true );
+    SLogOPEvent e = parse_and_accept( InputLine );
 }
 
 extern "C"
