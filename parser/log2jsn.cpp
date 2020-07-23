@@ -15,6 +15,8 @@ using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
 
+std::string tool_version( "1.0.0" );
+
 static JSONValueRef ToJsonString( const t_str & in )
 {
     if ( in . n > 0 )
@@ -167,6 +169,8 @@ struct cmnLogLines
         if ( num_headers > 0 )
             std::cerr << "headers : " << num_headers << endl;
         std::cerr << "unrecognized : " << num_unrecognized << endl;
+        std::cerr << "tool-version : " << tool_version << endl;
+        std::cerr << "compiled at : " << __DATE__ << " - " << __TIME__ << endl;
     }
 
     cmnLogLines( ostream &os, const Options & options ) : mem_os( os ),
