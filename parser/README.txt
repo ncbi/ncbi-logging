@@ -2,7 +2,7 @@ prerequisits for building/testing the 3 parser-classes:
 
 $sudo apt-get update
 $sudo apt-get upgrade
-$sudo apt-get install git build-essential flex bison cmake uuid-dev
+$sudo apt-get install git build-essential flex bison cmake uuid-dev jq
 
 $cd ~/devel
 $git clone https://github.com/google/googletest

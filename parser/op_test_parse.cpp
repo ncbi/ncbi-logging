@@ -443,6 +443,58 @@ TEST_F ( TestParseFixture, OnPremise_user_agent_with_phid_and_libc )
     ASSERT_EQ( "2.17", e.agent.vdb_libc );
 }
 
+TEST_F ( TestParseFixture, OnPremise_agent_doubled )
+{
+    const char * InputLine =
+"66.189.43.90 - - [15/Jul/2020:01:40:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /traces/refseq/NC_004330.1 HTTP/1.1\" 200 0 0.000 \"-\" \"linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)\" \"-\" port=443 rl=288 tls=TLSv1.2";
+    SLogOPEvent e = parse_and_accept( InputLine );
+}
+
+TEST_F ( TestParseFixture, OnPremise_time_is_not_float )
+{
+    const char * InputLine =
+"66.189.43.90 - - [15/Jul/2020:01:40:05 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /traces/refseq/NC_004330.1 HTTP/1.1\" 200 0 0 \"-\" \"linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)linux64 sra-toolkit fasterq-dump.2.10.8 (phid=noc83f645a,libc=2.31)\" \"-\" port=443 rl=288 tls=TLSv1.2";
+    SLogOPEvent e = parse_and_accept( InputLine );
+    ASSERT_EQ( "0", e.req_time );
+}
+
+TEST_F ( TestParseFixture, OnPremise_pipe_symbol_in_path )
+{
+    const char * InputLine =
+"54.219.188.148 - - [15/Jul/2020:05:15:50 -0400] \"ftp.be-md.ncbi.nlm.nih.gov\" \"GET /notify?from=nessus\\\"|id\\\" HTTP/1.1\" 400 0 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=288";
+    SLogOPEvent e = parse_and_accept( InputLine );
+    ASSERT_EQ( "/notify?from=nessus\\\"|id\\\"", e.request.path );
+}
+
+TEST_F ( TestParseFixture, OnPremise_resultlen_is_dash )
+{
+    const char * InputLine =
+"54.219.188.148 - - [15/Jul/2020:05:15:50 -0400] \"ftp.be-md.ncbi.nlm.nih.gov\" \"GET /notify?from=nessus\\\"|id\\\" HTTP/1.1\" 400 - 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=288";
+    SLogOPEvent e = parse_and_accept( InputLine );
+    ASSERT_EQ( 0, e.res_len );
+}
+
+TEST_F ( TestParseFixture, OnPremise_multiple_questionmarks_in_url )
+{
+    const char * InputLine =
+"54.219.188.164 - - [15/Jul/2020:00:43:14 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET /CSCOnm/servlet/login/login.jsp?URL=CSCOnm/servlet/com.cisco.core.mice.main?command=</script><script>alert(document.cookie)</script> HTTP/1.1\" 404 548 0.000 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; NIHInfoSec)\" \"-\" port=443 rl=447 tls=TLSv1.1";
+    SLogOPEvent e = parse_and_accept( InputLine );
+}
+
+TEST_F ( TestParseFixture, OnPremise_request_is_invalid_http )
+{
+    const char * InputLine =
+"185.216.140.251 - - [15/Jul/2020:15:53:34 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET  HTTP/1.1\" 400 150 0.082 \"-\" \"-\" \"-\" port=80 rl=0 tls=-";
+    check_rejected( InputLine );
+}
+
+TEST_F ( TestParseFixture, OnPremise_unusual_tokens_in_referer )
+{
+    const char * InputLine =
+"114.67.116.191 - - [15/Jul/2020:21:36:55 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"POST /%75%73%65%72%2e%70%68%70 HTTP/1.1\" 404 146 0.000 \"554fcae493e564ee0dc75bdf2ebf94caads|a:3:{s:2:\\x22id\\x22;s:3:\\x22'/*\\x22;s:3:\\x22num\\x22;s:141:\\x22*/ union select 1,0x272F2A,3,4,5,6,7,8,0x7b247b24524345275d3b6469652f2a2a2f286d6435284449524543544f52595f534550415241544f5229293b2f2f7d7d,0--\\x22;s:4:\\x22name\\x22;s:3:\\x22ads\\x22;}554fcae493e564ee0dc75bdf2ebf94ca\" \"Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0\" \"-\" port=80 rl=499 tls=-";
+    SLogOPEvent e = parse_and_accept( InputLine );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

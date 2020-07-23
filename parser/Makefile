@@ -9,6 +9,7 @@ CPP := g++ -c
 LD := g++
 CXXFLAGS += -I . -MMD
 GPROFFLAGS = -pg -O3
+FLEXFLAGS = -8 --fast
 
 PREFIX_OP := op_
 PREFIX_AWS := aws_
@@ -62,21 +63,21 @@ $(OBJDIR)/$(PREFIX_GCP)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.rel.o
 $(OBJDIR)/$(PREFIX_GCP)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.prof.o
 
 $(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l $(PREFIX_OP)parser.hpp
-	flex --fast --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
 
 $(PREFIX_OP)parser.cpp: $(PREFIX_OP)parser.y
 	bison --report all -d $(PREFIX_OP)parser.y --output-file $(PREFIX_OP)parser.cpp
 
 
 $(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l $(PREFIX_AWS)parser.hpp
-	flex --fast --header-file=$(PREFIX_AWS)scanner.hpp --outfile=$(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.l
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_AWS)scanner.hpp --outfile=$(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.l
 
 $(PREFIX_AWS)parser.cpp: $(PREFIX_AWS)parser.y
 	bison --report all -d $(PREFIX_AWS)parser.y --output-file $(PREFIX_AWS)parser.cpp
 
 
 $(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l $(PREFIX_GCP)parser.hpp
-	flex --fast --header-file=$(PREFIX_GCP)scanner.hpp --outfile=$(PREFIX_GCP)scanner.cpp $(PREFIX_GCP)scanner.l
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_GCP)scanner.hpp --outfile=$(PREFIX_GCP)scanner.cpp $(PREFIX_GCP)scanner.l
 
 $(PREFIX_GCP)parser.cpp: $(PREFIX_GCP)parser.y
 	bison --report all -d $(PREFIX_GCP)parser.y --output-file $(PREFIX_GCP)parser.cpp
@@ -359,6 +360,7 @@ LOG2JSON = $(BINDIR)/log2jsn-dbg
 
 test2jsn: log2jsn_
 	@ mkdir -p actual
+	jq -e . expected/*.out > /dev/null
 	cat data/op_unrecognized.log    | $(LOG2JSON) op -p >./actual/op_unrecognized.out 2>./actual/op_unrecognized.err \
 						&& diff ./expected/op_unrecognized.out ./actual/op_unrecognized.out \
 						&& diff ./expected/op_unrecognized.err ./actual/op_unrecognized.err 

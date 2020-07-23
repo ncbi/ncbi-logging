@@ -134,7 +134,7 @@ public:
     virtual void SetUp() {}
     virtual void TearDown() {}
 
-    SLogAWSEvent parse_aws( const char * input, bool p_debug = false )
+    SLogAWSEvent parse_accept( const char * input, bool p_debug = false )
     {
         std::istringstream inputstream( input );
         AWS_Parser p( m_lines, inputstream );
@@ -142,6 +142,16 @@ public:
         p.parse();
         if ( m_lines.m_accepted.empty() ) throw logic_error( "last_m_accepted is null" );
         return m_lines . m_accepted.back();
+    }
+
+    SLogAWSEvent parse_reject( const char * input, bool p_debug = false )
+    {
+        std::istringstream inputstream( input );
+        AWS_Parser p( m_lines, inputstream );
+        p.setDebug( p_debug );
+        p.parse();
+        if ( m_lines.m_rejected.empty() ) throw logic_error( "m_rejected is null" );
+        return m_lines . m_rejected.back();
     }
 
     TestLogLines m_lines;
@@ -181,7 +191,7 @@ TEST_F ( TestParseFixture, AWS )
     "TLSv1.2";
     "\n";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
 
     ASSERT_EQ( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37", e.owner );
     ASSERT_EQ( "sra-pub-src-14", e.bucket );
@@ -231,7 +241,7 @@ TEST_F ( TestParseFixture, AWS_turnaround_time_is_dash )
     const char * InputLine =
     "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
     
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
 
     ASSERT_EQ( "200", e.res_code );
     ASSERT_EQ( "", e.error );
@@ -247,7 +257,7 @@ TEST_F ( TestParseFixture, AWS_SpaceInReferrer )
     const char * InputLine =
     "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"referrer with spaces\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
     
-    SLogAWSEvent e = parse_aws( InputLine, false );
+    SLogAWSEvent e = parse_accept( InputLine, false );
     ASSERT_EQ( "referrer with spaces", e.referer );
 }
 
@@ -286,15 +296,8 @@ TEST_F ( TestParseFixture, AWS_UnparsedInput_WhenRejected )
     const char * InputLine =
 "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/XXX/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"-\" \"aws-cli/1.16.249 Python/2.7.16 Linux/4.14.138-89.102.amzn1.x86_64 botocore/1.12.239\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    std::istringstream inputstream( InputLine );
-    {
-        AWS_Parser p( m_lines, inputstream );
-        p.parse();
-        ASSERT_EQ ( 1, m_lines.m_rejected.size() ); 
-        ASSERT_EQ ( string (InputLine), m_lines.m_rejected.front().unparsed);
-        ASSERT_EQ ( 0, m_lines.m_accepted.size() ); 
-        ASSERT_EQ ( 0, m_lines.m_unrecognized.size() );    
-    }
+    SLogAWSEvent e = parse_reject( InputLine );
+    ASSERT_EQ ( string (InputLine), e.unparsed);
 }
 
 TEST_F ( TestParseFixture, AWS_StrayBackslashes )
@@ -303,7 +306,7 @@ TEST_F ( TestParseFixture, AWS_StrayBackslashes )
 "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] 52.54.203.43 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
     std::istringstream inputstream( InputLine );
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string ("win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li"), e.agent.original);
 }
 
@@ -312,7 +315,7 @@ TEST_F ( TestParseFixture, AWS_NoIP )
     const char * InputLine =
 "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"HEAD /ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 HTTP/1.1\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string (), e.ip);
 }
 
@@ -321,7 +324,7 @@ TEST_F ( TestParseFixture, AWS_Request_QuotedDash )
     const char * InputLine =
 "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04b64e15519efb678 EF87C0499CB7FDCA REST.HEAD.OBJECT ERR792423/m150101_223627_42225_c100719502550000001823155305141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS5IgOb006L7yAqIz7zKBtUIxbAZgzvM1aQbbSHXeKUDoSVfPXro2v1AN4gf7Ek5VTV2FeV8= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string (), e.request.path);
     ASSERT_EQ ( string (), e.request.method);
     ASSERT_EQ ( string (), e.request.vers);
@@ -332,7 +335,7 @@ TEST_F ( TestParseFixture, AWS_multiple_valid_accessions_in_key )
     const char * InputLine =
 "7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRX123456/ERR792423/5141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string ("SRX123456/ERR792423/5141526_s1_p0.bas.h5.1"), e.key );
     ASSERT_EQ ( string ("ERR792423"), e.request.accession );
     ASSERT_EQ ( string ("5141526_s1_p0"), e.request.filename );
@@ -344,7 +347,7 @@ TEST_F ( TestParseFixture, AWS_no_valid_accessions_in_key )
     const char * InputLine =
 "7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT abc.12/5141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string ("abc.12/5141526_s1_p0.bas.h5.1"), e.key );
     ASSERT_EQ ( string (), e.request.accession );
     ASSERT_EQ ( string (), e.request.filename );
@@ -356,7 +359,7 @@ TEST_F ( TestParseFixture, AWS_valid_accessions_with_multiple_path_segments_in_k
     const char * InputLine =
 "7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456/abc.12/5141526_s1_p0.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string ("SRR123456/abc.12/5141526_s1_p0.bas.h5.1"), e.key );
     ASSERT_EQ ( string ("SRR123456"), e.request.accession );
     ASSERT_EQ ( string ("5141526_s1_p0"), e.request.filename );
@@ -368,7 +371,7 @@ TEST_F ( TestParseFixture, AWS_valid_accessions_no_extension_in_key )
     const char * InputLine =
 "7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456/abc.12/5141526_s1_p0 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string ("SRR123456/abc.12/5141526_s1_p0"), e.key );
     ASSERT_EQ ( string ("SRR123456"), e.request.accession );
     ASSERT_EQ ( string ("5141526_s1_p0"), e.request.filename );
@@ -380,7 +383,7 @@ TEST_F ( TestParseFixture, AWS_valid_accessions_only_extension_in_key )
     const char * InputLine =
 "7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456/abc.12/.bas.h5.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string ("SRR123456/abc.12/.bas.h5.1"), e.key );
     ASSERT_EQ ( string ("SRR123456"), e.request.accession );
     ASSERT_EQ ( string (""), e.request.filename );
@@ -392,7 +395,7 @@ TEST_F ( TestParseFixture, AWS_accessions_is_also_filename )
     const char * InputLine =
 "7dd4dcfe9 sra-pub-src-1 [25/May/2020:22:54:57 +0000] - arn:aws:sts - REST.HEAD.OBJECT SRR123456.1 \"-\" 200 - - 1318480 30 - \"referrer with spaces\" \"win64 sra-toolkit D:\\\\sratool\\\\sratoolkit.2.10.7 (phid=nocaeb9e77,li\" - Is1QS= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-1.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string ("SRR123456.1"), e.key );
     ASSERT_EQ ( string ("SRR123456"), e.request.accession );
     ASSERT_EQ ( string ("SRR123456"), e.request.filename );
@@ -404,7 +407,7 @@ TEST_F ( TestParseFixture, AWS_empty_key )
     const char * InputLine =
 "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-5 [09/Mar/2020:22:53:57 +0000] 35.172.121.21 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04a6132b8172af805 479B09DC662E4B67 REST.GET.BUCKET - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" 200 - 325 - 14 14 \"-\" \"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.154-99.181.amzn1.x86_64 botocore/1.12.92\" - 4588JL1XJI30m/MURh3Xoz4qVakHYt/u1JwJ/u4BvxAUCOFUfvPJAG/utO0+cBgipDArBig9kL4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-5.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ ( string (""), e.key );
     ASSERT_EQ ( string ("SRR11060177"), e.request.accession );
     ASSERT_EQ ( string ("filename"), e.request.filename );
@@ -416,7 +419,7 @@ TEST_F ( TestParseFixture, AWS_every_field_is_quoted_dash )
     const char * InputLine =
 "\"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\"";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
 
     ASSERT_EQ( "", e.owner );
     ASSERT_EQ( "", e.bucket );
@@ -463,7 +466,7 @@ TEST_F ( TestParseFixture, AWS_every_field_is_justdash )
     const char * InputLine =
 "- - - - - - - - - - - - - - - - - - - - - - - -";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
 
     ASSERT_EQ( "", e.owner );
     ASSERT_EQ( "", e.bucket );
@@ -522,7 +525,7 @@ TEST_F ( TestParseFixture, AWS_empty_user_agent )
     const char * InputLine =
 "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-5 [09/Mar/2020:22:53:57 +0000] 35.172.121.21 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04a6132b8172af805 479B09DC662E4B67 REST.GET.BUCKET - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" 200 - 325 - 14 14 \"-\" - - 4588JL1XJI30m/MURh3Xoz4qVakHYt/u1JwJ/u4BvxAUCOFUfvPJAG/utO0+cBgipDArBig9kL4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-5.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ( "", e.agent.original );
     ASSERT_EQ( "", e.agent.vdb_os );
     ASSERT_EQ( "", e.agent.vdb_tool );
@@ -538,7 +541,7 @@ TEST_F ( TestParseFixture, AWS_user_agent )
     const char * InputLine =
 "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-5 [09/Mar/2020:22:53:57 +0000] 35.172.121.21 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-04a6132b8172af805 479B09DC662E4B67 REST.GET.BUCKET - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" 200 - 325 - 14 14 \"-\" \"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\" - 4588JL1XJI30m/MURh3Xoz4qVakHYt/u1JwJ/u4BvxAUCOFUfvPJAG/utO0+cBgipDArBig9kL4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-5.s3.amazonaws.com TLSv1.2";
 
-    SLogAWSEvent e = parse_aws( InputLine );
+    SLogAWSEvent e = parse_accept( InputLine );
     ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", e.agent.original );
     ASSERT_EQ( "linux64", e.agent.vdb_os );
     ASSERT_EQ( "test-sra", e.agent.vdb_tool );
@@ -548,6 +551,59 @@ TEST_F ( TestParseFixture, AWS_user_agent )
     ASSERT_EQ( "000", e.agent.vdb_phid_session_id );
     ASSERT_EQ( "2.17", e.agent.vdb_libc );
 }
+
+TEST_F ( TestParseFixture, AWS_2_part_hostId )
+{   
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-1 [20/Mar/2019:19:44:01 +0000] 130.14.20.103 arn:aws:iam::783971887864:user/ignatovi 92D3B218463A63EA REST.GET.TAGGING - \"GET /sra-pub-run-1?tagging= HTTP/1.1\" 404 NoSuchTagSet 293 - 59 - \"-\" \"S3Console/0.4, aws-internal/3 aws-sdk-java/1.11.509 Linux/4.9.137-0.1.ac.218.74.329.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.202-b08 java/1.8.0_202\" - AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc= SigV4 ECDHE-RSA-AES128-SHA AuthHeader s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_accept( InputLine );
+    ASSERT_EQ( "AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=", e.host_id );
+}
+
+TEST_F ( TestParseFixture, AWS_1_part_hostId_a )
+{   
+    const char * InputLine = "- - - - - - - - - - - - - - - - - - AIDAISBTTLPGXGH6YFFAY - - - - TLSv1.2";
+    SLogAWSEvent e = parse_accept( InputLine );
+    ASSERT_EQ( "AIDAISBTTLPGXGH6YFFAY", e.host_id );
+}
+
+TEST_F ( TestParseFixture, AWS_1_part_hostId_b )
+{   
+    const char * InputLine = "- - - - - - - - - - - - - - - - - - LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc= - - - - TLSv1.2";
+    SLogAWSEvent e = parse_accept( InputLine );
+    ASSERT_EQ( "LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=", e.host_id );
+}
+
+TEST_F ( TestParseFixture, AWS_unescaped_quotes )
+{   
+    const char * InputLine =
+"7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-1 [07/May/2020:17:54:04 +0000] 155.130.133.78 - 9051A54D800E901B REST.GET.OBJECT SRR9201794/E15_5_R1.fastq.gz.1 \"GET /SRR9201794/E15_5_R1.fastq.gz.1 HTTP/1.1\" 200 - 9898557440 11674111891 251695 178 \"-\" \"pip/19.1 {\"ci\":null,\"cpu\":\"x86_64\",\"distro\":{\"id\":\"Core\",\"libc\":{\"lib\":\"glibc\",\"version\":\"2.17\"},\"name\":\"CentOS Linux\",\"version\":\"7\"},\"implementation\":{\"name\":\"CPython\",\"version\":\"3.6.7\"},\"installer\":{\"name\":\"pip\",\"version\":\"19.1\"},\"openssl_version\":\"OpenSSL 1.1.1b  26 Feb 2019\",\"python\":\"3.6.7\",\"setuptools_version\":\"41.0.1\",\"system\":{\"name\":\"Linux\",\"release\":\"3.10.0-514.10.2.el7.x86_64\"}}\" - KP+BPjI0RA4Nv1xBmBVFWMW/WdRamLN/2jbqsgdkLTZdzGF8i/DceLFmJJ7nzB15GQwwi9WKIts= - ECDHE-RSA-AES128-GCM-SHA256 - sra-pub-src-1.s3.amazonaws.com TLSv1.2";
+
+    SLogAWSEvent e = parse_reject( InputLine );
+}
+
+TEST_F ( TestParseFixture, AWS_missing_tokens )
+{   
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-3 [02/Oct/2019:02:25:33 +0000] - AmazonS3 125BA23426B965A1 S3.RESTORE.OBJECT data_check_loop.log \"-\" - - - 7803564 - - \"-\" \"-\" -";
+    SLogAWSEvent e = parse_reject( InputLine );
+}
+
+TEST_F ( TestParseFixture, AWS_one_part_TLS_version )
+{   
+    const char * InputLine =
+"7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-src-2 [16/Jul/2020:15:34:00 +0000] 218.75.25.6 - 34C7DF6E45B851B5 REST.GET.OBJECT ERR1676719/ecoli_er2925.pcr.r9.timp.061716.tar.gz.1 \"GET /ERR1676719/ecoli_er2925.pcr.r9.timp.061716.tar.gz.1 HTTP/1.1\" 206 - 4440619 400713583012 271245 140 \"https://sra-pub-src-2.s3.amazonaws.com/ERR1676719/\" \"Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko\" - Qhf7yUtlK7q9M4iGOqQTvY1ToRnmN045fBSW8WwtnPkO+cMmM+ONjuvA44sJLnMZsEVmVBoKFlE= - ECDHE-RSA-AES128-SHA - sra-pub-src-2.s3.amazonaws.com TLSv1";
+    SLogAWSEvent e = parse_accept( InputLine );
+}
+
+TEST_F ( TestParseFixture, AWS_duplicated_user_agent )
+{   
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-9 [26/May/2020:03:35:55 +0000] 34.238.194.11 arn:aws:iam::783971887864:user/data-access-service E0A893E41EAB8D15 REST.GET.OBJECT SRR11548641/SRR11548641.1 \"GET /SRR11548641/SRR11548641.1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA3NCC5VL4MPW55HQR%2F20200526%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200526T033553Z&X-Amz-Expires=360000&X-Amz-SignedHeaders=host&ncbi_phid=322C3DE7469C3B850000577E651A80C7.1.1&x-amz-request-payer=requester&X-Amz-Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX HTTP/1.1\" 206 - 262144 2245360961 28 25 \"-\" \"linux64 ncbi-vdb.2.10.5 (phid=LS1419242d,libc=2.26)linux64 ncbi-vdb.2.10.5 (phid=LS1419242d,libc=2.26)\" - 73/i7hQF4Ss+HJpizEinzsQoHo9WzpZ1CCjLjzObIL3MfydAFH8mJEIMjg4GwOhvUZ/oLQUJ0Wc= SigV4 ECDHE-RSA-AES128-GCM-SHA256 QueryString sra-pub-run-9.s3.amazonaws.com TLSv1.2";
+    SLogAWSEvent e = parse_accept( InputLine );
+}
+
 
 //TODO: rejected lines with more than IP recognized
 

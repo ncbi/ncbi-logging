@@ -211,7 +211,7 @@ vdb_agent_token
         } 
     | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; }
     | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
-    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; } 
+    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; }
     /*TODO: add an UNKNOWTOOLVERS token, categorize */
     ;
 
@@ -248,6 +248,11 @@ vdb_agent
             $$ . vdb_release = $2 . vdb_release;
         }
     }
+    | vdb_agent OS
+    {
+        $$ = $1;
+        MERGE_TSTR( $$ . original, $2 );
+    } 
     ;
 
 agent

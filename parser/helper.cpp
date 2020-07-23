@@ -58,6 +58,23 @@ uint8_t NCBI::Logging::month_int( const t_str * s )
     return 0;
 }
 
+int64_t NCBI::Logging::ToInt64( const t_str & s )
+{
+    int64_t res = 0;
+    if ( 0 == s . n ) return res;
+    int i = 0;
+    if ( s . p [ 0 ] == '-' || s . p [ 0 ] == '+' )
+        i++;
+    while( i < s . n )
+    {
+        res *=10;
+        res += s . p[ i++ ] - '0';
+    }
+    if ( s . p [ 0 ] == '-' )
+        res = -res;
+    return res;
+}
+
 string 
 NCBI::Logging::ToString( const t_str & in )
 {

@@ -38,8 +38,8 @@ VERS    [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
 
-CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]<>|`{}^\\]
-STR_CHARS   "?"|"\."|"\/"|{CHARS}
+CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]<>|`{}^]
+STR_CHARS   "?"|"\."|"\/"|"\\"|{CHARS}
 
 QSTR        {STR_CHARS}+
 QSTR_ESC    (\\\"|{STR_CHARS})+
@@ -98,9 +98,11 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 
 <PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
 <PATH>{SPACE}       { MAKE_STR(); return SPACE; }
-<PATH>\"            { return QUOTE; }
+<PATH>\\\"          { MAKE_STR(); return PATHSTR; }
+<PATH>\"            { MAKE_STR(); return QUOTE; }
 <PATH>\?            { MAKE_STR(); return QMARK; }
 <PATH>\/            { MAKE_STR(); return SLASH; };
+<PATH>\\            { MAKE_STR(); return PATHSTR; };
 <PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; };
@@ -120,7 +122,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {FLOAT}         { MAKE_STR(); return FLOAT; }
-{I64}           { yylval -> i64 = atol( yytext ); return I64; }
+{I64}           { MAKE_STR(); return I64; }
 {MONTH}         { MAKE_STR(); return MONTH; }
 {STR}           { MAKE_STR(); return STR; }
 
