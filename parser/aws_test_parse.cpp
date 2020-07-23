@@ -597,6 +597,14 @@ TEST_F ( TestParseFixture, AWS_one_part_TLS_version )
     SLogAWSEvent e = parse_accept( InputLine );
 }
 
+TEST_F ( TestParseFixture, AWS_duplicated_user_agent )
+{   
+    const char * InputLine =
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-9 [26/May/2020:03:35:55 +0000] 34.238.194.11 arn:aws:iam::783971887864:user/data-access-service E0A893E41EAB8D15 REST.GET.OBJECT SRR11548641/SRR11548641.1 \"GET /SRR11548641/SRR11548641.1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA3NCC5VL4MPW55HQR%2F20200526%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200526T033553Z&X-Amz-Expires=360000&X-Amz-SignedHeaders=host&ncbi_phid=322C3DE7469C3B850000577E651A80C7.1.1&x-amz-request-payer=requester&X-Amz-Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX HTTP/1.1\" 206 - 262144 2245360961 28 25 \"-\" \"linux64 ncbi-vdb.2.10.5 (phid=LS1419242d,libc=2.26)linux64 ncbi-vdb.2.10.5 (phid=LS1419242d,libc=2.26)\" - 73/i7hQF4Ss+HJpizEinzsQoHo9WzpZ1CCjLjzObIL3MfydAFH8mJEIMjg4GwOhvUZ/oLQUJ0Wc= SigV4 ECDHE-RSA-AES128-GCM-SHA256 QueryString sra-pub-run-9.s3.amazonaws.com TLSv1.2";
+    SLogAWSEvent e = parse_accept( InputLine );
+}
+
+
 //TODO: rejected lines with more than IP recognized
 
 extern "C"
