@@ -6,9 +6,35 @@ namespace NCBI
 {
     namespace Logging
     {
+        struct AWS_LogLinesInterface : public LogLinesInterface
+        {
+            typedef enum { 
+                owner = LastMemberId+1,
+                bucket,
+                time,
+                requester,
+                request_id,
+                operation,
+                key,
+                res_code,
+                error,
+                res_len,
+                obj_size,
+                total_time,
+                turnaround_time,
+                version_id,
+                host_id,
+                sig_ver,
+                cipher_suite,
+                auth_type,
+                host_header,
+                tls_version,
+                AWS_LastMemberId = tls_version
+            } AWS_Members;
+            virtual void set( AWS_Members m, const t_str & ) = 0;
+        };
 
-#if 0
-        struct LogAWSEvent : public CommonLogEvent
+        struct LogAWSEvent : public AWS_LogLinesInterface, public CommonLogEvent
         {
             t_str       owner;
             t_str       bucket;
@@ -54,136 +80,26 @@ namespace NCBI
                 EMPTY_TSTR( host_header );
                 EMPTY_TSTR( tls_version );
             }
+
+            virtual void beginLine();
+            virtual void endLine();
+            virtual Category GetCategory() const;
+            virtual void failedToParse( const t_str & source );
+            virtual void set( Members m, const t_str & v );
+            virtual void set( Members m, int64_t v );
+            virtual void setAgent( const t_agent & a );
+            virtual void setRequest( const t_request & r );
+            virtual bool nextMember( Member & value );
+            virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type );
+
+            virtual void set( AWS_Members m, const t_str & );
+            virtual void setTime( const t_timepoint & t );
+
+        private:
+            // typedef vector<Member> Members;
+            // Members members;
         };
-#endif
-
-        struct AWS_LogLinesInterface : public LogLinesInterface
-        {
-            typedef enum { 
-                owner = LastMemberId+1,
-                bucket,
-                time,
-                requester,
-                request_id,
-                operation,
-                key,
-                res_code,
-                error,
-                res_len,
-                obj_size,
-                total_time,
-                turnaround_time,
-                version_id,
-                host_id,
-                sig_ver,
-                cipher_suite,
-                auth_type,
-                host_header,
-                tls_version            
-            } AWS_Members;
-            virtual void set( AWS_Members m, const t_str & ) = 0;
-        };
-
-        class FormatterInterface
-        {
-        public:
-            virtual string format( LogLinesInterface & line ) = 0;
-            virtual string format( string & line ) = 0;
-        }
-
-        class JsonFormatter : public FormatterInterface
-        {
-        public:
-            virtual string format( LogLinesInterface & line )
-            {
-                stringstream ret = "{";
-                Member m;
-                bool first = true;
-                while ( line.nextMember( m ) )
-                {
-                    if (! first ) 
-                    {
-                        ret += ",";
-                        first = false;
-                    }
-
-                    ret << "\"" << ToString( m.key ) << "\"=";
-                    switch ( m. type )
-                    {
-                    case t_string: 
-                        ret << "\"" << Escape( m.u.s ) << "\""; break;
-                    case t_int: 
-                        ret << m.u.i; break;
-                    }
-                }
-                ret << "\"";
-                return ret.str();
-            }
-        }
-
-        class ClassificationInterface
-        {
-        public:
-            virtual ~ClassificationInterface() = 0;
-
-            virtual void write( Category cat, const string & s ) = 0;
-        }
-
-        class FileClassifier : public ClassificationInterface
-        {
-        public:
-            FileClassifier( const string & basename ) :
-                review  ( baseName+".review" ),
-                good    ( baseName+".good" ),
-                bad     ( baseName+".bad" ), 
-                ugly    ( baseName+".unrecog" )
-            {
-            }
-            virtual ~FileClassifier() {};
-
-            ofstream review, good, bad, ugly;
-
-            virtual void write( Category cat, const string & s )
-            {
-                switch ( cat )    
-                {
-                case cat_review : review << s; break;
-                // ...
-                }
-            }
-        }
-
-        class ThreadedFileClassifier : public ClassificationInterface
-        {
-        public:
-            ThreadedFileClassifier( const string & basename ) :
-                review  ( ofstream(baseName+".review") ),
-                good    ( ofstream(baseName+".good") ),
-                bad     ( ofstream(baseName+".bad") ), 
-                ugly    ( ofstream(baseName+".unrecog") )
-            {
-            }
-
-            OutputThread review, good, bad, ugly;
-
-            virtual ~ThreadedFileClassifier()
-            {
-                review.close();
-                good.close();
-                bad.close();
-                ugly.close();
-            }
-
-            virtual void write( Category cat, const string & s )
-            {
-                switch ( cat )    
-                {
-                case cat_review : review << s; break;
-                // ...
-                }
-            }
-        }
-
+#if 0
         class AWSParser
         {
         public:
@@ -366,7 +282,7 @@ namespace NCBI
             std::istream &  m_input;
             unsigned long int line_filter = 0;            
         };
-
+#endif
     }
 }
 

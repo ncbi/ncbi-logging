@@ -13,6 +13,8 @@ using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
 
+std::string tool_version( "1.1.0" );
+
 static void handle_aws( const Options & options )
 {
     AWSToJsonLogLines event_receiver( cout, options );
@@ -51,7 +53,7 @@ int main ( int argc, char * argv [], const char * envp []  )
             args . help();
 
         if ( vers )
-            cout << "version: 1.1" << endl;
+            cout << "version: " << tool_version << endl;
         
         if ( !help && !vers )
             handle_aws( options );

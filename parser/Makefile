@@ -391,7 +391,9 @@ test2jsn: log2jsn_
 #################################################
 # stand alone AWS parser
 
-AWS2JSN_SRC = aws2jsn.cpp helper.cpp
+AWS2JSN_SRC = helper.cpp Classifiers.cpp Formatters.cpp AWS_Interface.cpp
+
+#aws2jsn.cpp 
 
 AWS2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS2JSN_SRC)))
 AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
@@ -411,7 +413,7 @@ aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 aws_prof: mkdir $(BINDIR)/log2jsn-prof
 
 AWS_TEST_IMPL_SRC = \
-	$(PREFIX_AWS)test_impl.cpp helper.cpp
+	$(PREFIX_AWS)test_impl.cpp $(AWS2JSN_SRC)
 
 AWS_TEST_IMPL_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS_TEST_IMPL_SRC)))
 AWS_TEST_IMPL_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS_TEST_IMPL_SRC)))

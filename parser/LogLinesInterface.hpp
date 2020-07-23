@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <string>
 #include <cstring>
 
 #include "types.h"
@@ -60,56 +60,6 @@ namespace NCBI
             }
         };
 
-#if 0
-        struct LogAWSEvent : public CommonLogEvent
-        {
-            t_str       owner;
-            t_str       bucket;
-            t_timepoint time;
-            t_str       requester;
-            t_str       request_id;
-            t_str       operation;
-            t_str       key;
-            t_str       res_code;
-            t_str       error;
-            t_str       res_len;
-            t_str       obj_size;
-            t_str       total_time;
-            t_str       turnaround_time;
-            t_str       version_id;
-            t_str       host_id;
-            t_str       sig_ver;
-            t_str       cipher_suite;
-            t_str       auth_type;
-            t_str       host_header;
-            t_str       tls_version;
-
-            LogAWSEvent()
-            {
-                EMPTY_TSTR( owner );
-                EMPTY_TSTR( bucket );
-                memset( &time, 0, sizeof time );
-                EMPTY_TSTR( requester );
-                EMPTY_TSTR( request_id );
-                EMPTY_TSTR( operation );
-                EMPTY_TSTR( key );
-                EMPTY_TSTR( res_code );
-                EMPTY_TSTR( error );
-                EMPTY_TSTR( res_len );
-                EMPTY_TSTR( obj_size );
-                EMPTY_TSTR( total_time );
-                EMPTY_TSTR( turnaround_time );
-                EMPTY_TSTR( version_id );
-                EMPTY_TSTR( host_id );
-                EMPTY_TSTR( sig_ver );
-                EMPTY_TSTR( cipher_suite );
-                EMPTY_TSTR( auth_type );
-                EMPTY_TSTR( host_header );
-                EMPTY_TSTR( tls_version );
-            }
-        };
-#endif
-
         struct LogLinesInterface
         {
             virtual ~LogLinesInterface() {}
@@ -117,7 +67,7 @@ namespace NCBI
             virtual void beginLine() = 0;
             virtual void endLine() = 0;
 
-            enum { cat_review, cat_good, cat_bad, cat_ugly } Category;
+            typedef enum { cat_review, cat_good, cat_bad, cat_ugly } Category;
 
             virtual Category GetCategory() const = 0;
 
@@ -129,28 +79,27 @@ namespace NCBI
             typedef enum { 
                 ip,
                 referer,
-                agent,
                 unparsed,
-                request,                
-                LastMemberId = request
+                LastMemberId = unparsed
             } Members;
 
             virtual void set( Members m, const t_str & v ) = 0;
             virtual void set( Members m, int64_t v ) = 0;
-            virtual void set( const t_agent & a ) = 0;
-            virtual void set( const t_request & r ) = 0;
+            virtual void setAgent( const t_agent & a ) = 0;
+            virtual void setRequest( const t_request & r ) = 0;
 
-            class Member
+            typedef struct Member
             {
                 t_str name;
-                enum { t_string, t_int } Type;
+                typedef enum { t_string, t_int, t_time } Type;
                 Type type;
                 union 
                 {
                     t_str s;
                     int64_t i;
+                    t_timepoint t;
                 } u;
-            };
+            } Member;
             virtual bool nextMember( Member & value ) = 0;
 
             // could be a throw instead of abort, but we need to make sure the parser terminates cleanly if we throw.
@@ -158,6 +107,7 @@ namespace NCBI
             typedef enum { suspect, bad } ReportFieldType;
             virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type ) = 0;
         };
+
     }
 }
 
