@@ -82,6 +82,7 @@ struct Options
     bool jsonlib = false;
     bool path_only = false;
     bool agent_only = false;
+    bool with_version_and_date = true;
     unsigned long int selected_line = 0;
 };
 
@@ -160,7 +161,7 @@ struct cmnLogLines
         line_nr ++;
     }
 
-    void report( void )
+    void report( bool with_version_and_date )
     {
         unsigned long int total = num_accepted + num_rejected + num_unrecognized + num_headers;
         std::cerr << "total : " << total << endl;
@@ -169,8 +170,11 @@ struct cmnLogLines
         if ( num_headers > 0 )
             std::cerr << "headers : " << num_headers << endl;
         std::cerr << "unrecognized : " << num_unrecognized << endl;
-        std::cerr << "tool-version : " << tool_version << endl;
-        std::cerr << "compiled at : " << __DATE__ << " - " << __TIME__ << endl;
+        if ( with_version_and_date )
+        {
+            std::cerr << "tool-version : " << tool_version << endl;
+            std::cerr << "compiled at : " << __DATE__ << " - " << __TIME__ << endl;
+        }
     }
 
     cmnLogLines( ostream &os, const Options & options ) : mem_os( os ),
@@ -585,7 +589,7 @@ static void handle_on_prem( const Options & options )
     p . setLineFilter( options . selected_line );
     p . parse();
     if ( options . report )
-        event_receiver.report();
+        event_receiver.report( options . with_version_and_date );
 }
 
 static void handle_aws( const Options & options )
@@ -597,7 +601,7 @@ static void handle_aws( const Options & options )
     p . setLineFilter( options . selected_line );
     p . parse();
     if ( options . report )
-        event_receiver.report();
+        event_receiver.report( options . with_version_and_date );
 }
 
 static void handle_gcp( const Options & options ) 
@@ -609,7 +613,7 @@ static void handle_gcp( const Options & options )
     p . setLineFilter( options . selected_line );
     p . parse();
     if ( options . report )
-        event_receiver.report();
+        event_receiver.report( options . with_version_and_date );
 }
 
 enum logformat{ op, aws, gcp, unknown };
@@ -646,11 +650,13 @@ int main ( int argc, char * argv [], const char * envp []  )
         Options options;
         bool vers = false;
         bool no_report = false;
+        bool no_version_and_date = false;
 
         ncbi::Cmdline args( argc, argv );
         args . addOption( options . readable, "r", "readable", "pretty print json output ( only with -j )" );
         args . addOption( options . parser_debug, "d", "debug", "run with parser-debug-output" );
         args . addOption( no_report, "n", "no-report", "supress report" );
+        args . addOption( no_version_and_date, "t", "no-version-on-report", "supress version and date on report" );
         args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
         args . addOption( options . jsonlib, "j", "jsonlib", "use Json library for output ( much slower )" );
         args . addOption( options . path_only, "a", "path-only", "print only the path found ( not json )" );
@@ -666,8 +672,9 @@ int main ( int argc, char * argv [], const char * envp []  )
 
         args . parse();
 
-        options.report = ! no_report;
-
+        options . report = ! no_report;
+        options . with_version_and_date = ! no_version_and_date;
+       
         if ( help )
             args . help();
 
@@ -678,8 +685,8 @@ int main ( int argc, char * argv [], const char * envp []  )
         }
 
         if ( vers )
-            cout << "version: 1.0" << endl;
-        
+            cout << "version: " << tool_version << endl;
+
         if ( !help && !vers )
             return perform_parsing( string2logformat( format ), options );
         else
