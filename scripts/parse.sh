@@ -97,6 +97,8 @@ for LOG_BUCKET in $buckets; do
     echo "  Parsing $TGZ (pattern=$wildcard), $totalwc lines ..."
     touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
+    VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel --version)
+
     tar -xaOf "$TGZ" "$wildcard" | \
         time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
         "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
@@ -156,6 +158,7 @@ for LOG_BUCKET in $buckets; do
             printf '"provider": "%s",' "$PROVIDER"
             printf '"log_date": "%s",' "$YESTERDAY"
             printf '"parse_date": "%s",' "$DATE"
+            printf '"parser_version" : "%s",' "$VERSION"
             printf '"total_lines" : %d,' "$totalwc"
             printf '"recognized_lines" : %d,' "$recwc"
             printf '"unrecognized_lines" : %d'  "$unrecwc"
