@@ -7,6 +7,7 @@
 #include "helper.hpp"
 
 #include "AWS_Interface.hpp"
+#include "Formatters.hpp"
 
 namespace NCBI
 {
@@ -14,32 +15,34 @@ namespace NCBI
     {
         struct Options
         {
+            std::string outputBaseName;
             bool print_line_nr = false;
             bool parser_debug = false;
-            bool path_only = false;
-            bool agent_only = false;
-            unsigned long int selected_line = 0;
         };
 
         struct AWSToJsonLogLines : public AWS_LogLinesInterface
         {
-            AWSToJsonLogLines( std :: ostream &os, const Options& options ) {};
+            AWSToJsonLogLines( const Options& options ) : AWS_LogLinesInterface( jsonFmt ) {}
 
             virtual ~AWSToJsonLogLines() {}
 
             virtual void failedToParse( const t_str & source ) {}
 
-            virtual void beginLine() {}
-            virtual void endLine(  ) {}
+            virtual void endLine() {}
 
             virtual void set( Members, const t_str & ){}           //{ switch( m ) { case ip: ...; default: throw; }; }
             virtual void set( Members, int64_t ){}
-            virtual void set( const t_agent & a ){}
-            virtual void set( const t_request & r ){}
+            virtual void setAgent( const t_agent & a ){}
+            virtual void setRequest( const t_request & r ){}
             virtual void set( AWS_Members m, const t_str & ){}   //{ switch( m ) { case owner...; default: set(Members(m)) }; }
+
+            virtual std::stringstream & format( std::stringstream & out ) const { return out; } 
 
             // could be a throw instead of abort, but we need to make sure the parser terminates cleanly if we throw.
             virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type ) { return abort; }
+
+        private:
+            JsonLibFormatter jsonFmt; //TODO: use JsonFastFormatter
         };
 
 #if 0

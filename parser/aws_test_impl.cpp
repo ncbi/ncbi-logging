@@ -17,7 +17,6 @@ public:
     {
     }
 
-    virtual void beginLine() {}
     virtual void endLine() {}
     virtual Category GetCategory() const { return cat_ugly; }
     virtual void failedToParse( const t_str & source ) {}

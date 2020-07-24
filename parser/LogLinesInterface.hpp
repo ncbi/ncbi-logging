@@ -9,6 +9,10 @@ namespace NCBI
 {
     namespace Logging
     {
+        class FormatterInterface;
+        class LogLinesInterface;
+        class ClassificationInterface;
+
         typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
 
         typedef struct t_request
@@ -62,14 +66,18 @@ namespace NCBI
 
         struct LogLinesInterface
         {
+            LogLinesInterface( FormatterInterface & p_fmt ) 
+            : m_fmt ( p_fmt ), m_cat ( cat_ugly ) 
+            {
+            }
+
             virtual ~LogLinesInterface() {}
 
-            virtual void beginLine() = 0;
             virtual void endLine() = 0;
 
             typedef enum { cat_review, cat_good, cat_bad, cat_ugly } Category;
 
-            virtual Category GetCategory() const = 0;
+            virtual Category GetCategory() const { return m_cat; }
 
             // LogLinesInterface();
             // virtual LogLinesInterface();
@@ -88,24 +96,45 @@ namespace NCBI
             virtual void setAgent( const t_agent & a ) = 0;
             virtual void setRequest( const t_request & r ) = 0;
 
-            typedef struct Member
-            {
-                t_str name;
-                typedef enum { t_string, t_int, t_time } Type;
-                Type type;
-                union 
-                {
-                    t_str s;
-                    int64_t i;
-                    t_timepoint t;
-                } u;
-            } Member;
-            virtual bool nextMember( Member & value ) = 0;
+            // iterate over members with fmt.addNameValue(), call fmt.format(out) at the end
+            virtual std::stringstream & format( std::stringstream & out ) const = 0; 
 
             // could be a throw instead of abort, but we need to make sure the parser terminates cleanly if we throw.
             typedef enum { proceed, abort } ReportFieldResult;
             typedef enum { suspect, bad } ReportFieldType;
             virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type ) = 0;
+
+            FormatterInterface & GetFormatter() { return m_fmt; }
+
+        protected:
+            FormatterInterface & m_fmt;
+            Category m_cat;
+        };
+
+        class ParserInterface 
+        {
+        public:
+            ParserInterface( std::istream & input,  
+                             LogLinesInterface & receiver,
+                             ClassificationInterface & outputs ) 
+            :   m_input ( input ),
+                m_receiver ( receiver ), 
+                m_outputs ( outputs ),
+                m_debug ( false )
+            {
+            }
+
+            virtual ~ParserInterface() {};
+
+            virtual void parse() = 0;
+
+            void setDebug ( bool onOff ) { m_debug = onOff; }
+
+        protected:
+            std::istream & m_input;
+            LogLinesInterface & m_receiver; // we use its built-in formatter
+            ClassificationInterface & m_outputs;
+            bool m_debug;
         };
 
     }

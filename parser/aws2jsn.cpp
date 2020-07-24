@@ -1,4 +1,3 @@
-#include "AWSToJsonImpl.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -9,6 +8,9 @@
 
 #include "helper.hpp"
 
+#include "AWSToJsonImpl.hpp"
+#include "Classifiers.hpp"
+
 using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
@@ -17,10 +19,10 @@ std::string tool_version( "1.1.0" );
 
 static void handle_aws( const Options & options )
 {
-    AWSToJsonLogLines event_receiver( cout, options );
-    AWSParser p( event_receiver, cin );
+    AWSToJsonLogLines receiver( options );
+    FileClassifier outputs(options.outputBaseName); 
+    AWSParser p( cin, receiver, outputs );
     p . setDebug( options . parser_debug );
-    p . setLineFilter( options . selected_line );
     p . parse(); // does the parsing and generates the report
 }
 
@@ -28,26 +30,23 @@ int main ( int argc, char * argv [], const char * envp []  )
 {
     try
     {
-        ncbi::String format( "op" );
         bool help = false;
         Options options;
         bool vers = false;
-        bool no_report = false;
 
         ncbi::Cmdline args( argc, argv );
+
         args . addOption( options . parser_debug, "d", "debug", "run with parser-debug-output" );
         args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
-        args . addOption( options . path_only, "a", "path-only", "print only the path found ( not json )" );
-        args . addOption( options . agent_only, "g", "agent-only", "print only the agent found ( not json )" );
-
-        args . addOption( options . selected_line, nullptr, "l", "line-to-select", "line-nr", "select only this line from input (1-based)" );
 
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
 
-        args . parse();
+        String outputBaseName;
+        args . addParam( outputBaseName, "base-output-name", "base name for the output files" );
 
-        options.report = ! no_report;
+        args . parse();
+        options.outputBaseName = outputBaseName . toSTLString ();
 
         if ( help )
             args . help();

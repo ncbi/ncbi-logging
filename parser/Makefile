@@ -13,6 +13,7 @@ FLEXFLAGS = -8 --fast
 
 PREFIX_OP := op_
 PREFIX_AWS := aws_
+PREFIX_AWS_V2 := aws_v2_
 PREFIX_GCP := gcp_
 
 all: log2jsn_
@@ -58,6 +59,10 @@ $(OBJDIR)/$(PREFIX_AWS)parser.dbg.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
 $(OBJDIR)/$(PREFIX_AWS)parser.prof.o:  $(OBJDIR)/$(PREFIX_AWS)scanner.prof.o
 
+$(OBJDIR)/$(PREFIX_AWS_V2)parser.dbg.o:  	$(OBJDIR)/$(PREFIX_AWS_V2)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_AWS_V2)parser.rel.o:  	$(OBJDIR)/$(PREFIX_AWS_V2)scanner.rel.o
+$(OBJDIR)/$(PREFIX_AWS_V2)parser.prof.o:  	$(OBJDIR)/$(PREFIX_AWS_V2)scanner.prof.o
+
 $(OBJDIR)/$(PREFIX_GCP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_GCP)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.rel.o
 $(OBJDIR)/$(PREFIX_GCP)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.prof.o
@@ -74,6 +79,12 @@ $(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l $(PREFIX_AWS)parser.hpp
 
 $(PREFIX_AWS)parser.cpp: $(PREFIX_AWS)parser.y
 	bison --report all -d $(PREFIX_AWS)parser.y --output-file $(PREFIX_AWS)parser.cpp
+
+$(PREFIX_AWS_V2)scanner.cpp: $(PREFIX_AWS_V2)scanner.l $(PREFIX_AWS_V2)parser.hpp
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_AWS_V2)scanner.hpp --outfile=$(PREFIX_AWS_V2)scanner.cpp $(PREFIX_AWS_V2)scanner.l
+
+$(PREFIX_AWS_V2)parser.cpp: $(PREFIX_AWS_V2)parser.y
+	bison --report all -d $(PREFIX_AWS_V2)parser.y --output-file $(PREFIX_AWS_V2)parser.cpp
 
 
 $(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l $(PREFIX_GCP)parser.hpp
@@ -391,9 +402,14 @@ test2jsn: log2jsn_
 #################################################
 # stand alone AWS parser
 
-AWS2JSN_SRC = helper.cpp Classifiers.cpp Formatters.cpp AWS_Interface.cpp
-
-#aws2jsn.cpp 
+AWS2JSN_SRC = \
+	$(PREFIX_AWS_V2)parser.cpp \
+	$(PREFIX_AWS_V2)scanner.cpp \
+	helper.cpp \
+	Classifiers.cpp \
+	Formatters.cpp \
+	AWS_Interface.cpp \
+	aws2jsn.cpp 
 
 AWS2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS2JSN_SRC)))
 AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))

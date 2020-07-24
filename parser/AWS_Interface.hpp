@@ -8,6 +8,8 @@ namespace NCBI
     {
         struct AWS_LogLinesInterface : public LogLinesInterface
         {
+            AWS_LogLinesInterface( FormatterInterface & fmt ) : LogLinesInterface ( fmt ) {}
+
             typedef enum { 
                 owner = LastMemberId+1,
                 bucket,
@@ -57,7 +59,8 @@ namespace NCBI
             t_str       host_header;
             t_str       tls_version;
 
-            LogAWSEvent()
+            LogAWSEvent( FormatterInterface & fmt )
+            : AWS_LogLinesInterface ( fmt )
             {
                 EMPTY_TSTR( owner );
                 EMPTY_TSTR( bucket );
@@ -81,7 +84,6 @@ namespace NCBI
                 EMPTY_TSTR( tls_version );
             }
 
-            virtual void beginLine();
             virtual void endLine();
             virtual Category GetCategory() const;
             virtual void failedToParse( const t_str & source );
@@ -89,7 +91,9 @@ namespace NCBI
             virtual void set( Members m, int64_t v );
             virtual void setAgent( const t_agent & a );
             virtual void setRequest( const t_request & r );
-            virtual bool nextMember( Member & value );
+
+            virtual std::ostream & format( std::ostream & out ) const; 
+
             virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type );
 
             virtual void set( AWS_Members m, const t_str & );
@@ -99,31 +103,25 @@ namespace NCBI
             // typedef vector<Member> Members;
             // Members members;
         };
-#if 0
-        class AWSParser
+
+        class AWSParser : public ParserInterface
         {
         public:
-            AWSParser(  ) : m_lines( loglines ), m_input( input ) {}
-
-            void parseSingleThreaded(AWS_LogLinesInterface &loglines, 
-                       std::istream &input,
-                       FormatterInterface & formatter,
+            AWSParser( std::istream &input,  
+                       AWS_LogLinesInterface &receiver,
                        ClassificationInterface & outputs ) 
-            { 
-                string source;
-                while ( m_input.getline( source ) )
-                {
-                    loglines.reset();
-                    scan_init(source);
-                    if ( ! yyparse( loglines ) ) 
-                        outputs . write( cat_ugly, formatter.format(source) );
-                    else 
-                    {
-                        outputs. write ( loglines.Category(), formatter . format ( loglines ) );
-                    }
-                }
+            :   ParserInterface ( input, receiver, outputs )
+            {
             }
 
+            virtual void parse();
+        };
+
+        class AWSMultiThreadedParser : public ParserInterface
+        {
+        public:
+        };
+#if 0
             class OneReaderQueue
             {   //TODO: instrument to report the maximum queue size reached
 
