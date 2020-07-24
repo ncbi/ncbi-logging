@@ -1,0 +1,16 @@
+    { "schema": { "fields": [
+    { "name" : "log_bucket", "type": "STRING" },
+    { "name" : "provider", "type": "STRING" },
+    { "name" : "log_date", "type": "STRING" },
+    { "name" : "parse_date", "type": "STRING" },
+    { "name" : "parser_version", "type": "STRING" },
+    { "name" : "total_lines", "type": "INTEGER" },
+    { "name" : "recognized_lines", "type": "INTEGER" },
+    { "name" : "unrecognized_lines", "type": "INTEGER" }
+        ]
+    },
+  "sourceFormat": "NEWLINE_DELIMITED_JSON",
+  "sourceUris": [
+  "gs://logmon_logs_parsed_us/logs_s3_public/summary.*"
+  ]
+}

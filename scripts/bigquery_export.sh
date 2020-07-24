@@ -65,7 +65,7 @@ EOF
     jq -S -c -e . < gs_schema.json > /dev/null
     jq -S -c .schema.fields < gs_schema.json > gs_schema_only.json
 
-    #bq mk --external_table_definition=gs_schema_only.son strides_analytics.gs_parsed
+    #bq mk --external_table_definition=gs_schema_only.json strides_analytics.gs_parsed
 
     gsutil ls -lR "gs://logmon_logs_parsed_us/logs_gs_public/recognized.*"
 
