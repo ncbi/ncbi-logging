@@ -17,12 +17,17 @@ using namespace ncbi;
 
 std::string tool_version( "1.1.0" );
 
+struct Options
+{
+    std::string outputBaseName;
+};
+
 static void handle_aws( const Options & options )
 {
-    AWSToJsonLogLines receiver( options );
-    FileClassifier outputs(options.outputBaseName); 
+    JsonLibFormatter jsonFmt; 
+    LogAWSEvent receiver( jsonFmt );
+    FileClassifier outputs( options.outputBaseName ); 
     AWSParser p( cin, receiver, outputs );
-    p . setDebug( options . parser_debug );
     p . parse(); // does the parsing and generates the report
 }
 
@@ -35,9 +40,6 @@ int main ( int argc, char * argv [], const char * envp []  )
         bool vers = false;
 
         ncbi::Cmdline args( argc, argv );
-
-        args . addOption( options . parser_debug, "d", "debug", "run with parser-debug-output" );
-        args . addOption( options . print_line_nr, "p", "print-line-nr", "print line numbers" );
 
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );

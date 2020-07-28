@@ -82,7 +82,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLinesInterface * lib, const char* msg );
+void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg );
 
 
 #line 89 "aws_v2_parser.cpp" /* yacc.c:339  */
@@ -196,7 +196,7 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int aws_parse (void * scanner, NCBI::Logging::AWS_LogLinesInterface * lib);
+int aws_parse (void * scanner, NCBI::Logging::LogAWSEvent * lib);
 
 #endif /* !YY_AWS_AWS_V2_PARSER_HPP_INCLUDED  */
 
@@ -814,7 +814,7 @@ do {                                                                      \
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::AWS_LogLinesInterface * lib)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogAWSEvent * lib)
 {
   FILE *yyo = yyoutput;
   YYUSE (yyo);
@@ -835,7 +835,7 @@ yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvalue
 `--------------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::AWS_LogLinesInterface * lib)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogAWSEvent * lib)
 {
   YYFPRINTF (yyoutput, "%s %s (",
              yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
@@ -873,7 +873,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::AWS_LogLinesInterface * lib)
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::LogAWSEvent * lib)
 {
   unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1153,7 +1153,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::AWS_LogLinesInterface * lib)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::LogAWSEvent * lib)
 {
   YYUSE (yyvaluep);
   YYUSE (scanner);
@@ -1175,7 +1175,7 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NC
 `----------*/
 
 int
-yyparse (void * scanner, NCBI::Logging::AWS_LogLinesInterface * lib)
+yyparse (void * scanner, NCBI::Logging::LogAWSEvent * lib)
 {
 /* The lookahead symbol.  */
 int yychar;
@@ -2252,7 +2252,7 @@ yyreturn:
 #line 529 "aws_v2_parser.y" /* yacc.c:1906  */
 
 
-void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLinesInterface * lib, const char * msg )
+void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char * msg )
 {
-    // intentionally left empty, we communicate errors rejected lines
+    // intentionally left empty, we communicate errors via rejected lines
 }

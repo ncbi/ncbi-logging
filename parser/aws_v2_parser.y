@@ -1,6 +1,6 @@
 %define api.pure full
 %lex-param { void * scanner }
-%parse-param { void * scanner }{ NCBI::Logging::AWS_LogLinesInterface * lib }
+%parse-param { void * scanner }{ NCBI::Logging::LogAWSEvent * lib }
 
 %define parse.trace
 %define parse.error verbose
@@ -20,7 +20,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLinesInterface * lib, const char* msg );
+void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg );
 
 %}
 
@@ -528,7 +528,7 @@ time
 
 %%
 
-void aws_error( yyscan_t locp, NCBI::Logging::AWS_LogLinesInterface * lib, const char * msg )
+void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char * msg )
 {
-    // intentionally left empty, we communicate errors rejected lines
+    // intentionally left empty, we communicate errors via rejected lines
 }

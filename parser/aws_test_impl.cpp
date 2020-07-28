@@ -10,93 +10,19 @@ using namespace NCBI::Logging;
 #define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); (t).escaped = false; } while (false)
 #define INIT_TSTR_ESC(t, s) do { (t).p = s; (t).n = strlen(s); (t).escaped = true; } while (false)
 
-class TestLogLinesInterface : public LogLinesInterface
-{
-public:
-    TestLogLinesInterface( uint16_t p_memCount ) : memCount ( p_memCount )
-    {
-    }
-
-    virtual void endLine() {}
-    virtual Category GetCategory() const { return cat_ugly; }
-    virtual void failedToParse( const t_str & source ) {}
-    virtual void set( Members m, const t_str & v ) {}
-    virtual void set( Members m, int64_t v ) {}
-    virtual void setAgent( const t_agent & a ) {}
-    virtual void setRequest( const t_request & r ) {}
-    virtual void setTime( const t_timepoint & t ) {}
-    virtual bool nextMember( Member & m ) 
-    {
-        ++curMember;
-        if ( curMember > memCount )
-        {
-            return false;
-        }
-        switch (curMember)
-        {
-        case 1:
-            INIT_TSTR( m . name, "a");
-            m . type = Member::t_string;
-            EMPTY_TSTR( m.u.s );
-            m . u . s . p = "str";
-            m . u . s . n = 3;
-            return true;
-        case 2:
-            INIT_TSTR( m . name, "b");
-            m . type = Member::t_int;
-            m . u . i = 123;
-            return true;
-        default:
-            return false;
-        }
-    }
-    uint16_t curMember = 0;
-    uint16_t memCount;
-
-    virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type ) { return abort; }
-};
-
-TEST(JsonFormatterTest, Iterate_NoEscape)
-{
-    TestLogLinesInterface line(2);
-    JsonFormatter f;
-    ASSERT_EQ ( "{\"a\":\"str\",\"b\":123}", f.format( line ) );
-}
-
-TEST(JsonFormatterTest, Iterate_NoMembers)
-{
-    TestLogLinesInterface line(0);
-    JsonFormatter f;
-    ASSERT_EQ ( "{}", f.format( line ) );
-}
-TEST(JsonFormatterTest, SingleString)
-{
-    JsonFormatter f;
-    t_str v;
-    INIT_TSTR( v, "abc");
-    ASSERT_EQ ( "{\"key\":\"abc\"}", f.format( "key", v ) );
-}
-
-TEST(JsonFormatterTest, Escaping)
-{
-    JsonFormatter f;
-    t_str v;
-    INIT_TSTR( v, "abc");
-    ASSERT_EQ ( "{\"key\":\"abc\"}", f.format( "key", v ) );
-}
-
-
 TEST(LogAWSEventTest, Create)
 {
-    LogAWSEvent e;
+    JsonLibFormatter f;
+    LogAWSEvent e ( f );
 }
 
 TEST(LogAWSEventTest, Setters)
 {
-    LogAWSEvent e;
+    JsonLibFormatter f;
+    LogAWSEvent e ( f );
     
     t_str v;
-    INIT_TSTR( v, "ip");
+    INIT_TSTR( v, "i_p");
     e.set( LogLinesInterface::ip, v );
     INIT_TSTR( v, "ref");
     e.set( LogLinesInterface::referer, v );
@@ -126,37 +52,34 @@ TEST(LogAWSEventTest, Setters)
     };
     e.setRequest( r );
 
-    INIT_TSTR( v, "own");
-    e.set(AWS_LogLinesInterface::owner, v);
-    INIT_TSTR( v, "buc");
-    e.set(AWS_LogLinesInterface::bucket, v);
-    t_timepoint t = {1, 2, 3, 4, 5, 6, 7};
-    e.setTime(t);
-    INIT_TSTR( v, "req");e.set(AWS_LogLinesInterface::requester, v);
-    INIT_TSTR( v, "req_id");e.set(AWS_LogLinesInterface::request_id, v);
-    INIT_TSTR( v, "ope");e.set(AWS_LogLinesInterface::operation, v);
-    INIT_TSTR( v, "key");e.set(AWS_LogLinesInterface::key, v);
-    INIT_TSTR( v, "cod");e.set(AWS_LogLinesInterface::res_code, v);
-    INIT_TSTR( v, "err");e.set(AWS_LogLinesInterface::error, v);
-    INIT_TSTR( v, "res");e.set(AWS_LogLinesInterface::res_len, v);
-    INIT_TSTR( v, "obj");e.set(AWS_LogLinesInterface::obj_size, v);
-    INIT_TSTR( v, "tot");e.set(AWS_LogLinesInterface::total_time, v);
-    INIT_TSTR( v, "tur");e.set(AWS_LogLinesInterface::turnaround_time, v);
-    INIT_TSTR( v, "ver");e.set(AWS_LogLinesInterface::version_id, v);
-    INIT_TSTR( v, "host");e.set(AWS_LogLinesInterface::host_id, v);
-    INIT_TSTR( v, "sig");e.set(AWS_LogLinesInterface::sig_ver, v);
-    INIT_TSTR( v, "cip");e.set(AWS_LogLinesInterface::cipher_suite, v);
-    INIT_TSTR( v, "aut");e.set(AWS_LogLinesInterface::auth_type, v);
-    INIT_TSTR( v, "hos");e.set(AWS_LogLinesInterface::host_header, v);
-    INIT_TSTR( v, "tls");e.set(AWS_LogLinesInterface::tls_version, v);
+    INIT_TSTR( v, "own"); e.set(LogAWSEvent::owner, v);
+    INIT_TSTR( v, "buc"); e.set(LogAWSEvent::bucket, v);
+    INIT_TSTR( v, "tim"); e.set(LogAWSEvent::time, v);
+    INIT_TSTR( v, "req"); e.set(LogAWSEvent::requester, v);
+    INIT_TSTR( v, "req_id");e.set(LogAWSEvent::request_id, v);
+    INIT_TSTR( v, "ope"); e.set(LogAWSEvent::operation, v);
+    INIT_TSTR( v, "key"); e.set(LogAWSEvent::key, v);
+    INIT_TSTR( v, "cod"); e.set(LogAWSEvent::res_code, v);
+    INIT_TSTR( v, "err"); e.set(LogAWSEvent::error, v);
+    INIT_TSTR( v, "res"); e.set(LogAWSEvent::res_len, v);
+    INIT_TSTR( v, "obj"); e.set(LogAWSEvent::obj_size, v);
+    INIT_TSTR( v, "tot"); e.set(LogAWSEvent::total_time, v);
+    INIT_TSTR( v, "tur"); e.set(LogAWSEvent::turnaround_time, v);
+    INIT_TSTR( v, "ver"); e.set(LogAWSEvent::version_id, v);
+    INIT_TSTR( v, "host");e.set(LogAWSEvent::host_id, v);
+    INIT_TSTR( v, "sig"); e.set(LogAWSEvent::sig_ver, v);
+    INIT_TSTR( v, "cip"); e.set(LogAWSEvent::cipher_suite, v);
+    INIT_TSTR( v, "aut"); e.set(LogAWSEvent::auth_type, v);
+    INIT_TSTR( v, "hos"); e.set(LogAWSEvent::host_header, v);
+    INIT_TSTR( v, "tls"); e.set(LogAWSEvent::tls_version, v);
 
-    JsonFormatter f;
+    stringstream out;
     ASSERT_EQ ( 
-        "{blah}", 
-        f.format( e ) );    
+        "{\"accession\":\"a\",\"agent\":\"o\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"extension\":\"e\",\"filename\":\"f\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_ip\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\",\"version_id\":\"ver\"}", 
+        e.GetFormatter().format( out ).str() );    
 }
 
-//TODO: add tests for t_timepoint LogLinesInterface::Member::u.t
+//TODO: reportField
 
 #if 0
 TEST (TestHelper, StringEscaped)
@@ -184,48 +107,6 @@ TEST (TestHelper, StringEscaped_NotEscapedCharacter)
     ASSERT_EQ( string("\\n"), ToString( s ) );
 }
 #endif
-
-
-// Classifiers
-
-TEST(FileClassifier, Write)
-{
-    {
-        FileClassifier f( "test" );
-        f.write( LogLinesInterface::cat_review, "review");
-        f.write( LogLinesInterface::cat_good, "good");
-        f.write( LogLinesInterface::cat_bad, "bad");
-        f.write( LogLinesInterface::cat_ugly, "ugly");
-    }
-
-    {
-        ifstream in("test.review"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("review"), s);
-    }
-    remove("test.review");
-
-    {
-        ifstream in("test.good"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("good"), s);
-    }
-    remove("test.good");
-
-    {
-        ifstream in("test.bad"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("bad"), s);
-    }
-    remove("test.bad");
-
-    {
-        ifstream in("test.unrecog"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("ugly"), s);
-    }
-    remove("test.unrecog");
-}
 
 extern "C"
 {

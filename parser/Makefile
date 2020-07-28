@@ -400,16 +400,43 @@ test2jsn: log2jsn_
 .PHONY: log2jsn_ log2jsn_prof test2jsn
 
 #################################################
+# unit tests for formatter/classifier
+
+TEST_SUPPORT_SRC = \
+	Formatters.cpp test_formatter.cpp \
+	Classifiers.cpp test_classifier.cpp \
+	test_support_main.cpp
+
+TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
+TEST_SUPPORT_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(TEST_SUPPORT_SRC)))
+
+$(BINDIR)/test_support-dbg: $(TEST_SUPPORT_DBG_OBJ)
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread 
+
+$(BINDIR)/test_support-rel: $(TEST_SUPPORT_REL_OBJ) 
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread 
+
+test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
+
+run_test_support: $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
+	$(BINDIR)/test_support-dbg
+	$(BINDIR)/test_support-rel
+
+.PHONY: test_support run_test_support
+
+#################################################
 # stand alone AWS parser
 
-AWS2JSN_SRC = \
+AWS2JSN_CMN_SRC = \
 	$(PREFIX_AWS_V2)parser.cpp \
 	$(PREFIX_AWS_V2)scanner.cpp \
 	helper.cpp \
 	Classifiers.cpp \
 	Formatters.cpp \
-	AWS_Interface.cpp \
-	aws2jsn.cpp 
+	LogLinesInterface.cpp \
+	AWS_Interface.cpp
+
+AWS2JSN_SRC = $(AWS2JSN_CMN_SRC) aws2jsn.cpp 
 
 AWS2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS2JSN_SRC)))
 AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
@@ -428,19 +455,18 @@ aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 
 aws_prof: mkdir $(BINDIR)/log2jsn-prof
 
-AWS_TEST_IMPL_SRC = \
-	$(PREFIX_AWS)test_impl.cpp $(AWS2JSN_SRC)
+AWS_TEST_IMPL_SRC = $(AWS2JSN_CMN_SRC) aws_test_impl.cpp
 
 AWS_TEST_IMPL_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS_TEST_IMPL_SRC)))
 AWS_TEST_IMPL_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS_TEST_IMPL_SRC)))
 
 $(BINDIR)/$(PREFIX_AWS)test_impl-dbg: $(AWS_TEST_IMPL_DBG_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread
+	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
 $(BINDIR)/$(PREFIX_AWS)test_impl-rel: $(AWS_TEST_IMPL_REL_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread 
+	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
-run_$(PREFIX_AWS)impltest: $(BINDIR)/$(PREFIX_AWS)test_impl-dbg $(BINDIR)/$(PREFIX_AWS)test_impl-rel
+run_$(PREFIX_AWS)impltest: run_test_support $(BINDIR)/$(PREFIX_AWS)test_impl-dbg $(BINDIR)/$(PREFIX_AWS)test_impl-rel
 	$(BINDIR)/$(PREFIX_AWS)test_impl-dbg
 	$(BINDIR)/$(PREFIX_AWS)test_impl-rel
 

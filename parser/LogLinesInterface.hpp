@@ -4,12 +4,12 @@
 #include <cstring>
 
 #include "types.h"
+#include "Formatters.hpp"
 
 namespace NCBI
 {
     namespace Logging
     {
-        class FormatterInterface;
         class LogLinesInterface;
         class ClassificationInterface;
 
@@ -46,58 +46,29 @@ namespace NCBI
 
         inline void InitAgent( t_agent & r ) { memset( & r, 0, sizeof ( r ) ); }
 
-        struct CommonLogEvent
-        {
-            t_str       ip;
-            t_str       referer;
-            t_agent     agent;
-            t_str       unparsed;
-            t_request   request;
-
-            CommonLogEvent()
-            {
-                EMPTY_TSTR( ip );
-                EMPTY_TSTR( referer );
-                InitAgent( agent );
-                EMPTY_TSTR( unparsed );
-                InitRequest( request );
-            }
-        };
-
         struct LogLinesInterface
         {
-            LogLinesInterface( FormatterInterface & p_fmt ) 
-            : m_fmt ( p_fmt ), m_cat ( cat_ugly ) 
-            {
-            }
+            LogLinesInterface( FormatterInterface & p_fmt );
 
-            virtual ~LogLinesInterface() {}
-
-            virtual void endLine() = 0;
+            virtual ~LogLinesInterface();
 
             typedef enum { cat_review, cat_good, cat_bad, cat_ugly } Category;
 
-            virtual Category GetCategory() const { return m_cat; }
-
-            // LogLinesInterface();
-            // virtual LogLinesInterface();
-
-            virtual void failedToParse( const t_str & source ) = 0;
+            Category GetCategory() const { return m_cat; }
+            void SetCategory( Category p_cat ) { m_cat = p_cat; }
 
             typedef enum { 
                 ip,
                 referer,
                 unparsed,
+                agent,
+                request,
                 LastMemberId = unparsed
-            } Members;
+            } Members; 
 
-            virtual void set( Members m, const t_str & v ) = 0;
-            virtual void set( Members m, int64_t v ) = 0;
-            virtual void setAgent( const t_agent & a ) = 0;
-            virtual void setRequest( const t_request & r ) = 0;
-
-            // iterate over members with fmt.addNameValue(), call fmt.format(out) at the end
-            virtual std::stringstream & format( std::stringstream & out ) const = 0; 
+            void set( Members m, const t_str & v ); // for agent and request, use the methods below
+            void setAgent( const t_agent & a );
+            void setRequest( const t_request & r );
 
             // could be a throw instead of abort, but we need to make sure the parser terminates cleanly if we throw.
             typedef enum { proceed, abort } ReportFieldResult;
@@ -105,6 +76,7 @@ namespace NCBI
             virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type ) = 0;
 
             FormatterInterface & GetFormatter() { return m_fmt; }
+            std::stringstream & format( std::stringstream & out ) const { return m_fmt.format( out ); }
 
         protected:
             FormatterInterface & m_fmt;

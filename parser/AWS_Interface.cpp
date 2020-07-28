@@ -13,26 +13,39 @@ extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
 using namespace NCBI::Logging;
 using namespace std;
 
-void LogAWSEvent::endLine()  {}
-
-LogLinesInterface::Category 
-LogAWSEvent::GetCategory() const 
-{ 
-    return cat_ugly; 
+LogAWSEvent::LogAWSEvent( FormatterInterface & fmt )
+: LogLinesInterface ( fmt )
+{
 }
 
-void LogAWSEvent::failedToParse( const t_str & source ) {}
-void LogAWSEvent::set( Members m, const t_str & v ) {}
-void LogAWSEvent::set( Members m, int64_t v ) {}
-void LogAWSEvent::setAgent( const t_agent & a ) {}
-void LogAWSEvent::setRequest( const t_request & r ) {}
-void LogAWSEvent::setTime( const t_timepoint & t ) {}
-
-ostream & 
-LogAWSEvent::format( ostream & out ) const
+void LogAWSEvent::set( AWS_Members m, const t_str & v ) 
 {
-    //TODO iterate over members
-    return out;
+#define CASE(mem) case mem: m_fmt.addNameValue(#mem, v); break;
+    switch( m )
+    {
+    CASE( owner )
+    CASE( bucket )
+    CASE( time )
+    CASE( requester )
+    CASE( request_id )
+    CASE( operation )
+    CASE( key )
+    CASE( res_code )
+    CASE( error )
+    CASE( res_len )
+    CASE( obj_size )
+    CASE( total_time )
+    CASE( turnaround_time )
+    CASE( version_id )
+    CASE( host_id )
+    CASE( sig_ver )
+    CASE( cipher_suite )
+    CASE( auth_type )
+    CASE( host_header )
+    CASE( tls_version )
+    default: LogLinesInterface::set((LogLinesInterface::Members)m, v); 
+    }
+#undef CASE
 }
 
 LogLinesInterface::ReportFieldResult 
@@ -41,48 +54,40 @@ LogAWSEvent::reportField( Members field, const char * value, const char * messag
     return proceed;
 }
 
-void LogAWSEvent::set( AWS_Members m, const t_str & ) {}
-
 void 
 AWSParser::parse()
 { 
-    string line;
     yyscan_t sc;
-    unsigned long int line_nr = 0;
-
     aws_lex_init( &sc );
 
     // set debug output flags
-    aws_debug = m_debug ? 1 : 0;            // bison (aws is global)
+    aws_debug = m_debug ? 1 : 0;            // bison (aws_debug is global)
     aws_set_debug( m_debug ? 1 : 0, sc );   // flex
 
+    unsigned long int line_nr = 0;
+    string line;
     while( getline( m_input, line ) )
     {
         line_nr++;
 
         YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
-        t_str t_line;
-
         stringstream out; // consider moving out of the loop
-        if ( aws_parse( sc, static_cast<AWS_LogLinesInterface*>( & m_receiver ) ) != 0 )
+        if ( aws_parse( sc, static_cast<LogAWSEvent*>( & m_receiver ) ) != 0 )
         {
             FormatterInterface & fmt = m_receiver.GetFormatter();
             fmt.addNameValue("line_nr", line_nr);
 
+            t_str t_line;
             t_line.p = line.c_str();
             t_line.n = line.size();
             t_line.escaped = false;
             fmt.addNameValue("unparsed", t_line);
 
-            m_outputs . write( LogLinesInterface::cat_ugly, fmt.format( out ).str() );
+            m_receiver.SetCategory( LogLinesInterface::cat_ugly );
         }
-        else 
-        {
-            //TODO: set line_nr if cmd line option requires            
-            m_outputs. write ( m_receiver.GetCategory(), m_receiver . format ( out ).str() );
-        }
-        m_receiver.endLine();
+
+        m_outputs. write ( m_receiver.GetCategory(), m_receiver . format ( out ).str() );
 
         aws__delete_buffer( bs, sc );
     }
