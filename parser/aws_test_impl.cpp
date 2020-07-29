@@ -79,6 +79,84 @@ TEST(LogAWSEventTest, Setters)
         e.GetFormatter().format( out ).str() );    
 }
 
+class LogAWSEventFixture : public ::testing::Test
+{
+    public :
+        void try_to_parse( std::string line, bool debug = false )
+        {
+            istringstream ss( line );
+            JsonLibFormatter jsonFmt; 
+            LogAWSEvent receiver( jsonFmt );
+            AWSParser p( ss, receiver, s_outputs );
+            p . setDebug( debug );
+            p . parse(); // does the parsing and generates the report
+        }
+
+        std::string try_to_parse_good( std::string line, bool debug = false )
+        {
+            try_to_parse( line, debug );
+            return s_outputs.get_good();
+        }
+
+        std::string try_to_parse_bad( std::string line, bool debug = false )
+        {
+            try_to_parse( line, debug );
+            return s_outputs.get_bad();
+        }
+
+        std::string try_to_parse_ugly( std::string line, bool debug = false )
+        {
+            try_to_parse( line, debug );
+            return s_outputs.get_ugly();
+        }
+
+        std::string extract_value( const std::string & src, std::string key )
+        {
+
+        }
+
+        StringClassifier s_outputs;
+};
+
+TEST_F( LogAWSEventFixture, parse_just_dashes )
+{
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( 
+        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_ip\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}",
+        res
+        );
+}
+
+TEST_F( LogAWSEventFixture, parse_quoted_dashes )
+{
+    std::string res = try_to_parse_good( "\"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\"" );
+    ASSERT_EQ( 
+        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_ip\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}",
+        res
+        );
+}
+
+TEST_F( LogAWSEventFixture, LineRejecting )
+{
+    std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );
+    ASSERT_EQ( "{\"bucket\":\"blah\",\"line_nr\":1,\"owner\":\"line1\",\"unparsed\":\"line1 blah\"}{\"line_nr\":2,\"owner\":\"line2\",\"unparsed\":\"line2\"}{\"line_nr\":3,\"owner\":\"line3\",\"unparsed\":\"line3\"}", res );
+}
+
+TEST_F( LogAWSEventFixture, unrecognized_char )
+{
+    std::string res = try_to_parse_ugly( "line1 \07" );
+    ASSERT_EQ( "{\"line_nr\":1,\"owner\":\"line1\",\"unparsed\":\"line1 \\u0007\"}", res );
+}
+
+TEST_F( LogAWSEventFixture, parse_owner )
+{
+    std::string res = try_to_parse_good( "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 - - - - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( 
+        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_ip\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}",
+        res
+        );
+}
+
 //TODO: reportField
 
 #if 0

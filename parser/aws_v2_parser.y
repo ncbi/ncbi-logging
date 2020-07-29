@@ -22,6 +22,9 @@ using namespace NCBI::Logging;
 
 void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg );
 
+#define SET_VALUE( selector, source ) ( ( ( LogAWSEvent * ) lib ) -> set( (selector), (source) ) )
+#define REPORT( selector, source ) ( ( ( LogAWSEvent * ) lib ) -> set( (selector), (source) ) )
+
 %}
 
 %code requires
@@ -35,6 +38,9 @@ extern void aws_start_URL( void * yyscanner );
 extern void aws_start_UserAgent( void * yyscanner );
 extern void aws_start_TLS_vers( void * yyscanner );
 extern void aws_start_host_id( void * yyscanner );
+extern void aws_start_time( void * yyscanner );
+extern void aws_start_ipaddr( void * yyscanner );
+extern void aws_start_rescode( void * yyscanner );
 
 extern void aws_pop_state( void * yyscanner );
 
@@ -44,18 +50,17 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
-    t_timepoint tp;
     t_request req;
     t_agent agent;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
-%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID
+%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID TIMEFMT RESULTCODE
 %token COLON QUOTE OB CB 
 %token UNRECOGNIZED
 %token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
 
-%type<tp> time
+%type<s> time
 %type<s> ip referer method qstr_list dash string_or_dash
 %type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
 %type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
@@ -76,14 +81,14 @@ line
 log_aws
     : aws_owner SPACE
       aws_bucket SPACE
-      time SPACE
-      ip SPACE
+      { aws_start_time( scanner ); } time SPACE
+      { aws_start_ipaddr( scanner ); } ip SPACE
       aws_requester SPACE
       aws_request_id SPACE
       aws_operation SPACE
       { aws_start_URL( scanner ); } aws_quoted_key SPACE
       request SPACE
-      result_code SPACE
+      { aws_start_rescode( scanner ); } result_code SPACE
       aws_error SPACE
       aws_bytes_sent SPACE
       aws_obj_size SPACE
@@ -104,55 +109,29 @@ log_aws
       aws_host_hdr SPACE
       { aws_start_TLS_vers( scanner ); } aws_tls_vers { aws_pop_state( scanner ); }
     {
+        // numbers may be shifted!!!!
+        lib -> setRequest( $20 );
 
-/*        
-        LogAWSEvent ev;
-        ev . owner = $1;
-        ev . bucket = $3;
-        ev . time = $5;
-        ev . ip = $7;
-        ev . requester = $9;
-        ev . request_id = $11;
-        ev . operation = $13;
-
-        ev . request = $18; // this has to happen before we use the key-decomposition
+        /*
         // combine data from aws_key and request
-        if ( $16 . path . n == 1 && $16 . path . p[ 0 ] == '-' )
+        if ( $17 . path . n == 1 && $17 . path . p[ 0 ] == '-' )
         {
             EMPTY_TSTR( ev . key );
         }
-        else if ( $16 . path . n == 3 && $16 . path . p[ 0 ] == '\"' && $16 . path . p[ 1 ] == '-' && $16 . path . p[ 2 ] == '\"' )
+        else if ( $17 . path . n == 3 && $17 . path . p[ 0 ] == '\"' && $17 . path . p[ 1 ] == '-' && $17 . path . p[ 2 ] == '\"' )
         {
             EMPTY_TSTR( ev . key );
         }
         else
         {
-            ev . key = $16 . path;
+            ev . key = $17 . path;
         }
-        if ( $16 . accession . n > 0 )
+        if ( $17 . accession . n > 0 )
         {
-            ev . request . accession = $16 . accession;
-            ev . request . filename  = $16 . filename;
-            ev . request . extension = $16 . extension;
+            ev . request . accession = $17 . accession;
+            ev . request . filename  = $17 . filename;
+            ev . request . extension = $17 . extension;
         }
-
-        ev . res_code           = $20;
-        ev . error              = $22;
-        ev . res_len            = $24;
-        ev . obj_size           = $26;
-        ev . total_time         = $28;
-        ev . turnaround_time    = $30;
-        ev . referer            = $32;
-        ev . agent              = $35;
-        ev . version_id         = $38;
-        ev . host_id            = $41;
-        ev . sig_ver            = $43;
-        ev . cipher_suite       = $45;
-        ev . auth_type          = $47;
-        ev . host_header        = $49;
-        ev . tls_version        = $52;
-        
-        lib -> acceptLine( ev );
 */        
     }
     ;
@@ -169,20 +148,20 @@ string_or_dash
     ;
 
 log_aws_err
-    : aws_owner error
-    {
-        // LogAWSEvent ev;
-        // ev . owner = $1;
-        // aws_get_scanner_input( scanner, ev . unparsed );
-        // lib -> rejectLine( ev );
-    }
+    : aws_owner error       {  YYABORT; }
     ;
 
-aws_owner : string_or_dash ;
-aws_bucket : string_or_dash ;
-aws_requester : string_or_dash ;
-aws_request_id : string_or_dash ;
-aws_operation : string_or_dash ;
+aws_owner      : string_or_dash             { SET_VALUE( LogAWSEvent::owner, $1 ); };
+aws_bucket     : string_or_dash             { SET_VALUE( LogAWSEvent::bucket, $1 ); };
+aws_requester  : string_or_dash             { SET_VALUE( LogAWSEvent::requester, $1 ); };
+aws_request_id : string_or_dash             { SET_VALUE( LogAWSEvent::request_id, $1 ); };
+aws_operation  : string_or_dash             { SET_VALUE( LogAWSEvent::operation, $1 ); };
+aws_error      : string_or_dash             { SET_VALUE( LogAWSEvent::error, $1 ); };
+aws_version_id : string_or_dash             { SET_VALUE( LogAWSEvent::version_id, $1 ); };
+aws_sig        : string_or_dash             { SET_VALUE( LogAWSEvent::sig_ver, $1 ); };
+aws_cipher     : string_or_dash             { SET_VALUE( LogAWSEvent::cipher_suite, $1 ); };
+aws_auth       : string_or_dash             { SET_VALUE( LogAWSEvent::auth_type, $1 ); };
+aws_host_hdr   : string_or_dash             { SET_VALUE( LogAWSEvent::host_header, $1 ); };
 
 key_token
     : SLASH         { InitRequest( $$ ); $$ . path = $1; }
@@ -234,33 +213,29 @@ aws_key
     ;
 
 aws_quoted_key
-    : aws_key
-    | QUOTE DASH QUOTE {  InitRequest( $$ ); }
+    : aws_key               { $$ = $1; }
+    | QUOTE DASH QUOTE      { InitRequest( $$ ); }
     ;
 
-aws_error : string_or_dash ;
-
 aws_bytes_sent
-    : STR
-    | dash
+    : STR                   { SET_VALUE( LogAWSEvent::res_len, $1 ); }
+    | dash                  { SET_VALUE( LogAWSEvent::res_len, $1 ); }
     ;
 
 aws_obj_size
-    : STR
-    | dash
+    : STR                   { SET_VALUE( LogAWSEvent::obj_size, $1 ); }
+    | dash                  { SET_VALUE( LogAWSEvent::obj_size, $1 ); }
     ;
 
 aws_total_time
-    : STR
-    | dash
+    : STR                   { SET_VALUE( LogAWSEvent::total_time, $1 ); }
+    | dash                  { SET_VALUE( LogAWSEvent::total_time, $1 ); }
     ;
 
 aws_turnaround_time
-    : STR
-    | dash
+    : STR                   { SET_VALUE( LogAWSEvent::turnaround_time, $1 ); }
+    | dash                  { SET_VALUE( LogAWSEvent::turnaround_time, $1 ); }
     ;
-
-aws_version_id : string_or_dash ;
 
 x_amz_id_2: X_AMZ_ID_2 SPACE
         { 
@@ -274,30 +249,34 @@ aws_host_id
         { 
             $$ = $1; // keep the space between the 2 parts of the Id
             MERGE_TSTR( $$ , $2 );
+            SET_VALUE( LogAWSEvent::host_id, $$ );
         }
     | x_amz_id_2
         {
             $$ = $1;
             // trim the trailing space
             $$ . n --;
+            SET_VALUE( LogAWSEvent::host_id, $$ );
         }
     | S3_EXT_REQ_ID SPACE
+        {
+            SET_VALUE( LogAWSEvent::host_id, $1 );
+        }
     | dash SPACE
+        {
+            SET_VALUE( LogAWSEvent::host_id, $1 );
+        }
     ;
 
-aws_sig : string_or_dash ;
-aws_cipher : string_or_dash ;
-aws_auth : string_or_dash ;
-aws_host_hdr : string_or_dash ;
-
 aws_tls_vers 
-    : TLS_VERSION
-    | dash;
+    : TLS_VERSION           { SET_VALUE( LogAWSEvent::tls_version, $1 ); }
+    | dash                  { SET_VALUE( LogAWSEvent::tls_version, $1 ); }
+    ;
 
 ip
-    : IPV4
-    | IPV6
-    | dash
+    : IPV4      { SET_VALUE( LogAWSEvent::ip, $1 ); }
+    | IPV6      { SET_VALUE( LogAWSEvent::ip, $1 ); }
+    | dash      { SET_VALUE( LogAWSEvent::ip, $1 ); }
     ;
 
 method
@@ -418,13 +397,13 @@ request
     ;
 
 result_code
-    : STR
-    | dash
+    : RESULTCODE        { SET_VALUE( LogAWSEvent::res_code, $1 ); }
+    | dash              { SET_VALUE( LogAWSEvent::res_code, $1 ); }
     ;
 
 referer
-    : QUOTE qstr_list QUOTE { $$ = $2; }
-    | string_or_dash
+    : QUOTE qstr_list QUOTE                 { SET_VALUE( LogAWSEvent::referer, $2 ); }
+    | string_or_dash                        { SET_VALUE( LogAWSEvent::referer, $1 ); }
     ;
 
 vdb_agent_token
@@ -495,35 +474,29 @@ agent
             MERGE_TSTR( temp . original, $3 . original );
             $$ = $3;
             $$ . original = temp . original;
-
-            $$.vdb_os = $2;
+            $$ . vdb_os = $2;
+            lib -> setAgent( $$ );
         }
     | QUOTE vdb_agent QUOTE
         { 
             $$ = $2;
+            lib -> setAgent( $$ );
         }
     | QUOTE QUOTE                                           
         { 
             InitAgent( $$ ); 
+            lib -> setAgent( $$ );
         }
     | dash 
         { 
             InitAgent( $$ ); 
+            lib -> setAgent( $$ );
         }
     ;
 
 time
-    : OB I64 SLASH MONTH SLASH I64 COLON I64 COLON I64 COLON I64 I64 CB
-    {
-        $$.day = atoi( $2.p );
-        $$.month = month_int( &($4) );
-        $$.year = atoi( $6.p );
-        $$.hour = atoi( $8.p );
-        $$.minute = atoi( $10.p );
-        $$.second = atoi( $12.p );
-        $$.offset = atoi( $13.p );
-    } 
-    | dash  { memset( &($$), 0, sizeof $$ ); }
+    : TIMEFMT               { SET_VALUE( LogAWSEvent::time, $1 ); }
+    | dash                  { SET_VALUE( LogAWSEvent::time, $1 ); }
     ;
 
 %%

@@ -84,8 +84,11 @@ using namespace NCBI::Logging;
 
 void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg );
 
+#define SET_VALUE( selector, source ) ( ( ( LogAWSEvent * ) lib ) -> set( (selector), (source) ) )
+#define REPORT( selector, source ) ( ( ( LogAWSEvent * ) lib ) -> set( (selector), (source) ) )
 
-#line 89 "aws_v2_parser.cpp" /* yacc.c:339  */
+
+#line 92 "aws_v2_parser.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -115,7 +118,7 @@ void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg
 extern int aws_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 28 "aws_v2_parser.y" /* yacc.c:355  */
+#line 31 "aws_v2_parser.y" /* yacc.c:355  */
 
 #include "types.h"
 #include "AWS_Interface.hpp"
@@ -126,12 +129,15 @@ extern void aws_start_URL( void * yyscanner );
 extern void aws_start_UserAgent( void * yyscanner );
 extern void aws_start_TLS_vers( void * yyscanner );
 extern void aws_start_host_id( void * yyscanner );
+extern void aws_start_time( void * yyscanner );
+extern void aws_start_ipaddr( void * yyscanner );
+extern void aws_start_rescode( void * yyscanner );
 
 extern void aws_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 
-#line 135 "aws_v2_parser.cpp" /* yacc.c:355  */
+#line 141 "aws_v2_parser.cpp" /* yacc.c:355  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -160,17 +166,19 @@ using namespace NCBI::Logging;
     TLS_VERSION = 277,
     X_AMZ_ID_2 = 278,
     S3_EXT_REQ_ID = 279,
-    COLON = 280,
-    QUOTE = 281,
-    OB = 282,
-    CB = 283,
-    UNRECOGNIZED = 284,
-    OS = 285,
-    SRA_TOOLKIT = 286,
-    LIBCVERSION = 287,
-    AGENTSTR = 288,
-    SRATOOLVERS = 289,
-    PHIDVALUE = 290
+    TIMEFMT = 280,
+    RESULTCODE = 281,
+    COLON = 282,
+    QUOTE = 283,
+    OB = 284,
+    CB = 285,
+    UNRECOGNIZED = 286,
+    OS = 287,
+    SRA_TOOLKIT = 288,
+    LIBCVERSION = 289,
+    AGENTSTR = 290,
+    SRATOOLVERS = 291,
+    PHIDVALUE = 292
   };
 #endif
 
@@ -179,14 +187,13 @@ using namespace NCBI::Logging;
 
 union YYSTYPE
 {
-#line 45 "aws_v2_parser.y" /* yacc.c:355  */
+#line 51 "aws_v2_parser.y" /* yacc.c:355  */
 
     t_str s;
-    t_timepoint tp;
     t_request req;
     t_agent agent;
 
-#line 190 "aws_v2_parser.cpp" /* yacc.c:355  */
+#line 197 "aws_v2_parser.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -202,7 +209,7 @@ int aws_parse (void * scanner, NCBI::Logging::LogAWSEvent * lib);
 
 /* Copy the second part of user declarations.  */
 
-#line 206 "aws_v2_parser.cpp" /* yacc.c:358  */
+#line 213 "aws_v2_parser.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -444,21 +451,21 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  12
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   196
+#define YYLAST   198
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  36
+#define YYNTOKENS  38
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  49
+#define YYNNTS  52
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  100
+#define YYNRULES  103
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  182
+#define YYNSTATES  172
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   290
+#define YYMAXUTOK   292
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -496,24 +503,24 @@ static const yytype_uint8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35
+      35,    36,    37
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    72,    72,    73,    84,    93,    95,    98,   100,   105,
-     105,    77,   161,   162,   166,   167,   168,   172,   181,   182,
-     183,   184,   185,   188,   189,   190,   191,   192,   193,   194,
-     195,   199,   207,   237,   238,   241,   244,   245,   249,   250,
-     254,   255,   259,   260,   263,   265,   273,   278,   284,   285,
-     288,   289,   290,   291,   294,   295,   298,   299,   300,   304,
-     305,   309,   310,   329,   330,   331,   332,   333,   334,   341,
-     342,   348,   356,   388,   388,   392,   398,   403,   408,   413,
-     413,   417,   421,   422,   426,   427,   431,   432,   443,   444,
-     445,   446,   450,   451,   482,   490,   501,   505,   509,   516,
-     526
+       0,    77,    77,    78,    84,    85,    89,    91,    98,   100,
+     103,   105,   110,   110,    82,   140,   141,   145,   146,   147,
+     151,   154,   155,   156,   157,   158,   159,   160,   161,   162,
+     163,   164,   167,   168,   169,   170,   171,   172,   173,   174,
+     178,   186,   216,   217,   221,   222,   226,   227,   231,   232,
+     236,   237,   240,   248,   254,   261,   265,   272,   273,   277,
+     278,   279,   283,   284,   288,   289,   308,   309,   310,   311,
+     312,   313,   320,   321,   327,   335,   367,   367,   371,   377,
+     382,   387,   392,   392,   396,   400,   401,   405,   406,   410,
+     411,   422,   423,   424,   425,   429,   430,   461,   469,   480,
+     485,   490,   498,   499
 };
 #endif
 
@@ -525,18 +532,19 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "STR", "STR1", "MONTH", "IPV4", "IPV6",
   "METHOD", "VERS", "QSTR", "DASH", "I64", "AMPERSAND", "EQUAL", "PERCENT",
   "SLASH", "QMARK", "PATHSTR", "PATHEXT", "ACCESSION", "SPACE",
-  "TLS_VERSION", "X_AMZ_ID_2", "S3_EXT_REQ_ID", "COLON", "QUOTE", "OB",
-  "CB", "UNRECOGNIZED", "OS", "SRA_TOOLKIT", "LIBCVERSION", "AGENTSTR",
-  "SRATOOLVERS", "PHIDVALUE", "$accept", "line", "log_aws", "$@1", "$@2",
-  "$@3", "$@4", "$@5", "$@6", "$@7", "dash", "string_or_dash",
-  "log_aws_err", "aws_owner", "aws_bucket", "aws_requester",
-  "aws_request_id", "aws_operation", "key_token", "aws_key",
-  "aws_quoted_key", "aws_error", "aws_bytes_sent", "aws_obj_size",
-  "aws_total_time", "aws_turnaround_time", "aws_version_id", "x_amz_id_2",
-  "aws_host_id", "aws_sig", "aws_cipher", "aws_auth", "aws_host_hdr",
-  "aws_tls_vers", "ip", "method", "qstr_list", "url_token", "url_list",
-  "url", "$@8", "request", "$@9", "result_code", "referer",
-  "vdb_agent_token", "vdb_agent", "agent", "time", YY_NULLPTR
+  "TLS_VERSION", "X_AMZ_ID_2", "S3_EXT_REQ_ID", "TIMEFMT", "RESULTCODE",
+  "COLON", "QUOTE", "OB", "CB", "UNRECOGNIZED", "OS", "SRA_TOOLKIT",
+  "LIBCVERSION", "AGENTSTR", "SRATOOLVERS", "PHIDVALUE", "$accept", "line",
+  "log_aws", "$@1", "$@2", "$@3", "$@4", "$@5", "$@6", "$@7", "$@8", "$@9",
+  "$@10", "dash", "string_or_dash", "log_aws_err", "aws_owner",
+  "aws_bucket", "aws_requester", "aws_request_id", "aws_operation",
+  "aws_error", "aws_version_id", "aws_sig", "aws_cipher", "aws_auth",
+  "aws_host_hdr", "key_token", "aws_key", "aws_quoted_key",
+  "aws_bytes_sent", "aws_obj_size", "aws_total_time",
+  "aws_turnaround_time", "x_amz_id_2", "aws_host_id", "aws_tls_vers", "ip",
+  "method", "qstr_list", "url_token", "url_list", "url", "$@11", "request",
+  "$@12", "result_code", "referer", "vdb_agent_token", "vdb_agent",
+  "agent", "time", YY_NULLPTR
 };
 #endif
 
@@ -548,14 +556,14 @@ static const yytype_uint16 yytoknum[] =
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287,   288,   289,   290
+     285,   286,   287,   288,   289,   290,   291,   292
 };
 # endif
 
-#define YYPACT_NINF -82
+#define YYPACT_NINF -46
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-82)))
+  (!!((Yystate) == (-46)))
 
 #define YYTABLE_NINF -1
 
@@ -566,25 +574,24 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       0,   -82,   -82,   -82,    -3,    15,   -82,   -82,   -82,   -82,
-      46,    27,   -82,   -82,     0,   -82,   -82,    20,    38,    42,
-     -82,    36,    47,    33,    67,   -82,   -82,   -82,    60,    72,
-       0,    79,   -82,    71,    73,     0,    82,   -82,    75,    80,
-       0,    96,   -82,    88,    89,   -82,   101,   114,   109,   -82,
-     -82,   -82,   -82,   -82,   -82,   -82,   -82,   126,   -82,   149,
-     117,   111,   123,   -82,    -4,   -82,   -82,   -82,    40,   129,
-     -82,   -82,    -9,   157,    -2,   -82,   -82,    50,   -82,   -82,
-     -82,   -82,   -82,   -82,   -82,   -82,   -82,   128,   -82,   -82,
-     131,   157,    43,   -82,   -82,   -82,     0,   157,   127,   -82,
-     -82,   135,   -82,    16,   -82,   -82,   136,    32,   -82,   -82,
-     139,    34,   -82,   -82,   158,    35,   -82,   -82,   159,    10,
-      76,   -82,   -82,   -82,    52,   160,   168,   -82,    44,   -82,
-      -1,   -82,   -82,   -82,   -82,    91,   -82,   -82,   -82,   -82,
-     -82,   -82,    69,   161,    85,   -82,   -82,   -82,     0,   -82,
-     -82,   162,   -82,    51,   163,   164,   165,   166,   -82,   -82,
-     -82,   -82,   167,     0,   -82,   -82,   170,     0,   -82,   171,
-       0,   -82,   172,     0,   -82,   173,   -82,    57,   -82,   -82,
-     -82,   -82
+       5,   -46,   -46,   -46,   -10,    58,   -46,   -46,   -46,   -46,
+      40,   -23,   -46,   -46,     5,   -46,   -46,    52,   -46,    28,
+     -46,   -46,    61,   -46,    37,   -46,   -46,   -46,    62,     5,
+     -46,    65,     5,   -46,    69,     5,   -46,    71,   -46,   138,
+     -46,   -46,   -46,   -46,   -46,   -46,   -46,   -46,    67,   -46,
+     170,    72,    66,   -46,    43,   -46,   -46,    24,    76,   -46,
+     -46,   -11,   178,   -46,   -46,   -46,    51,   -46,   -46,   -46,
+     -46,   -46,   -46,   -46,   -46,   -46,   154,    38,   178,    -5,
+     -46,   -46,   -46,   -46,   -46,    78,   178,    85,   -46,     5,
+     -46,   -46,    79,     3,   -46,   -46,    93,    19,   -46,   -46,
+      94,    31,   -46,   -46,    96,    34,   -46,   -46,    97,     8,
+      59,   -46,   -46,   -46,    53,    98,   110,   -46,    57,   -46,
+      -8,   -46,   -46,   -46,   -46,    75,   -46,   -46,   -46,   -46,
+     -46,   -46,    70,   100,    95,   -46,   -46,   -46,     5,   -46,
+     -46,   101,   -46,    27,   104,   112,   113,   111,   -46,   -46,
+     -46,   -46,   115,     5,   -46,   -46,   116,     5,   -46,   117,
+       5,   -46,   119,     5,   -46,   120,   -46,    35,   -46,   -46,
+     -46,   -46
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -592,45 +599,46 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,    14,    15,    12,     0,     0,     2,    16,    18,     3,
-       0,     0,     1,    17,     0,    13,    19,     0,     0,     0,
-     100,     0,     0,     0,     0,    56,    57,    58,     0,     0,
-       0,     0,    20,     0,     0,     0,     0,    21,     0,     0,
-       0,     0,    22,     0,     0,     4,     0,     0,     0,    25,
-      24,    27,    23,    26,    29,    30,    28,     0,    31,    33,
-       0,     0,     0,    32,     0,    99,    34,    81,    79,     0,
-      59,    60,     0,     0,     0,    73,    78,     0,    65,    64,
-      67,    63,    66,    69,    70,    68,    71,     0,    82,    83,
-       0,     0,     0,    77,    80,    72,     0,    74,     0,    76,
-      35,     0,    75,     0,    36,    37,     0,     0,    38,    39,
-       0,     0,    40,    41,     0,     0,    42,    43,     0,     0,
-       0,    85,     5,    61,     0,     0,     0,    84,     0,    62,
-       0,    98,     6,    90,    97,     0,    86,    88,    91,    87,
-      89,    92,     0,     0,     0,    96,    94,    93,     0,    95,
-      44,     0,     7,     0,     0,     0,     0,    47,     8,    45,
-      48,    49,     0,     0,    46,    50,     0,     0,    51,     0,
-       0,    52,     0,     0,    53,     0,     9,     0,    54,    55,
-      10,    11
+       0,    17,    18,    15,     0,     0,     2,    19,    21,     3,
+       0,     0,     1,    20,     0,    16,    22,     0,     4,     0,
+     102,   103,     0,     5,     0,    59,    60,    61,     0,     0,
+      23,     0,     0,    24,     0,     0,    25,     0,     6,     0,
+      34,    33,    36,    32,    35,    38,    39,    37,     0,    40,
+      42,     0,     0,    41,     0,    43,    84,    82,     0,    62,
+      63,     0,     0,     7,    76,    81,     0,    68,    67,    70,
+      66,    69,    72,    73,    71,    74,     0,     0,     0,     0,
+      80,    83,    75,    85,    86,     0,    77,     0,    79,     0,
+      78,    26,     0,     0,    44,    45,     0,     0,    46,    47,
+       0,     0,    48,    49,     0,     0,    50,    51,     0,     0,
+       0,    88,     8,    64,     0,     0,     0,    87,     0,    65,
+       0,   101,     9,    93,   100,     0,    89,    91,    94,    90,
+      92,    95,     0,     0,     0,    99,    97,    96,     0,    98,
+      27,     0,    10,     0,     0,     0,     0,    54,    11,    52,
+      55,    56,     0,     0,    53,    28,     0,     0,    29,     0,
+       0,    30,     0,     0,    31,     0,    12,     0,    57,    58,
+      13,    14
 };
 
   /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int16 yypgoto[] =
+static const yytype_int8 yypgoto[] =
 {
-     -82,   -82,   -82,   -82,   -82,   -82,   -82,   -82,   -82,   -82,
-     -18,   -12,   -82,   -82,   -82,   -82,   -82,   -82,   130,   -82,
-     -82,   -82,   -82,   -82,   -82,   -82,   -82,   -82,   -82,   -82,
-     -82,   -82,   -82,   -82,   -82,   -82,   -82,   -81,   104,   -82,
-     -82,   -82,   -82,   -82,   -82,   -62,    61,   -82,   -82
+     -46,   -46,   -46,   -46,   -46,   -46,   -46,   -46,   -46,   -46,
+     -46,   -46,   -46,   -17,   -14,   -46,   -46,   -46,   -46,   -46,
+     -46,   -46,   -46,   -46,   -46,   -46,   -46,    92,   -46,   -46,
+     -46,   -46,   -46,   -46,   -46,   -46,   -46,   -46,   -46,   -46,
+      -9,    81,   -46,   -46,   -46,   -46,   -46,   -46,   -45,    20,
+     -46,   -46
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     5,     6,    47,   125,   143,   153,   163,   177,   181,
-       7,     8,     9,    10,    17,    33,    38,    43,    58,    59,
-      60,   101,   106,   110,   114,   118,   151,   157,   158,   166,
-     169,   172,   175,   180,    28,    72,   124,    86,    87,    77,
-      91,    69,    73,    90,   122,   141,   142,   132,    21
+      -1,     5,     6,    19,    24,    39,    77,   115,   133,   143,
+     153,   167,   171,     7,     8,     9,    10,    17,    31,    34,
+      37,    92,   141,   156,   159,   162,   165,    49,    50,    51,
+      96,   100,   104,   108,   147,   148,   170,    28,    61,   114,
+      75,    76,    66,    78,    58,    62,    85,   112,   131,   132,
+     122,    22
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -638,107 +646,106 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      20,    88,    16,     1,     2,    27,    95,    67,    11,     3,
-      11,     3,    75,     1,     2,    12,    95,    76,    32,   104,
-     133,     3,    68,    37,     4,   134,     4,     3,    42,   135,
-     136,   137,   138,   139,   140,   108,   120,   112,   116,    25,
-      26,    18,     4,     3,     3,     3,     3,    13,    70,     3,
-      71,     3,    98,    15,    22,     3,    89,    23,     4,     4,
-       4,     4,     3,    24,     4,    19,     4,    14,     3,    99,
-     130,    92,    29,   126,   154,   155,    93,     4,   127,   178,
-     147,    30,   147,     4,   100,   105,   123,    11,    31,   109,
-     133,    34,    35,   113,    39,   145,    40,   117,    36,   146,
-     136,   137,   138,   139,   140,    41,   133,   121,    44,    45,
-     131,   149,   133,    48,    46,   146,   136,   137,   138,   139,
-     140,    61,   136,   137,   138,   139,   140,    49,    50,    51,
-      52,    53,    54,    55,    56,   156,   150,    62,    64,    65,
-      57,    78,    79,    80,    81,    82,    83,    84,    85,    66,
-      74,   165,    96,   102,    94,   168,   103,   107,   171,   179,
-     111,   174,    49,    50,    51,    52,    53,    54,    55,    56,
-      78,    79,    80,    81,    82,    83,    84,    85,   129,   115,
-     119,   128,   148,   152,   159,   160,   161,     0,   164,    63,
-     162,   167,   170,   173,   176,    97,   144
+      16,    11,    21,    11,    87,    15,    94,    27,     1,     2,
+      64,     1,     2,   123,     3,    30,     3,    65,    33,     3,
+     124,    36,    98,    88,   125,   126,   127,   128,   129,   130,
+       3,     4,    59,     4,   102,     3,   110,   106,     3,     3,
+      60,    13,     3,    25,    26,     3,     3,     4,     3,     3,
+     144,   145,     4,    20,    56,     4,     4,   168,    12,     4,
+      84,    14,     4,     4,    83,     4,     4,    82,     3,   113,
+      11,    57,    79,    18,   116,    91,    95,    82,    52,    80,
+      99,   117,    23,    29,   103,   120,    32,   137,   107,   137,
+      35,   123,    38,    54,    55,   111,   123,    63,   135,    89,
+      93,   121,   136,   126,   127,   128,   129,   130,   126,   127,
+     128,   129,   130,    90,    97,   101,   123,   105,   109,   118,
+     119,   138,   142,   139,   140,   149,   146,   136,   126,   127,
+     128,   129,   130,   150,   151,   152,   154,   157,   160,   155,
+     163,   166,    53,   158,     0,   134,   161,     0,     0,   164,
+     169,    40,    41,    42,    43,    44,    45,    46,    47,    86,
+       0,     0,     0,     0,     0,     0,    48,    67,    68,    69,
+      70,    71,    72,    73,    74,     0,     0,     0,     0,     0,
+       0,     0,    81,    40,    41,    42,    43,    44,    45,    46,
+      47,    67,    68,    69,    70,    71,    72,    73,    74
 };
 
 static const yytype_int16 yycheck[] =
 {
-      18,     3,    14,     3,     4,    23,    87,    11,    11,    11,
-      11,    11,    21,     3,     4,     0,    97,    26,    30,     3,
-      21,    11,    26,    35,    26,    26,    26,    11,    40,    30,
-      31,    32,    33,    34,    35,     3,    26,     3,     3,     6,
-       7,    21,    26,    11,    11,    11,    11,     1,     8,    11,
-      68,    11,     9,    26,    12,    11,    74,    21,    26,    26,
-      26,    26,    11,    16,    26,    27,    26,    21,    11,    26,
-      26,    21,     5,    21,    23,    24,    26,    26,    26,    22,
-     142,    21,   144,    26,    96,   103,    10,    11,    16,   107,
-      21,    12,    21,   111,    12,    26,    21,   115,    25,    30,
-      31,    32,    33,    34,    35,    25,    21,   119,    12,    21,
-     128,    26,    21,    12,    25,    30,    31,    32,    33,    34,
-      35,    12,    31,    32,    33,    34,    35,    13,    14,    15,
-      16,    17,    18,    19,    20,   153,   148,    11,    21,    28,
-      26,    13,    14,    15,    16,    17,    18,    19,    20,    26,
-      21,   163,    21,    26,    26,   167,    21,    21,   170,   177,
-      21,   173,    13,    14,    15,    16,    17,    18,    19,    20,
-      13,    14,    15,    16,    17,    18,    19,    20,    10,    21,
-      21,    21,    21,    21,    21,    21,    21,    -1,    21,    59,
-      24,    21,    21,    21,    21,    91,   135
+      14,    11,    19,    11,     9,    28,     3,    24,     3,     4,
+      21,     3,     4,    21,    11,    29,    11,    28,    32,    11,
+      28,    35,     3,    28,    32,    33,    34,    35,    36,    37,
+      11,    28,     8,    28,     3,    11,    28,     3,    11,    11,
+      57,     1,    11,     6,     7,    11,    11,    28,    11,    11,
+      23,    24,    28,    25,    11,    28,    28,    22,     0,    28,
+      77,    21,    28,    28,    26,    28,    28,    76,    11,    10,
+      11,    28,    21,    21,    21,    89,    93,    86,    11,    28,
+      97,    28,    21,    21,   101,    28,    21,   132,   105,   134,
+      21,    21,    21,    21,    28,   109,    21,    21,    28,    21,
+      21,   118,    32,    33,    34,    35,    36,    37,    33,    34,
+      35,    36,    37,    28,    21,    21,    21,    21,    21,    21,
+      10,    21,    21,    28,   138,    21,   143,    32,    33,    34,
+      35,    36,    37,    21,    21,    24,    21,    21,    21,   153,
+      21,    21,    50,   157,    -1,   125,   160,    -1,    -1,   163,
+     167,    13,    14,    15,    16,    17,    18,    19,    20,    78,
+      -1,    -1,    -1,    -1,    -1,    -1,    28,    13,    14,    15,
+      16,    17,    18,    19,    20,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    28,    13,    14,    15,    16,    17,    18,    19,
+      20,    13,    14,    15,    16,    17,    18,    19,    20
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     4,    11,    26,    37,    38,    46,    47,    48,
-      49,    11,     0,     1,    21,    26,    47,    50,    21,    27,
-      46,    84,    12,    21,    16,     6,     7,    46,    70,     5,
-      21,    16,    47,    51,    12,    21,    25,    47,    52,    12,
-      21,    25,    47,    53,    12,    21,    25,    39,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    26,    54,    55,
-      56,    12,    11,    54,    21,    28,    26,    11,    26,    77,
-       8,    46,    71,    78,    21,    21,    26,    75,    13,    14,
-      15,    16,    17,    18,    19,    20,    73,    74,     3,    46,
-      79,    76,    21,    26,    26,    73,    21,    74,     9,    26,
-      47,    57,    26,    21,     3,    46,    58,    21,     3,    46,
-      59,    21,     3,    46,    60,    21,     3,    46,    61,    21,
-      26,    47,    80,    10,    72,    40,    21,    26,    21,    10,
-      26,    46,    83,    21,    26,    30,    31,    32,    33,    34,
-      35,    81,    82,    41,    82,    26,    30,    81,    21,    26,
-      47,    62,    21,    42,    23,    24,    46,    63,    64,    21,
-      21,    21,    24,    43,    21,    47,    65,    21,    47,    66,
-      21,    47,    67,    21,    47,    68,    21,    44,    22,    46,
-      69,    45
+       0,     3,     4,    11,    28,    39,    40,    51,    52,    53,
+      54,    11,     0,     1,    21,    28,    52,    55,    21,    41,
+      25,    51,    89,    21,    42,     6,     7,    51,    75,    21,
+      52,    56,    21,    52,    57,    21,    52,    58,    21,    43,
+      13,    14,    15,    16,    17,    18,    19,    20,    28,    65,
+      66,    67,    11,    65,    21,    28,    11,    28,    82,     8,
+      51,    76,    83,    21,    21,    28,    80,    13,    14,    15,
+      16,    17,    18,    19,    20,    78,    79,    44,    81,    21,
+      28,    28,    78,    26,    51,    84,    79,     9,    28,    21,
+      28,    52,    59,    21,     3,    51,    68,    21,     3,    51,
+      69,    21,     3,    51,    70,    21,     3,    51,    71,    21,
+      28,    52,    85,    10,    77,    45,    21,    28,    21,    10,
+      28,    51,    88,    21,    28,    32,    33,    34,    35,    36,
+      37,    86,    87,    46,    87,    28,    32,    86,    21,    28,
+      52,    60,    21,    47,    23,    24,    51,    72,    73,    21,
+      21,    21,    24,    48,    21,    52,    61,    21,    52,    62,
+      21,    52,    63,    21,    52,    64,    21,    49,    22,    51,
+      74,    50
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    36,    37,    37,    39,    40,    41,    42,    43,    44,
-      45,    38,    46,    46,    47,    47,    47,    48,    49,    50,
-      51,    52,    53,    54,    54,    54,    54,    54,    54,    54,
-      54,    55,    55,    56,    56,    57,    58,    58,    59,    59,
-      60,    60,    61,    61,    62,    63,    64,    64,    64,    64,
-      65,    66,    67,    68,    69,    69,    70,    70,    70,    71,
-      71,    72,    72,    73,    73,    73,    73,    73,    73,    73,
-      73,    74,    74,    76,    75,    77,    77,    77,    77,    78,
-      77,    77,    79,    79,    80,    80,    81,    81,    81,    81,
-      81,    81,    82,    82,    82,    83,    83,    83,    83,    84,
-      84
+       0,    38,    39,    39,    41,    42,    43,    44,    45,    46,
+      47,    48,    49,    50,    40,    51,    51,    52,    52,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    65,    65,    65,    65,    65,    65,    65,
+      66,    66,    67,    67,    68,    68,    69,    69,    70,    70,
+      71,    71,    72,    73,    73,    73,    73,    74,    74,    75,
+      75,    75,    76,    76,    77,    77,    78,    78,    78,    78,
+      78,    78,    78,    78,    79,    79,    81,    80,    82,    82,
+      82,    82,    83,    82,    82,    84,    84,    85,    85,    86,
+      86,    86,    86,    86,    86,    87,    87,    87,    88,    88,
+      88,    88,    89,    89
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     1,     0,     0,     0,     0,     0,     0,
-       0,    53,     1,     3,     1,     1,     1,     2,     1,     1,
+       0,     0,     0,     0,    56,     1,     3,     1,     1,     1,
+       2,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     2,     1,     3,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     2,     3,     1,     2,     2,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     3,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     2,     0,     3,     6,     5,     4,     3,     0,
-       4,     1,     1,     1,     3,     1,     1,     1,     1,     1,
-       1,     1,     1,     2,     2,     4,     3,     2,     1,    14,
-       1
+       1,     2,     1,     3,     1,     1,     1,     1,     1,     1,
+       1,     1,     2,     3,     1,     2,     2,     1,     1,     1,
+       1,     1,     1,     1,     1,     3,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     2,     0,     3,     6,     5,
+       4,     3,     0,     4,     1,     1,     1,     3,     1,     1,
+       1,     1,     1,     1,     1,     1,     2,     2,     4,     3,
+       2,     1,     1,     1
 };
 
 
@@ -1423,189 +1430,242 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 72 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 77 "aws_v2_parser.y" /* yacc.c:1646  */
     { YYACCEPT; }
-#line 1429 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1436 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 73 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 78 "aws_v2_parser.y" /* yacc.c:1646  */
     { YYACCEPT; }
-#line 1435 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1442 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
 #line 84 "aws_v2_parser.y" /* yacc.c:1646  */
-    { aws_start_URL( scanner ); }
-#line 1441 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    { aws_start_time( scanner ); }
+#line 1448 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 93 "aws_v2_parser.y" /* yacc.c:1646  */
-    { aws_start_UserAgent( scanner ); }
-#line 1447 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 85 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_start_ipaddr( scanner ); }
+#line 1454 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 95 "aws_v2_parser.y" /* yacc.c:1646  */
-    { aws_pop_state( scanner ); }
-#line 1453 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 89 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_start_URL( scanner ); }
+#line 1460 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 98 "aws_v2_parser.y" /* yacc.c:1646  */
-    { aws_start_host_id( scanner ); }
-#line 1459 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 91 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_start_rescode( scanner ); }
+#line 1466 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 100 "aws_v2_parser.y" /* yacc.c:1646  */
-    { aws_pop_state( scanner ); /* the following space is consumed by aws_host_id */ }
-#line 1465 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 98 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_start_UserAgent( scanner ); }
+#line 1472 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 105 "aws_v2_parser.y" /* yacc.c:1646  */
-    { aws_start_TLS_vers( scanner ); }
-#line 1471 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 100 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_pop_state( scanner ); }
+#line 1478 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 105 "aws_v2_parser.y" /* yacc.c:1646  */
-    { aws_pop_state( scanner ); }
-#line 1477 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 103 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_start_host_id( scanner ); }
+#line 1484 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 106 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 105 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_pop_state( scanner ); /* the following space is consumed by aws_host_id */ }
+#line 1490 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 110 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_start_TLS_vers( scanner ); }
+#line 1496 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 13:
+#line 110 "aws_v2_parser.y" /* yacc.c:1646  */
+    { aws_pop_state( scanner ); }
+#line 1502 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 14:
+#line 111 "aws_v2_parser.y" /* yacc.c:1646  */
     {
+        // numbers may be shifted!!!!
+        lib -> setRequest( (yyvsp[-36].req) );
 
-/*        
-        LogAWSEvent ev;
-        ev . owner = $1;
-        ev . bucket = $3;
-        ev . time = $5;
-        ev . ip = $7;
-        ev . requester = $9;
-        ev . request_id = $11;
-        ev . operation = $13;
-
-        ev . request = $18; // this has to happen before we use the key-decomposition
+        /*
         // combine data from aws_key and request
-        if ( $16 . path . n == 1 && $16 . path . p[ 0 ] == '-' )
+        if ( $17 . path . n == 1 && $17 . path . p[ 0 ] == '-' )
         {
             EMPTY_TSTR( ev . key );
         }
-        else if ( $16 . path . n == 3 && $16 . path . p[ 0 ] == '\"' && $16 . path . p[ 1 ] == '-' && $16 . path . p[ 2 ] == '\"' )
+        else if ( $17 . path . n == 3 && $17 . path . p[ 0 ] == '\"' && $17 . path . p[ 1 ] == '-' && $17 . path . p[ 2 ] == '\"' )
         {
             EMPTY_TSTR( ev . key );
         }
         else
         {
-            ev . key = $16 . path;
+            ev . key = $17 . path;
         }
-        if ( $16 . accession . n > 0 )
+        if ( $17 . accession . n > 0 )
         {
-            ev . request . accession = $16 . accession;
-            ev . request . filename  = $16 . filename;
-            ev . request . extension = $16 . extension;
+            ev . request . accession = $17 . accession;
+            ev . request . filename  = $17 . filename;
+            ev . request . extension = $17 . extension;
         }
-
-        ev . res_code           = $20;
-        ev . error              = $22;
-        ev . res_len            = $24;
-        ev . obj_size           = $26;
-        ev . total_time         = $28;
-        ev . turnaround_time    = $30;
-        ev . referer            = $32;
-        ev . agent              = $35;
-        ev . version_id         = $38;
-        ev . host_id            = $41;
-        ev . sig_ver            = $43;
-        ev . cipher_suite       = $45;
-        ev . auth_type          = $47;
-        ev . host_header        = $49;
-        ev . tls_version        = $52;
-        
-        lib -> acceptLine( ev );
 */        
     }
-#line 1534 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1533 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 12:
-#line 161 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 15:
+#line 140 "aws_v2_parser.y" /* yacc.c:1646  */
     { EMPTY_TSTR((yyval.s)); }
-#line 1540 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1539 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 13:
-#line 162 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 16:
+#line 141 "aws_v2_parser.y" /* yacc.c:1646  */
     { EMPTY_TSTR((yyval.s)); }
-#line 1546 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1545 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 17:
-#line 173 "aws_v2_parser.y" /* yacc.c:1646  */
-    {
-        // LogAWSEvent ev;
-        // ev . owner = $1;
-        // aws_get_scanner_input( scanner, ev . unparsed );
-        // lib -> rejectLine( ev );
-    }
+  case 20:
+#line 151 "aws_v2_parser.y" /* yacc.c:1646  */
+    {  YYABORT; }
+#line 1551 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 154 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::owner, (yyvsp[0].s) ); }
 #line 1557 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 188 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+  case 22:
+#line 155 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::bucket, (yyvsp[0].s) ); }
 #line 1563 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 189 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+  case 23:
+#line 156 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::requester, (yyvsp[0].s) ); }
 #line 1569 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 190 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+  case 24:
+#line 157 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::request_id, (yyvsp[0].s) ); }
 #line 1575 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 191 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+  case 25:
+#line 158 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::operation, (yyvsp[0].s) ); }
 #line 1581 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 192 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+  case 26:
+#line 159 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::error, (yyvsp[0].s) ); }
 #line 1587 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 193 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . accession = (yyvsp[0].s); }
+  case 27:
+#line 160 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::version_id, (yyvsp[0].s) ); }
 #line 1593 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 29:
-#line 194 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . filename = (yyvsp[0].s); }
+  case 28:
+#line 161 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::sig_ver, (yyvsp[0].s) ); }
 #line 1599 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 195 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . extension = (yyvsp[0].s); }
+  case 29:
+#line 162 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::cipher_suite, (yyvsp[0].s) ); }
 #line 1605 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
+  case 30:
+#line 163 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::auth_type, (yyvsp[0].s) ); }
+#line 1611 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
   case 31:
-#line 200 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 164 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::host_header, (yyvsp[0].s) ); }
+#line 1617 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 167 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+#line 1623 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 168 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+#line 1629 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 34:
+#line 169 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+#line 1635 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 170 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+#line 1641 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 171 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+#line 1647 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 172 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . accession = (yyvsp[0].s); }
+#line 1653 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 38:
+#line 173 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . filename = (yyvsp[0].s); }
+#line 1659 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 39:
+#line 174 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . extension = (yyvsp[0].s); }
+#line 1665 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 40:
+#line 179 "aws_v2_parser.y" /* yacc.c:1646  */
     {
             (yyval.req) = (yyvsp[0].req);
             if ( (yyvsp[0].req) . accession . n > 0 )
@@ -1613,11 +1673,11 @@ yyreduce:
                 (yyval.req) . filename  = (yyvsp[0].req) . accession;
             }
         }
-#line 1617 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1677 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 32:
-#line 208 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 41:
+#line 187 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) . path . n += (yyvsp[0].req) . path . n;
 
@@ -1644,110 +1704,212 @@ yyreduce:
                 (yyval.req) . extension = (yyvsp[0].req) . extension;
             }
         }
-#line 1648 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1708 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 238 "aws_v2_parser.y" /* yacc.c:1646  */
-    {  InitRequest( (yyval.req) ); }
-#line 1654 "aws_v2_parser.cpp" /* yacc.c:1646  */
+  case 42:
+#line 216 "aws_v2_parser.y" /* yacc.c:1646  */
+    { (yyval.req) = (yyvsp[0].req); }
+#line 1714 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 43:
+#line 217 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); }
+#line 1720 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 44:
+#line 221 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::res_len, (yyvsp[0].s) ); }
+#line 1726 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 266 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 222 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::res_len, (yyvsp[0].s) ); }
+#line 1732 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 46:
+#line 226 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::obj_size, (yyvsp[0].s) ); }
+#line 1738 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 47:
+#line 227 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::obj_size, (yyvsp[0].s) ); }
+#line 1744 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 48:
+#line 231 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::total_time, (yyvsp[0].s) ); }
+#line 1750 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 49:
+#line 232 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::total_time, (yyvsp[0].s) ); }
+#line 1756 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 50:
+#line 236 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::turnaround_time, (yyvsp[0].s) ); }
+#line 1762 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 51:
+#line 237 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::turnaround_time, (yyvsp[0].s) ); }
+#line 1768 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 52:
+#line 241 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.s) = (yyvsp[-1].s);
             MERGE_TSTR( (yyval.s) , (yyvsp[0].s) );
         }
-#line 1663 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1777 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 46:
-#line 274 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 53:
+#line 249 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.s) = (yyvsp[-2].s); // keep the space between the 2 parts of the Id
             MERGE_TSTR( (yyval.s) , (yyvsp[-1].s) );
+            SET_VALUE( LogAWSEvent::host_id, (yyval.s) );
         }
-#line 1672 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1787 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 47:
-#line 279 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 54:
+#line 255 "aws_v2_parser.y" /* yacc.c:1646  */
     {
             (yyval.s) = (yyvsp[0].s);
             // trim the trailing space
             (yyval.s) . n --;
+            SET_VALUE( LogAWSEvent::host_id, (yyval.s) );
         }
-#line 1682 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1798 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 55:
+#line 262 "aws_v2_parser.y" /* yacc.c:1646  */
+    {
+            SET_VALUE( LogAWSEvent::host_id, (yyvsp[-1].s) );
+        }
+#line 1806 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 56:
+#line 266 "aws_v2_parser.y" /* yacc.c:1646  */
+    {
+            SET_VALUE( LogAWSEvent::host_id, (yyvsp[-1].s) );
+        }
+#line 1814 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 57:
+#line 272 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::tls_version, (yyvsp[0].s) ); }
+#line 1820 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 58:
+#line 273 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::tls_version, (yyvsp[0].s) ); }
+#line 1826 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 59:
+#line 277 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::ip, (yyvsp[0].s) ); }
+#line 1832 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 60:
+#line 278 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::ip, (yyvsp[0].s) ); }
+#line 1838 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 309 "aws_v2_parser.y" /* yacc.c:1646  */
-    { (yyval.s) = (yyvsp[0].s); }
-#line 1688 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 62:
-#line 310 "aws_v2_parser.y" /* yacc.c:1646  */
-    { (yyval.s) = (yyvsp[-2].s); (yyval.s).n += 1 + (yyvsp[0].s).n; (yyval.s).escaped = (yyvsp[-2].s).escaped || (yyvsp[0].s).escaped; }
-#line 1694 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 63:
-#line 329 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
-#line 1700 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 279 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::ip, (yyvsp[0].s) ); }
+#line 1844 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 330 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1706 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 288 "aws_v2_parser.y" /* yacc.c:1646  */
+    { (yyval.s) = (yyvsp[0].s); }
+#line 1850 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 331 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1712 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 289 "aws_v2_parser.y" /* yacc.c:1646  */
+    { (yyval.s) = (yyvsp[-2].s); (yyval.s).n += 1 + (yyvsp[0].s).n; (yyval.s).escaped = (yyvsp[-2].s).escaped || (yyvsp[0].s).escaped; }
+#line 1856 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 332 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1718 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 308 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+#line 1862 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 333 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
-#line 1724 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 309 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
+#line 1868 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 335 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 310 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
+#line 1874 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 69:
+#line 311 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
+#line 1880 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 70:
+#line 312 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
+#line 1886 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 71:
+#line 314 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             InitRequest( (yyval.req) ); 
             (yyval.req) . path = (yyvsp[0].s); 
             (yyval.req) . accession = (yyvsp[0].s); 
             (yyval.req) . accession_mode = acc_inside; 
         }
-#line 1735 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1897 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 69:
-#line 341 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 72:
+#line 320 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . filename = (yyvsp[0].s); }
-#line 1741 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1903 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 70:
-#line 342 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 73:
+#line 321 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . extension = (yyvsp[0].s); }
-#line 1747 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1909 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 71:
-#line 349 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 74:
+#line 328 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[0].req); 
             if ( (yyvsp[0].req) . accession_mode == acc_after )            
@@ -1755,11 +1917,11 @@ yyreduce:
                 (yyval.req) . accession_mode = acc_before;
             }
         }
-#line 1759 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1921 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 72:
-#line 357 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 75:
+#line 336 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[-1].req); 
             MERGE_TSTR( (yyval.req) . path, (yyvsp[0].req) . path );
@@ -1788,92 +1950,110 @@ yyreduce:
                 break;
             }
         }
-#line 1792 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1954 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 73:
-#line 388 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 76:
+#line 367 "aws_v2_parser.y" /* yacc.c:1646  */
     { aws_start_URL( scanner ); }
-#line 1798 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1960 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 74:
-#line 388 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 77:
+#line 367 "aws_v2_parser.y" /* yacc.c:1646  */
     { (yyval.req) = (yyvsp[0].req); }
-#line 1804 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1966 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 75:
-#line 393 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 78:
+#line 372 "aws_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.req) = (yyvsp[-3].req);
         (yyval.req).method = (yyvsp[-4].s);
         (yyval.req).vers   = (yyvsp[-1].s);
     }
-#line 1814 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1976 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 76:
-#line 399 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 79:
+#line 378 "aws_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.req) = (yyvsp[-2].req);
         (yyval.req).method = (yyvsp[-3].s);
      }
-#line 1823 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1985 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 77:
-#line 404 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 80:
+#line 383 "aws_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.req) = (yyvsp[-1].req);
         (yyval.req).method = (yyvsp[-2].s);
     }
-#line 1832 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1994 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 78:
-#line 409 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 81:
+#line 388 "aws_v2_parser.y" /* yacc.c:1646  */
     {
         InitRequest( (yyval.req) );
         (yyval.req).method = (yyvsp[-1].s);
     }
-#line 1841 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2003 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 79:
-#line 413 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 82:
+#line 392 "aws_v2_parser.y" /* yacc.c:1646  */
     { aws_start_URL( scanner ); }
-#line 1847 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2009 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 80:
-#line 414 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 83:
+#line 393 "aws_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.req) = (yyvsp[-1].req);
     }
-#line 1855 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 81:
-#line 417 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitRequest( (yyval.req) );}
-#line 1861 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2017 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 426 "aws_v2_parser.y" /* yacc.c:1646  */
-    { (yyval.s) = (yyvsp[-1].s); }
-#line 1867 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 396 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitRequest( (yyval.req) );}
+#line 2023 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 85:
+#line 400 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::res_code, (yyvsp[0].s) ); }
+#line 2029 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 431 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1873 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 401 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::res_code, (yyvsp[0].s) ); }
+#line 2035 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 433 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 405 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::referer, (yyvsp[-1].s) ); }
+#line 2041 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 88:
+#line 406 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::referer, (yyvsp[0].s) ); }
+#line 2047 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 89:
+#line 410 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
+#line 2053 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 90:
+#line 412 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             InitAgent( (yyval.agent) ); 
             (yyval.agent).original = (yyvsp[0].s); 
@@ -1884,41 +2064,41 @@ yyreduce:
             (yyval.agent) . vdb_release . p = dot + 1; 
             (yyval.agent) . vdb_release . n = (yyvsp[0].s) . n - ( dot - (yyvsp[0].s) . p ) - 1; 
         }
-#line 1888 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 88:
-#line 443 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_libc = (yyvsp[0].s); }
-#line 1894 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 89:
-#line 444 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_phid_compute_env = (yyvsp[0].s); }
-#line 1900 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 90:
-#line 445 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1906 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2068 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 446 "aws_v2_parser.y" /* yacc.c:1646  */
-    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1912 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 422 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_libc = (yyvsp[0].s); }
+#line 2074 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 450 "aws_v2_parser.y" /* yacc.c:1646  */
-    { (yyval.agent) = (yyvsp[0].agent); }
-#line 1918 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 423 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_phid_compute_env = (yyvsp[0].s); }
+#line 2080 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 452 "aws_v2_parser.y" /* yacc.c:1646  */
+#line 424 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
+#line 2086 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 94:
+#line 425 "aws_v2_parser.y" /* yacc.c:1646  */
+    { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
+#line 2092 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 95:
+#line 429 "aws_v2_parser.y" /* yacc.c:1646  */
+    { (yyval.agent) = (yyvsp[0].agent); }
+#line 2098 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 96:
+#line 431 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].agent) . original );
@@ -1949,20 +2129,20 @@ yyreduce:
             (yyval.agent) . vdb_release = (yyvsp[0].agent) . vdb_release;
         }
     }
-#line 1953 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2133 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 94:
-#line 483 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 97:
+#line 462 "aws_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].s) );
     }
-#line 1962 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2142 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 95:
-#line 491 "aws_v2_parser.y" /* yacc.c:1646  */
+  case 98:
+#line 470 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
             t_agent temp;
             InitAgent( temp ); 
@@ -1970,58 +2150,53 @@ yyreduce:
             MERGE_TSTR( temp . original, (yyvsp[-1].agent) . original );
             (yyval.agent) = (yyvsp[-1].agent);
             (yyval.agent) . original = temp . original;
-
-            (yyval.agent).vdb_os = (yyvsp[-2].s);
+            (yyval.agent) . vdb_os = (yyvsp[-2].s);
+            lib -> setAgent( (yyval.agent) );
         }
-#line 1977 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 96:
-#line 502 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            (yyval.agent) = (yyvsp[-1].agent);
-        }
-#line 1985 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 97:
-#line 506 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            InitAgent( (yyval.agent) ); 
-        }
-#line 1993 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 98:
-#line 510 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            InitAgent( (yyval.agent) ); 
-        }
-#line 2001 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2157 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 517 "aws_v2_parser.y" /* yacc.c:1646  */
-    {
-        (yyval.tp).day = atoi( (yyvsp[-12].s).p );
-        (yyval.tp).month = month_int( &((yyvsp[-10].s)) );
-        (yyval.tp).year = atoi( (yyvsp[-8].s).p );
-        (yyval.tp).hour = atoi( (yyvsp[-6].s).p );
-        (yyval.tp).minute = atoi( (yyvsp[-4].s).p );
-        (yyval.tp).second = atoi( (yyvsp[-2].s).p );
-        (yyval.tp).offset = atoi( (yyvsp[-1].s).p );
-    }
-#line 2015 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 481 "aws_v2_parser.y" /* yacc.c:1646  */
+    { 
+            (yyval.agent) = (yyvsp[-1].agent);
+            lib -> setAgent( (yyval.agent) );
+        }
+#line 2166 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 526 "aws_v2_parser.y" /* yacc.c:1646  */
-    { memset( &((yyval.tp)), 0, sizeof (yyval.tp) ); }
-#line 2021 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 486 "aws_v2_parser.y" /* yacc.c:1646  */
+    { 
+            InitAgent( (yyval.agent) ); 
+            lib -> setAgent( (yyval.agent) );
+        }
+#line 2175 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 101:
+#line 491 "aws_v2_parser.y" /* yacc.c:1646  */
+    { 
+            InitAgent( (yyval.agent) ); 
+            lib -> setAgent( (yyval.agent) );
+        }
+#line 2184 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 102:
+#line 498 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::time, (yyvsp[0].s) ); }
+#line 2190 "aws_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 103:
+#line 499 "aws_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( LogAWSEvent::time, (yyvsp[0].s) ); }
+#line 2196 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2025 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2200 "aws_v2_parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2249,7 +2424,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 529 "aws_v2_parser.y" /* yacc.c:1906  */
+#line 502 "aws_v2_parser.y" /* yacc.c:1906  */
 
 
 void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char * msg )

@@ -52,8 +52,6 @@ PATHEXT     \.(\.|{PATHSTR})*
 STR     [.\-a-zA-Z0-9_]+
 STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
 
-%x QUOTED TIMEFMT PATH
-
 AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/]
 AGENTDELIMS     [(),=\\]
 AGENTSTR        {AGENTCHARS}+
@@ -72,18 +70,22 @@ PHIDGUID        "nog"|({PHIDCHAR}{4})
 PHIDSESS        "nos"|({PHIDCHAR}{3})
 PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 
-%x AGENT
+INT4            [0-9]{4}
+INT3            [0-9]{3}
+INT2            [0-9]{2}
+TIMEZONE        [-+]?[0-9]{4}
+TIMEFMT         "["{INT4}"/"{MONTH}"/"{INT2}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZONE}"]"
 
 TLSV           [0-9]+(\.[0-9]+){0,2}
 TLSVERSION     "TLSv"{TLSV}
-
-%x TLSVERSION
 
 X_AMZ_ID_2       [A-Z0-9]{21}
 BASE64           [A-Za-z0-9+/]+={0,2}   
 S3_EXT_REQ_ID    {BASE64}
 
-%x HOSTID
+RESULTCODE      ([0-9]{3})|"-"
+
+%x QUOTED TIMEFMT PATH AGENT TLSVERSION HOSTID IPADDR RESCODE
 
 %%
 
@@ -101,14 +103,14 @@ S3_EXT_REQ_ID    {BASE64}
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
 <QUOTED>.           { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
-\[                  { yy_push_state( TIMEFMT, yyscanner ); return OB; }
-<TIMEFMT>\]         { yy_pop_state( yyscanner ); return CB; }
-<TIMEFMT>{I64}      { MAKE_STR(); return I64; }
-<TIMEFMT>\:         { return COLON; }
-<TIMEFMT>\/         { return SLASH; }
-<TIMEFMT>[ \t]      { ; }
-<TIMEFMT>{MONTH}    { MAKE_STR(); return MONTH; }
-<TIMEFMT>.          { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+{STR}           { MAKE_STR(); return STR; }
+{STR1}          { MAKE_STR1(); return STR1; }
+.               { /* fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); */ return UNRECOGNIZED; }
+
+<TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIMEFMT; }
+<TIMEFMT>-          { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
+<TIMEFMT>\"-\"      { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
+<TIMEFMT>.          { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in TIMEFMT '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 <PATH>{SPACE}       { yy_pop_state( yyscanner ); return SPACE; }
 <PATH>\"            { yy_pop_state( yyscanner ); return QUOTE; }
@@ -148,13 +150,16 @@ S3_EXT_REQ_ID    {BASE64}
 <HOSTID>{S3_EXT_REQ_ID} { MAKE_STR(); return S3_EXT_REQ_ID; }
 <HOSTID>.               { return yytext[0]; }
 
-{IPV4ADDR}      { MAKE_STR(); return IPV4; }
-{IPV6ADDR}      { MAKE_STR(); return IPV6; }
-{MONTH}         { MAKE_STR(); return MONTH; }
-{STR}           { MAKE_STR(); return STR; }
-{STR1}          { MAKE_STR1(); return STR1; }
+<IPADDR>{IPV4ADDR}      { yy_pop_state( yyscanner ); MAKE_STR(); return IPV4; }
+<IPADDR>{IPV6ADDR}      { yy_pop_state( yyscanner ); MAKE_STR(); return IPV6; }
+<IPADDR>-               { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
+<IPADDR>\"-\"           { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
+<IPADDR>.               { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in IPADDR '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
-.               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<RESCODE>{INT3}         { yy_pop_state( yyscanner ); MAKE_STR(); return RESULTCODE; }
+<RESCODE>-              { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
+<RESCODE>\"-\"          { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
+<RESCODE>.              { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in RESCODE '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 %%
 
@@ -193,6 +198,21 @@ void aws_start_TLS_vers( yyscan_t yyscanner )
 void aws_start_host_id( yyscan_t yyscanner )
 {
     yy_push_state( HOSTID, yyscanner ); 
+}
+
+void aws_start_time( yyscan_t yyscanner )
+{
+    yy_push_state( TIMEFMT, yyscanner ); 
+}
+
+void aws_start_ipaddr( yyscan_t yyscanner )
+{
+    yy_push_state( IPADDR, yyscanner ); 
+}
+
+void aws_start_rescode( yyscan_t yyscanner )
+{
+    yy_push_state( RESCODE, yyscanner ); 
 }
 
 void aws_pop_state( yyscan_t yyscanner )

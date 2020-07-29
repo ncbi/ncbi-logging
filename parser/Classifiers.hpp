@@ -3,6 +3,7 @@
 #include "LogLinesInterface.hpp"
 
 #include <fstream>
+#include <sstream>
 
 namespace NCBI
 {
@@ -26,6 +27,23 @@ namespace NCBI
 
         private:
             std::ofstream review, good, bad, ugly;
+        };
+
+        class StringClassifier : public ClassificationInterface
+        {
+        public:
+            StringClassifier() {}
+            virtual ~StringClassifier();
+
+            virtual void write( LogLinesInterface::Category cat, const std::string & s );
+
+            const std::string get_review() { return review . str(); }
+            const std::string get_good()   { return good . str(); }
+            const std::string get_bad()    { return bad . str(); }
+            const std::string get_ugly()   { return ugly . str(); }
+
+        private:
+            std::stringstream review, good, bad, ugly;
         };
 
 #if 0

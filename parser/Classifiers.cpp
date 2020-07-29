@@ -28,3 +28,19 @@ void FileClassifier :: write( LogLinesInterface::Category cat, const string & s 
     default: throw logic_error( "Unknown Category" ); break;
     }
 }
+
+StringClassifier :: ~StringClassifier() 
+{
+}
+
+void StringClassifier :: write( LogLinesInterface::Category cat, const string & s )
+{
+    switch ( cat )    
+    {
+    case LogLinesInterface::cat_review :    review << s; break;
+    case LogLinesInterface::cat_good :      good << s; break;
+    case LogLinesInterface::cat_bad :       bad << s; break;
+    case LogLinesInterface::cat_ugly :      ugly << s; break;
+    default: throw logic_error( "Unknown Category" ); break;
+    }
+}

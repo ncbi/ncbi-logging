@@ -37,7 +37,7 @@ namespace NCBI
             } AWS_Members; // all are t_str values
             virtual void set( AWS_Members m, const t_str & ); // will invoke set( LogLinesInterface::Members ) if necessary
 
-            virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type );
+            virtual void reportField( const char * message );
 
         private:
         };

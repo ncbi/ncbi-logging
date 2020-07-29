@@ -40,7 +40,7 @@
 extern int aws_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 28 "aws_v2_parser.y" /* yacc.c:1909  */
+#line 31 "aws_v2_parser.y" /* yacc.c:1909  */
 
 #include "types.h"
 #include "AWS_Interface.hpp"
@@ -51,12 +51,15 @@ extern void aws_start_URL( void * yyscanner );
 extern void aws_start_UserAgent( void * yyscanner );
 extern void aws_start_TLS_vers( void * yyscanner );
 extern void aws_start_host_id( void * yyscanner );
+extern void aws_start_time( void * yyscanner );
+extern void aws_start_ipaddr( void * yyscanner );
+extern void aws_start_rescode( void * yyscanner );
 
 extern void aws_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 
-#line 60 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 63 "aws_v2_parser.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -85,17 +88,19 @@ using namespace NCBI::Logging;
     TLS_VERSION = 277,
     X_AMZ_ID_2 = 278,
     S3_EXT_REQ_ID = 279,
-    COLON = 280,
-    QUOTE = 281,
-    OB = 282,
-    CB = 283,
-    UNRECOGNIZED = 284,
-    OS = 285,
-    SRA_TOOLKIT = 286,
-    LIBCVERSION = 287,
-    AGENTSTR = 288,
-    SRATOOLVERS = 289,
-    PHIDVALUE = 290
+    TIMEFMT = 280,
+    RESULTCODE = 281,
+    COLON = 282,
+    QUOTE = 283,
+    OB = 284,
+    CB = 285,
+    UNRECOGNIZED = 286,
+    OS = 287,
+    SRA_TOOLKIT = 288,
+    LIBCVERSION = 289,
+    AGENTSTR = 290,
+    SRATOOLVERS = 291,
+    PHIDVALUE = 292
   };
 #endif
 
@@ -104,14 +109,13 @@ using namespace NCBI::Logging;
 
 union YYSTYPE
 {
-#line 45 "aws_v2_parser.y" /* yacc.c:1909  */
+#line 51 "aws_v2_parser.y" /* yacc.c:1909  */
 
     t_str s;
-    t_timepoint tp;
     t_request req;
     t_agent agent;
 
-#line 115 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 119 "aws_v2_parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

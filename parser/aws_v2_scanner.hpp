@@ -517,6 +517,8 @@ void yyfree ( void * , yyscan_t yyscanner );
 #define AGENT 4
 #define TLSVERSION 5
 #define HOSTID 6
+#define IPADDR 7
+#define RESCODE 8
 
 #endif
 
@@ -835,9 +837,9 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 160 "aws_v2_scanner.l"
+#line 165 "aws_v2_scanner.l"
 
 
-#line 842 "aws_v2_scanner.hpp"
+#line 844 "aws_v2_scanner.hpp"
 #undef aws_IN_HEADER
 #endif /* aws_HEADER_H */

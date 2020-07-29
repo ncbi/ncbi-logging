@@ -46,12 +46,23 @@ void LogAWSEvent::set( AWS_Members m, const t_str & v )
     default: LogLinesInterface::set((LogLinesInterface::Members)m, v); 
     }
 #undef CASE
+    if ( m_cat == cat_unknown )
+        m_cat = cat_good;
 }
 
-LogLinesInterface::ReportFieldResult 
-LogAWSEvent::reportField( Members field, const char * value, const char * message, ReportFieldType type ) 
+void LogAWSEvent::reportField( const char * message ) 
 {
-    return proceed;
+    if ( m_cat == cat_unknown || m_cat == cat_good )
+        m_cat = cat_review;
+    try
+    {
+        t_str msg { message, (int)strlen( message ), false };
+        m_fmt . addNameValue( "_parse-error", msg );
+    }
+    catch( const ncbi::JSONUniqueConstraintViolation & e )
+    {
+        // in case we already inserted a parse-error value, we do nothing...
+    }
 }
 
 void 

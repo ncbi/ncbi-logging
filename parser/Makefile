@@ -443,13 +443,13 @@ AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
 AWS2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(AWS2JSN_SRC)))
 
 $(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_CMD_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
 $(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_CMD_OBJ) 
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-secure-rel -lutf8proc -lmbedcrypto
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
 $(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
-	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-secure-prof -lutf8proc -lmbedcrypto
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-prof -lncbi-secure-prof -lutf8proc -lmbedcrypto
 
 aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 

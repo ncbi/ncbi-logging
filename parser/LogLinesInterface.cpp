@@ -5,7 +5,7 @@
 using namespace NCBI::Logging;
 
 LogLinesInterface::LogLinesInterface( FormatterInterface & p_fmt ) 
-: m_fmt ( p_fmt ), m_cat ( cat_ugly ) 
+: m_fmt ( p_fmt ), m_cat ( cat_unknown ) 
 {
 }
 
@@ -27,6 +27,8 @@ LogLinesInterface::set( Members m, const t_str & v )
     default:
         throw std::logic_error( "invalid LogLinesInterface::Member" ); 
     }
+    if ( m_cat == cat_unknown )
+        m_cat = cat_good;
 }
 
 void 
@@ -40,6 +42,8 @@ LogLinesInterface::setAgent( const t_agent & a )
     m_fmt . addNameValue( "vdb_phid_guid",          a . vdb_phid_guid );
     m_fmt . addNameValue( "vdb_phid_session_ip",    a . vdb_phid_session_id );
     m_fmt . addNameValue( "vdb_libc",               a . vdb_libc );
+    if ( m_cat == cat_unknown )
+        m_cat = cat_good;
 }
 
 void 
@@ -51,6 +55,6 @@ LogLinesInterface::setRequest( const t_request & r )
     m_fmt . addNameValue( "accession", r . accession );
     m_fmt . addNameValue( "filename",  r . filename );
     m_fmt . addNameValue( "extension", r . extension );
+    if ( m_cat == cat_unknown )
+        m_cat = cat_good;
 }
-
-

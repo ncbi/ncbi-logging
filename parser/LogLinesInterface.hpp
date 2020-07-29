@@ -52,7 +52,7 @@ namespace NCBI
 
             virtual ~LogLinesInterface();
 
-            typedef enum { cat_review, cat_good, cat_bad, cat_ugly } Category;
+            typedef enum { cat_review, cat_good, cat_bad, cat_ugly, cat_unknown } Category;
 
             Category GetCategory() const { return m_cat; }
             void SetCategory( Category p_cat ) { m_cat = p_cat; }
@@ -70,10 +70,7 @@ namespace NCBI
             void setAgent( const t_agent & a );
             void setRequest( const t_request & r );
 
-            // could be a throw instead of abort, but we need to make sure the parser terminates cleanly if we throw.
-            typedef enum { proceed, abort } ReportFieldResult;
-            typedef enum { suspect, bad } ReportFieldType;
-            virtual ReportFieldResult reportField( Members field, const char * value, const char * message, ReportFieldType type ) = 0;
+            virtual void reportField( const char * message ) = 0;
 
             FormatterInterface & GetFormatter() { return m_fmt; }
             std::stringstream & format( std::stringstream & out ) const { return m_fmt.format( out ); }

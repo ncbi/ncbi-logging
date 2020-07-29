@@ -8,7 +8,7 @@
 
 #include "helper.hpp"
 
-#include "AWSToJsonImpl.hpp"
+#include "AWS_Interface.hpp"
 #include "Classifiers.hpp"
 
 using namespace std;
@@ -61,17 +61,17 @@ int main ( int argc, char * argv [], const char * envp []  )
 
         return 0;
     }
-    catch( const exception & e)
+    catch( const exception & e )
     {
         cerr << "Exception caught: " << e.what() << endl;
         return 1;
     }
-    catch( const ncbi::InvalidArgument & e)
+    catch( const ncbi::Exception & e )
     {
-        cerr << "Invalid Argument: " << e.what() << endl;
+        cerr << "NCBI Exception caught: " << e.what() << endl;
         return 1;
     }
-    catch(...)
+    catch( ... )
     {
         cerr << "Unknown exception caught" << endl;
         return 2;
