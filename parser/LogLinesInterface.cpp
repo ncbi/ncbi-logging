@@ -40,7 +40,7 @@ LogLinesInterface::setAgent( const t_agent & a )
     m_fmt . addNameValue( "vdb_release",            a . vdb_release );
     m_fmt . addNameValue( "vdb_phid_compute_env",   a . vdb_phid_compute_env );
     m_fmt . addNameValue( "vdb_phid_guid",          a . vdb_phid_guid );
-    m_fmt . addNameValue( "vdb_phid_session_ip",    a . vdb_phid_session_id );
+    m_fmt . addNameValue( "vdb_phid_session_id",    a . vdb_phid_session_id );
     m_fmt . addNameValue( "vdb_libc",               a . vdb_libc );
     if ( m_cat == cat_unknown )
         m_cat = cat_good;

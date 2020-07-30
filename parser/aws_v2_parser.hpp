@@ -54,12 +54,13 @@ extern void aws_start_host_id( void * yyscanner );
 extern void aws_start_time( void * yyscanner );
 extern void aws_start_ipaddr( void * yyscanner );
 extern void aws_start_rescode( void * yyscanner );
+extern void aws_start_referer( void * yyscanner );
 
 extern void aws_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 
-#line 63 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 64 "aws_v2_parser.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -88,7 +89,7 @@ using namespace NCBI::Logging;
     TLS_VERSION = 277,
     X_AMZ_ID_2 = 278,
     S3_EXT_REQ_ID = 279,
-    TIMEFMT = 280,
+    TIME_FMT = 280,
     RESULTCODE = 281,
     COLON = 282,
     QUOTE = 283,
@@ -109,13 +110,13 @@ using namespace NCBI::Logging;
 
 union YYSTYPE
 {
-#line 51 "aws_v2_parser.y" /* yacc.c:1909  */
+#line 52 "aws_v2_parser.y" /* yacc.c:1909  */
 
     t_str s;
     t_request req;
     t_agent agent;
 
-#line 119 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 120 "aws_v2_parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

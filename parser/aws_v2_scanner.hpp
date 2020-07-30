@@ -519,6 +519,7 @@ void yyfree ( void * , yyscan_t yyscanner );
 #define HOSTID 6
 #define IPADDR 7
 #define RESCODE 8
+#define REFERER 9
 
 #endif
 
@@ -837,9 +838,9 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 165 "aws_v2_scanner.l"
+#line 171 "aws_v2_scanner.l"
 
 
-#line 844 "aws_v2_scanner.hpp"
+#line 845 "aws_v2_scanner.hpp"
 #undef aws_IN_HEADER
 #endif /* aws_HEADER_H */

@@ -41,6 +41,7 @@ extern void aws_start_host_id( void * yyscanner );
 extern void aws_start_time( void * yyscanner );
 extern void aws_start_ipaddr( void * yyscanner );
 extern void aws_start_rescode( void * yyscanner );
+extern void aws_start_referer( void * yyscanner );
 
 extern void aws_pop_state( void * yyscanner );
 
@@ -55,7 +56,7 @@ using namespace NCBI::Logging;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
-%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID TIMEFMT RESULTCODE
+%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID TIME_FMT RESULTCODE
 %token COLON QUOTE OB CB 
 %token UNRECOGNIZED
 %token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
@@ -110,29 +111,28 @@ log_aws
       { aws_start_TLS_vers( scanner ); } aws_tls_vers { aws_pop_state( scanner ); }
     {
         // numbers may be shifted!!!!
-        lib -> setRequest( $20 );
 
-        /*
         // combine data from aws_key and request
-        if ( $17 . path . n == 1 && $17 . path . p[ 0 ] == '-' )
+        if ( $18 . path . n == 1 && $18 . path . p[ 0 ] == '-' )
         {
-            EMPTY_TSTR( ev . key );
-        }
-        else if ( $17 . path . n == 3 && $17 . path . p[ 0 ] == '\"' && $17 . path . p[ 1 ] == '-' && $17 . path . p[ 2 ] == '\"' )
-        {
-            EMPTY_TSTR( ev . key );
+            t_str empty;
+            EMPTY_TSTR( empty );
+            SET_VALUE( LogAWSEvent::key, empty );
         }
         else
         {
-            ev . key = $17 . path;
+            SET_VALUE( LogAWSEvent::key, $18 . path );
         }
-        if ( $17 . accession . n > 0 )
+
+        t_request req = $20;
+        if ( $18 . accession . n > 0 )
         {
-            ev . request . accession = $17 . accession;
-            ev . request . filename  = $17 . filename;
-            ev . request . extension = $17 . extension;
+            req . accession = $18 . accession;
+            req . filename  = $18 . filename;
+            req . extension = $18 . extension;
         }
-*/        
+
+        lib -> setRequest( req );
     }
     ;
 
@@ -165,13 +165,29 @@ aws_host_hdr   : string_or_dash             { SET_VALUE( LogAWSEvent::host_heade
 
 key_token
     : SLASH         { InitRequest( $$ ); $$ . path = $1; }
-    | EQUAL         { InitRequest( $$ ); $$ . path = $1; }
-    | AMPERSAND     { InitRequest( $$ ); $$ . path = $1; }
-    | QMARK         { InitRequest( $$ ); $$ . path = $1; }
-    | PERCENT       { InitRequest( $$ ); $$ . path = $1; }
     | ACCESSION     { InitRequest( $$ ); $$ . path = $1; $$ . accession = $1; }
     | PATHSTR       { InitRequest( $$ ); $$ . path = $1; $$ . filename = $1; }
     | PATHEXT       { InitRequest( $$ ); $$ . path = $1; $$ . extension = $1; }
+    | EQUAL  
+        { 
+            lib -> reportField( "Unexpected '=' in key" ); 
+            InitRequest( $$ ); $$ . path = $1; 
+        }
+    | AMPERSAND
+        { 
+            lib -> reportField( "Unexpected '&' in key" ); 
+            InitRequest( $$ ); $$ . path = $1; 
+        }
+    | PERCENT
+        { 
+            lib -> reportField( "Unexpected '%' in key" ); 
+            InitRequest( $$ ); $$ . path = $1; 
+        }
+    | QMARK         
+        { 
+            lib -> reportField( "Unexpected '?' in key" ); 
+            InitRequest( $$ ); $$ . path = $1; 
+        }
     ;
 
 aws_key
@@ -284,11 +300,6 @@ method
     | dash
     ;
 
-qstr_list
-    : QSTR                  { $$ = $1; }
-    | qstr_list SPACE QSTR  { $$ = $1; $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
-    ;
-
  /* 
     typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode; (defined in log_lines.hpp)
 
@@ -379,20 +390,20 @@ request
         $$ = $3;
         $$.method = $2;
      }
-    | QUOTE method url QUOTE
-    {
-        $$ = $3;
-        $$.method = $2;
-    }
     | QUOTE method QUOTE 
     {
         InitRequest( $$ );
         $$.method = $2;
     }
-    | QUOTE { aws_start_URL( scanner ); } url_list QUOTE
-    {
-        $$ = $3;
-    }
+    | QUOTE method url 
+        { /* SPACE does that in the above branches, here have to pop state explicitly */
+            aws_pop_state( scanner ); 
+        } 
+      QUOTE
+        { 
+            $$ = $3;
+            $$.method = $2;
+        }
     | DASH { InitRequest( $$ );}
     ;
 
@@ -401,9 +412,22 @@ result_code
     | dash              { SET_VALUE( LogAWSEvent::res_code, $1 ); }
     ;
 
+qstr_list
+    : QSTR            { $$ = $1; }
+    | qstr_list QSTR  { $$ = $1; MERGE_TSTR ( $$, $2 ); }
+    ;
+
 referer
-    : QUOTE qstr_list QUOTE                 { SET_VALUE( LogAWSEvent::referer, $2 ); }
-    | string_or_dash                        { SET_VALUE( LogAWSEvent::referer, $1 ); }
+    : QUOTE { aws_start_referer( scanner ); } 
+        qstr_list QUOTE                 
+        { 
+            SET_VALUE( LogAWSEvent::referer, $3 ); 
+            aws_pop_state( scanner ); // out of QUOTED into the global state
+        }
+    | string_or_dash                        
+        { 
+            SET_VALUE( LogAWSEvent::referer, $1 ); 
+        }
     ;
 
 vdb_agent_token
@@ -495,7 +519,7 @@ agent
     ;
 
 time
-    : TIMEFMT               { SET_VALUE( LogAWSEvent::time, $1 ); }
+    : TIME_FMT              { SET_VALUE( LogAWSEvent::time, $1 ); }
     | dash                  { SET_VALUE( LogAWSEvent::time, $1 ); }
     ;
 

@@ -21,10 +21,10 @@ void FileClassifier :: write( LogLinesInterface::Category cat, const string & s 
 {
     switch ( cat )    
     {
-    case LogLinesInterface::cat_review :    review << s; break;
-    case LogLinesInterface::cat_good :      good << s; break;
-    case LogLinesInterface::cat_bad :       bad << s; break;
-    case LogLinesInterface::cat_ugly :      ugly << s; break;
+    case LogLinesInterface::cat_review :    review << s << endl; break;
+    case LogLinesInterface::cat_good :      good << s << endl; break;
+    case LogLinesInterface::cat_bad :       bad << s << endl; break;
+    case LogLinesInterface::cat_ugly :      ugly << s << endl; break;
     default: throw logic_error( "Unknown Category" ); break;
     }
 }
@@ -37,10 +37,10 @@ void StringClassifier :: write( LogLinesInterface::Category cat, const string & 
 {
     switch ( cat )    
     {
-    case LogLinesInterface::cat_review :    review << s; break;
-    case LogLinesInterface::cat_good :      good << s; break;
-    case LogLinesInterface::cat_bad :       bad << s; break;
-    case LogLinesInterface::cat_ugly :      ugly << s; break;
+    case LogLinesInterface::cat_review :    review << s << endl; break;
+    case LogLinesInterface::cat_good :      good << s << endl; break;
+    case LogLinesInterface::cat_bad :       bad << s << endl; break;
+    case LogLinesInterface::cat_ugly :      ugly << s << endl; break;
     default: throw logic_error( "Unknown Category" ); break;
     }
 }

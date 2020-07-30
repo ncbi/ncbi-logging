@@ -74,7 +74,7 @@ INT4            [0-9]{4}
 INT3            [0-9]{3}
 INT2            [0-9]{2}
 TIMEZONE        [-+]?[0-9]{4}
-TIMEFMT         "["{INT4}"/"{MONTH}"/"{INT2}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZONE}"]"
+TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZONE}"]"
 
 TLSV           [0-9]+(\.[0-9]+){0,2}
 TLSVERSION     "TLSv"{TLSV}
@@ -85,7 +85,7 @@ S3_EXT_REQ_ID    {BASE64}
 
 RESULTCODE      ([0-9]{3})|"-"
 
-%x QUOTED TIMEFMT PATH AGENT TLSVERSION HOSTID IPADDR RESCODE
+%x QUOTED TIMEFMT PATH AGENT TLSVERSION HOSTID IPADDR RESCODE REFERER
 
 %%
 
@@ -107,7 +107,7 @@ RESULTCODE      ([0-9]{3})|"-"
 {STR1}          { MAKE_STR1(); return STR1; }
 .               { /* fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); */ return UNRECOGNIZED; }
 
-<TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIMEFMT; }
+<TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }
 <TIMEFMT>-          { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
 <TIMEFMT>\"-\"      { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
 <TIMEFMT>.          { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in TIMEFMT '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
@@ -161,6 +161,12 @@ RESULTCODE      ([0-9]{3})|"-"
 <RESCODE>\"-\"          { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
 <RESCODE>.              { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in RESCODE '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
+<REFERER>\"             { yy_pop_state( yyscanner ); MAKE_STR(); return QUOTE; }
+<REFERER>\\\"           { MAKE_STR(); return QSTR; }
+<REFERER>{QSTR}         { MAKE_STR(); return QSTR; }
+<REFERER>{QSTR_ESC}     { MAKE_STR_ESCAPED(); return QSTR; }
+<REFERER>.              { MAKE_STR(); return QSTR; }
+
 %%
 
 YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner )
@@ -213,6 +219,11 @@ void aws_start_ipaddr( yyscan_t yyscanner )
 void aws_start_rescode( yyscan_t yyscanner )
 {
     yy_push_state( RESCODE, yyscanner ); 
+}
+
+void aws_start_referer( yyscan_t yyscanner )
+{
+    yy_push_state( REFERER, yyscanner ); 
 }
 
 void aws_pop_state( yyscan_t yyscanner )

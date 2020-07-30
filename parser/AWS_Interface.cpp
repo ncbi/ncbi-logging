@@ -57,7 +57,7 @@ void LogAWSEvent::reportField( const char * message )
     try
     {
         t_str msg { message, (int)strlen( message ), false };
-        m_fmt . addNameValue( "_parse-error", msg );
+        m_fmt . addNameValue( "_error", msg );
     }
     catch( const ncbi::JSONUniqueConstraintViolation & e )
     {
@@ -83,21 +83,25 @@ AWSParser::parse()
 
         YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
-        stringstream out; // consider moving out of the loop
+        FormatterInterface & fmt = m_receiver.GetFormatter();
+
         if ( aws_parse( sc, static_cast<LogAWSEvent*>( & m_receiver ) ) != 0 )
         {
-            FormatterInterface & fmt = m_receiver.GetFormatter();
-            fmt.addNameValue("line_nr", line_nr);
+            m_receiver.SetCategory( LogLinesInterface::cat_ugly );
+        }
 
+        if ( m_receiver.GetCategory() != LogLinesInterface::cat_good )
+        {
+            fmt.addNameValue("_line_nr", line_nr);
             t_str t_line;
             t_line.p = line.c_str();
             t_line.n = line.size();
             t_line.escaped = false;
-            fmt.addNameValue("unparsed", t_line);
-
-            m_receiver.SetCategory( LogLinesInterface::cat_ugly );
+            fmt.addNameValue("_unparsed", t_line);
         }
 
+        //TODO: consider passing the output stream to write() without a temporary string
+        stringstream out;
         m_outputs. write ( m_receiver.GetCategory(), m_receiver . format ( out ).str() );
 
         aws__delete_buffer( bs, sc );

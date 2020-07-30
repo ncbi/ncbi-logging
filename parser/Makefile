@@ -418,7 +418,7 @@ $(BINDIR)/test_support-rel: $(TEST_SUPPORT_REL_OBJ)
 
 test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
 
-run_test_support: $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
+run_test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
 	$(BINDIR)/test_support-dbg
 	$(BINDIR)/test_support-rel
 

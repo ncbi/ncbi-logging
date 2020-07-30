@@ -75,7 +75,7 @@ TEST(LogAWSEventTest, Setters)
 
     stringstream out;
     ASSERT_EQ ( 
-        "{\"accession\":\"a\",\"agent\":\"o\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"extension\":\"e\",\"filename\":\"f\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_ip\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\",\"version_id\":\"ver\"}", 
+        "{\"accession\":\"a\",\"agent\":\"o\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"extension\":\"e\",\"filename\":\"f\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\",\"version_id\":\"ver\"}", 
         e.GetFormatter().format( out ).str() );    
 }
 
@@ -110,9 +110,27 @@ class LogAWSEventFixture : public ::testing::Test
             return s_outputs.get_ugly();
         }
 
+        std::string try_to_parse_review( std::string line, bool debug = false )
+        {
+            try_to_parse( line, debug );
+            return s_outputs.get_review();
+        }
+
         std::string extract_value( const std::string & src, std::string key )
         {
-
+            try
+            {
+                const ncbi::String input ( src );
+                ncbi::JSONObjectRef obj = ncbi::JSON::parseObject ( input );
+                const ncbi::String name ( key );
+                ncbi::JSONValue & val = obj -> getValue( name );
+                return val.toString().toSTLString();
+            }
+            catch(const ncbi::Exception & ex)
+            {
+                cerr << "extract_value():" << ex.what() << endl;
+                throw;
+            }
         }
 
         StringClassifier s_outputs;
@@ -122,7 +140,7 @@ TEST_F( LogAWSEventFixture, parse_just_dashes )
 {
     std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - - - - -" );
     ASSERT_EQ( 
-        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_ip\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}",
+        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
         res
         );
 }
@@ -131,7 +149,7 @@ TEST_F( LogAWSEventFixture, parse_quoted_dashes )
 {
     std::string res = try_to_parse_good( "\"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\"" );
     ASSERT_EQ( 
-        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_ip\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}",
+        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
         res
         );
 }
@@ -139,23 +157,365 @@ TEST_F( LogAWSEventFixture, parse_quoted_dashes )
 TEST_F( LogAWSEventFixture, LineRejecting )
 {
     std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );
-    ASSERT_EQ( "{\"bucket\":\"blah\",\"line_nr\":1,\"owner\":\"line1\",\"unparsed\":\"line1 blah\"}{\"line_nr\":2,\"owner\":\"line2\",\"unparsed\":\"line2\"}{\"line_nr\":3,\"owner\":\"line3\",\"unparsed\":\"line3\"}", res );
+    ASSERT_EQ( 
+        "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\",\"bucket\":\"blah\",\"owner\":\"line1\"}\n"
+        "{\"_line_nr\":2,\"_unparsed\":\"line2\",\"owner\":\"line2\"}\n"
+        "{\"_line_nr\":3,\"_unparsed\":\"line3\",\"owner\":\"line3\"}\n", res );
 }
 
 TEST_F( LogAWSEventFixture, unrecognized_char )
 {
     std::string res = try_to_parse_ugly( "line1 \07" );
-    ASSERT_EQ( "{\"line_nr\":1,\"owner\":\"line1\",\"unparsed\":\"line1 \\u0007\"}", res );
+    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\",\"owner\":\"line1\"}\n", res );
 }
 
 TEST_F( LogAWSEventFixture, parse_owner )
 {
     std::string res = try_to_parse_good( "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 - - - - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455",
+                extract_value( res, "owner" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_owner_str1 )
+{
+    std::string res = try_to_parse_good( "123%@& - - - - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "123%@&", extract_value( res, "owner" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_bucket )
+{
+    std::string res = try_to_parse_good( "- abucket - - - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "abucket", extract_value( res, "bucket" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_time )
+{
+    std::string res = try_to_parse_good( "- - [09/May/2020:22:07:21 +0000] - - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "[09/May/2020:22:07:21 +0000]", extract_value( res, "time" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_ip4 )
+{
+    std::string res = try_to_parse_good( "- - - 18.207.254.142 - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "18.207.254.142", extract_value( res, "ip" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_ip6 )
+{
+    std::string res = try_to_parse_good( "- - - 0123:4567:89ab:cdef::1.2.3.4 - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "0123:4567:89ab:cdef::1.2.3.4", extract_value( res, "ip" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_requester )
+{
+    std::string res = try_to_parse_good( "- - - - arn:aws:sts::783971887864 - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "arn:aws:sts::783971887864", extract_value( res, "requester" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_request_id )
+{
+    std::string res = try_to_parse_good( "- - - - - B6301F55C2486C74 - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "B6301F55C2486C74", extract_value( res, "request_id" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_operation )
+{
+    std::string res = try_to_parse_good( "- - - - - - REST.PUT.PART - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "REST.PUT.PART", extract_value( res, "operation" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key )
+{
+    std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1 - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "ERR792423/5141526_s1_p0.bas.h5.1", extract_value( res, "key" ) );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_with_qmark )
+{
+    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1?ab - - - - - - - - - - - - - - - -" );
     ASSERT_EQ( 
-        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_ip\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}",
+        "{\"_error\":\"Unexpected '?' in key\",\"_line_nr\":1,\"_unparsed\":\"- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1?ab - - - - - - - - - - - - - - - -\",\"accession\":\"ERR792423\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"ab\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"ERR792423/5141526_s1_p0.bas.h5.1?ab\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
         res
         );
 }
+
+TEST_F( LogAWSEventFixture, parse_key_with_pct )
+{
+    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1%ab - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "Unexpected '%' in key", extract_value( res, "_error" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_with_eq )
+{
+    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1=b - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "Unexpected '=' in key", extract_value( res, "_error" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_with_amp )
+{
+    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1&b - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "Unexpected '&' in key", extract_value( res, "_error" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_multiple_accessions )
+{   // pick the last accession
+    std::string res = try_to_parse_good( "- - - - - - - SRX123456/ERR792423/5141526_s1_p0.bas.h5.1 - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "SRX123456/ERR792423/5141526_s1_p0.bas.h5.1", extract_value( res, "key" ) );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_no_accessions )
+{   // pick the last accession
+    std::string res = try_to_parse_good( "- - - - - - - abc.12/5141526_s1_p0.bas.h5.1 - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "abc.12/5141526_s1_p0.bas.h5.1", extract_value( res, "key" ) );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_multiple_path_segments )
+{   // pick the last segment
+    std::string res = try_to_parse_good( "- - - - - - - SRR123456/abc.12/5141526_s1_p0.bas.h5.1 - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "SRR123456/abc.12/5141526_s1_p0.bas.h5.1", extract_value( res, "key" ) );
+    ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_no_extension )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - SRR123456/abc.12/5141526_s1_p0 - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "SRR123456/abc.12/5141526_s1_p0", extract_value( res, "key" ) );
+    ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_only_extension )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - SRR123456/abc.12/.bas.h5.1 - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "SRR123456/abc.12/.bas.h5.1", extract_value( res, "key" ) );
+    ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_accession_is_filename )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - SRR123456.1 - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "SRR123456.1", extract_value( res, "key" ) );
+    ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
+    ASSERT_EQ( "SRR123456", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".1", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_request )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "GET", extract_value( res, "method" ) );
+    ASSERT_EQ( "?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url", extract_value( res, "path" ) );
+    ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
+    ASSERT_EQ( "SRR11060177", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".1", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_request_no_ver )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET url \" - - - - - - - - - - - - - - -" );
+
+    ASSERT_EQ( "GET", extract_value( res, "method" ) );
+    ASSERT_EQ( "url", extract_value( res, "path" ) );
+    ASSERT_EQ( "", extract_value( res, "vers" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_request_no_space_ver )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET url\" - - - - - - - - - - - - - - -" );
+
+    ASSERT_EQ( "GET", extract_value( res, "method" ) );
+    ASSERT_EQ( "url", extract_value( res, "path" ) );
+    ASSERT_EQ( "", extract_value( res, "vers" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_request_no_url )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET\" - - - - - - - - - - - - - - -" );
+
+    ASSERT_EQ( "GET", extract_value( res, "method" ) );
+    ASSERT_EQ( "", extract_value( res, "path" ) );
+    ASSERT_EQ( "", extract_value( res, "vers" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_request_no_method )
+{   // not supported for now
+    std::string res = try_to_parse_ugly( "- - - - - - - - \"url\" - - - - - - - - - - - - - - -" );
+}
+
+TEST_F( LogAWSEventFixture, parse_key_and_request )
+{   // the key wins
+    std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1 \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "GET", extract_value( res, "method" ) );
+    ASSERT_EQ( "?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url", extract_value( res, "path" ) );
+    ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
+    // the extracted values come from the key
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1", extract_value( res, "extension" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_res_code )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - 200 - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "200", extract_value( res, "res_code" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_error )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - NoSuchKey - - - - - - - - - - - - -" );
+    ASSERT_EQ( "NoSuchKey", extract_value( res, "error" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_res_len )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - 1024 - - - - - - - - - - - -" );
+    ASSERT_EQ( "1024", extract_value( res, "res_len" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_obj_size )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - 1024 - - - - - - - - - - -" );
+    ASSERT_EQ( "1024", extract_value( res, "obj_size" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_total_time )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - 1024 - - - - - - - - - -" );
+    ASSERT_EQ( "1024", extract_value( res, "total_time" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_turnaround_time )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - 1024 - - - - - - - - -" );
+    ASSERT_EQ( "1024", extract_value( res, "turnaround_time" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_referrer_simple )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - referrrer - - - - - - - -" );
+    ASSERT_EQ( "referrrer", extract_value( res, "referer" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_referrer_compound )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - \"referring referrrer\" - - - - - - - -" );
+    ASSERT_EQ( "referring referrrer", extract_value( res, "referer" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_agent )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\" - - - - - - -" );
+    ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
+    ASSERT_EQ( "linux64", extract_value( res, "vdb_os" ) );
+    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
+    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
+    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
+    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
+    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
+    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_agent_no_os )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\" - - - - - - -" );
+    ASSERT_EQ( "sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );   
+    ASSERT_EQ( "", extract_value( res, "vdb_os" ) );
+    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
+    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
+    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
+    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
+    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
+    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_agent_os_in_middle )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)linux64\" - - - - - - -" );
+    ASSERT_EQ( "sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)linux64", extract_value( res, "agent" ) );   
+    ASSERT_EQ( "", extract_value( res, "vdb_os" ) );
+    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
+    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
+    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
+    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
+    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
+    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_agent_empty )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"\" - - - - - - -" );
+    ASSERT_EQ( "", extract_value( res, "agent" ) );   
+}
+
+TEST_F( LogAWSEventFixture, parse_version_id )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - 3HL4kqtJvjVBH40Nrjfkd - - - - - -" );
+    ASSERT_EQ( "3HL4kqtJvjVBH40Nrjfkd", extract_value( res, "version_id" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_2_part_hostId )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc= - - - - -" );
+    ASSERT_EQ( "AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=", extract_value( res, "host_id" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_1_part_hostId_a )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - AIDAISBTTLPGXGH6YFFAY - - - - -" );
+    ASSERT_EQ( "AIDAISBTTLPGXGH6YFFAY", extract_value( res, "host_id" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_1_part_hostId_b )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc= - - - - -" );
+    ASSERT_EQ( "LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=", extract_value( res, "host_id" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_sig_ver )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - SigV4 - - - -" );
+    ASSERT_EQ( "SigV4", extract_value( res, "sig_ver" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_cipher )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - ECDHE-RSA-AES128-GCM-SHA256 - - -" );
+    ASSERT_EQ( "ECDHE-RSA-AES128-GCM-SHA256", extract_value( res, "cipher_suite" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_auth )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - - AuthHeader - -" );
+    ASSERT_EQ( "AuthHeader", extract_value( res, "auth_type" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_host_hdr )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - - - sra-pub-src-14.s3.amazonaws.com -" );
+    ASSERT_EQ( "sra-pub-src-14.s3.amazonaws.com", extract_value( res, "host_header" ) );
+}
+
+TEST_F( LogAWSEventFixture, parse_tls )
+{   
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - - - - TLSv1.2" );
+    ASSERT_EQ( "TLSv1.2", extract_value( res, "tls_version" ) );
+}
+
 
 //TODO: reportField
 
