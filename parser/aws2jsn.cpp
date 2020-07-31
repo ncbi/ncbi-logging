@@ -9,7 +9,7 @@
 #include "helper.hpp"
 
 #include "AWS_Interface.hpp"
-#include "Classifiers.hpp"
+#include "CatWriters.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
@@ -22,22 +22,26 @@ struct Options
     std::string outputBaseName;
 };
 
+static void report( const CatCounter & ctr )
+{
+    JsonLibFormatter catFmt; 
+    catFmt.addNameValue("_total", ctr.get_total());
+    catFmt.addNameValue("good", ctr.get_cat_count( LogLinesInterface::cat_good ) );
+    catFmt.addNameValue("review", ctr.get_cat_count( LogLinesInterface::cat_review ) );
+    catFmt.addNameValue("bad", ctr.get_cat_count( LogLinesInterface::cat_bad ) );
+    catFmt.addNameValue("ugly", ctr.get_cat_count( LogLinesInterface::cat_ugly ) );
+    stringstream s;
+    cerr << catFmt.format(s).str() << endl; 
+}
+
 static void handle_aws( const Options & options )
 {
     JsonLibFormatter jsonFmt; 
     LogAWSEvent receiver( jsonFmt );
-    FileClassifier outputs( options.outputBaseName ); 
+    FileCatWriter outputs( options.outputBaseName ); 
     AWSParser p( cin, receiver, outputs );
-    p . parse(); // does the parsing and generates the report
-
-    JsonLibFormatter catFmt; 
-    catFmt.addNameValue("_total", outputs.getCounter().get_total());
-    catFmt.addNameValue("good", outputs.getCounter().get_cat_count( LogLinesInterface::cat_good ) );
-    catFmt.addNameValue("review", outputs.getCounter().get_cat_count( LogLinesInterface::cat_review ) );
-    catFmt.addNameValue("bad", outputs.getCounter().get_cat_count( LogLinesInterface::cat_bad ) );
-    catFmt.addNameValue("ugly", outputs.getCounter().get_cat_count( LogLinesInterface::cat_ugly ) );
-    stringstream s;
-    cerr << catFmt.format(s).str() << endl; 
+    p . parse(); 
+    report( outputs.getCounter() );
 }
 
 int main ( int argc, char * argv [], const char * envp []  )

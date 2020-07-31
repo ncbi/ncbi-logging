@@ -1,4 +1,4 @@
-#include "Classifiers.hpp"
+#include "CatWriters.hpp"
 
 using namespace NCBI :: Logging;
 using namespace std;
@@ -28,13 +28,13 @@ CatCounter::count( LogLinesInterface::Category cat )
     ++ total;
 }
 
-// ClassificationInterface
+// CatWriterInterface
 
-ClassificationInterface :: ~ClassificationInterface() {}
+CatWriterInterface :: ~CatWriterInterface() {}
 
-// FileClassifier
+// FileCatWriter
 
-FileClassifier :: FileClassifier( const string & baseName ) :
+FileCatWriter :: FileCatWriter( const string & baseName ) :
     review  ( baseName+".review" ),
     good    ( baseName+".good" ),
     bad     ( baseName+".bad" ), 
@@ -42,11 +42,11 @@ FileClassifier :: FileClassifier( const string & baseName ) :
 {
 }
 
-FileClassifier :: ~FileClassifier() 
+FileCatWriter :: ~FileCatWriter() 
 {
 }
 
-void FileClassifier :: write( LogLinesInterface::Category cat, const string & s )
+void FileCatWriter :: write( LogLinesInterface::Category cat, const string & s )
 {
     switch ( cat )    
     {
@@ -59,13 +59,13 @@ void FileClassifier :: write( LogLinesInterface::Category cat, const string & s 
     ctr.count( cat ); 
 }
 
-// StringClassifier
+// StringCatWriter
 
-StringClassifier :: ~StringClassifier() 
+StringCatWriter :: ~StringCatWriter() 
 {
 }
 
-void StringClassifier :: write( LogLinesInterface::Category cat, const string & s )
+void StringCatWriter :: write( LogLinesInterface::Category cat, const string & s )
 {
     switch ( cat )    
     {

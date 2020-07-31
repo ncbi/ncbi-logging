@@ -47,7 +47,7 @@ namespace NCBI
         public:
             AWSParser( std::istream & input,  
                        LogAWSEvent & receiver,
-                       ClassificationInterface & outputs ) 
+                       CatWriterInterface & outputs ) 
             :   ParserInterface ( input, receiver, outputs )
             {
             }
@@ -109,7 +109,7 @@ namespace NCBI
             public:
                 Thread(AWS_LogLinesInterface_Factory &loglinesF, 
                        Formatter & formatter,
-                       ClassificationInterface & outputs) {}
+                       CatWriterInterface & outputs) {}
 
                 OneReaderQueue queue; 
 
@@ -159,7 +159,7 @@ namespace NCBI
                 ThreadPool( numTreads, 
                        AWS_LogLinesInterface_Factory &loglinesF, 
                        formatter,
-                       ClassificationInterface & outputs )
+                       CatWriterInterface & outputs )
                 {
                     for( i = 1..numThreads )
                     {

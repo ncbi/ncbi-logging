@@ -11,7 +11,7 @@ namespace NCBI
     namespace Logging
     {
         class LogLinesInterface;
-        class ClassificationInterface;
+        class CatWriterInterface;
 
         typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
 
@@ -73,7 +73,6 @@ namespace NCBI
             virtual void reportField( const char * message ) = 0;
 
             FormatterInterface & GetFormatter() { return m_fmt; }
-            std::stringstream & format( std::stringstream & out ) const { return m_fmt.format( out ); }
 
         protected:
             FormatterInterface & m_fmt;
@@ -85,7 +84,7 @@ namespace NCBI
         public:
             ParserInterface( std::istream & input,  
                              LogLinesInterface & receiver,
-                             ClassificationInterface & outputs ) 
+                             CatWriterInterface & outputs ) 
             :   m_input ( input ),
                 m_receiver ( receiver ), 
                 m_outputs ( outputs ),
@@ -102,7 +101,7 @@ namespace NCBI
         protected:
             std::istream & m_input;
             LogLinesInterface & m_receiver; // we use its built-in formatter
-            ClassificationInterface & m_outputs;
+            CatWriterInterface & m_outputs;
             bool m_debug;
         };
 

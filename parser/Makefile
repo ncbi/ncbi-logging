@@ -400,11 +400,11 @@ test2jsn: log2jsn_
 .PHONY: log2jsn_ log2jsn_prof test2jsn
 
 #################################################
-# unit tests for formatter/classifier
+# unit tests for formatter/catwriter
 
 TEST_SUPPORT_SRC = \
 	Formatters.cpp test_formatter.cpp \
-	Classifiers.cpp test_classifier.cpp \
+	CatWriters.cpp test_catwriter.cpp \
 	test_support_main.cpp
 
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
@@ -431,7 +431,7 @@ AWS2JSN_CMN_SRC = \
 	$(PREFIX_AWS_V2)parser.cpp \
 	$(PREFIX_AWS_V2)scanner.cpp \
 	helper.cpp \
-	Classifiers.cpp \
+	CatWriters.cpp \
 	Formatters.cpp \
 	LogLinesInterface.cpp \
 	AWS_Interface.cpp

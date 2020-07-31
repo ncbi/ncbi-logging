@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Formatters.hpp"
-#include "Classifiers.hpp"
+#include "CatWriters.hpp"
 #include "AWS_Interface.hpp"
 
 using namespace std;
@@ -133,7 +133,7 @@ class LogAWSEventFixture : public ::testing::Test
             }
         }
 
-        StringClassifier s_outputs;
+        StringCatWriter s_outputs;
 };
 
 TEST_F( LogAWSEventFixture, parse_just_dashes )

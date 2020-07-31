@@ -23,7 +23,7 @@ namespace NCBI
             // TODO: decide if throw on invald UTF-8 in value
             virtual void addNameValue( const std::string & name, const t_str & value ) = 0;   // {"name":"value"}
             virtual void addNameValue( const std::string & name, int64_t value ) = 0;       // {"name":"value"}
-
+            //TODO: addNameValue( const std::string & name, const std::string & value ) 
         protected:
             std::string & unEscape( const t_str & value, std::string & str ) const; // appends to the end of str, returns updated str
         };

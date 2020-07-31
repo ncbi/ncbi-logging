@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Classifiers.hpp"
+#include "CatWriters.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
@@ -44,12 +44,12 @@ TEST(CatCounter, Count_BadCategory)
     ASSERT_THROW( cc.count(LogLinesInterface::cat_unknown), std::exception );
     ASSERT_EQ( 0, cc.get_total() );
 }
-// Classifiers
+// CatWriters
 
-TEST(FileClassifier, Write)
+TEST(FileCatWriter, Write)
 {
     {
-        FileClassifier f( "test" );
+        FileCatWriter f( "test" );
         f.write( LogLinesInterface::cat_review, "review");
         f.write( LogLinesInterface::cat_good, "good");
         f.write( LogLinesInterface::cat_bad, "bad");
@@ -85,9 +85,9 @@ TEST(FileClassifier, Write)
     remove("test.unrecog");
 }
 
-TEST(FileClassifier, Count)
+TEST(FileCatWriter, Count)
 {
-    FileClassifier f( "actual/test" );
+    FileCatWriter f( "actual/test" );
     f.write( LogLinesInterface::cat_review, "review");
     f.write( LogLinesInterface::cat_good, "good");
     f.write( LogLinesInterface::cat_bad, "bad");

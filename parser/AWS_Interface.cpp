@@ -6,7 +6,7 @@
 #include "aws_v2_parser.hpp"
 #include "aws_v2_scanner.hpp"
 #include "Formatters.hpp"
-#include "Classifiers.hpp"
+#include "CatWriters.hpp"
 
 extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
 
@@ -75,6 +75,8 @@ AWSParser::parse()
     aws_debug = m_debug ? 1 : 0;            // bison (aws_debug is global)
     aws_set_debug( m_debug ? 1 : 0, sc );   // flex
 
+    FormatterInterface & fmt = m_receiver.GetFormatter();
+
     unsigned long int line_nr = 0;
     string line;
     while( getline( m_input, line ) )
@@ -82,8 +84,6 @@ AWSParser::parse()
         line_nr++;
 
         YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
-
-        FormatterInterface & fmt = m_receiver.GetFormatter();
 
         if ( aws_parse( sc, static_cast<LogAWSEvent*>( & m_receiver ) ) != 0 )
         {
@@ -102,7 +102,7 @@ AWSParser::parse()
 
         //TODO: consider passing the output stream to write() without a temporary string
         stringstream out;
-        m_outputs. write ( m_receiver.GetCategory(), m_receiver . format ( out ).str() );
+        m_outputs. write ( m_receiver.GetCategory(), fmt . format ( out ).str() );
 
         aws__delete_buffer( bs, sc );
     }

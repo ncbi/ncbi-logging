@@ -25,19 +25,19 @@ namespace NCBI
                 std::vector< unsigned long int > cat_counts;
         };
 
-        class ClassificationInterface
+        class CatWriterInterface
         {
         public:
-            virtual ~ClassificationInterface() = 0;
+            virtual ~CatWriterInterface() = 0;
 
             virtual void write( LogLinesInterface::Category cat, const std::string & s ) = 0;
         };
 
-        class FileClassifier : public ClassificationInterface
+        class FileCatWriter : public CatWriterInterface
         {
         public:
-            FileClassifier( const std::string & basename );
-            virtual ~FileClassifier();
+            FileCatWriter( const std::string & basename );
+            virtual ~FileCatWriter();
 
             virtual void write( LogLinesInterface::Category cat, const std::string & s );
 
@@ -48,11 +48,11 @@ namespace NCBI
             CatCounter ctr;
         };
 
-        class StringClassifier : public ClassificationInterface
+        class StringCatWriter : public CatWriterInterface
         {
         public:
-            StringClassifier() {}
-            virtual ~StringClassifier();
+            StringCatWriter() {}
+            virtual ~StringCatWriter();
 
             virtual void write( LogLinesInterface::Category cat, const std::string & s );
 
@@ -66,10 +66,10 @@ namespace NCBI
         };
 
 #if 0
-        class ThreadedFileClassifier : public ClassificationInterface
+        class ThreadedFileCatWriter : public CatWriterInterface
         {
         public:
-            ThreadedFileClassifier( const string & basename ) :
+            ThreadedFileCatWriter( const string & basename ) :
                 review  ( ofstream(baseName+".review") ),
                 good    ( ofstream(baseName+".good") ),
                 bad     ( ofstream(baseName+".bad") ), 
@@ -79,7 +79,7 @@ namespace NCBI
 
             OutputThread review, good, bad, ugly;
 
-            virtual ~ThreadedFileClassifier()
+            virtual ~ThreadedFileCatWriter()
             {
                 review.close();
                 good.close();
