@@ -4,11 +4,27 @@
 
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 namespace NCBI
 {
     namespace Logging
     {
+        class CatCounter
+        {
+            public :
+                CatCounter();
+
+                void count( LogLinesInterface::Category cat );
+
+                unsigned long int get_total( void ) const { return total; }
+                unsigned long int get_cat_count( LogLinesInterface::Category cat ) const;
+
+            private :
+                unsigned long int total;
+                std::vector< unsigned long int > cat_counts;
+        };
+
         class ClassificationInterface
         {
         public:
