@@ -29,6 +29,15 @@ static void handle_aws( const Options & options )
     FileClassifier outputs( options.outputBaseName ); 
     AWSParser p( cin, receiver, outputs );
     p . parse(); // does the parsing and generates the report
+
+    JsonLibFormatter catFmt; 
+    catFmt.addNameValue("_total", outputs.getCounter().get_total());
+    catFmt.addNameValue("good", outputs.getCounter().get_cat_count( LogLinesInterface::cat_good ) );
+    catFmt.addNameValue("review", outputs.getCounter().get_cat_count( LogLinesInterface::cat_review ) );
+    catFmt.addNameValue("bad", outputs.getCounter().get_cat_count( LogLinesInterface::cat_bad ) );
+    catFmt.addNameValue("ugly", outputs.getCounter().get_cat_count( LogLinesInterface::cat_ugly ) );
+    stringstream s;
+    cerr << catFmt.format(s).str() << endl; 
 }
 
 int main ( int argc, char * argv [], const char * envp []  )

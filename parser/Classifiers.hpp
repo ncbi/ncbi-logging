@@ -41,8 +41,11 @@ namespace NCBI
 
             virtual void write( LogLinesInterface::Category cat, const std::string & s );
 
+            const CatCounter& getCounter() const { return ctr; }
+
         private:
             std::ofstream review, good, bad, ugly;
+            CatCounter ctr;
         };
 
         class StringClassifier : public ClassificationInterface

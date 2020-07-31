@@ -52,7 +52,7 @@ namespace NCBI
 
             virtual ~LogLinesInterface();
 
-            typedef enum { cat_review, cat_good, cat_bad, cat_ugly, cat_unknown } Category;
+            typedef enum { cat_review = 0, cat_good, cat_bad, cat_ugly, cat_unknown } Category;
 
             Category GetCategory() const { return m_cat; }
             void SetCategory( Category p_cat ) { m_cat = p_cat; }
