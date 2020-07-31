@@ -63,7 +63,25 @@ TEST_F ( AWS_TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan(""
 TEST_F ( AWS_TestFlexFixture, SkipSpace )       { ASSERT_EQ( SPACE, StartScan("   ") ); }
 TEST_F ( AWS_TestFlexFixture, SkipTab )         { ASSERT_EQ( SPACE, StartScan(" \t ") ); }
 TEST_F ( AWS_TestFlexFixture, Dash )            { ASSERT_EQ( DASH,  StartScan("-") ); }
-TEST_F ( AWS_TestFlexFixture, OpenBracket )     { ASSERT_EQ( UNRECOGNIZED,    StartScan("[") ); }
+
+TEST_F ( AWS_TestFlexFixture, OpenBracket )
+{
+    ASSERT_EQ( STR1,  StartScan("[") );
+    ASSERT_EQ( "[", TokenValue() );
+}
+
+TEST_F ( AWS_TestFlexFixture, CloseBracket )
+{
+    ASSERT_EQ( STR1,  StartScan("]") );
+    ASSERT_EQ( "]", TokenValue() );
+}
+
+TEST_F ( AWS_TestFlexFixture, MisplacedTime )
+{
+    ASSERT_EQ( STR1,  StartScan("[01/Jan/2000:11:22:33 +1234]") );
+    ASSERT_EQ( "[01/Jan/2000:11:22:33", TokenValue() );
+}
+
 TEST_F ( AWS_TestFlexFixture, Quote )           { ASSERT_EQ( QUOTE, StartScan("\"") ); }
 
 TEST_F ( AWS_TestFlexFixture, STR )

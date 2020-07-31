@@ -50,7 +50,7 @@ PATHSTR     {CHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
 
 STR     [.\-a-zA-Z0-9_]+
-STR1    [/:+=%@&*!~;$,#.\-a-zA-Z0-9_]+
+STR1    [/:+=%@&*!~;$\],#.\-a-zA-Z0-9_\[]+
 
 AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/]
 AGENTDELIMS     [(),=\\]
