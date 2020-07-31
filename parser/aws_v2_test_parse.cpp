@@ -515,7 +515,13 @@ TEST_F( LogAWSEventFixture, parse_tls )
     std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - - - - TLSv1.2" );
     ASSERT_EQ( "TLSv1.2", extract_value( res, "tls_version" ) );
 }
-
+/*
+TEST_F( LogAWSEventFixture, under_investigation )
+{
+    std::string input = "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-7 [05/Jan/2020:23:48:44 +0000] 130.14.28.32 rn:aws:iam::783971922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-6 [05/Jan/2020:23:10:20 +0000] 130.14.28.140 arn:aws:iam::651740271041:user/sddp-1-ncbi-verifier A5D9D5749E3175C8 REST.GET.BUCKET - \"GET /?prefix=SRR7087357%2FSRR7087357.1&encoding-type=url HTTP/1.1\" 403 AccessDenied 243 - 14 - \"-\" \"aws-cli/1.16.87 Python/3.7.3 Linux/3.10.0-1062.7.1.el7.x86_64 botocore/1.12.77\" - kgI+NnID7YrclgTiImbWYaTJ9nRbiOsmQw/SnkihnWcpM67sWFjyx6T/YH9CnrlJV2wZit4LbSo= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-6.s3.amazonaws.com TLSv1.2";
+    std::string res = try_to_parse_good( input, true );
+}
+*/
 
 //TODO: reportField
 

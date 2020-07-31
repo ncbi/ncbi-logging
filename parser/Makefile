@@ -455,22 +455,36 @@ aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 
 aws_prof: mkdir $(BINDIR)/log2jsn-prof
 
-AWS_TEST_IMPL_SRC = $(AWS2JSN_CMN_SRC) aws_test_impl.cpp
+$(PREFIX_AWS_V2)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS_V2)test_parse.cpp
+$(PREFIX_AWS_V2)_TEST_FLEX_SRC = $(PREFIX_AWS_V2)test_flex.cpp $(PREFIX_AWS_V2)scanner.cpp
 
-AWS_TEST_IMPL_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS_TEST_IMPL_SRC)))
-AWS_TEST_IMPL_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS_TEST_IMPL_SRC)))
+$(PREFIX_AWS_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS_V2)_TEST_PARSE_SRC)))
+$(PREFIX_AWS_V2)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS_V2)_TEST_PARSE_SRC)))
 
-$(BINDIR)/$(PREFIX_AWS)test_impl-dbg: $(AWS_TEST_IMPL_DBG_OBJ)
+$(PREFIX_AWS_V2)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS_V2)_TEST_FLEX_SRC)))
+$(PREFIX_AWS_V2)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS_V2)_TEST_FLEX_SRC)))
+
+$(BINDIR)/$(PREFIX_AWS_V2)test_parse-dbg: $($(PREFIX_AWS_V2)_TEST_PARSE_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_AWS)test_impl-rel: $(AWS_TEST_IMPL_REL_OBJ)
+$(BINDIR)/$(PREFIX_AWS_V2)test_parse-rel: $($(PREFIX_AWS_V2)_TEST_PARSE_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
-run_$(PREFIX_AWS)impltest: run_test_support $(BINDIR)/$(PREFIX_AWS)test_impl-dbg $(BINDIR)/$(PREFIX_AWS)test_impl-rel
-	$(BINDIR)/$(PREFIX_AWS)test_impl-dbg
-	$(BINDIR)/$(PREFIX_AWS)test_impl-rel
+$(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg: $($(PREFIX_AWS_V2)_TEST_FLEX_DBG_OBJ) 
+	$(LD) -o $@ $^ -lgtest -lpthread
 
-.PHONY: aws aws_prof run_$(PREFIX_AWS)test_impl 
+$(BINDIR)/$(PREFIX_AWS_V2)test_flex-rel: $($(PREFIX_AWS_V2)_TEST_FLEX_REL_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread
+
+run_$(PREFIX_AWS_V2)parse_test: run_test_support run_$(PREFIX_AWS_V2)flex_test $(BINDIR)/$(PREFIX_AWS_V2)test_parse-dbg $(BINDIR)/$(PREFIX_AWS_V2)test_parse-rel
+	$(BINDIR)/$(PREFIX_AWS_V2)test_parse-dbg
+	$(BINDIR)/$(PREFIX_AWS_V2)test_parse-rel
+
+run_$(PREFIX_AWS_V2)flex_test: $(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg $(BINDIR)/$(PREFIX_AWS_V2)test_flex-rel
+	$(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg
+	$(BINDIR)/$(PREFIX_AWS_V2)test_flex-rel
+
+.PHONY: aws aws_prof run_$(PREFIX_AWS_V2)test_parse run_$(PREFIX_AWS_V2)test_flex
 
 #################################################
 #################################################
