@@ -39,6 +39,14 @@ TEST_F( JsonLibFormatter_Fixture, Format_t_str )
     ASSERT_EQ("{}", s1.str());
 }
 
+TEST_F( JsonLibFormatter_Fixture, Format_string )
+{
+    const string str ( "v" );
+    f.addNameValue("a", str);
+    f.format(s);
+    ASSERT_EQ("{\"a\":\"v\"}", s.str());
+}
+
 TEST_F( JsonLibFormatter_Fixture, Format_t_str_quote )
 {
     const t_str str = { "v\"", 2, true };

@@ -21,9 +21,10 @@ namespace NCBI
             // t_str may have '\' inserted by the original input format (t.str.escaped == true), 
             // these will be removed before conversion into the implementation-specific output format
             // TODO: decide if throw on invald UTF-8 in value
-            virtual void addNameValue( const std::string & name, const t_str & value ) = 0;   // {"name":"value"}
-            virtual void addNameValue( const std::string & name, int64_t value ) = 0;       // {"name":"value"}
-            //TODO: addNameValue( const std::string & name, const std::string & value ) 
+            virtual void addNameValue( const std::string & name, const t_str & value ) = 0;   
+            virtual void addNameValue( const std::string & name, int64_t value ) = 0;         
+            virtual void addNameValue( const std::string & name, const std::string & value ) = 0;
+
         protected:
             std::string & unEscape( const t_str & value, std::string & str ) const; // appends to the end of str, returns updated str
         };
@@ -34,10 +35,13 @@ namespace NCBI
             JsonLibFormatter();
             virtual ~JsonLibFormatter();
 
+            // {"name":"value", ... }
             virtual std::stringstream & format( std::stringstream & );
 
-            virtual void addNameValue( const std::string & name, const t_str & value ); // may throw
+            // these may throw if 'name' already exists
+            virtual void addNameValue( const std::string & name, const t_str & value ); 
             virtual void addNameValue( const std::string & name, int64_t value );    
+            virtual void addNameValue( const std::string & name, const std::string & value );
 
         private:
             ncbi :: JSONObjectRef j;
@@ -52,6 +56,7 @@ namespace NCBI
 
             virtual void addNameValue( const std::string & name, const t_str & value ); 
             virtual void addNameValue( const std::string & name, int64_t value );    
+            virtual void addNameValue( const std::string & name, const std::string & value );
 
         private:
             std::string escape( const std::string & s ) const; // Json-escape; make a static function?

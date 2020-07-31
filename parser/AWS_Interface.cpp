@@ -93,11 +93,7 @@ AWSParser::parse()
         if ( m_receiver.GetCategory() != LogLinesInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
-            t_str t_line;
-            t_line.p = line.c_str();
-            t_line.n = line.size();
-            t_line.escaped = false;
-            fmt.addNameValue("_unparsed", t_line);
+            fmt.addNameValue("_unparsed", line);
         }
 
         //TODO: consider passing the output stream to write() without a temporary string

@@ -58,3 +58,9 @@ JsonLibFormatter::addNameValue( const std::string & name, int64_t value )
     j -> addValue( String ( name.c_str(), name.size() ), JSON::makeInteger( value ) );
 }
 
+void 
+JsonLibFormatter::addNameValue( const std::string & name, const std::string & value )
+{
+    j -> addValue( String ( name.c_str(), name.size() ), JSON::makeString( String( value.c_str(), value.size() ) ) );
+}
+
