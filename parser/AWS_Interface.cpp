@@ -2,11 +2,14 @@
 
 #include <sstream>
 #include <iostream>
+#include <thread>
+#include <vector>
 
 #include "aws_v2_parser.hpp"
 #include "aws_v2_scanner.hpp"
 #include "Formatters.hpp"
 #include "CatWriters.hpp"
+#include "helper.hpp"
 
 extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
 
@@ -65,6 +68,15 @@ void LogAWSEvent::reportField( const char * message )
     }
 }
 
+AWSParser::AWSParser( 
+    std::istream & input,  
+    LogAWSEvent & receiver,
+    CatWriterInterface & outputs ) 
+:   ParserInterface ( input, outputs ),
+    m_receiver ( receiver )
+{
+}
+
 void 
 AWSParser::parse()
 { 
@@ -104,5 +116,86 @@ AWSParser::parse()
     }
 
     aws_lex_destroy( sc );
+}
+
+AWSMultiThreadedParser :: AWSMultiThreadedParser( 
+    std::istream & input,  
+    CatWriterInterface & outputs,
+    size_t queueLimit,
+    size_t threadNum ) 
+:   ParserInterface ( input, outputs ),
+    m_queueLimit ( queueLimit ),
+    m_threadNum ( threadNum )
+{
+}
+
+void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
+{
+    JsonLibFormatter fmt;
+    LogAWSEvent receiver( fmt ); //TODO: use a factory
+    const unsigned int WorkerWait = 10;
+    yyscan_t sc;
+    aws_lex_init( &sc );
+
+    while ( true )
+    {
+        string line;
+        if ( !q -> dequeue( line ) )
+        {
+            if ( !q -> is_open() )
+                return;
+            else
+                std::this_thread::sleep_for( std::chrono::milliseconds( WorkerWait ) );
+        }
+        else
+        {
+            YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
+
+            if ( aws_parse( sc, static_cast<LogAWSEvent*>( & receiver ) ) != 0 )
+            {
+                receiver.SetCategory( LogLinesInterface::cat_ugly );
+            }
+
+            if ( receiver.GetCategory() != LogLinesInterface::cat_good )
+            {
+                //fmt.addNameValue("_line_nr", line_nr); //TODO: get line_nr from the queue
+                fmt.addNameValue("_unparsed", line);
+            }
+
+            //TODO: consider passing the output stream to write() without a temporary string
+            stringstream out;
+            outputs -> write ( receiver.GetCategory(), fmt . format ( out ).str() );
+
+            aws__delete_buffer( bs, sc );
+        }
+    }
+
+    aws_lex_destroy( sc );
+}
+
+void
+AWSMultiThreadedParser::parse( )
+{
+    OneWriterManyReadersQueue Q ( m_queueLimit );
+    vector<thread> workers;
+    for ( auto i = 0; i < m_threadNum; ++i )
+    {
+        workers.push_back( thread( parser, &Q, &m_outputs ) );
+    }
+
+    string line;
+    while( getline( m_input, line ) )
+    {
+        while ( ! Q.enqueue( line ) ) //TODO: pass in line_nr
+        {
+            this_thread::sleep_for(chrono::milliseconds(1));
+        }
+    }
+
+    Q.close();
+    for ( auto i = 0; i < m_threadNum; ++i )
+    {
+        workers[i].join();
+    }
 }
 

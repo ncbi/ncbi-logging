@@ -47,20 +47,32 @@ namespace NCBI
         public:
             AWSParser( std::istream & input,  
                        LogAWSEvent & receiver,
-                       CatWriterInterface & outputs ) 
-            :   ParserInterface ( input, receiver, outputs )
-            {
-            }
+                       CatWriterInterface & outputs );
 
             virtual void parse();
+
+        private:
+            LogAWSEvent & m_receiver;
         };
 
         class AWSMultiThreadedParser : public ParserInterface
         {
         public:
+            AWSMultiThreadedParser( 
+                std::istream & input,  
+                CatWriterInterface & outputs,
+                size_t queueLimit,
+                size_t threadNum
+            );
+
+            virtual void parse();
+
+        private:
+            size_t m_queueLimit;
+            size_t m_threadNum;
         };
-#if 0
-           
+
+#if 0   
             class ParseThread
             {
             public:

@@ -83,10 +83,8 @@ namespace NCBI
         {
         public:
             ParserInterface( std::istream & input,  
-                             LogLinesInterface & receiver,
                              CatWriterInterface & outputs ) 
             :   m_input ( input ),
-                m_receiver ( receiver ), 
                 m_outputs ( outputs ),
                 m_debug ( false )
             {
@@ -100,7 +98,6 @@ namespace NCBI
 
         protected:
             std::istream & m_input;
-            LogLinesInterface & m_receiver; // we use its built-in formatter
             CatWriterInterface & m_outputs;
             bool m_debug;
         };
