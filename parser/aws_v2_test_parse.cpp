@@ -538,6 +538,11 @@ TEST_F( LogAWSEventFixture, percent_in_key )
     ASSERT_EQ( "SRR12318371/run2249_lane2_read2_indexN703%253DDropSeq_Potter_BrainWT_8_17_17_N703.fastq.gz.1", extract_value( res, "key" ) );
 }
 
+TEST_F( LogAWSEventFixture, why_in_review )
+{
+    std::string input = "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-10 [27/Jul/2020:22:29:07 +0000] 3.83.185.177 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-0a0530bddb90f5940 27F104464C860D1F REST.PUT.ACL ERR4178925/Mice_S442_R1.fastq.gz.1 \"PUT /ERR4178925/Mice_S442_R1.fastq.gz.1?acl HTTP/1.1\" 200 - - - 63 - \"-\" \"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92\" - yvoKr+7mevLVB4WKytPYl7ZLPAX89qdCjBHAsio3lvEZbMS+GEA6e9AMeSlmn1/AKjviN+yXqk0= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-10.s3.amazonaws.com TLSv1.2";
+    std::string res = try_to_parse_good( input, true );
+}
 
 //TODO: reportField
 
