@@ -235,29 +235,38 @@ TEST_F( LogAWSEventFixture, parse_key )
 
 TEST_F( LogAWSEventFixture, parse_key_with_qmark )
 {
-    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1?ab - - - - - - - - - - - - - - - -" );
-    ASSERT_EQ( 
-        "{\"_error\":\"Unexpected '?' in key\",\"_line_nr\":1,\"_unparsed\":\"- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1?ab - - - - - - - - - - - - - - - -\",\"accession\":\"ERR792423\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"ab\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"ERR792423/5141526_s1_p0.bas.h5.1?ab\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
-        res
-        );
+    std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1?ab - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "ERR792423/5141526_s1_p0.bas.h5.1?ab", extract_value( res, "key" ) );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1?ab", extract_value( res, "extension" ) );
 }
 
 TEST_F( LogAWSEventFixture, parse_key_with_pct )
 {
-    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1%ab - - - - - - - - - - - - - - - -" );
-    ASSERT_EQ( "Unexpected '%' in key", extract_value( res, "_error" ) );
+    std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_%s1_p0.bas.h5.1%ab - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "ERR792423/5141526_%s1_p0.bas.h5.1%ab", extract_value( res, "key" ) );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_%s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1%ab", extract_value( res, "extension" ) );
 }
 
 TEST_F( LogAWSEventFixture, parse_key_with_eq )
 {
-    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1=b - - - - - - - - - - - - - - - -" );
-    ASSERT_EQ( "Unexpected '=' in key", extract_value( res, "_error" ) );
+    std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_=s1_p0.bas.h5.1=b - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "ERR792423/5141526_=s1_p0.bas.h5.1=b", extract_value( res, "key" ) );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_=s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1=b", extract_value( res, "extension" ) );
 }
 
 TEST_F( LogAWSEventFixture, parse_key_with_amp )
 {
-    std::string res = try_to_parse_review( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1&b - - - - - - - - - - - - - - - -" );
-    ASSERT_EQ( "Unexpected '&' in key", extract_value( res, "_error" ) );
+    std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_&s1_p0.bas.h5.1&b - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "ERR792423/5141526_&s1_p0.bas.h5.1&b", extract_value( res, "key" ) );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_&s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1&b", extract_value( res, "extension" ) );
 }
 
 TEST_F( LogAWSEventFixture, parse_key_multiple_accessions )
@@ -516,11 +525,19 @@ TEST_F( LogAWSEventFixture, parse_tls )
     ASSERT_EQ( "TLSv1.2", extract_value( res, "tls_version" ) );
 }
 
-TEST_F( LogAWSEventFixture, under_investigation )
+TEST_F( LogAWSEventFixture, repeated_time_shifts_tls_vers )
 {
     std::string input = "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-7 [05/Jan/2020:23:48:44 +0000] 130.14.28.32 rn:aws:iam::783971922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-6 [05/Jan/2020:23:10:20 +0000] 130.14.28.140 arn:aws:iam::651740271041:user/sddp-1-ncbi-verifier A5D9D5749E3175C8 REST.GET.BUCKET - \"GET /?prefix=SRR7087357%2FSRR7087357.1&encoding-type=url HTTP/1.1\" 403 AccessDenied 243 - 14 - \"-\" \"aws-cli/1.16.87 Python/3.7.3 Linux/3.10.0-1062.7.1.el7.x86_64 botocore/1.12.77\" - kgI+NnID7YrclgTiImbWYaTJ9nRbiOsmQw/SnkihnWcpM67sWFjyx6T/YH9CnrlJV2wZit4LbSo= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-run-6.s3.amazonaws.com TLSv1.2";
     std::string res = try_to_parse_bad( input );
 }
+
+TEST_F( LogAWSEventFixture, percent_in_key )
+{
+    std::string input = "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-src-13 [27/Jul/2020:22:56:40 +0000] 35.175.201.205 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-0b6b034f8f9b482fb 8C244990662F952E REST.PUT.PART SRR12318371/run2249_lane2_read2_indexN703%253DDropSeq_Potter_BrainWT_8_17_17_N703.fastq.gz.1 \"PUT /SRR12318371/run2249_lane2_read2_indexN703%3DDropSeq_Potter_BrainWT_8_17_17_N703.fastq.gz.1?partNumber=4&uploadId=qpR5BCc2akFqypS4spNO3VQiVAFHRYcSPNoZgZCJSQVh71SLNrUQLeARnEaBGhGGnrZihGRLY1T1pJ055KFXvVa7RYMLm1VM.t6ZKJt2zY16rP0q_wgAcu2aY4eNfrFWOe0GEl7xjYv2ZBe99zmqMg-- HTTP/1.1\" 200 - - 8388608 743 47 \"-\" \"aws-cli/1.16.102 Python/2.7.16 Linux/4.14.171-105.231.amzn1.x86_64 botocore/1.12.92\" - Tfy76PKfrEHlL2+E2a1wC87RDinpRfa1tngc77ETpa94hBUbT/GxSWE/SqHWK8iC8DLTqIfRn3w= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-src-13.s3.amazonaws.com TLSv1.2";
+    std::string res = try_to_parse_good( input );
+    ASSERT_EQ( "SRR12318371/run2249_lane2_read2_indexN703%253DDropSeq_Potter_BrainWT_8_17_17_N703.fastq.gz.1", extract_value( res, "key" ) );
+}
+
 
 //TODO: reportField
 

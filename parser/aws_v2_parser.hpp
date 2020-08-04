@@ -48,6 +48,7 @@ extern int aws_debug;
 extern void aws_get_scanner_input( void * yyscanner, t_str & str );
 
 extern void aws_start_URL( void * yyscanner );
+extern void aws_start_key( void * yyscanner );
 extern void aws_start_UserAgent( void * yyscanner );
 extern void aws_start_TLS_vers( void * yyscanner );
 extern void aws_start_host_id( void * yyscanner );
@@ -60,7 +61,7 @@ extern void aws_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 
-#line 64 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 65 "aws_v2_parser.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -110,13 +111,13 @@ using namespace NCBI::Logging;
 
 union YYSTYPE
 {
-#line 52 "aws_v2_parser.y" /* yacc.c:1909  */
+#line 53 "aws_v2_parser.y" /* yacc.c:1909  */
 
     t_str s;
     t_request req;
     t_agent agent;
 
-#line 120 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 121 "aws_v2_parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

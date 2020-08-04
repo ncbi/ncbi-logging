@@ -470,7 +470,7 @@ $(BINDIR)/$(PREFIX_AWS_V2)test_parse-dbg: $($(PREFIX_AWS_V2)_TEST_PARSE_DBG_OBJ)
 $(BINDIR)/$(PREFIX_AWS_V2)test_parse-rel: $($(PREFIX_AWS_V2)_TEST_PARSE_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg: $($(PREFIX_AWS_V2)_TEST_FLEX_DBG_OBJ) 
+$(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg: $($(PREFIX_AWS_V2)_TEST_FLEX_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
 $(BINDIR)/$(PREFIX_AWS_V2)test_flex-rel: $($(PREFIX_AWS_V2)_TEST_FLEX_REL_OBJ)

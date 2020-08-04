@@ -35,6 +35,7 @@ void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg
 extern void aws_get_scanner_input( void * yyscanner, t_str & str );
 
 extern void aws_start_URL( void * yyscanner );
+extern void aws_start_key( void * yyscanner );
 extern void aws_start_UserAgent( void * yyscanner );
 extern void aws_start_TLS_vers( void * yyscanner );
 extern void aws_start_host_id( void * yyscanner );
@@ -87,7 +88,7 @@ log_aws
       aws_requester SPACE
       aws_request_id SPACE
       aws_operation SPACE
-      { aws_start_URL( scanner ); } aws_quoted_key SPACE
+      { aws_start_key( scanner ); } aws_quoted_key SPACE
       request SPACE
       { aws_start_rescode( scanner ); } result_code SPACE
       aws_error SPACE
@@ -168,26 +169,6 @@ key_token
     | ACCESSION     { InitRequest( $$ ); $$ . path = $1; $$ . accession = $1; }
     | PATHSTR       { InitRequest( $$ ); $$ . path = $1; $$ . filename = $1; }
     | PATHEXT       { InitRequest( $$ ); $$ . path = $1; $$ . extension = $1; }
-    | EQUAL  
-        { 
-            lib -> reportField( "Unexpected '=' in key" ); 
-            InitRequest( $$ ); $$ . path = $1; 
-        }
-    | AMPERSAND
-        { 
-            lib -> reportField( "Unexpected '&' in key" ); 
-            InitRequest( $$ ); $$ . path = $1; 
-        }
-    | PERCENT
-        { 
-            lib -> reportField( "Unexpected '%' in key" ); 
-            InitRequest( $$ ); $$ . path = $1; 
-        }
-    | QMARK         
-        { 
-            lib -> reportField( "Unexpected '?' in key" ); 
-            InitRequest( $$ ); $$ . path = $1; 
-        }
     ;
 
 aws_key

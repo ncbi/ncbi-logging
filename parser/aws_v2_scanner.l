@@ -41,6 +41,7 @@ SPACE       " "
 
 CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\]^{}]
 QCHARS      ${SPACE}|[.?&=%/\\]|{CHARS}
+KEYCHARS    [?&=%\\]|{CHARS}
 
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
@@ -48,6 +49,9 @@ QSTR_ESC    (\\\"|{QCHARS})+
 ACCESSION   [DES]R[RZXP][0-9]{6,9}
 PATHSTR     {CHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
+
+KEYSTR      {KEYCHARS}+
+KEYEXT      \.(\.|{KEYSTR})*
 
 STR     [.\-a-zA-Z0-9_]+
 STR1    [/:+=%@&*!~;$\],#.\-a-zA-Z0-9_\[]+
@@ -85,7 +89,7 @@ S3_EXT_REQ_ID    {BASE64}
 
 RESULTCODE      ([0-9]{3})|"-"
 
-%x QUOTED TIMEFMT PATH AGENT TLSVERSION HOSTID IPADDR RESCODE REFERER
+%x QUOTED TIMEFMT KEY PATH AGENT TLSVERSION HOSTID IPADDR RESCODE REFERER
 
 %%
 
@@ -124,6 +128,14 @@ RESULTCODE      ([0-9]{3})|"-"
 <PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; }
+
+<KEY>{SPACE}        { yy_pop_state( yyscanner ); return SPACE; }
+<KEY>\"             { yy_pop_state( yyscanner ); return QUOTE; }
+<KEY>{ACCESSION}    { MAKE_STR(); return ACCESSION; }
+<KEY>\/             { MAKE_STR(); return SLASH; }
+<KEY>{KEYEXT}       { MAKE_STR(); return PATHEXT; }
+<KEY>{KEYSTR}       { MAKE_STR(); return PATHSTR; }
+<KEY>.              { return yytext[0]; }
 
 <AGENT>{OS}             { MAKE_STR(); return OS; }
 <AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
@@ -189,6 +201,11 @@ void aws_get_scanner_input( yyscan_t yyscanner, t_str & str )
 void aws_start_URL( yyscan_t yyscanner )
 {
     yy_push_state( PATH, yyscanner ); 
+}
+
+void aws_start_key( yyscan_t yyscanner )
+{
+    yy_push_state( KEY, yyscanner ); 
 }
 
 void aws_start_UserAgent( yyscan_t yyscanner )
