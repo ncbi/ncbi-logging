@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <thread>
 
 #include "helper.hpp"
 
@@ -67,6 +68,139 @@ TEST (TestHelper, ToInt64_3)
 {
     t_str s = { "", 0, false };
     ASSERT_EQ( 0, ToInt64( s ) );
+}
+
+TEST ( TestOneWriterManyReadersQueue, Ctr )
+{
+    OneWriterManyReadersQueue Q( 10 );
+}
+
+TEST ( TestOneWriterManyReadersQueue, put_and_get )
+{
+    OneWriterManyReadersQueue Q( 10 );
+    ASSERT_TRUE( Q.enqueue( "1" ) );
+    ASSERT_TRUE( Q.enqueue( "2" ) );
+    ASSERT_TRUE( Q.enqueue( "3" ) );
+
+    std::string s;
+    ASSERT_TRUE( Q.dequeue( s ) );
+    ASSERT_EQ( "1", s );
+    ASSERT_TRUE( Q.dequeue( s ) );
+    ASSERT_EQ( "2", s );
+    ASSERT_TRUE( Q.dequeue( s ) );
+    ASSERT_EQ( "3", s );
+    ASSERT_FALSE( Q.dequeue( s ) );
+}
+
+TEST ( TestOneWriterManyReadersQueue, close_the_q )
+{
+    OneWriterManyReadersQueue Q( 10 );
+    ASSERT_TRUE( Q.is_open() );
+    Q.close();
+    ASSERT_FALSE( Q.is_open() );    
+}
+
+TEST ( TestOneWriterManyReadersQueue, limit )
+{
+    OneWriterManyReadersQueue Q( 2 );
+    ASSERT_TRUE( Q.enqueue( "1" ) );
+    ASSERT_TRUE( Q.enqueue( "2" ) );
+    ASSERT_FALSE( Q.enqueue( "3" ) );
+    std::string s;
+    ASSERT_TRUE( Q.dequeue( s ) );
+    ASSERT_TRUE( Q.enqueue( "3" ) );
+}
+
+void consumer( OneWriterManyReadersQueue * q, std::atomic< int > * cnt )
+{
+    while ( true )
+    {
+        std::string s;
+        if ( !q -> dequeue( s ) )
+        {
+            if ( !q -> is_open() )
+                return;
+            else
+                std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+        }
+        else
+            ( *cnt )++;
+    }
+}
+
+TEST ( TestOneWriterManyReadersQueue, with_threads )
+{
+    OneWriterManyReadersQueue Q( 100 );
+
+    for ( int i = 0; i < 3; ++i )
+    {
+        std::stringstream ss;
+        ss << "value #" << i;
+        Q.enqueue( ss.str() );
+    }
+
+    std::atomic< int > count( 0 );
+    std::thread worker_0( consumer, &Q, &count );
+    std::thread worker_1( consumer, &Q, &count );
+    std::thread worker_2( consumer, &Q, &count );
+
+    int i = 3;
+    while ( i < 20 )
+    {
+        std::stringstream ss;
+        ss << "value #" << i;
+        if ( Q.enqueue( ss.str() ) )
+            i++;
+        else
+            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+    }
+
+    Q.close();
+    worker_0.join();
+    worker_1.join();
+    worker_2.join();
+
+    ASSERT_EQ( 20, count.load() );
+}
+
+TEST ( TestOneWriterManyReadersQueue, with_limits )
+{
+    OneWriterManyReadersQueue Q( 3 );
+
+    for ( int i = 0; i < 3; ++i )
+    {
+        std::stringstream ss;
+        ss << "value #" << i;
+        Q.enqueue( ss.str() );
+    }
+
+    std::atomic< int > count( 0 );
+    std::thread worker_0( consumer, &Q, &count );
+    std::thread worker_1( consumer, &Q, &count );
+    std::thread worker_2( consumer, &Q, &count );
+
+    int i = 3;
+    int waits = 0;
+    while ( i < 20 )
+    {
+        std::stringstream ss;
+        ss << "value #" << i;
+        if ( Q.enqueue( ss.str() ) )
+            i++;
+        else
+        {
+            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+            waits++;
+        }
+    }
+
+    Q.close();
+    worker_0.join();
+    worker_1.join();
+    worker_2.join();
+
+    ASSERT_EQ( 20, count.load() );
+    ASSERT_LT( 0, waits );    
 }
 
 extern "C"

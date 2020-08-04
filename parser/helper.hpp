@@ -1,5 +1,4 @@
-#ifndef _h_helper_
-#define _h_helper_
+#pragma once
 
 #include "types.h"
 
@@ -8,6 +7,10 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
+#include <queue>
+#include <mutex>
+#include <atomic>
 
 namespace NCBI
 {
@@ -60,7 +63,27 @@ namespace NCBI
             return os;
         }
 
+        class OneWriterManyReadersQueue
+        {   //TODO: instrument to report the maximum queue size reached
+            public :
+                OneWriterManyReadersQueue( size_t limit );
+
+                // called by the line-splitter aka the producer
+                bool enqueue( const std::string & s );
+
+                // called by the worker-threads aka the consumers
+                bool dequeue( std::string & s );
+
+                void close() { m_open.store( false ); }
+                bool is_open() const { return m_open.load(); }
+
+            private :
+                std::queue< std::string > m_queue;
+                std::atomic< bool > m_open;
+                std::mutex m_mutex;
+                size_t m_limit;
+
+        };
+
     }
 }
-
-#endif

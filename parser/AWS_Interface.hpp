@@ -60,50 +60,7 @@ namespace NCBI
         public:
         };
 #if 0
-            class OneReaderQueue
-            {   //TODO: instrument to report the maximum queue size reached
-
-                void enqueue( const string & s ) 
-                { 
-                    locker(lock); 
-                    queue.push(s);  // copy
-                }
-
-                bool dequeue( string & s ) 
-                { 
-                    if ( ! queue.empty() )
-                    {
-                        locker(lock); 
-                        s = queue.pop(); 
-                        return true;
-                    }
-
-                    while ( open.get() )
-                    {
-                        if ( queue.empty() ) 
-                            sleep();
-                        else
-                        {
-                            locker(lock); 
-                            s = queue.pop(); 
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-
-                void close() 
-                { 
-                    open.set( false ); 
-                }
-
-                bool is_open() const { return open; }
-
-                vector<string> queue;
-                atomic<bool> open;
-                lock lock;
-            }
-            
+           
             class ParseThread
             {
             public:

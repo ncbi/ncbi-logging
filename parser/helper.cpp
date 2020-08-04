@@ -169,3 +169,30 @@ NCBI::Logging::ToString( const t_timepoint & t )
 
     return out.str();
 }
+
+NCBI::Logging::OneWriterManyReadersQueue::OneWriterManyReadersQueue( size_t limit ) : m_limit( limit )
+{
+    m_open.store( true );
+}
+
+
+bool NCBI::Logging::OneWriterManyReadersQueue::enqueue( const std::string & s ) 
+{
+    lock_guard< std::mutex > guard( m_mutex ); 
+    if ( m_queue.size() >= m_limit )
+        return false;
+
+    m_queue.push( s );  // makes a copy
+    return true;
+}
+
+bool NCBI::Logging::OneWriterManyReadersQueue::dequeue( std::string & s ) 
+{ 
+    lock_guard< std::mutex > guard( m_mutex ); 
+    if ( m_queue.empty() )
+        return false;
+
+    s = m_queue.front(); // makes a copy ( maybe put shared ptr of string into q )
+    m_queue.pop(); 
+    return true;
+}

@@ -104,7 +104,6 @@ namespace NCBI
             CatWriterInterface & m_outputs;
             bool m_debug;
         };
-
     }
 }
 
