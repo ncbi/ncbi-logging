@@ -45,7 +45,7 @@ static void handle_aws( const Options & options )
     }
     else
     {
-        AWSMultiThreadedParser p( cin, outputs, 1000, options.numThreads );
+        AWSMultiThreadedParser p( cin, outputs, 1000000, options.numThreads );
         p . parse(); 
     }
     report( outputs.getCounter() );
