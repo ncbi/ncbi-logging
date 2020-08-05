@@ -449,11 +449,11 @@ $(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_CMD_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
 $(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
-	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-prof -lncbi-secure-prof -lutf8proc -lmbedcrypto
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
 aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 
-aws_prof: mkdir $(BINDIR)/log2jsn-prof
+aws_prof: mkdir $(BINDIR)/aws2jsn-prof
 
 $(PREFIX_AWS_V2)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS_V2)test_parse.cpp
 $(PREFIX_AWS_V2)_TEST_FLEX_SRC = $(PREFIX_AWS_V2)test_flex.cpp $(PREFIX_AWS_V2)scanner.cpp
