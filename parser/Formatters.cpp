@@ -64,3 +64,35 @@ JsonLibFormatter::addNameValue( const std::string & name, const std::string & va
     j -> addValue( String ( name.c_str(), name.size() ), JSON::makeString( String( value.c_str(), value.size() ) ) );
 }
 
+/* ------------------------------------------------------------------------------------------ */
+
+JsonFastFormatter::~JsonFastFormatter()
+{
+
+}
+
+std::stringstream & JsonFastFormatter::format( std::stringstream & s )
+{
+    return s;
+}
+
+void JsonFastFormatter::addNameValue( const std::string & name, const t_str & value )
+{
+
+}
+
+void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
+{
+
+}
+
+void JsonFastFormatter::addNameValue( const std::string & name, const std::string & value )
+{
+
+}
+
+
+std::string JsonFastFormatter::escape( const std::string & s ) const
+{
+    return s;
+}

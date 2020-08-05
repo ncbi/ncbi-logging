@@ -49,7 +49,8 @@ namespace NCBI
 
             virtual std::unique_ptr<LogLinesInterface> MakeReceiver() const
             {
-                std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
+                //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
+                std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
                 return std::make_unique<LogAWSEvent>( fmt );     
             }
         };
