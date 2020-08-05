@@ -202,3 +202,32 @@ bool NCBI::Logging::OneWriterManyReadersQueue::dequeue( std::string & s, size_t 
     m_queue.pop(); 
     return true;
 }
+
+NCBI::Logging::OutputQueue::OutputQueue( size_t limit )
+:   m_limit( limit )
+{
+    m_open.store( true );
+}
+
+bool NCBI::Logging::OutputQueue::enqueue( const std::string & s, LogLinesInterface::Category cat )
+{
+    lock_guard< std::mutex > guard( m_mutex ); 
+    if ( m_queue.size() >= m_limit )
+        return false;
+
+    m_queue.push( output_pair( s, cat ) );  // makes a copy
+    return true;
+}
+
+bool NCBI::Logging::OutputQueue::dequeue( std::string & s, LogLinesInterface::Category &cat )
+{
+    lock_guard< std::mutex > guard( m_mutex ); 
+    if ( m_queue.empty() )
+        return false;
+
+    auto p = m_queue.front(); // makes a copy ( maybe put shared ptr of string into q )
+    s = p . first;
+    cat = p . second;
+    m_queue.pop(); 
+    return true;
+}

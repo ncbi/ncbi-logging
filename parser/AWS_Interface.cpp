@@ -135,8 +135,8 @@ AWSMultiThreadedParser :: AWSMultiThreadedParser(
 }
 
 void parser( AWSReceiverFactory * factory, 
-             OneWriterManyReadersQueue * q, 
-             CatWriterInterface * outputs )
+             OneWriterManyReadersQueue * in_q, 
+             OutputQueue * out_q )
 {
     const unsigned int WorkerWait = 500;
     auto receiver = factory -> MakeReceiver();
@@ -148,9 +148,9 @@ void parser( AWSReceiverFactory * factory,
     {
         string line;
         size_t line_nr;
-        if ( !q -> dequeue( line, line_nr ) )
+        if ( !in_q -> dequeue( line, line_nr ) )
         {
-            if ( !q -> is_open() )
+            if ( !in_q -> is_open() )
                 return;
             else
             {
@@ -177,7 +177,13 @@ void parser( AWSReceiverFactory * factory,
 
             //TODO: consider passing the output stream to write() without a temporary string
             stringstream out;
-            outputs -> write ( receiver -> GetCategory(), fmt . format ( out ).str() );
+            LogLinesInterface::Category cat = receiver -> GetCategory();
+            std::string output = fmt . format( out ).str();
+
+            while ( ! out_q -> enqueue( output, cat ) ) //TODO: pass in line_nr
+            {
+                this_thread::sleep_for( chrono::microseconds( 100 ) );
+            }
 
             aws__delete_buffer( bs, sc );
         }
@@ -186,13 +192,40 @@ void parser( AWSReceiverFactory * factory,
     aws_lex_destroy( sc );
 }
 
+void writer( OutputQueue * q,
+             CatWriterInterface * outputs )
+{
+    const unsigned int WriterWait = 500;
+
+    while ( true )
+    {
+        string line;
+        LogLinesInterface::Category cat;
+        if ( !q -> dequeue( line, cat ) )
+        {
+            if ( !q -> is_open() )
+                return;
+            else
+                std::this_thread::sleep_for( std::chrono::microseconds( WriterWait ) );
+        }
+        else
+        {
+            outputs -> write ( cat, line );
+        }
+    }
+}
+
 void AWSMultiThreadedParser::parse( )
 {
     OneWriterManyReadersQueue Q ( m_queueLimit );
+    OutputQueue Q_out ( m_queueLimit );    
+
+    thread writer_thread( writer, &Q_out, &m_outputs );
+
     vector<thread> workers;
     for ( auto i = 0; i < m_threadNum; ++i )
     {
-        workers.push_back( thread( parser, &m_factory, &Q, &m_outputs ) );
+        workers.push_back( thread( parser, &m_factory, &Q, &Q_out ) );
     }
 
     FILE * ifile = stdin;
@@ -209,23 +242,16 @@ void AWSMultiThreadedParser::parse( )
 
     }
     free( line );
-/*
-    string line;
-    while( getline( m_input, line ) )
-    {
-        while ( ! Q.enqueue( line ) ) //TODO: pass in line_nr
-        {
-            this_thread::sleep_for( chrono::milliseconds( 1 ) );
-            num_feed_sleeps++;
-        }
-    }
-*/
 
     Q.close();
     for ( auto i = 0; i < m_threadNum; ++i )
     {
        workers[i].join();
     }
+
+    Q_out.close();
+    writer_thread.join();
+
     std::cout << "q.max = " << Q.m_max << std::endl;
 }
 

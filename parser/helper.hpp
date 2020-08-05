@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "LogLinesInterface.hpp"
 
 #include <cstdint>
 #include <string>
@@ -11,6 +12,7 @@
 #include <queue>
 #include <mutex>
 #include <atomic>
+#include <utility>
 
 namespace NCBI
 {
@@ -85,6 +87,30 @@ namespace NCBI
                 std::mutex m_mutex;
                 size_t m_limit;
                 size_t m_line_nr;
+        };
+
+        class OutputQueue
+        {
+            typedef std::pair< std::string, LogLinesInterface::Category > output_pair;
+
+            public :
+                OutputQueue( size_t limit );
+
+                // called by the worker-threads to put output in
+                // returns false if the queue is full
+                bool enqueue( const std::string & s, LogLinesInterface::Category cat );
+
+                // called by the worker-threads aka the consumers
+                bool dequeue( std::string & s, LogLinesInterface::Category &cat );
+
+                void close() { m_open.store( false ); }
+                bool is_open() const { return m_open.load(); }
+
+            private :
+                std::queue< output_pair > m_queue;
+                std::atomic< bool > m_open;
+                std::mutex m_mutex;
+                size_t m_limit;
         };
 
     }

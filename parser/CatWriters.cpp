@@ -48,7 +48,6 @@ FileCatWriter :: ~FileCatWriter()
 
 void FileCatWriter :: write( LogLinesInterface::Category cat, const string & s )
 {
-    /*
     lock_guard<mutex> lock( mut );
     switch ( cat )    
     {
@@ -59,7 +58,6 @@ void FileCatWriter :: write( LogLinesInterface::Category cat, const string & s )
     default: throw logic_error( "Unknown Category" ); break;
     }
     ctr.count( cat ); 
-    */
 }
 
 // StringCatWriter

@@ -4,6 +4,8 @@
 #include "CatWriters.hpp"
 #include "AWS_Interface.hpp"
 
+#include <algorithm>
+
 using namespace std;
 using namespace NCBI::Logging;
 
@@ -12,13 +14,13 @@ using namespace NCBI::Logging;
 
 TEST(LogAWSEventTest, Create)
 {
-    JsonLibFormatter f;
-    LogAWSEvent e ( & f );
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+    LogAWSEvent e ( f );
 }
 
 TEST(LogAWSEventTest, Setters)
 {
-    JsonLibFormatter f;
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
     LogAWSEvent e ( f );
     
     t_str v;
@@ -85,9 +87,9 @@ class LogAWSEventFixture : public ::testing::Test
         void try_to_parse( std::string line, bool debug = false )
         {
             istringstream ss( line );
-            JsonLibFormatter jsonFmt; 
-            LogAWSEvent receiver( jsonFmt );
-            AWSParser p( ss, receiver, s_outputs );
+            //std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+            //LogAWSEvent receiver( f );
+            AWSParser p( ss, s_outputs );
             p . setDebug( debug );
             p . parse(); // does the parsing and generates the report
         }
