@@ -151,7 +151,7 @@ void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
                 std::this_thread::sleep_for( std::chrono::milliseconds( WorkerWait ) );
         }
         else
-        {   // TODO: this block is almost identical to the bpody of the loop in AWSMultiThreadedParser::parser
+        {   // TODO: this block is almost identical to the body of the loop in AWSMultiThreadedParser::parser
             YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
             receiver.SetCategory( LogLinesInterface::cat_unknown );

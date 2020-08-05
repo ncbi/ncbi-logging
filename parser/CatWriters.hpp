@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <mutex>
 
 namespace NCBI
 {
@@ -46,6 +47,9 @@ namespace NCBI
         private:
             std::ofstream review, good, bad, ugly;
             CatCounter ctr;
+            //TODO: conside placing this object on a separate thread, or
+            // having one writer per category, running on a separate thread.
+            std::mutex mut; 
         };
 
         class StringCatWriter : public CatWriterInterface
@@ -63,39 +67,8 @@ namespace NCBI
 
         private:
             std::stringstream review, good, bad, ugly;
+            std::mutex mut;
         };
 
-#if 0
-        class ThreadedFileCatWriter : public CatWriterInterface
-        {
-        public:
-            ThreadedFileCatWriter( const string & basename ) :
-                review  ( ofstream(baseName+".review") ),
-                good    ( ofstream(baseName+".good") ),
-                bad     ( ofstream(baseName+".bad") ), 
-                ugly    ( ofstream(baseName+".unrecog") )
-            {
-            }
-
-            OutputThread review, good, bad, ugly;
-
-            virtual ~ThreadedFileCatWriter()
-            {
-                review.close();
-                good.close();
-                bad.close();
-                ugly.close();
-            }
-
-            virtual void write( Category cat, const string & s )
-            {
-                switch ( cat )    
-                {
-                case cat_review : review << s; break;
-                // ...
-                }
-            }
-        }
-#endif
     }
 }

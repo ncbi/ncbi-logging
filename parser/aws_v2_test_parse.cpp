@@ -608,6 +608,7 @@ TEST_F( LogAWSEventFixture, MultiThreading )
         lines.push_back( s );    
 
     ASSERT_EQ( 3, lines.size() );
+    sort( lines.begin(), lines.end() );
 
     ASSERT_EQ( "1", extract_value( lines[0], "owner" ) );
     ASSERT_EQ( "2", extract_value( lines[1], "owner" ) );

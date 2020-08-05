@@ -48,6 +48,7 @@ FileCatWriter :: ~FileCatWriter()
 
 void FileCatWriter :: write( LogLinesInterface::Category cat, const string & s )
 {
+    lock_guard<mutex> lock( mut );
     switch ( cat )    
     {
     case LogLinesInterface::cat_review :    review << s << endl; break;
@@ -67,6 +68,7 @@ StringCatWriter :: ~StringCatWriter()
 
 void StringCatWriter :: write( LogLinesInterface::Category cat, const string & s )
 {
+    lock_guard<mutex> lock( mut );
     switch ( cat )    
     {
     case LogLinesInterface::cat_review :    review << s << endl; break;
