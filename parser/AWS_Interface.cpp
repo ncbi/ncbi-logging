@@ -92,16 +92,18 @@ AWSParser::parse()
     unsigned long int line_nr = 0;
     string line;
     while( getline( m_input, line ) )
-    {
+    {   // TODO: the body of the loop is almost identical to a block in AWSMultiThreadedParser::parser()
         line_nr++;
 
         YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
+
+        m_receiver.SetCategory( LogLinesInterface::cat_unknown );
 
         if ( aws_parse( sc, static_cast<LogAWSEvent*>( & m_receiver ) ) != 0 )
         {
             m_receiver.SetCategory( LogLinesInterface::cat_ugly );
         }
-
+        
         if ( m_receiver.GetCategory() != LogLinesInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
@@ -140,7 +142,8 @@ void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
     while ( true )
     {
         string line;
-        if ( !q -> dequeue( line ) )
+        size_t line_nr;
+        if ( !q -> dequeue( line, line_nr ) )
         {
             if ( !q -> is_open() )
                 return;
@@ -148,8 +151,10 @@ void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
                 std::this_thread::sleep_for( std::chrono::milliseconds( WorkerWait ) );
         }
         else
-        {
+        {   // TODO: this block is almost identical to the bpody of the loop in AWSMultiThreadedParser::parser
             YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
+
+            receiver.SetCategory( LogLinesInterface::cat_unknown );
 
             if ( aws_parse( sc, static_cast<LogAWSEvent*>( & receiver ) ) != 0 )
             {
@@ -158,7 +163,7 @@ void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
 
             if ( receiver.GetCategory() != LogLinesInterface::cat_good )
             {
-                //fmt.addNameValue("_line_nr", line_nr); //TODO: get line_nr from the queue
+                fmt.addNameValue("_line_nr", line_nr);
                 fmt.addNameValue("_unparsed", line);
             }
 

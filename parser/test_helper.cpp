@@ -83,13 +83,17 @@ TEST ( TestOneWriterManyReadersQueue, put_and_get )
     ASSERT_TRUE( Q.enqueue( "3" ) );
 
     std::string s;
-    ASSERT_TRUE( Q.dequeue( s ) );
+    size_t line_nr;
+    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
     ASSERT_EQ( "1", s );
-    ASSERT_TRUE( Q.dequeue( s ) );
+    ASSERT_EQ( 1, line_nr );
+    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
     ASSERT_EQ( "2", s );
-    ASSERT_TRUE( Q.dequeue( s ) );
+    ASSERT_EQ( 2, line_nr );
+    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
     ASSERT_EQ( "3", s );
-    ASSERT_FALSE( Q.dequeue( s ) );
+    ASSERT_EQ( 3, line_nr );
+    ASSERT_FALSE( Q.dequeue( s, line_nr ) );
 }
 
 TEST ( TestOneWriterManyReadersQueue, close_the_q )
@@ -107,7 +111,8 @@ TEST ( TestOneWriterManyReadersQueue, limit )
     ASSERT_TRUE( Q.enqueue( "2" ) );
     ASSERT_FALSE( Q.enqueue( "3" ) );
     std::string s;
-    ASSERT_TRUE( Q.dequeue( s ) );
+    size_t line_nr;
+    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
     ASSERT_TRUE( Q.enqueue( "3" ) );
 }
 
@@ -116,7 +121,8 @@ void consumer( OneWriterManyReadersQueue * q, std::atomic< int > * cnt )
     while ( true )
     {
         std::string s;
-        if ( !q -> dequeue( s ) )
+        size_t line_nr;
+        if ( !q -> dequeue( s, line_nr ) )
         {
             if ( !q -> is_open() )
                 return;

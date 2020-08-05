@@ -64,15 +64,16 @@ namespace NCBI
         }
 
         class OneWriterManyReadersQueue
-        {   //TODO: instrument to report the maximum queue size reached
+        {   
             public :
                 OneWriterManyReadersQueue( size_t limit );
 
                 // called by the line-splitter aka the producer
+                // returns false if the queue is full
                 bool enqueue( const std::string & s );
 
                 // called by the worker-threads aka the consumers
-                bool dequeue( std::string & s );
+                bool dequeue( std::string & s, size_t & line_nr );
 
                 void close() { m_open.store( false ); }
                 bool is_open() const { return m_open.load(); }
@@ -82,7 +83,7 @@ namespace NCBI
                 std::atomic< bool > m_open;
                 std::mutex m_mutex;
                 size_t m_limit;
-
+                size_t m_line_nr;
         };
 
     }

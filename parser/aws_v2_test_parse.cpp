@@ -163,6 +163,17 @@ TEST_F( LogAWSEventFixture, LineRejecting )
         "{\"_line_nr\":3,\"_unparsed\":\"line3\",\"owner\":\"line3\"}\n", res );
 }
 
+TEST_F( LogAWSEventFixture, ErrorRecovery )
+{
+    try_to_parse( 
+        "line1 blah\n" 
+        "- - - - - - - - - - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\",\"bucket\":\"blah\",\"owner\":\"line1\"}\n",
+                s_outputs.get_ugly() );
+    ASSERT_EQ( "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n", 
+                s_outputs.get_good() );
+}
+
 TEST_F( LogAWSEventFixture, unrecognized_char )
 {
     std::string res = try_to_parse_ugly( "line1 \07" );
@@ -569,28 +580,41 @@ TEST (TestHelper, StringEscaped_NotEscapedCharacter)
 
 TEST_F( LogAWSEventFixture, MultiThreading )
 {
-
     std::string input( 
-        "1 - - - - - - - - - - - - - - - - - - - - - - -\n"
-        "2 - - - - - - - - - - - - - - - - - - - - - - -\n"
-        "3 - - - - - - - - - - - - - - - - - - - - - - -\n"
-        "4 - - - - - - - - - - - - - - - - - - - - - - -\n"
+        "1 - - - - - - - - - - - - - - - - - - - - - - x\n" // ugly
+        "2 - - - - - - - - - - - - - - - - - - - - - - x\n" // ugly
+        "3 - - - - - - - - - - - - - - - - - - - - - - -\n" // good
+        "4 - - - - - - - - - - - - - - - - - - - - - - x\n" // ugly
     );
 
     istringstream ss( input );
     AWSMultiThreadedParser p( ss, s_outputs, 100, 2 );
     p . parse();
 
-    stringstream res ( s_outputs.get_good() );
+    ASSERT_LT( 0, s_outputs.get_good().size() );
+    ASSERT_EQ( 0, s_outputs.get_bad().size() );
+    ASSERT_EQ( 0, s_outputs.get_review().size() );
+
     vector<string> lines;
-    copy( istream_iterator<string>(res), 
-          istream_iterator<string>(),
-          back_inserter(lines) );
+    std::string s = s_outputs.get_ugly();
+    std::string separator = "\n";
+    while( s.find( separator ) != std::string::npos )
+    {
+        auto separatorIndex = s.find( separator );
+        lines.push_back( s.substr( 0, separatorIndex ) );
+        s = s.substr( separatorIndex + 1, s.length() );
+    }
+    if ( s.length() > 0 )
+        lines.push_back( s );    
+
+    ASSERT_EQ( 3, lines.size() );
 
     ASSERT_EQ( "1", extract_value( lines[0], "owner" ) );
     ASSERT_EQ( "2", extract_value( lines[1], "owner" ) );
-    ASSERT_EQ( "3", extract_value( lines[2], "owner" ) );
-    ASSERT_EQ( "4", extract_value( lines[3], "owner" ) );
+    ASSERT_EQ( "4", extract_value( lines[2], "owner" ) );
+    ASSERT_EQ( "1", extract_value( lines[0], "_line_nr" ) );
+    ASSERT_EQ( "2", extract_value( lines[1], "_line_nr" ) );
+    ASSERT_EQ( "4", extract_value( lines[2], "_line_nr" ) );
 }
 
 extern "C"
