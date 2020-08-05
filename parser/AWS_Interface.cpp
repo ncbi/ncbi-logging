@@ -154,7 +154,7 @@ void parser( AWSReceiverFactory * factory,
                 return;
             else
             {
-                std::this_thread::sleep_for( std::chrono::milliseconds( WorkerWait ) );
+                std::this_thread::sleep_for( std::chrono::microseconds( WorkerWait ) );
                 AWSMultiThreadedParser :: thread_sleeps++;
             }
         }
