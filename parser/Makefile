@@ -443,10 +443,10 @@ AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
 AWS2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(AWS2JSN_SRC)))
 
 $(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_CMD_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
 
 $(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_CMD_OBJ) 
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
 $(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
 	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-prof -lncbi-secure-prof -lutf8proc -lmbedcrypto
@@ -496,8 +496,16 @@ AWS2JSON = $(BINDIR)/aws2jsn-dbg
 
 test_aws: aws
 	@ mkdir -p actual
-	@ echo "test_aws passed"
-	@ rm -rf actual/aws2jsn*
+	#jq -e . expected/$(PREFIX_AWS_V2)*.out > /dev/null
+	mkdir -p  actual/$(PREFIX_AWS_V2)unrecognized
+	cat data/aws_unrecognized.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)unrecognized/ >./actual/$(PREFIX_AWS_V2)unrecognized/stdout 2>./actual/$(PREFIX_AWS_V2)unrecognized/stderr \
+						&& diff ./expected/$(PREFIX_AWS_V2)unrecognized ./actual/$(PREFIX_AWS_V2)unrecognized
+	#TODO: the outputs need sorting
+	# mkdir -p actual/$(PREFIX_AWS_V2)unrecognized22
+	# cat data/aws_unrecognized.log | $(AWS2JSON) -t 22 actual/$(PREFIX_AWS_V2)unrecognized22/ >./actual/$(PREFIX_AWS_V2)unrecognized22/stdout 2>./actual/$(PREFIX_AWS_V2)unrecognized22/stderr \
+	#					&& diff ./expected/$(PREFIX_AWS_V2)unrecognized ./actual/$(PREFIX_AWS_V2)unrecognized22
+	@ echo "test_aws v2 passed"
+	@ rm -rf actual/$(PREFIX_AWS_V2)*
 
 .PHONY: aws aws2jsn_prof test_aws
 

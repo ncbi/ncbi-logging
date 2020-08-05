@@ -13,7 +13,7 @@ using namespace NCBI::Logging;
 TEST(LogAWSEventTest, Create)
 {
     JsonLibFormatter f;
-    LogAWSEvent e ( f );
+    LogAWSEvent e ( & f );
 }
 
 TEST(LogAWSEventTest, Setters)

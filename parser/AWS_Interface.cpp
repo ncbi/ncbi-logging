@@ -16,14 +16,14 @@ extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
 using namespace NCBI::Logging;
 using namespace std;
 
-LogAWSEvent::LogAWSEvent( FormatterInterface & fmt )
+LogAWSEvent::LogAWSEvent( unique_ptr<FormatterInterface> & fmt )
 : LogLinesInterface ( fmt )
 {
 }
 
 void LogAWSEvent::set( AWS_Members m, const t_str & v ) 
 {
-#define CASE(mem) case mem: m_fmt.addNameValue(#mem, v); break;
+#define CASE(mem) case mem: m_fmt -> addNameValue(#mem, v); break;
     switch( m )
     {
     CASE( owner )
@@ -60,7 +60,7 @@ void LogAWSEvent::reportField( const char * message )
     try
     {
         t_str msg { message, (int)strlen( message ), false };
-        m_fmt . addNameValue( "_error", msg );
+        m_fmt -> addNameValue( "_error", msg );
     }
     catch( const ncbi::JSONUniqueConstraintViolation & e )
     {
@@ -70,10 +70,8 @@ void LogAWSEvent::reportField( const char * message )
 
 AWSParser::AWSParser( 
     std::istream & input,  
-    LogAWSEvent & receiver,
     CatWriterInterface & outputs ) 
-:   ParserInterface ( input, outputs ),
-    m_receiver ( receiver )
+:   ParserInterface ( input, outputs )
 {
 }
 
@@ -87,7 +85,8 @@ AWSParser::parse()
     aws_debug = m_debug ? 1 : 0;            // bison (aws_debug is global)
     aws_set_debug( m_debug ? 1 : 0, sc );   // flex
 
-    FormatterInterface & fmt = m_receiver.GetFormatter();
+    auto m_receiver = m_factory.MakeReceiver();
+    FormatterInterface & fmt = m_receiver -> GetFormatter();
 
     unsigned long int line_nr = 0;
     string line;
@@ -97,14 +96,14 @@ AWSParser::parse()
 
         YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
-        m_receiver.SetCategory( LogLinesInterface::cat_unknown );
+        m_receiver -> SetCategory( LogLinesInterface::cat_unknown );
 
-        if ( aws_parse( sc, static_cast<LogAWSEvent*>( & m_receiver ) ) != 0 )
+        if ( aws_parse( sc, static_cast<LogAWSEvent*>( m_receiver.get() ) ) != 0 )
         {
-            m_receiver.SetCategory( LogLinesInterface::cat_ugly );
+            m_receiver -> SetCategory( LogLinesInterface::cat_ugly );
         }
         
-        if ( m_receiver.GetCategory() != LogLinesInterface::cat_good )
+        if ( m_receiver -> GetCategory() != LogLinesInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
             fmt.addNameValue("_unparsed", line);
@@ -112,7 +111,7 @@ AWSParser::parse()
 
         //TODO: consider passing the output stream to write() without a temporary string
         stringstream out;
-        m_outputs. write ( m_receiver.GetCategory(), fmt . format ( out ).str() );
+        m_outputs. write ( m_receiver -> GetCategory(), fmt . format ( out ).str() );
 
         aws__delete_buffer( bs, sc );
     }
@@ -131,10 +130,13 @@ AWSMultiThreadedParser :: AWSMultiThreadedParser(
 {
 }
 
-void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
+void parser( AWSReceiverFactory * factory, 
+             OneWriterManyReadersQueue * q, 
+             CatWriterInterface * outputs )
 {
-    JsonLibFormatter fmt;
-    LogAWSEvent receiver( fmt ); //TODO: use a factory
+    auto receiver = factory -> MakeReceiver();
+    FormatterInterface & fmt = receiver -> GetFormatter();
+    
     const unsigned int WorkerWait = 10;
     yyscan_t sc;
     aws_lex_init( &sc );
@@ -154,14 +156,14 @@ void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
         {   // TODO: this block is almost identical to the body of the loop in AWSMultiThreadedParser::parser
             YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
-            receiver.SetCategory( LogLinesInterface::cat_unknown );
+            receiver -> SetCategory( LogLinesInterface::cat_unknown );
 
-            if ( aws_parse( sc, static_cast<LogAWSEvent*>( & receiver ) ) != 0 )
+            if ( aws_parse( sc, static_cast<LogAWSEvent*>( receiver.get() ) ) != 0 )
             {
-                receiver.SetCategory( LogLinesInterface::cat_ugly );
+                receiver -> SetCategory( LogLinesInterface::cat_ugly );
             }
 
-            if ( receiver.GetCategory() != LogLinesInterface::cat_good )
+            if ( receiver -> GetCategory() != LogLinesInterface::cat_good )
             {
                 fmt.addNameValue("_line_nr", line_nr);
                 fmt.addNameValue("_unparsed", line);
@@ -169,7 +171,7 @@ void parser( OneWriterManyReadersQueue * q, CatWriterInterface * outputs )
 
             //TODO: consider passing the output stream to write() without a temporary string
             stringstream out;
-            outputs -> write ( receiver.GetCategory(), fmt . format ( out ).str() );
+            outputs -> write ( receiver -> GetCategory(), fmt . format ( out ).str() );
 
             aws__delete_buffer( bs, sc );
         }
@@ -185,7 +187,7 @@ AWSMultiThreadedParser::parse( )
     vector<thread> workers;
     for ( auto i = 0; i < m_threadNum; ++i )
     {
-        workers.push_back( thread( parser, &Q, &m_outputs ) );
+        workers.push_back( thread( parser, &m_factory, &Q, &m_outputs ) );
     }
 
     string line;

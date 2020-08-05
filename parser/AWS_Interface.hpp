@@ -10,7 +10,7 @@ namespace NCBI
         {
             using LogLinesInterface::set;
             
-            LogAWSEvent( FormatterInterface & fmt );
+            LogAWSEvent( std::unique_ptr<FormatterInterface> & fmt );
 
             typedef enum { 
                 owner = LastMemberId+1,
@@ -42,17 +42,28 @@ namespace NCBI
         private:
         };
 
+        class AWSReceiverFactory : public ReceiverFactoryInterface
+        {
+        public:
+            virtual ~AWSReceiverFactory() {}
+
+            virtual std::unique_ptr<LogLinesInterface> MakeReceiver() const
+            {
+                std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
+                return std::make_unique<LogAWSEvent>( fmt );     
+            }
+        };
+
         class AWSParser : public ParserInterface
         {
         public:
             AWSParser( std::istream & input,  
-                       LogAWSEvent & receiver,
                        CatWriterInterface & outputs );
 
             virtual void parse();
 
         private:
-            LogAWSEvent & m_receiver;
+            AWSReceiverFactory m_factory;
         };
 
         class AWSMultiThreadedParser : public ParserInterface
@@ -70,6 +81,7 @@ namespace NCBI
         private:
             size_t m_queueLimit;
             size_t m_threadNum;
+            AWSReceiverFactory m_factory;
         };
 
 #if 0   

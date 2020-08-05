@@ -20,6 +20,7 @@ std::string tool_version( "1.1.0" );
 struct Options
 {
     std::string outputBaseName;
+    unsigned int numThreads;
 };
 
 static void report( const CatCounter & ctr )
@@ -36,11 +37,17 @@ static void report( const CatCounter & ctr )
 
 static void handle_aws( const Options & options )
 {
-    JsonLibFormatter jsonFmt; 
-    LogAWSEvent receiver( jsonFmt );
     FileCatWriter outputs( options.outputBaseName ); 
-    AWSParser p( cin, receiver, outputs );
-    p . parse(); 
+    if ( options.numThreads <= 1 )
+    {
+        AWSParser p( cin, outputs );
+        p . parse(); 
+    }
+    else
+    {
+        AWSMultiThreadedParser p( cin, outputs, 1000, options.numThreads );
+        p . parse(); 
+    }
     report( outputs.getCounter() );
 }
 
@@ -52,10 +59,14 @@ int main ( int argc, char * argv [], const char * envp []  )
         Options options;
         bool vers = false;
 
+        options.numThreads = 1;
+
         ncbi::Cmdline args( argc, argv );
 
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
+        U32 count;
+        args . addOption<unsigned int>( options.numThreads, &count, "t", "threads", "count", "# of parser threads" );
 
         String outputBaseName;
         args . addParam( outputBaseName, "base-output-name", "base name for the output files" );

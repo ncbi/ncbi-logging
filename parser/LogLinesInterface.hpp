@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstring>
+#include <memory>
 
 #include "types.h"
 #include "Formatters.hpp"
@@ -48,7 +49,7 @@ namespace NCBI
 
         struct LogLinesInterface
         {
-            LogLinesInterface( FormatterInterface & p_fmt );
+            LogLinesInterface( std::unique_ptr<FormatterInterface> & p_fmt );
 
             virtual ~LogLinesInterface();
 
@@ -72,10 +73,10 @@ namespace NCBI
 
             virtual void reportField( const char * message ) = 0;
 
-            FormatterInterface & GetFormatter() { return m_fmt; }
+            FormatterInterface & GetFormatter() { return * m_fmt.get(); }
 
         protected:
-            FormatterInterface & m_fmt;
+            std::unique_ptr<FormatterInterface> m_fmt;
             Category m_cat;
         };
 
@@ -100,6 +101,14 @@ namespace NCBI
             std::istream & m_input;
             CatWriterInterface & m_outputs;
             bool m_debug;
+        };
+
+        class ReceiverFactoryInterface
+        {
+        public:
+            virtual ~ReceiverFactoryInterface() = 0;
+
+            virtual std::unique_ptr<LogLinesInterface> MakeReceiver() const = 0;
         };
     }
 }
