@@ -172,7 +172,8 @@ NCBI::Logging::ToString( const t_timepoint & t )
 
 NCBI::Logging::OneWriterManyReadersQueue::OneWriterManyReadersQueue( size_t limit ) 
 :   m_limit( limit ),
-    m_line_nr ( 0 )
+    m_line_nr ( 0 ),
+    m_max( 0 )
 {
     m_open.store( true );
 }
@@ -185,6 +186,7 @@ bool NCBI::Logging::OneWriterManyReadersQueue::enqueue( const std::string & s )
         return false;
 
     m_queue.push( s );  // makes a copy
+    m_max = max( m_queue.size(), m_max );
     return true;
 }
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <stdio.h>
 
 #include "aws_v2_parser.hpp"
 #include "aws_v2_scanner.hpp"
@@ -137,10 +138,9 @@ void parser( AWSReceiverFactory * factory,
              OneWriterManyReadersQueue * q, 
              CatWriterInterface * outputs )
 {
+    const unsigned int WorkerWait = 500;
     auto receiver = factory -> MakeReceiver();
     FormatterInterface & fmt = receiver -> GetFormatter();
-    
-    const unsigned int WorkerWait = 1;
     yyscan_t sc;
     aws_lex_init( &sc );
 
@@ -182,7 +182,7 @@ void parser( AWSReceiverFactory * factory,
             aws__delete_buffer( bs, sc );
         }
     }
-
+    
     aws_lex_destroy( sc );
 }
 
@@ -195,6 +195,21 @@ void AWSMultiThreadedParser::parse( )
         workers.push_back( thread( parser, &m_factory, &Q, &m_outputs ) );
     }
 
+    FILE * ifile = stdin;
+    size_t linesz = 0;
+    char * line = nullptr;
+    while( getline( &line, &linesz, ifile ) > 0 )
+    {
+        std::string s( line, linesz );
+        while ( ! Q.enqueue( s ) ) //TODO: pass in line_nr
+        {
+            this_thread::sleep_for( chrono::microseconds( 100 ) );
+            num_feed_sleeps++;
+        }
+
+    }
+    free( line );
+/*
     string line;
     while( getline( m_input, line ) )
     {
@@ -204,11 +219,13 @@ void AWSMultiThreadedParser::parse( )
             num_feed_sleeps++;
         }
     }
+*/
 
     Q.close();
     for ( auto i = 0; i < m_threadNum; ++i )
     {
-        workers[i].join();
+       workers[i].join();
     }
+    std::cout << "q.max = " << Q.m_max << std::endl;
 }
 

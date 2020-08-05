@@ -77,6 +77,7 @@ namespace NCBI
 
                 void close() { m_open.store( false ); }
                 bool is_open() const { return m_open.load(); }
+                size_t m_max;
 
             private :
                 std::queue< std::string > m_queue;
