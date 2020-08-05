@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LogLinesInterface.hpp"
+#include <atomic>
 
 namespace NCBI
 {
@@ -79,6 +80,7 @@ namespace NCBI
 
             virtual void parse();
             size_t num_feed_sleeps = 0;
+            static std::atomic< size_t > thread_sleeps;
 
         private:
             size_t m_queueLimit;

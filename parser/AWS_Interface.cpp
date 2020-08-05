@@ -119,6 +119,8 @@ AWSParser::parse()
     aws_lex_destroy( sc );
 }
 
+std::atomic< size_t > AWSMultiThreadedParser :: thread_sleeps;
+
 AWSMultiThreadedParser :: AWSMultiThreadedParser( 
     std::istream & input,  
     CatWriterInterface & outputs,
@@ -128,6 +130,7 @@ AWSMultiThreadedParser :: AWSMultiThreadedParser(
     m_queueLimit ( queueLimit ),
     m_threadNum ( threadNum )
 {
+    AWSMultiThreadedParser :: thread_sleeps . store( 0 );
 }
 
 void parser( AWSReceiverFactory * factory, 
@@ -150,7 +153,10 @@ void parser( AWSReceiverFactory * factory,
             if ( !q -> is_open() )
                 return;
             else
+            {
                 std::this_thread::sleep_for( std::chrono::milliseconds( WorkerWait ) );
+                AWSMultiThreadedParser :: thread_sleeps++;
+            }
         }
         else
         {   // TODO: this block is almost identical to the body of the loop in AWSMultiThreadedParser::parser
