@@ -137,7 +137,7 @@ void parser( AWSReceiverFactory * factory,
     auto receiver = factory -> MakeReceiver();
     FormatterInterface & fmt = receiver -> GetFormatter();
     
-    const unsigned int WorkerWait = 10;
+    const unsigned int WorkerWait = 1;
     yyscan_t sc;
     aws_lex_init( &sc );
 
