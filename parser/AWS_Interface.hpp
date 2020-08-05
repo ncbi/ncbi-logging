@@ -78,6 +78,7 @@ namespace NCBI
             );
 
             virtual void parse();
+            size_t num_feed_sleeps = 0;
 
         private:
             size_t m_queueLimit;

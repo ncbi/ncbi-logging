@@ -180,8 +180,7 @@ void parser( AWSReceiverFactory * factory,
     aws_lex_destroy( sc );
 }
 
-void
-AWSMultiThreadedParser::parse( )
+void AWSMultiThreadedParser::parse( )
 {
     OneWriterManyReadersQueue Q ( m_queueLimit );
     vector<thread> workers;
@@ -195,7 +194,8 @@ AWSMultiThreadedParser::parse( )
     {
         while ( ! Q.enqueue( line ) ) //TODO: pass in line_nr
         {
-            this_thread::sleep_for(chrono::milliseconds(1));
+            this_thread::sleep_for( chrono::milliseconds( 1 ) );
+            num_feed_sleeps++;
         }
     }
 

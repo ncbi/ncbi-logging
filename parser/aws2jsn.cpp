@@ -46,7 +46,8 @@ static void handle_aws( const Options & options )
     else
     {
         AWSMultiThreadedParser p( cin, outputs, 1000000, options.numThreads );
-        p . parse(); 
+        p . parse();
+        std::cout << "num-feed-sleeps = " << p . num_feed_sleeps << endl;
     }
     report( outputs.getCounter() );
 }
