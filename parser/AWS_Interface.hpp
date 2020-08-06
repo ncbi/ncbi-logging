@@ -50,8 +50,8 @@ namespace NCBI
 
             virtual std::unique_ptr<LogLinesInterface> MakeReceiver() const
             {
-                //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
-                std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
+                std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
+                //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
                 return std::make_unique<LogAWSEvent>( fmt );     
             }
         };
@@ -65,6 +65,7 @@ namespace NCBI
             virtual void parse();
 
         private:
+            std::istream & m_input;
             AWSReceiverFactory m_factory;
         };
 
@@ -72,7 +73,7 @@ namespace NCBI
         {
         public:
             AWSMultiThreadedParser( 
-                std::istream & input,  
+                FILE * input,  // need for speed
                 CatWriterInterface & outputs,
                 size_t queueLimit,
                 size_t threadNum
@@ -83,6 +84,7 @@ namespace NCBI
             static std::atomic< size_t > thread_sleeps;
 
         private:
+            FILE * m_input;
             size_t m_queueLimit;
             size_t m_threadNum;
             AWSReceiverFactory m_factory;

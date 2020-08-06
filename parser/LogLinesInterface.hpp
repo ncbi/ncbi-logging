@@ -83,10 +83,8 @@ namespace NCBI
         class ParserInterface 
         {
         public:
-            ParserInterface( std::istream & input,  
-                             CatWriterInterface & outputs ) 
-            :   m_input ( input ),
-                m_outputs ( outputs ),
+            ParserInterface( CatWriterInterface & outputs ) 
+            :   m_outputs ( outputs ),
                 m_debug ( false )
             {
             }
@@ -98,7 +96,6 @@ namespace NCBI
             void setDebug ( bool onOff ) { m_debug = onOff; }
 
         protected:
-            std::istream & m_input;
             CatWriterInterface & m_outputs;
             bool m_debug;
         };

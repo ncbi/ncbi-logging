@@ -10,7 +10,7 @@
 #include "aws_v2_scanner.hpp"
 #include "Formatters.hpp"
 #include "CatWriters.hpp"
-#include "helper.hpp"
+#include "Queues.hpp"
 
 extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
 
@@ -72,7 +72,7 @@ void LogAWSEvent::reportField( const char * message )
 AWSParser::AWSParser( 
     std::istream & input,  
     CatWriterInterface & outputs ) 
-:   ParserInterface ( input, outputs )
+:   ParserInterface ( outputs ), m_input ( input )
 {
 }
 
@@ -110,7 +110,6 @@ AWSParser::parse()
             fmt.addNameValue("_unparsed", line);
         }
 
-        //TODO: consider passing the output stream to write() without a temporary string
         stringstream out;
         m_outputs. write ( m_receiver -> GetCategory(), fmt . format ( out ).str() );
 
@@ -123,11 +122,12 @@ AWSParser::parse()
 std::atomic< size_t > AWSMultiThreadedParser :: thread_sleeps;
 
 AWSMultiThreadedParser :: AWSMultiThreadedParser( 
-    std::istream & input,  
+    FILE * input,  
     CatWriterInterface & outputs,
     size_t queueLimit,
     size_t threadNum ) 
-:   ParserInterface ( input, outputs ),
+:   ParserInterface ( outputs ),
+    m_input ( input ),
     m_queueLimit ( queueLimit ),
     m_threadNum ( threadNum )
 {
@@ -138,7 +138,6 @@ void parser( AWSReceiverFactory * factory,
              OneWriterManyReadersQueue * in_q, 
              OutputQueue * out_q )
 {
-    const unsigned int WorkerWait = 500;
     auto receiver = factory -> MakeReceiver();
     FormatterInterface & fmt = receiver -> GetFormatter();
     yyscan_t sc;
@@ -151,15 +150,16 @@ void parser( AWSReceiverFactory * factory,
         if ( !in_q -> dequeue( line, line_nr ) )
         {
             if ( !in_q -> is_open() )
-                return;
+                break;
             else
             {
-                std::this_thread::sleep_for( std::chrono::microseconds( WorkerWait ) );
+                const chrono::microseconds WorkerReadWait ( 500 );
+                std::this_thread::sleep_for( WorkerReadWait );
                 AWSMultiThreadedParser :: thread_sleeps++;
             }
         }
         else
-        {   // TODO: this block is almost identical to the body of the loop in AWSMultiThreadedParser::parser
+        {   // TODO: this block replicates much of AWSParser::parse()
             YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), sc );
 
             receiver -> SetCategory( LogLinesInterface::cat_unknown );
@@ -175,14 +175,14 @@ void parser( AWSReceiverFactory * factory,
                 fmt.addNameValue("_unparsed", line);
             }
 
-            //TODO: consider passing the output stream to write() without a temporary string
             stringstream out;
             LogLinesInterface::Category cat = receiver -> GetCategory();
             std::string output = fmt . format( out ).str();
 
-            while ( ! out_q -> enqueue( output, cat ) ) //TODO: pass in line_nr
+            while ( ! out_q -> enqueue( output, cat ) )
             {
-                this_thread::sleep_for( chrono::microseconds( 100 ) );
+                const chrono::microseconds WorkerWriteWait ( 100 );
+                this_thread::sleep_for( WorkerWriteWait );
             }
 
             aws__delete_buffer( bs, sc );
@@ -206,7 +206,9 @@ void writer( OutputQueue * q,
             if ( !q -> is_open() )
                 return;
             else
+            {
                 std::this_thread::sleep_for( std::chrono::microseconds( WriterWait ) );
+            }
         }
         else
         {
@@ -228,20 +230,34 @@ void AWSMultiThreadedParser::parse( )
         workers.push_back( thread( parser, &m_factory, &Q, &Q_out ) );
     }
 
-    FILE * ifile = stdin;
-    size_t linesz = 0;
-    char * line = nullptr;
-    while( getline( &line, &linesz, ifile ) > 0 )
+    try
     {
-        std::string s( line, linesz );
-        while ( ! Q.enqueue( s ) ) //TODO: pass in line_nr
+        size_t allocsz = 0;
+        ssize_t linesz = 0;
+        char * line = nullptr;
+        while( ( linesz = getline( &line, &allocsz, m_input ) ) > 0 )
+        {   
+            while ( ! Q.enqueue( string( line, linesz ) ) ) //TODO: pass in line_nr
+            {
+                this_thread::sleep_for( chrono::microseconds( 100 ) );
+                num_feed_sleeps++;
+            }
+
+        }
+        free( line );
+    }
+    catch(...)
+    {
+        Q.close();
+        for ( auto i = 0; i < m_threadNum; ++i )
         {
-            this_thread::sleep_for( chrono::microseconds( 100 ) );
-            num_feed_sleeps++;
+            workers[i].join();
         }
 
+        Q_out.close();
+        writer_thread.join();
+        throw;
     }
-    free( line );
 
     Q.close();
     for ( auto i = 0; i < m_threadNum; ++i )
@@ -252,6 +268,6 @@ void AWSMultiThreadedParser::parse( )
     Q_out.close();
     writer_thread.join();
 
-    std::cout << "q.max = " << Q.m_max << std::endl;
+    //std::cout << "q.max = " << Q.m_max << std::endl;
 }
 

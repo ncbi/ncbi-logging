@@ -405,6 +405,7 @@ test2jsn: log2jsn_
 TEST_SUPPORT_SRC = \
 	Formatters.cpp test_formatter.cpp \
 	CatWriters.cpp test_catwriter.cpp \
+	Queues.cpp test_queues.cpp \
 	test_support_main.cpp
 
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
@@ -434,7 +435,8 @@ AWS2JSN_CMN_SRC = \
 	CatWriters.cpp \
 	Formatters.cpp \
 	LogLinesInterface.cpp \
-	AWS_Interface.cpp
+	AWS_Interface.cpp \
+	Queues.cpp
 
 AWS2JSN_SRC = $(AWS2JSN_CMN_SRC) aws2jsn.cpp 
 
@@ -455,7 +457,7 @@ aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 
 aws_prof: mkdir $(BINDIR)/aws2jsn-prof
 
-$(PREFIX_AWS_V2)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS_V2)test_parse.cpp
+$(PREFIX_AWS_V2)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS_V2)test_parse.cpp 
 $(PREFIX_AWS_V2)_TEST_FLEX_SRC = $(PREFIX_AWS_V2)test_flex.cpp $(PREFIX_AWS_V2)scanner.cpp
 
 $(PREFIX_AWS_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS_V2)_TEST_PARSE_SRC)))

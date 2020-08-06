@@ -589,7 +589,7 @@ TEST_F( LogAWSEventFixture, MultiThreading )
         "4 - - - - - - - - - - - - - - - - - - - - - - x\n" // ugly
     );
 
-    istringstream ss( input );
+    FILE * ss = fmemopen( (void*) input.c_str(), input.size(), "r");
     AWSMultiThreadedParser p( ss, s_outputs, 100, 2 );
     p . parse();
 
@@ -618,6 +618,8 @@ TEST_F( LogAWSEventFixture, MultiThreading )
     ASSERT_EQ( "1", extract_value( lines[0], "_line_nr" ) );
     ASSERT_EQ( "2", extract_value( lines[1], "_line_nr" ) );
     ASSERT_EQ( "4", extract_value( lines[2], "_line_nr" ) );
+
+    fclose( ss );
 }
 
 extern "C"
