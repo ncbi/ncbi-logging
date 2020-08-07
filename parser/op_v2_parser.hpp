@@ -30,38 +30,31 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_AWS_AWS_V2_PARSER_HPP_INCLUDED
-# define YY_AWS_AWS_V2_PARSER_HPP_INCLUDED
+#ifndef YY_OP_OP_V2_PARSER_HPP_INCLUDED
+# define YY_OP_OP_V2_PARSER_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
 #endif
 #if YYDEBUG
-extern int aws_debug;
+extern int op_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 29 "aws_v2_parser.y" /* yacc.c:1909  */
+#line 29 "op_v2_parser.y" /* yacc.c:1909  */
 
 #include "types.h"
-#include "AWS_Interface.hpp"
+#include "OP_Interface.hpp"
 
-extern void aws_get_scanner_input( void * yyscanner, t_str & str );
+extern void op_get_scanner_input( void * yyscanner, t_str & str );
+extern void op_start_URL( void * yyscanner );
+extern void op_start_UserAgent( void * yyscanner );
+extern void op_start_time( void * yyscanner );
 
-extern void aws_start_URL( void * yyscanner );
-extern void aws_start_key( void * yyscanner );
-extern void aws_start_UserAgent( void * yyscanner );
-extern void aws_start_TLS_vers( void * yyscanner );
-extern void aws_start_host_id( void * yyscanner );
-extern void aws_start_time( void * yyscanner );
-extern void aws_start_ipaddr( void * yyscanner );
-extern void aws_start_rescode( void * yyscanner );
-extern void aws_start_referer( void * yyscanner );
-
-extern void aws_pop_state( void * yyscanner );
+extern void op_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 
-#line 65 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 58 "op_v2_parser.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -69,40 +62,42 @@ using namespace NCBI::Logging;
   enum yytokentype
   {
     STR = 258,
-    STR1 = 259,
-    MONTH = 260,
-    IPV4 = 261,
-    IPV6 = 262,
+    MONTH = 259,
+    IPV4 = 260,
+    IPV6 = 261,
+    FLOAT = 262,
     METHOD = 263,
     VERS = 264,
     QSTR = 265,
-    DASH = 266,
-    I64 = 267,
-    AMPERSAND = 268,
-    EQUAL = 269,
-    PERCENT = 270,
-    SLASH = 271,
-    QMARK = 272,
-    PATHSTR = 273,
-    PATHEXT = 274,
-    ACCESSION = 275,
-    SPACE = 276,
-    TLS_VERSION = 277,
-    X_AMZ_ID_2 = 278,
-    S3_EXT_REQ_ID = 279,
-    TIME_FMT = 280,
-    RESULTCODE = 281,
-    COLON = 282,
-    QUOTE = 283,
-    OB = 284,
-    CB = 285,
-    UNRECOGNIZED = 286,
-    OS = 287,
-    SRA_TOOLKIT = 288,
-    LIBCVERSION = 289,
-    AGENTSTR = 290,
-    SRATOOLVERS = 291,
-    PHIDVALUE = 292
+    QSTR_ESC = 266,
+    SPACE = 267,
+    SLASH = 268,
+    QMARK = 269,
+    I64 = 270,
+    DOT = 271,
+    DASH = 272,
+    COLON = 273,
+    QUOTE = 274,
+    OB = 275,
+    CB = 276,
+    PORT = 277,
+    RL = 278,
+    CR = 279,
+    LF = 280,
+    UNRECOGNIZED = 281,
+    PATHSTR = 282,
+    PATHEXT = 283,
+    ACCESSION = 284,
+    OS = 285,
+    SRA_TOOLKIT = 286,
+    LIBCVERSION = 287,
+    AGENTSTR = 288,
+    SRATOOLVERS = 289,
+    PAREN_OPEN = 290,
+    PAREN_CLOSE = 291,
+    COMMA = 292,
+    PHIDVALUE = 293,
+    TIME_FMT = 294
   };
 #endif
 
@@ -111,13 +106,14 @@ using namespace NCBI::Logging;
 
 union YYSTYPE
 {
-#line 51 "aws_v2_parser.y" /* yacc.c:1909  */
+#line 44 "op_v2_parser.y" /* yacc.c:1909  */
 
     t_str s;
+    t_timepoint tp;
     t_request req;
     t_agent agent;
 
-#line 121 "aws_v2_parser.hpp" /* yacc.c:1909  */
+#line 117 "op_v2_parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -127,6 +123,6 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int aws_parse (void * scanner, NCBI::Logging::LogAWSEvent * lib);
+int op_parse (void * scanner, NCBI::Logging::LogOPEvent * lib);
 
-#endif /* !YY_AWS_AWS_V2_PARSER_HPP_INCLUDED  */
+#endif /* !YY_OP_OP_V2_PARSER_HPP_INCLUDED  */

@@ -25,8 +25,6 @@ namespace NCBI
             t_str filename;
             t_str extension;
 
-            t_str server; // only used in OP
-
             eAccessionMode accession_mode; // private to the GCP and AWS parser
         } t_request;
 

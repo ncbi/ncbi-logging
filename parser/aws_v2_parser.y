@@ -12,7 +12,6 @@
 
 #include <stdint.h>
 
-//#include "AWS_Interface.hpp"
 #include "aws_v2_parser.hpp"
 #include "aws_v2_scanner.hpp"
 #include "helper.hpp"
@@ -22,8 +21,7 @@ using namespace NCBI::Logging;
 
 void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg );
 
-#define SET_VALUE( selector, source ) ( ( ( LogAWSEvent * ) lib ) -> set( (selector), (source) ) )
-#define REPORT( selector, source ) ( ( ( LogAWSEvent * ) lib ) -> set( (selector), (source) ) )
+#define SET_VALUE( selector, source ) ( lib -> set( (selector), (source) ) )
 
 %}
 
