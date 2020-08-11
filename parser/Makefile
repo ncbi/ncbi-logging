@@ -568,14 +568,18 @@ run_$(PREFIX_OP_V2)flex_test: $(BINDIR)/$(PREFIX_OP_V2)test_flex-dbg $(BINDIR)/$
 
 #################################################
 #################################################
-# OP acceptance 
+# V2 acceptance 
 
-# which version to run for acceptance (uncomment one)
+AWS2JSON = $(BINDIR)/aws2jsn-dbg
 OP2JSON = $(BINDIR)/op2jsn-dbg
-#OP2JSON = $(BINDIR)/op2jsn-rel
 
-test_op: op
-	@ mkdir -p actual
+test_v2: aws op
+	mkdir -p  actual/$(PREFIX_AWS_V2)unrecognized
+	cat data/aws_unrecognized.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)unrecognized/ >./actual/$(PREFIX_AWS_V2)unrecognized/stdout 2>./actual/$(PREFIX_AWS_V2)unrecognized/stderr \
+						&& diff ./expected/$(PREFIX_AWS_V2)unrecognized ./actual/$(PREFIX_AWS_V2)unrecognized
+	@ echo "test_aws v2 passed"
+	@ rm -rf actual/$(PREFIX_AWS_V2)*
+	#
 	mkdir -p  actual/$(PREFIX_OP_V2)unrecognized
 	cat data/op_unrecognized.log | $(OP2JSON) actual/$(PREFIX_OP_V2)unrecognized/ >./actual/$(PREFIX_OP_V2)unrecognized/stdout 2>./actual/$(PREFIX_OP_V2)unrecognized/stderr \
 						&& diff ./expected/$(PREFIX_OP_V2)unrecognized ./actual/$(PREFIX_OP_V2)unrecognized

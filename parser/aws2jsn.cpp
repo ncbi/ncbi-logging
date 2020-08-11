@@ -38,17 +38,18 @@ static void report( const CatCounter & ctr )
 static void handle_aws( const Options & options )
 {
     FileCatWriter outputs( options.outputBaseName ); 
+    AWSParseBlockFactory pbFact;
     if ( options.numThreads <= 1 )
     {
-        AWSParser p( cin, outputs );
+        SingleThreadedParser p( cin, outputs, pbFact );
         p . parse(); 
     }
     else
     {
-        AWSMultiThreadedParser p( stdin, outputs, 100000, options.numThreads );
+        MultiThreadedParser p( stdin, outputs, 100000, options.numThreads, pbFact );
         p . parse();
         std::cout << "num-feed-sleeps = " << p . num_feed_sleeps << endl;
-        std::cout << "thread-sleeps = " << AWSMultiThreadedParser :: thread_sleeps . load() << endl;        
+        std::cout << "thread-sleeps = " << MultiThreadedParser :: thread_sleeps . load() << endl;        
     }
     report( outputs.getCounter() );
 }

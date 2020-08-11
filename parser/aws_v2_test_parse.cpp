@@ -49,7 +49,6 @@ TEST(LogAWSEventTest, Setters)
         { "a", 1, false },
         { "f", 1, false },
         { "e", 1, false },
-        { "s", 1, false },
         acc_before
     };
     e.setRequest( r );
@@ -87,9 +86,8 @@ class LogAWSEventFixture : public ::testing::Test
         void try_to_parse( std::string line, bool debug = false )
         {
             istringstream ss( line );
-            //std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-            //LogAWSEvent receiver( f );
-            AWSParser p( ss, s_outputs );
+            AWSParseBlockFactory pbFact;
+            SingleThreadedParser p( ss, s_outputs, pbFact );
             p . setDebug( debug );
             p . parse(); // does the parsing and generates the report
         }
@@ -590,7 +588,8 @@ TEST_F( LogAWSEventFixture, MultiThreading )
     );
 
     FILE * ss = fmemopen( (void*) input.c_str(), input.size(), "r");
-    AWSMultiThreadedParser p( ss, s_outputs, 100, 2 );
+    AWSParseBlockFactory pbFact;
+    MultiThreadedParser p( ss, s_outputs, 100, 2, pbFact );
     p . parse();
 
     ASSERT_LT( 0, s_outputs.get_good().size() );

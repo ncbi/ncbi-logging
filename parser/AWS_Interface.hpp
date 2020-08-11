@@ -1,7 +1,8 @@
 #pragma once
 
 #include "LogLinesInterface.hpp"
-#include <atomic>
+
+#include <memory>
 
 namespace NCBI
 {
@@ -43,169 +44,13 @@ namespace NCBI
         private:
         };
 
-        class AWSReceiverFactory : public ReceiverFactoryInterface
+        class AWSParseBlockFactory : public ParseBlockFactoryInterface
         {
         public:
-            virtual ~AWSReceiverFactory() {}
-
-            virtual std::unique_ptr<LogLinesInterface> MakeReceiver() const
-            {
-                std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
-                //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
-                return std::make_unique<LogAWSEvent>( fmt );     
-            }
+            virtual ~AWSParseBlockFactory();
+            virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
         };
 
-        class AWSParser : public ParserInterface
-        {
-        public:
-            AWSParser( std::istream & input,  
-                       CatWriterInterface & outputs );
-
-            virtual void parse();
-
-        private:
-            std::istream & m_input;
-            AWSReceiverFactory m_factory;
-        };
-
-        class AWSMultiThreadedParser : public ParserInterface
-        {
-        public:
-            AWSMultiThreadedParser( 
-                FILE * input,  // need for speed
-                CatWriterInterface & outputs,
-                size_t queueLimit,
-                size_t threadNum
-            );
-
-            virtual void parse();
-            size_t num_feed_sleeps = 0;
-            static std::atomic< size_t > thread_sleeps;
-
-        private:
-            FILE * m_input;
-            size_t m_queueLimit;
-            size_t m_threadNum;
-            AWSReceiverFactory m_factory;
-        };
-
-#if 0   
-            class ParseThread
-            {
-            public:
-                Thread(AWS_LogLinesInterface_Factory &loglinesF, 
-                       Formatter & formatter,
-                       CatWriterInterface & outputs) {}
-
-                OneReaderQueue queue; 
-
-                void run()
-                {
-                    string line;
-                    while ( queue.dequeue( line ) )
-                    {   //TODO: keep track fo line numbers (have queue carry tuples <line, line_no>)
-                        AWS_LogLinesInterface receiver = loglinesF.create(); //TODO: add line_no to receiver
-                        scan_reset( line );
-                        if ( ! yyparse( receiver, scanner ) ) 
-                            outputs . write( cat_ugly, formatter.format(line) );
-                        else 
-                        {
-                            outputs. write ( receiver.Category(), formatter . format ( receiver ) );
-                        }
-                    }
-                }
-
-                void close() 
-                { 
-                    queue.close(); 
-                    queue.join(); 
-                }
-            }
-
-            class OutputThread
-            {
-            public:
-                OutputThread( ostream& out);
-
-                OneReaderQueue queue; 
-
-                void run()
-                {
-                    string line;
-                    while ( queue.dequeue( line ) )
-                    {
-                        out << line << endl;
-                    }
-                }        
-            };
-
-            class ThreadPool
-            {
-            public:
-                ThreadPool( numTreads, 
-                       AWS_LogLinesInterface_Factory &loglinesF, 
-                       formatter,
-                       CatWriterInterface & outputs )
-                {
-                    for( i = 1..numThreads )
-                    {
-                        workers.push(new ParseThread(loglinesF, formatter, outputs ))
-                    }
-                }
-                ~ThreadPool()
-                {
-                }
-
-                void enqueueLine( string str )
-                {   
-                    //round robin
-                    workers[cur].enqueue(str); //TODO: if the queues are bounded, block if full
-                    cur++;
-                    if ( cur >= numThreads )
-                    {
-                        cur = 0;
-                    }
-                }
-
-                void wait()
-                {
-                    for( i = 1..numThreads )
-                    {
-                        workers[i].close();
-                    }
-                }
-            }
-
-            void parseMultiThreaded 
-              ( AWS_LogLinesInterface_Factory &loglinesF, 
-                std::istream &input,
-                formatter,
-                strng baseName,
-                uint numTreads ) 
-            { 
-                ThreadFileClassifier outputs ( baseName );
-                ThreadPool threadPool(numTreads, 
-                                     loglinesF, 
-                                     formatter,
-                                     outputs);
-                string source;
-                while ( m_input.getline( source ) )
-                {
-                    threadPool.enqueueLine( source );
-                }
-                threadPool.wait();
-            }
-
-            void setDebug( bool on ) {}
-            void setLineFilter( unsigned long int line_nr ) {}
-
-        private:
-            AWS_LogLinesInterface &  m_lines;
-            std::istream &  m_input;
-            unsigned long int line_filter = 0;            
-        };
-#endif
     }
 }
 

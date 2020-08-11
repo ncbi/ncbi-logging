@@ -1,16 +1,7 @@
 #include "OP_Interface.hpp"
 
-#include <sstream>
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <stdio.h>
-
 #include "op_v2_parser.hpp"
 #include "op_v2_scanner.hpp"
-#include "Formatters.hpp"
-#include "CatWriters.hpp"
-#include "Queues.hpp"
 
 extern YY_BUFFER_STATE op_scan_reset( const char * input, yyscan_t yyscanner );
 
@@ -59,205 +50,59 @@ void LogOPEvent::reportField( const char * message )
     }
 }
 
-OPParser::OPParser( 
-    std::istream & input,  
-    CatWriterInterface & outputs ) 
-:   ParserInterface ( outputs ), m_input ( input )
+namespace NCBI
 {
+    namespace Logging
+    {
+        class OPParseBlock : public ParseBlockInterface
+        {
+        public:
+            OPParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
+            virtual ~OPParseBlock();
+            virtual LogLinesInterface & GetReceiver() { return m_receiver; }
+            virtual bool Parse( const std::string & line );
+            virtual void SetDebug( bool onOff );
+
+            yyscan_t m_sc;
+            LogOPEvent m_receiver;
+        };
+    }
+}
+
+OPParseBlockFactory::~OPParseBlockFactory() {}
+
+std::unique_ptr<ParseBlockInterface> 
+OPParseBlockFactory::MakeParseBlock() const
+{
+    std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
+    //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
+    return std::make_unique<OPParseBlock>( fmt );     
+}
+
+OPParseBlock::OPParseBlock( std::unique_ptr<FormatterInterface> & fmt ) 
+: m_receiver ( fmt )
+{
+    op_lex_init( &m_sc );
+}
+
+OPParseBlock::~OPParseBlock() 
+{
+    op_lex_destroy( m_sc );
 }
 
 void 
-OPParser::parse()
-{ 
-    yyscan_t sc;
-    op_lex_init( &sc );
-
-    // set debug output flags
-    op_debug = m_debug ? 1 : 0;            // bison (op_debug is global)
-    op_set_debug( m_debug ? 1 : 0, sc );   // flex
-
-    auto m_receiver = m_factory.MakeReceiver();
-    FormatterInterface & fmt = m_receiver -> GetFormatter();
-
-    unsigned long int line_nr = 0;
-    string line;
-    while( getline( m_input, line ) )
-    {   // TODO: the body of the loop is almost identical to a block in OPMultiThreadedParser::parser()
-        line_nr++;
-
-        YY_BUFFER_STATE bs = op_scan_reset( line.c_str(), sc );
-
-        m_receiver -> SetCategory( LogLinesInterface::cat_unknown );
-
-        if ( op_parse( sc, static_cast<LogOPEvent*>( m_receiver.get() ) ) != 0 )
-        {
-            m_receiver -> SetCategory( LogLinesInterface::cat_ugly );
-        }
-        
-        if ( m_receiver -> GetCategory() != LogLinesInterface::cat_good )
-        {
-            fmt.addNameValue("_line_nr", line_nr);
-            fmt.addNameValue("_unparsed", line);
-        }
-
-        stringstream out;
-        m_outputs. write ( m_receiver -> GetCategory(), fmt . format ( out ).str() );
-
-        op__delete_buffer( bs, sc );
-    }
-
-    op_lex_destroy( sc );
+OPParseBlock::SetDebug( bool onOff )
+{
+    op_debug = onOff ? 1 : 0;            // bison (op_debug is global)
+    op_set_debug( onOff ? 1 : 0, m_sc );   // flex
 }
 
-std::atomic< size_t > OPMultiThreadedParser :: thread_sleeps;
-
-OPMultiThreadedParser :: OPMultiThreadedParser( 
-    FILE * input,  
-    CatWriterInterface & outputs,
-    size_t queueLimit,
-    size_t threadNum ) 
-:   ParserInterface ( outputs ),
-    m_input ( input ),
-    m_queueLimit ( queueLimit ),
-    m_threadNum ( threadNum )
+bool 
+OPParseBlock::Parse( const string & line )
 {
-    OPMultiThreadedParser :: thread_sleeps . store( 0 );
-}
-
-void parser( OPReceiverFactory * factory, 
-             OneWriterManyReadersQueue * in_q, 
-             OutputQueue * out_q )
-{
-    auto receiver = factory -> MakeReceiver();
-    FormatterInterface & fmt = receiver -> GetFormatter();
-    yyscan_t sc;
-    op_lex_init( &sc );
-
-    while ( true )
-    {
-        string line;
-        size_t line_nr;
-        if ( !in_q -> dequeue( line, line_nr ) )
-        {
-            if ( !in_q -> is_open() )
-                break;
-            else
-            {
-                const chrono::microseconds WorkerReadWait ( 500 );
-                std::this_thread::sleep_for( WorkerReadWait );
-                OPMultiThreadedParser :: thread_sleeps++;
-            }
-        }
-        else
-        {   // TODO: this block replicates much of OPParser::parse()
-            YY_BUFFER_STATE bs = op_scan_reset( line.c_str(), sc );
-
-            receiver -> SetCategory( LogLinesInterface::cat_unknown );
-
-            if ( op_parse( sc, static_cast<LogOPEvent*>( receiver.get() ) ) != 0 )
-            {
-                receiver -> SetCategory( LogLinesInterface::cat_ugly );
-            }
-
-            if ( receiver -> GetCategory() != LogLinesInterface::cat_good )
-            {
-                fmt.addNameValue("_line_nr", line_nr);
-                fmt.addNameValue("_unparsed", line);
-            }
-
-            stringstream out;
-            LogLinesInterface::Category cat = receiver -> GetCategory();
-            std::string output = fmt . format( out ).str();
-
-            while ( ! out_q -> enqueue( output, cat ) )
-            {
-                const chrono::microseconds WorkerWriteWait ( 100 );
-                this_thread::sleep_for( WorkerWriteWait );
-            }
-
-            op__delete_buffer( bs, sc );
-        }
-    }
-    
-    op_lex_destroy( sc );
-}
-
-void writer( OutputQueue * q,
-             CatWriterInterface * outputs )
-{
-    const unsigned int WriterWait = 500;
-
-    while ( true )
-    {
-        string line;
-        LogLinesInterface::Category cat;
-        if ( !q -> dequeue( line, cat ) )
-        {
-            if ( !q -> is_open() )
-                return;
-            else
-            {
-                std::this_thread::sleep_for( std::chrono::microseconds( WriterWait ) );
-            }
-        }
-        else
-        {
-            outputs -> write ( cat, line );
-        }
-    }
-}
-
-void OPMultiThreadedParser::parse( )
-{
-    OneWriterManyReadersQueue Q ( m_queueLimit );
-    OutputQueue Q_out ( m_queueLimit );    
-
-    thread writer_thread( writer, &Q_out, &m_outputs );
-
-    vector<thread> workers;
-    for ( auto i = 0; i < m_threadNum; ++i )
-    {
-        workers.push_back( thread( parser, &m_factory, &Q, &Q_out ) );
-    }
-
-    try
-    {
-        size_t allocsz = 0;
-        ssize_t linesz = 0;
-        char * line = nullptr;
-        while( ( linesz = getline( &line, &allocsz, m_input ) ) > 0 )
-        {   
-            while ( ! Q.enqueue( string( line, linesz ) ) ) //TODO: pass in line_nr
-            {
-                this_thread::sleep_for( chrono::microseconds( 100 ) );
-                num_feed_sleeps++;
-            }
-
-        }
-        free( line );
-    }
-    catch(...)
-    {
-        Q.close();
-        for ( auto i = 0; i < m_threadNum; ++i )
-        {
-            workers[i].join();
-        }
-
-        Q_out.close();
-        writer_thread.join();
-        throw;
-    }
-
-    Q.close();
-    for ( auto i = 0; i < m_threadNum; ++i )
-    {
-       workers[i].join();
-    }
-
-    Q_out.close();
-    writer_thread.join();
-
-    //std::cout << "q.max = " << Q.m_max << std::endl;
+    YY_BUFFER_STATE bs = op_scan_reset( line.c_str(), m_sc );
+    int ret = op_parse( m_sc, & m_receiver );
+    op__delete_buffer( bs, m_sc );
+    return ret == 0;
 }
 

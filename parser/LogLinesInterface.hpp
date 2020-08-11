@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include <memory>
+#include <atomic>
 
 #include "types.h"
 #include "Formatters.hpp"
@@ -78,33 +79,65 @@ namespace NCBI
             Category m_cat;
         };
 
-        class ParserInterface 
+        class ParseBlockInterface
         {
         public:
-            ParserInterface( CatWriterInterface & outputs ) 
-            :   m_outputs ( outputs ),
-                m_debug ( false )
-            {
-            }
+            virtual ~ParseBlockInterface() = 0;
+            virtual LogLinesInterface & GetReceiver() = 0;
+            virtual bool Parse( const std :: string & line ) = 0;
+            virtual void SetDebug( bool onOff ) = 0;
+        };
 
-            virtual ~ParserInterface() {};
+        class ParseBlockFactoryInterface
+        {
+        public:
+            virtual ~ParseBlockFactoryInterface() = 0;
 
-            virtual void parse() = 0;
+            virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const = 0;
+        };
 
+        class SingleThreadedParser 
+        {
+        public:
+            SingleThreadedParser( std::istream & input,  
+                    CatWriterInterface & outputs,
+                    ParseBlockFactoryInterface & pbFact );
+
+            ~SingleThreadedParser();
+
+            void parse();
             void setDebug ( bool onOff ) { m_debug = onOff; }
 
         protected:
+            std::istream & m_input;
             CatWriterInterface & m_outputs;
+            std::unique_ptr<ParseBlockInterface> m_pb;
             bool m_debug;
         };
 
-        class ReceiverFactoryInterface
+        class MultiThreadedParser
         {
         public:
-            virtual ~ReceiverFactoryInterface() = 0;
+            MultiThreadedParser( 
+                FILE * input,  // need for speed
+                CatWriterInterface & outputs,
+                size_t queueLimit,
+                size_t threadNum,
+                ParseBlockFactoryInterface & pbFact
+            );
 
-            virtual std::unique_ptr<LogLinesInterface> MakeReceiver() const = 0;
+            void parse();
+            size_t num_feed_sleeps = 0;
+            static std::atomic< size_t > thread_sleeps;
+
+        private:
+            FILE * m_input;
+            CatWriterInterface & m_outputs;
+            size_t m_queueLimit;
+            size_t m_threadNum;
+            ParseBlockFactoryInterface & m_pbFact;
         };
+
     }
 }
 
