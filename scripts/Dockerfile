@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 # docker build --build-arg PARSER_BRANCH=LOGMON-65 -t logmon_parser -f Dockerfile .
 ARG PARSER_BRANCH=LOGMON-65
-ARG SCRIPT_BRANCH=LOGMON-53
+ARG SCRIPT_BRANCH=LOGMON-76
 
 LABEL author="Mike Vartanian" \
       maintainer="mike.vartanian@nih.gov" \
