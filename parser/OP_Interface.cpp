@@ -74,8 +74,8 @@ OPParseBlockFactory::~OPParseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface> 
 OPParseBlockFactory::MakeParseBlock() const
 {
-    std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
-    //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
+    //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
+    std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
     return std::make_unique<OPParseBlock>( fmt );     
 }
 

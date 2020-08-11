@@ -60,6 +60,7 @@ namespace NCBI
 
         private:
             std::string escape( const std::string & s ) const; // Json-escape; make a static function?
+            std::vector< std::string > kv;
         };
     }
 }

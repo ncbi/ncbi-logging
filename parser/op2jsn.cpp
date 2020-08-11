@@ -35,7 +35,7 @@ static void report( const CatCounter & ctr )
     cerr << catFmt.format(s).str() << endl; 
 }
 
-static void handle_aws( const Options & options )
+static void handle_op( const Options & options )
 {
     FileCatWriter outputs( options.outputBaseName ); 
     OPParseBlockFactory pbFact;
@@ -84,7 +84,7 @@ int main ( int argc, char * argv [], const char * envp []  )
             cout << "version: " << tool_version << endl;
         
         if ( !help && !vers )
-            handle_aws( options );
+            handle_op( options );
 
         return 0;
     }

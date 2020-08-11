@@ -1,6 +1,9 @@
 #include "Formatters.hpp"
 
+#include "helper.hpp"
+
 #include <sstream>
+#include <algorithm>
 
 using namespace std;
 using namespace NCBI::Logging;
@@ -73,24 +76,46 @@ JsonFastFormatter::~JsonFastFormatter()
 
 std::stringstream & JsonFastFormatter::format( std::stringstream & s )
 {
+    s << "{";
+    std::sort( kv.begin(), kv.end() );
+    bool first = true;
+    for( auto& item : kv )
+    {
+        if ( first )
+        {
+            s << item;
+            first = false;
+        }
+        else
+        {
+            s << "," << item;
+        }
+        
+    }
+    kv.clear();
+    s << "}";
     return s;
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const t_str & value )
 {
-
+    std::stringstream ss;
+    ss << "\"" << name << "\":" << value;
+    kv.push_back( ss.str() );
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 {
-
+    std::stringstream ss;
+    ss << "\"" << name << "\":" << value;
+    kv.push_back( ss.str() );
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const std::string & value )
 {
-
+    t_str tmp { value.c_str(), (int)value.size(), false };
+    addNameValue( name, tmp );
 }
-
 
 std::string JsonFastFormatter::escape( const std::string & s ) const
 {
