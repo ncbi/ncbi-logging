@@ -461,6 +461,12 @@ values ('NCBI', 'srafiles36',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive',
     '', 'false', 'nginx log', 'hot');
 
+-- SRA-8546
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('S3', 'sra-pub-metadata-us-east-1', 'Athena metadata', 'Efremov', 'sra-pub-src-1-logs',
+    's3_readers', 'false', 'metadata', 'hot');
+
 
 
 .headers on
