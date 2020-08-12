@@ -16,6 +16,7 @@ PREFIX_OP_V2 := op_v2_
 PREFIX_AWS := aws_
 PREFIX_AWS_V2 := aws_v2_
 PREFIX_GCP := gcp_
+PREFIX_GCP_V2 := gcp_v2_
 
 all: log2jsn_
 	@echo "done"
@@ -569,13 +570,88 @@ run_$(PREFIX_OP_V2)flex_test: $(BINDIR)/$(PREFIX_OP_V2)test_flex-dbg $(BINDIR)/$
 .PHONY: op op_prof run_$(PREFIX_OP_V2)test_parse run_$(PREFIX_OP_V2)test_flex
 
 #################################################
+# stand alone GCP parser
+
+GCP2JSN_CMN_SRC = \
+	$(PREFIX_GCP_V2)parser.cpp \
+	$(PREFIX_GCP_V2)scanner.cpp \
+	CatWriters.cpp \
+	Formatters.cpp \
+	LogLinesInterface.cpp \
+	GCP_Interface.cpp \
+	Queues.cpp
+
+#	helper.cpp \
+
+GCP2JSN_SRC = $(GCP2JSN_CMN_SRC) gcp2jsn.cpp 
+
+GCP2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(GCP2JSN_SRC)))
+GCP2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(GCP2JSN_SRC)))
+GCP2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(GCP2JSN_SRC)))
+
+$(OBJDIR)/$(PREFIX_GCP_V2)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP_V2)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_GCP_V2)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP_V2)scanner.rel.o
+$(OBJDIR)/$(PREFIX_GCP_V2)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP_V2)scanner.prof.o
+
+$(PREFIX_GCP_V2)scanner.cpp: $(PREFIX_GCP_V2)scanner.l $(PREFIX_GCP_V2)parser.hpp
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_GCP_V2)scanner.hpp --outfile=$(PREFIX_GCP_V2)scanner.cpp $(PREFIX_GCP_V2)scanner.l
+
+$(PREFIX_GCP_V2)parser.cpp: $(PREFIX_GCP_V2)parser.y
+	bison --report all -d $(PREFIX_GCP_V2)parser.y --output-file $(PREFIX_GCP_V2)parser.cpp
+
+$(BINDIR)/gcp2jsn-dbg: $(GCP2JSN_DBG_OBJ) $(DBG_CMD_OBJ)
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+
+$(BINDIR)/gcp2jsn-rel: $(GCP2JSN_REL_OBJ) $(REL_CMD_OBJ) 
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+
+$(BINDIR)/gcp2jsn-prof: $(GCP2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+
+gcp: mkdir $(BINDIR)/gcp2jsn-dbg $(BINDIR)/gcp2jsn-rel
+
+gcp_prof: mkdir $(BINDIR)/gcp2jsn-prof
+
+$(PREFIX_GCP_V2)_TEST_PARSE_SRC = $(GCP2JSN_CMN_SRC) $(PREFIX_GCP_V2)test_parse.cpp 
+$(PREFIX_GCP_V2)_TEST_FLEX_SRC = $(PREFIX_GCP_V2)test_flex.cpp $(PREFIX_GCP_V2)scanner.cpp
+
+$(PREFIX_GCP_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_GCP_V2)_TEST_PARSE_SRC)))
+$(PREFIX_GCP_V2)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_GCP_V2)_TEST_PARSE_SRC)))
+
+$(PREFIX_GCP_V2)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_GCP_V2)_TEST_FLEX_SRC)))
+$(PREFIX_GCP_V2)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_GCP_V2)_TEST_FLEX_SRC)))
+
+$(BINDIR)/$(PREFIX_GCP_V2)test_parse-dbg: $($(PREFIX_GCP_V2)_TEST_PARSE_DBG_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+
+$(BINDIR)/$(PREFIX_GCP_V2)test_parse-rel: $($(PREFIX_GCP_V2)_TEST_PARSE_REL_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
+
+$(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg: $($(PREFIX_GCP_V2)_TEST_FLEX_DBG_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread
+
+$(BINDIR)/$(PREFIX_GCP_V2)test_flex-rel: $($(PREFIX_GCP_V2)_TEST_FLEX_REL_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread
+
+run_$(PREFIX_GCP_V2)parse_test: run_test_support run_$(PREFIX_GCP_V2)flex_test $(BINDIR)/$(PREFIX_GCP_V2)test_parse-dbg $(BINDIR)/$(PREFIX_GCP_V2)test_parse-rel
+	$(BINDIR)/$(PREFIX_GCP_V2)test_parse-dbg
+	$(BINDIR)/$(PREFIX_GCP_V2)test_parse-rel
+
+run_$(PREFIX_GCP_V2)flex_test: $(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg $(BINDIR)/$(PREFIX_GCP_V2)test_flex-rel
+	$(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg
+	$(BINDIR)/$(PREFIX_GCP_V2)test_flex-rel
+
+.PHONY: op op_prof run_$(PREFIX_GCP_V2)test_parse run_$(PREFIX_GCP_V2)test_flex
+
+#################################################
 #################################################
 # V2 acceptance 
 
 AWS2JSON = $(BINDIR)/aws2jsn-dbg
 OP2JSON = $(BINDIR)/op2jsn-dbg
+GCP2JSON = $(BINDIR)/gcp2jsn-dbg
 
-test_v2: aws op
+test_v2: aws op gcp
 	mkdir -p  actual/$(PREFIX_AWS_V2)unrecognized
 	cat data/aws_unrecognized.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)unrecognized/ >./actual/$(PREFIX_AWS_V2)unrecognized/stdout 2>./actual/$(PREFIX_AWS_V2)unrecognized/stderr \
 						&& diff ./expected/$(PREFIX_AWS_V2)unrecognized ./actual/$(PREFIX_AWS_V2)unrecognized
@@ -587,8 +663,14 @@ test_v2: aws op
 						&& diff ./expected/$(PREFIX_OP_V2)unrecognized ./actual/$(PREFIX_OP_V2)unrecognized
 	@ echo "test_op v2 passed"
 	@ rm -rf actual/$(PREFIX_OP_V2)*
+	#
+	mkdir -p  actual/$(PREFIX_GCP_V2)unrecognized
+	cat data/gcp_unrecognized.log | $(GCP2JSON) actual/$(PREFIX_GCP_V2)unrecognized/ >./actual/$(PREFIX_GCP_V2)unrecognized/stdout 2>./actual/$(PREFIX_GCP_V2)unrecognized/stderr \
+						&& diff ./expected/$(PREFIX_GCP_V2)unrecognized ./actual/$(PREFIX_GCP_V2)unrecognized
+	@ echo "test_gcp v2 passed"
+	@ rm -rf actual/$(PREFIX_GCP_V2)*
 
-.PHONY: op op2jsn_prof test_op
+.PHONY: test_v2
 
 #################################################
 # some valgrind checks...
