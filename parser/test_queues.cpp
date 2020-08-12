@@ -164,29 +164,50 @@ TEST ( TestOneWriterManyReadersQueue, with_limits )
     ASSERT_LT( 0, waits );    
 }
 
+/* --------------------------------------------------------------------------- */
+
 TEST ( TestOutputQueue, Ctr )
 {
     OutputQueue Q( 10 );
 }
 
-TEST ( TestOutputQueue, put_and_get )
+class OutputQueue_Fixture : public ::testing::Test
+{
+    public:
+        OutputQueue::string_type make_shared_str( const char * s )
+        {
+            return make_shared< string >( s );
+        }
+
+        void check_value_and_cat( OutputQueue &Q, const char * value, LogLinesInterface::Category cat )
+        {
+            OutputQueue::string_type s;
+            LogLinesInterface::Category cat_q;
+            s = Q.dequeue( cat_q );
+            ASSERT_TRUE( s );
+            ASSERT_EQ( value, *s );
+            ASSERT_EQ( cat, cat_q );
+        }
+
+        void check_empty( OutputQueue &Q )
+        {
+            OutputQueue::string_type s;
+            LogLinesInterface::Category cat_q;
+            s = Q.dequeue( cat_q );
+            ASSERT_FALSE( s );
+        }
+};
+
+TEST_F ( OutputQueue_Fixture, put_and_get )
 {
     OutputQueue Q( 10 );
-    ASSERT_TRUE( Q.enqueue( "1", LogLinesInterface::cat_good ) );
-    ASSERT_TRUE( Q.enqueue( "2", LogLinesInterface::cat_bad ) );
-    ASSERT_TRUE( Q.enqueue( "3", LogLinesInterface::cat_ugly ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "1" ), LogLinesInterface::cat_good ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "2" ), LogLinesInterface::cat_bad ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "3" ), LogLinesInterface::cat_ugly ) );
 
-    std::string s;
-    LogLinesInterface::Category cat;
-    ASSERT_TRUE( Q.dequeue( s, cat ) );
-    ASSERT_EQ( "1", s );
-    ASSERT_EQ( LogLinesInterface::cat_good, cat );
-    ASSERT_TRUE( Q.dequeue( s, cat ) );
-    ASSERT_EQ( "2", s );
-    ASSERT_EQ( LogLinesInterface::cat_bad, cat );
-    ASSERT_TRUE( Q.dequeue( s, cat ) );
-    ASSERT_EQ( "3", s );
-    ASSERT_EQ( LogLinesInterface::cat_ugly, cat );
+    check_value_and_cat( Q, "1", LogLinesInterface::cat_good );
+    check_value_and_cat( Q, "2", LogLinesInterface::cat_bad );
+    check_value_and_cat( Q, "3", LogLinesInterface::cat_ugly );
 }
 
 TEST ( TestOutputQueue, close_the_q )
@@ -197,23 +218,22 @@ TEST ( TestOutputQueue, close_the_q )
     ASSERT_FALSE( Q.is_open() );    
 }
 
-TEST ( TestOutputQueue, limit )
+TEST_F ( OutputQueue_Fixture, limit )
 {
     OutputQueue Q( 2 );
-    ASSERT_TRUE( Q.enqueue( "1", LogLinesInterface::cat_good ) );
-    ASSERT_TRUE( Q.enqueue( "2", LogLinesInterface::cat_good ) );
-    ASSERT_FALSE( Q.enqueue( "3", LogLinesInterface::cat_good ) );
-    std::string s;
-    LogLinesInterface::Category cat;
-    ASSERT_TRUE( Q.dequeue( s, cat ) );
-    ASSERT_TRUE( Q.enqueue( "3", LogLinesInterface::cat_good ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "1" ), LogLinesInterface::cat_good ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "2" ), LogLinesInterface::cat_bad ) );
+    ASSERT_FALSE( Q.enqueue( make_shared_str( "3" ), LogLinesInterface::cat_ugly ) );
+
+    check_value_and_cat( Q, "1", LogLinesInterface::cat_good );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "3" ), LogLinesInterface::cat_ugly ) );
 }
 
 void producer( OutputQueue * q, size_t cnt )
 {
     while ( cnt > 0 )
     {
-        if ( !q -> enqueue( string(), LogLinesInterface::cat_good ) )
+        if ( ! q -> enqueue( make_shared<string>( "" ), LogLinesInterface::cat_good ) )
         {
             if ( !q -> is_open() )
                 return;
@@ -234,11 +254,10 @@ TEST ( TestOutputQueue, with_threads )
     std::thread worker_2( producer, &Q, 40 );
 
     size_t cnt = 0;
-    std::string s;
     LogLinesInterface::Category cat;
     while ( cnt < 20+30+40 )
     {
-        if ( Q.dequeue( s, cat ) )
+        if ( Q.dequeue( cat ) )
         {
             ++ cnt;
         }
@@ -253,4 +272,3 @@ TEST ( TestOutputQueue, with_threads )
     worker_1.join();
     worker_2.join();
 }
-

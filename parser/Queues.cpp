@@ -35,31 +35,32 @@ NCBI::Logging::OneWriterManyReadersQueue::value_type NCBI::Logging::OneWriterMan
     return s;
 }
 
+/* --------------------------------------------------------------------------- */
+
 NCBI::Logging::OutputQueue::OutputQueue( size_t limit )
 :   m_limit( limit )
 {
     m_open.store( true );
 }
 
-bool NCBI::Logging::OutputQueue::enqueue( const std::string & s, LogLinesInterface::Category cat )
+bool NCBI::Logging::OutputQueue::enqueue( string_type s, LogLinesInterface::Category cat )
 {
     lock_guard< std::mutex > guard( m_mutex ); 
     if ( m_queue.size() >= m_limit )
         return false;
 
-    m_queue.push( output_pair( s, cat ) );  // makes a copy
+    m_queue.push( output_pair( s, cat ) );
     return true;
 }
 
-bool NCBI::Logging::OutputQueue::dequeue( std::string & s, LogLinesInterface::Category &cat )
+NCBI::Logging::OutputQueue::string_type NCBI::Logging::OutputQueue::dequeue( LogLinesInterface::Category &cat )
 {
     lock_guard< std::mutex > guard( m_mutex ); 
     if ( m_queue.empty() )
-        return false;
+        return nullptr;
 
-    auto p = m_queue.front(); // makes a copy ( maybe put shared ptr of string into q )
-    s = p . first;
-    cat = p . second;
+    auto p = m_queue.front();
     m_queue.pop(); 
-    return true;
+    cat = p . second;    
+    return p . first;
 }

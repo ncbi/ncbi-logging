@@ -93,22 +93,23 @@ namespace NCBI
 
         class OutputQueue
         {
-            typedef std::pair< std::string, LogLinesInterface::Category > output_pair;
-
             public :
+                typedef std::shared_ptr< std::string > string_type;
+
                 OutputQueue( size_t limit );
 
                 // called by the worker-threads to put output in
                 // returns false if the queue is full
-                bool enqueue( const std::string & s, LogLinesInterface::Category cat );
+                bool enqueue( string_type s, LogLinesInterface::Category cat );
 
                 // called by the worker-threads aka the consumers
-                bool dequeue( std::string & s, LogLinesInterface::Category &cat );
+                string_type dequeue( LogLinesInterface::Category &cat );
 
                 void close() { m_open.store( false ); }
                 bool is_open() const { return m_open.load(); }
 
             private :
+                typedef std::pair< string_type, LogLinesInterface::Category > output_pair;
                 std::queue< output_pair > m_queue;
                 std::atomic< bool > m_open;
                 std::mutex m_mutex;

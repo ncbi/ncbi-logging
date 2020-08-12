@@ -176,7 +176,7 @@ void parser( ParseBlockFactoryInterface * factory,
 
             stringstream out;
             LogLinesInterface::Category cat = receiver . GetCategory();
-            std::string output = fmt . format( out ).str();
+            shared_ptr< string > output( make_shared< string >( fmt . format( out ).str() ) );
 
             while ( ! out_q -> enqueue( output, cat ) )
             {
@@ -194,9 +194,9 @@ void writer( OutputQueue * q,
 
     while ( true )
     {
-        string line;
         LogLinesInterface::Category cat;
-        if ( !q -> dequeue( line, cat ) )
+        shared_ptr< string > line = q -> dequeue( cat );
+        if ( !line )
         {
             if ( !q -> is_open() )
                 return;
@@ -207,7 +207,7 @@ void writer( OutputQueue * q,
         }
         else
         {
-            outputs -> write ( cat, line );
+            outputs -> write ( cat, *line );
         }
     }
 }
