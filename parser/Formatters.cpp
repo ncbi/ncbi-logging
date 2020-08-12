@@ -75,37 +75,40 @@ JsonFastFormatter::~JsonFastFormatter()
 
 std::stringstream & JsonFastFormatter::format( std::stringstream & s )
 {
-    s << "{";
+    s . put ( '{' );
     std::sort( kv.begin(), kv.end() );
     bool first = true;
     for( auto& item : kv )
     {
         if ( first )
-        {
-            s << item;
             first = false;
-        }
         else
-        {
-            s << "," << item;
-        }
-        
+            s . put( ',' );
+        s . write( item.c_str(), item.size() );
     }
     kv.clear();
-    s << "}";
+    s . put ( '}' );
     return s;
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const t_str & value )
 {
-    ss << "\"" << name << "\":" << value;
+    ss . put( '"' );
+    ss . write( name.c_str(), name.size() );
+    ss . put( '"' );
+    ss . put( ':' );    
+    ss << value;
     kv.push_back( ss.str() );
     ss.str( "" );
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 {
-    ss << "\"" << name << "\":" << value;
+    ss . put( '"' );
+    ss . write( name.c_str(), name.size() );
+    ss . put( '"' );
+    ss . put( ':' );    
+    ss << value;
     kv.push_back( ss.str() );
     ss.str( "" );
 }

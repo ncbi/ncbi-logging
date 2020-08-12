@@ -52,7 +52,7 @@ void FileCatWriter :: write( LogLinesInterface::Category cat, const string & s )
     switch ( cat )    
     {
     case LogLinesInterface::cat_review :    review << s << endl; break;
-    case LogLinesInterface::cat_good :      good << s << endl; break;
+    case LogLinesInterface::cat_good :      good.write( s.c_str(), s.size() ); good.put( '\n' ); break;
     case LogLinesInterface::cat_bad :       bad << s << endl; break;
     case LogLinesInterface::cat_ugly :      ugly << s << endl; break;
     default: throw logic_error( "Unknown Category" ); break;

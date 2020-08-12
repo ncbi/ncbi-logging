@@ -259,6 +259,7 @@ void MultiThreadedParser::parse( )
     for ( auto i = 0; i < m_threadNum; ++i )
     {
        workers[i].join();
+       cout << "worker #" << i << " joined" << endl;
     }
 
     Q_out.close();
