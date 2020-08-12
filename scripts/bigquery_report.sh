@@ -12,10 +12,10 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 
-bq -q query \
-    --format "$FORMAT" \
-    --use_legacy_sql=false \
-    "select source, accepted, count(*) as parsed_count from (select source, accepted from strides_analytics.gs_parsed union all select source, accepted from strides_analytics.s3_parsed) group by source, accepted order by source"
+#bq -q query \
+#    --format "$FORMAT" \
+#    --use_legacy_sql=false \
+#    "select source, accepted, count(*) as parsed_count from (select source, accepted from strides_analytics.gs_parsed union all select source, accepted from strides_analytics.s3_parsed) group by source, accepted order by source"
 
 
 bq -q query \
