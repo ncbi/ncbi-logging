@@ -156,3 +156,13 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "SELECT datetime_trunc(start_ts, month) as month, bucket_owner, user_location, SUM(bytes_sent) as total_bytes, COUNT(*) as num_accesses, count(distinct accession) as distinct_accessions FROM ( SELECT start_ts, accession, case when starts_with(bucket ,'sra-pub-src-1') then 'Public' when starts_with(bucket , 'sra-pub-src-2') then 'Public' else 'NCBI' end as bucket_owner, bytes_sent, CASE when domain like '%nih.gov%' THEN 'NCBI' WHEN domain LIKE '%AWS%' THEN 'AWS' ELSE 'External' END AS user_location FROM strides_analytics.summary_export WHERE source='S3' AND http_operations NOT LIKE '%P%' ) GROUP BY month, bucket_owner, user_location order by month, bucket_owner, user_location"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "SELECT distinct source || '/' || bucket as unlogged_bucket from strides_analytics.objects where source || '/' || bucket not in (select distinct source || '/' || regexp_extract(bucket,r'^[\S]+') from strides_analytics.summary_export) order by unlogged_bucket"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from strides_analytics.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from strides_analytics.objects) order by unlisted_bucket"
