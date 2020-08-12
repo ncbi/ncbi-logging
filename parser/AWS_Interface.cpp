@@ -84,8 +84,11 @@ AWSParseBlockFactory::~AWSParseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface> 
 AWSParseBlockFactory::MakeParseBlock() const
 {
-    std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonLibFormatter>();
-    //std::unique_ptr<FormatterInterface> fmt = std::make_unique<JsonFastFormatter>();
+    std::unique_ptr<FormatterInterface> fmt;
+    if ( m_fast )
+        fmt = std::make_unique<JsonFastFormatter>();
+    else
+        fmt = std::make_unique<JsonLibFormatter>();
     return std::make_unique<AWSParseBlock>( fmt );     
 }
 
