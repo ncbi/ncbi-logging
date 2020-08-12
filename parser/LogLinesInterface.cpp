@@ -259,12 +259,9 @@ void MultiThreadedParser::parse( )
     for ( auto i = 0; i < m_threadNum; ++i )
     {
        workers[i].join();
-       cout << "worker #" << i << " joined" << endl;
     }
 
     Q_out.close();
     writer_thread.join();
-
-    //std::cout << "q.max = " << Q.m_max << std::endl;
 }
 
