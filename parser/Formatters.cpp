@@ -1,7 +1,6 @@
 #include "Formatters.hpp"
 
-#include "helper.hpp"
-
+#include "Queues.hpp"
 #include <sstream>
 #include <algorithm>
 
@@ -99,16 +98,16 @@ std::stringstream & JsonFastFormatter::format( std::stringstream & s )
 
 void JsonFastFormatter::addNameValue( const std::string & name, const t_str & value )
 {
-    std::stringstream ss;
     ss << "\"" << name << "\":" << value;
     kv.push_back( ss.str() );
+    ss.str( "" );
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 {
-    std::stringstream ss;
     ss << "\"" << name << "\":" << value;
     kv.push_back( ss.str() );
+    ss.str( "" );
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const std::string & value )

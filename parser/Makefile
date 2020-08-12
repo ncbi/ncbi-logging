@@ -426,12 +426,13 @@ run_test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
 AWS2JSN_CMN_SRC = \
 	$(PREFIX_AWS_V2)parser.cpp \
 	$(PREFIX_AWS_V2)scanner.cpp \
-	helper.cpp \
 	CatWriters.cpp \
 	Formatters.cpp \
 	LogLinesInterface.cpp \
 	AWS_Interface.cpp \
 	Queues.cpp
+
+#	helper.cpp \
 
 AWS2JSN_SRC = $(AWS2JSN_CMN_SRC) aws2jsn.cpp 
 
@@ -499,12 +500,13 @@ run_$(PREFIX_AWS_V2)flex_test: $(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg $(BINDIR)
 OP2JSN_CMN_SRC = \
 	$(PREFIX_OP_V2)parser.cpp \
 	$(PREFIX_OP_V2)scanner.cpp \
-	helper.cpp \
 	CatWriters.cpp \
 	Formatters.cpp \
 	LogLinesInterface.cpp \
 	OP_Interface.cpp \
 	Queues.cpp
+
+#	helper.cpp \
 
 OP2JSN_SRC = $(OP2JSN_CMN_SRC) op2jsn.cpp 
 
