@@ -21,6 +21,7 @@ struct Options
 {
     std::string outputBaseName;
     unsigned int numThreads;
+    bool fast;
 };
 
 static void report( const CatCounter & ctr )
@@ -38,7 +39,7 @@ static void report( const CatCounter & ctr )
 static void handle_aws( const Options & options )
 {
     FileCatWriter outputs( options.outputBaseName ); 
-    AWSParseBlockFactory pbFact;
+    AWSParseBlockFactory pbFact( options . fast );
     if ( options.numThreads <= 1 )
     {
         SingleThreadedParser p( cin, outputs, pbFact );
@@ -61,6 +62,7 @@ int main ( int argc, char * argv [], const char * envp []  )
         bool help = false;
         Options options;
         bool vers = false;
+        bool fast = false;
 
         options.numThreads = 1;
 
@@ -68,6 +70,8 @@ int main ( int argc, char * argv [], const char * envp []  )
 
         args . addOption( vers, "V", "version", "show version" );
         args . addOption( help, "h", "help", "show help" );
+        args . addOption( fast, "f", "fast", "use faster json formatting" );
+
         U32 count;
         args . addOption<unsigned int>( options.numThreads, &count, "t", "threads", "count", "# of parser threads" );
 
@@ -84,7 +88,10 @@ int main ( int argc, char * argv [], const char * envp []  )
             cout << "version: " << tool_version << endl;
         
         if ( !help && !vers )
+        {
+            options . fast = fast;
             handle_aws( options );
+        }
 
         return 0;
     }
