@@ -68,21 +68,23 @@ namespace NCBI
         class OneWriterManyReadersQueue
         {   
             public :
+                typedef std::shared_ptr<std::string> value_type;
+
                 OneWriterManyReadersQueue( size_t limit );
 
                 // called by the line-splitter aka the producer
                 // returns false if the queue is full
-                bool enqueue( const std::string & s );
+                bool enqueue( value_type s );
 
                 // called by the worker-threads aka the consumers
-                bool dequeue( std::string & s, size_t & line_nr );
+                value_type dequeue( size_t & line_nr );
 
                 void close() { m_open.store( false ); }
                 bool is_open() const { return m_open.load(); }
                 size_t m_max;
 
             private :
-                std::queue< std::string > m_queue;
+                std::queue< value_type > m_queue;
                 std::atomic< bool > m_open;
                 std::mutex m_mutex;
                 size_t m_limit;

@@ -11,25 +11,44 @@ TEST ( TestOneWriterManyReadersQueue, Ctr )
     OneWriterManyReadersQueue Q( 10 );
 }
 
-TEST ( TestOneWriterManyReadersQueue, put_and_get )
+class OneWriterManyReadersQueue_Fixture : public ::testing::Test
+{
+    public:
+        OneWriterManyReadersQueue::value_type make_shared_str( const char * s )
+        {
+            return make_shared< string >( s );
+        }
+
+        void check_value_and_line_nr( OneWriterManyReadersQueue &Q, const char * value, size_t line_nr )
+        {
+            OneWriterManyReadersQueue::value_type s;
+            size_t line_nr_q;
+            s = Q.dequeue( line_nr_q );
+            ASSERT_TRUE( s );
+            ASSERT_EQ( value, *s );
+            ASSERT_EQ( line_nr, line_nr_q );
+        }
+
+        void check_empty( OneWriterManyReadersQueue &Q )
+        {
+            OneWriterManyReadersQueue::value_type s;
+            size_t line_nr_q;
+            s = Q.dequeue( line_nr_q );
+            ASSERT_FALSE( s );
+        }
+};
+
+TEST_F ( OneWriterManyReadersQueue_Fixture, put_and_get )
 {
     OneWriterManyReadersQueue Q( 10 );
-    ASSERT_TRUE( Q.enqueue( "1" ) );
-    ASSERT_TRUE( Q.enqueue( "2" ) );
-    ASSERT_TRUE( Q.enqueue( "3" ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "1" ) ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "2" ) ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "3" ) ) );
 
-    std::string s;
-    size_t line_nr;
-    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
-    ASSERT_EQ( "1", s );
-    ASSERT_EQ( 1, line_nr );
-    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
-    ASSERT_EQ( "2", s );
-    ASSERT_EQ( 2, line_nr );
-    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
-    ASSERT_EQ( "3", s );
-    ASSERT_EQ( 3, line_nr );
-    ASSERT_FALSE( Q.dequeue( s, line_nr ) );
+    check_value_and_line_nr( Q, "1", 1 );
+    check_value_and_line_nr( Q, "2", 2 );
+    check_value_and_line_nr( Q, "3", 3 );
+    check_empty( Q );
 }
 
 TEST ( TestOneWriterManyReadersQueue, close_the_q )
@@ -40,25 +59,25 @@ TEST ( TestOneWriterManyReadersQueue, close_the_q )
     ASSERT_FALSE( Q.is_open() );    
 }
 
-TEST ( TestOneWriterManyReadersQueue, limit )
+TEST_F ( OneWriterManyReadersQueue_Fixture, limit )
 {
     OneWriterManyReadersQueue Q( 2 );
-    ASSERT_TRUE( Q.enqueue( "1" ) );
-    ASSERT_TRUE( Q.enqueue( "2" ) );
-    ASSERT_FALSE( Q.enqueue( "3" ) );
-    std::string s;
-    size_t line_nr;
-    ASSERT_TRUE( Q.dequeue( s, line_nr ) );
-    ASSERT_TRUE( Q.enqueue( "3" ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "1" ) ) );
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "2" ) ) );
+    ASSERT_FALSE( Q.enqueue( make_shared_str( "3" ) ) );
+
+    check_value_and_line_nr( Q, "1", 1 );   // this dequeues, now we can enqueue!
+    ASSERT_TRUE( Q.enqueue( make_shared_str( "3" ) ) );
 }
 
 void consumer( OneWriterManyReadersQueue * q, std::atomic< int > * cnt )
 {
     while ( true )
     {
-        std::string s;
         size_t line_nr;
-        if ( !q -> dequeue( s, line_nr ) )
+        OneWriterManyReadersQueue::value_type s = q -> dequeue( line_nr );
+
+        if ( !s )
         {
             if ( !q -> is_open() )
                 return;
@@ -78,7 +97,7 @@ TEST ( TestOneWriterManyReadersQueue, with_threads )
     {
         std::stringstream ss;
         ss << "value #" << i;
-        Q.enqueue( ss.str() );
+        Q.enqueue( make_shared< string >( ss.str() ) );
     }
 
     std::atomic< int > count( 0 );
@@ -91,7 +110,7 @@ TEST ( TestOneWriterManyReadersQueue, with_threads )
     {
         std::stringstream ss;
         ss << "value #" << i;
-        if ( Q.enqueue( ss.str() ) )
+        if ( Q.enqueue( make_shared< string >( ss.str() ) ) )
             i++;
         else
             std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
@@ -113,7 +132,7 @@ TEST ( TestOneWriterManyReadersQueue, with_limits )
     {
         std::stringstream ss;
         ss << "value #" << i;
-        Q.enqueue( ss.str() );
+        Q.enqueue( make_shared< string >( ss.str() ) );
     }
 
     std::atomic< int > count( 0 );
@@ -127,7 +146,7 @@ TEST ( TestOneWriterManyReadersQueue, with_limits )
     {
         std::stringstream ss;
         ss << "value #" << i;
-        if ( Q.enqueue( ss.str() ) )
+        if ( Q.enqueue( make_shared< string >( ss.str() ) ) )
             i++;
         else
         {

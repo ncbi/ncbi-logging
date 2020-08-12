@@ -146,9 +146,9 @@ void parser( ParseBlockFactoryInterface * factory,
 
     while ( true )
     {
-        string line;
         size_t line_nr;
-        if ( !in_q -> dequeue( line, line_nr ) )
+        OneWriterManyReadersQueue::value_type line = in_q -> dequeue( line_nr );
+        if ( !line )
         {
             if ( !in_q -> is_open() )
                 break;
@@ -163,15 +163,15 @@ void parser( ParseBlockFactoryInterface * factory,
         {   // TODO: this block replicates much of AWSParser::parse()
             receiver . SetCategory( LogLinesInterface::cat_unknown );
 
-            if ( ! pb -> Parse( line ) )
+            if ( ! pb -> Parse( *line ) )
             {
                 receiver . SetCategory( LogLinesInterface::cat_ugly );
             }
 
             if ( receiver . GetCategory() != LogLinesInterface::cat_good )
             {
-                fmt.addNameValue("_line_nr", line_nr);
-                fmt.addNameValue("_unparsed", line);
+                fmt.addNameValue( "_line_nr", line_nr );
+                fmt.addNameValue( "_unparsed", *line );
             }
 
             stringstream out;
@@ -232,7 +232,8 @@ void MultiThreadedParser::parse( )
         char * line = nullptr;
         while( ( linesz = getline( &line, &allocsz, m_input ) ) > 0 )
         {   
-            while ( ! Q.enqueue( string( line, linesz ) ) ) //TODO: pass in line_nr
+            OneWriterManyReadersQueue::value_type s = make_shared< string >( line, linesz );
+            while ( ! Q.enqueue( s ) )
             {
                 this_thread::sleep_for( chrono::microseconds( 100 ) );
                 num_feed_sleeps++;

@@ -11,7 +11,7 @@ NCBI::Logging::OneWriterManyReadersQueue::OneWriterManyReadersQueue( size_t limi
 }
 
 
-bool NCBI::Logging::OneWriterManyReadersQueue::enqueue( const std::string & s ) 
+bool NCBI::Logging::OneWriterManyReadersQueue::enqueue( NCBI::Logging::OneWriterManyReadersQueue::value_type s ) 
 {
     lock_guard< std::mutex > guard( m_mutex ); 
     if ( m_queue.size() >= m_limit )
@@ -22,17 +22,17 @@ bool NCBI::Logging::OneWriterManyReadersQueue::enqueue( const std::string & s )
     return true;
 }
 
-bool NCBI::Logging::OneWriterManyReadersQueue::dequeue( std::string & s, size_t & line_nr ) 
+NCBI::Logging::OneWriterManyReadersQueue::value_type NCBI::Logging::OneWriterManyReadersQueue::dequeue( size_t & line_nr ) 
 { 
     lock_guard< std::mutex > guard( m_mutex ); 
     if ( m_queue.empty() )
-        return false;
+        return nullptr;
 
-    s = m_queue.front(); // makes a copy ( maybe put shared ptr of string into q )
+    NCBI::Logging::OneWriterManyReadersQueue::value_type s = m_queue.front();
     ++ m_line_nr;
     line_nr = m_line_nr;
     m_queue.pop(); 
-    return true;
+    return s;
 }
 
 NCBI::Logging::OutputQueue::OutputQueue( size_t limit )
