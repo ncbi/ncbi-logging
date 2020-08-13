@@ -112,7 +112,7 @@ GCPParseBlock::Parse( const string & line )
     //TODO: if header, validate; set cat to ignore (good) or review (bad)
     if ( m_receiver.GetCategory() == LogLinesInterface::cat_ignored )
     {
-        if ( DefaultHeader != line )
+        if ( 0 != strncmp( DefaultHeader.c_str(), line.c_str(), DefaultHeader.size() ) )
         {
             m_receiver.SetCategory( LogLinesInterface::cat_review );
         }

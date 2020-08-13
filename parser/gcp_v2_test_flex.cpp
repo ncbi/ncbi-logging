@@ -230,7 +230,7 @@ TEST_F ( GCP_TestFlexFixture, linefeed )
 {
     const char * input = "\"blah\"\x0a";
     gcp__scan_string( input, sc );
-    gcp_set_debug ( 1, sc );
+    //gcp_set_debug ( 1, sc );
     ASSERT_EQ( QUOTE, NextTokenType() );
     ASSERT_EQ( QSTR, NextTokenType() );    
     ASSERT_EQ( QUOTE, NextTokenType() );
