@@ -48,12 +48,12 @@ esac
 
 
 buckets=$(sqlcmd "select distinct log_bucket from buckets where scope='public' and cloud_provider='$PROVIDER' order by log_bucket desc")
-
-echo "buckets is '$buckets'"
-for LOG_BUCKET in $buckets; do
+readarray -t buckets <<< "$buckets"
+echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
+for LOG_BUCKET in "${buckets[@]}"; do
     echo "Processing $LOG_BUCKET"
-
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
+    BUCKET_NAME=$(sqlcmd "select distinct bucket_name from buckets where cloud_provider='$PROVIDER' and log_bucket='$LOG_BUCKET' limit 1")
 
     if [ "$PROVIDER" = "GS" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
@@ -72,16 +72,21 @@ for LOG_BUCKET in $buckets; do
         if [ "$YESTERDAY" -lt "20180701" ]; then
             files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
         elif [ "$YESTERDAY" -gt "20200706" ]; then
-            files=$(find "$LOG_BUCKET" -type f -name "*$YESTERDAY*")
+            files=""
+            for f in $LOG_BUCKET; do
+                files="$files $f"
+            done
+#            files=$(/bin/ls -1 $LOG_BUCKET)
+#            files=$(find $LOG_BUCKET -type f)
         else
             files=$(find "$PANFS/sra_prod/$YESTERDAY" -type f -name "*$YESTERDAY*")
         fi
-        #echo "files is $files"
-        #echo "found ${#files[@]} files to mirror"
-        LOG_BUCKET="OP"
+        echo "files is $files"
+        LOG_BUCKET="OP-${BUCKET_NAME}"
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
         mkdir -p "$MIRROR"
-        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR ..."
+        echo "Profile is $PROFILE, $PROVIDER copying to $MIRROR for $LOG_BUCKET..."
+
         cd "$MIRROR" || exit
         for x in $files; do
             newfile=$(echo "$x" | tr '/' '+')

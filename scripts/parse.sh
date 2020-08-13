@@ -64,12 +64,14 @@ if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
 fi
 
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='public' order by log_bucket desc")
+readarray -t buckets <<< "$buckets"
+echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
+
 if [ "$PROVIDER" = "OP" ]; then
-    buckets="OP"
+    buckets=("OP")
 fi
 
-echo "buckets is '$buckets'"
-for LOG_BUCKET in $buckets; do
+for LOG_BUCKET in "${buckets[@]}"; do
     echo "  Parsing $LOG_BUCKET..."
 
     PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
