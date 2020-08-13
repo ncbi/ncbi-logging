@@ -79,6 +79,7 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 
 %%
 
+"\n"            { }
 [ \t]+          { return SPACE; }
 -               { MAKE_STR(); return DASH; }
 

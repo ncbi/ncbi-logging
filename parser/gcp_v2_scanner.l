@@ -1,5 +1,5 @@
 %{
-#include "gcp_parser.hpp"
+#include "gcp_v2_parser.hpp"
 #include "stdint.h"
 
 #define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
@@ -70,8 +70,8 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 
 %%
 
-[ \t]           ;
-\,              { return COMMA; }
+[ \t\n]             { }
+\,                  { return COMMA; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }
@@ -80,7 +80,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 <QUOTED>{IPV6ADDR}  { MAKE_STR(); return IPV6; }
 <QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED(); return QSTR; }
-<QUOTED>.           ;
+<QUOTED>.           { }
 
 <PATH>\"            { return QUOTE; }
 <PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
@@ -105,7 +105,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 <AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
 <AGENT>.                { MAKE_STR(); return AGENTSTR; }; 
 
-.               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+.                   { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 %%
 

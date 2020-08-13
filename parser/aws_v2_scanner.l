@@ -93,6 +93,7 @@ RESULTCODE      ([0-9]{3})|"-"
 
 %%
 
+"\n"            { }
 [ \t]+          { return SPACE; }
 -               { MAKE_STR(); return DASH; }
 \"-\"           { MAKE_STR(); return DASH; }

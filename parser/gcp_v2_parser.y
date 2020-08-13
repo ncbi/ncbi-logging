@@ -64,22 +64,16 @@ line
     :
     | log_gcp       { YYACCEPT; }
     | log_hdr       { lib -> SetCategory( LogLinesInterface::cat_ignored ); YYACCEPT; }
-    | log_err       { YYACCEPT; }
+    | log_err       { YYABORT; }
     ;
 
 log_err
-    : time error
-    {
-        // LogGCPEvent ev;
-        // ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
-        // gcp_get_scanner_input( scanner, ev . unparsed );
-        // lib -> rejectLine( ev );
-    }
+    : time error                {}
     ;
 
 log_hdr
-    : hdr_item_text            
-    | log_hdr COMMA hdr_item   
+    : hdr_item_text             {}       
+    | log_hdr COMMA hdr_item    {}
     ;
 
 hdr_item_text

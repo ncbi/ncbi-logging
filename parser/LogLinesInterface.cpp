@@ -230,7 +230,9 @@ void MultiThreadedParser::parse( )
         ssize_t linesz = 0;
         char * line = nullptr;
         while( ( linesz = getline( &line, &allocsz, m_input ) ) > 0 )
-        {   
+        {
+            //if ( line[ linesz - 1 ] == 0x0A ) linesz--;
+
             OneWriterManyReadersQueue::value_type s = make_shared< string >( line, linesz );
             while ( ! Q.enqueue( s ) )
             {

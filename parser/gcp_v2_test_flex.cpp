@@ -199,7 +199,6 @@ TEST_F ( GCP_TestFlexFixture, Agent )
     const char * input = "\"linux64 sra-toolkit fasterq-dump.2.10.7 (phid=noc86d2998,libc=2.17)\"";
 
     gcp__scan_string( input, sc );
-    //gcp_set_debug ( 1, sc );
     gcp_start_UserAgent( sc );
     ASSERT_EQ( QUOTE, NextTokenType() ); 
     ASSERT_EQ( OS, NextTokenType() ); ASSERT_EQ( "linux64", TokenValue() );
@@ -223,9 +222,19 @@ TEST_F ( GCP_TestFlexFixture, Agent_2_part_version )
     const char * input = "fasterq-dump.2.10";
 
     gcp__scan_string( input, sc );
-    //gcp_set_debug ( 1, sc );
     gcp_start_UserAgent( sc );
     ASSERT_EQ( SRATOOLVERS, NextTokenType() ); ASSERT_EQ( "fasterq-dump.2.10", TokenValue() );
+}
+
+TEST_F ( GCP_TestFlexFixture, linefeed )
+{
+    const char * input = "\"blah\"\x0a";
+    gcp__scan_string( input, sc );
+    gcp_set_debug ( 1, sc );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( QSTR, NextTokenType() );    
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( 0, NextTokenType() );
 }
 
 extern "C"
