@@ -651,7 +651,9 @@ AWS2JSON = $(BINDIR)/aws2jsn-dbg
 OP2JSON = $(BINDIR)/op2jsn-dbg
 GCP2JSON = $(BINDIR)/gcp2jsn-dbg
 
-test_v2: aws op gcp
+v2: aws op gcp
+
+test_v2: v2
 	mkdir -p  actual/$(PREFIX_AWS_V2)unrecognized
 	cat data/aws_unrecognized.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)unrecognized/ >./actual/$(PREFIX_AWS_V2)unrecognized/stdout 2>./actual/$(PREFIX_AWS_V2)unrecognized/stderr \
 						&& diff ./expected/$(PREFIX_AWS_V2)unrecognized ./actual/$(PREFIX_AWS_V2)unrecognized
@@ -670,7 +672,7 @@ test_v2: aws op gcp
 	@ echo "test_gcp v2 passed"
 	@ rm -rf actual/$(PREFIX_GCP_V2)*
 
-.PHONY: test_v2
+.PHONY: v2 test_v2
 
 #################################################
 # some valgrind checks...

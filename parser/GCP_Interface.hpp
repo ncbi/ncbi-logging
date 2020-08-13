@@ -29,7 +29,7 @@ namespace NCBI
                 bucket,
                 GCP_LastMemberId = bucket
             } GCP_Members; // all are t_str values
-            virtual void set( GCP_Members m, const t_str & ); // will invoke set( LogLinesInterface::Members ) if necessary
+            virtual void set( GCP_Members m, const t_str & v ); // will invoke set( LogLinesInterface::Members ) if necessary
 
             virtual void reportField( const char * message );
 

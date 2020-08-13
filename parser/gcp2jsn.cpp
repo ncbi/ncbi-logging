@@ -24,18 +24,6 @@ struct Options
     bool fast;
 };
 
-static void report( const CatCounter & ctr )
-{
-    JsonLibFormatter catFmt; 
-    catFmt.addNameValue("_total", ctr.get_total());
-    catFmt.addNameValue("good", ctr.get_cat_count( LogLinesInterface::cat_good ) );
-    catFmt.addNameValue("review", ctr.get_cat_count( LogLinesInterface::cat_review ) );
-    catFmt.addNameValue("bad", ctr.get_cat_count( LogLinesInterface::cat_bad ) );
-    catFmt.addNameValue("ugly", ctr.get_cat_count( LogLinesInterface::cat_ugly ) );
-    stringstream s;
-    cerr << catFmt.format(s).str() << endl; 
-}
-
 static void handle_gcp( const Options & options )
 {
     FileCatWriter outputs( options.outputBaseName ); 
@@ -52,7 +40,9 @@ static void handle_gcp( const Options & options )
         std::cout << "num-feed-sleeps = " << p . num_feed_sleeps << endl;
         std::cout << "thread-sleeps = " << MultiThreadedParser :: thread_sleeps . load() << endl;        
     }
-    report( outputs.getCounter() );
+
+    JsonLibFormatter f;
+    cerr << outputs.getCounter().report( f ) << endl; 
 }
 
 int main ( int argc, char * argv [], const char * envp []  )

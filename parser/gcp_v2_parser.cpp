@@ -486,15 +486,15 @@ static const yytype_uint16 yyrline[] =
 {
        0,    63,    63,    65,    66,    67,    71,    81,    82,    86,
       87,    91,    92,    93,    98,   100,   103,   105,   107,   109,
-      97,   152,   156,   157,   158,   162,   166,   167,   171,   175,
-     179,   183,   187,   191,   192,   196,   197,   201,   202,   213,
-     214,   215,   220,   221,   252,   260,   271,   275,   283,   284,
-     285,   289,   290,   294,   295,   314,   315,   316,   317,   318,
-     319,   326,   327,   333,   341,   373,   377,   385,   386,   387,
-     388,   389,   390,   391,   395,   399,   404,   412,   413,   417,
-     418,   422,   423,   424,   425,   429,   430,   434,   435,   439,
-     440,   441,   442,   443,   447,   458,   463,   467,   471,   478,
-     479
+      97,   129,   133,   134,   135,   139,   143,   144,   148,   152,
+     156,   160,   164,   168,   169,   173,   174,   178,   179,   190,
+     191,   192,   197,   198,   229,   237,   249,   254,   262,   263,
+     264,   268,   269,   273,   274,   293,   294,   295,   296,   297,
+     298,   305,   306,   312,   320,   352,   357,   365,   366,   367,
+     368,   369,   370,   371,   375,   379,   384,   392,   393,   397,
+     398,   402,   403,   404,   405,   409,   410,   414,   415,   419,
+     420,   421,   422,   423,   427,   438,   443,   447,   451,   458,
+     459
 };
 #endif
 
@@ -1401,7 +1401,7 @@ yyreduce:
 
   case 4:
 #line 66 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { /*lib -> headerLine(); YYACCEPT;*/ }
+    { lib -> SetCategory( LogLinesInterface::cat_ignored ); YYACCEPT; }
 #line 1406 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1422,232 +1422,197 @@ yyreduce:
 #line 1423 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 7:
-#line 81 "gcp_v2_parser.y" /* yacc.c:1646  */
-    {}
-#line 1429 "gcp_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 8:
-#line 82 "gcp_v2_parser.y" /* yacc.c:1646  */
-    {}
-#line 1435 "gcp_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
   case 9:
 #line 86 "gcp_v2_parser.y" /* yacc.c:1646  */
     {}
-#line 1441 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1429 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
 #line 87 "gcp_v2_parser.y" /* yacc.c:1646  */
     {}
-#line 1447 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1435 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
 #line 91 "gcp_v2_parser.y" /* yacc.c:1646  */
     {}
-#line 1453 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1441 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
 #line 92 "gcp_v2_parser.y" /* yacc.c:1646  */
     {}
-#line 1459 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1447 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
 #line 93 "gcp_v2_parser.y" /* yacc.c:1646  */
     {}
-#line 1465 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1453 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 98 "gcp_v2_parser.y" /* yacc.c:1646  */
     { gcp_start_URL( scanner ); }
-#line 1471 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1459 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 100 "gcp_v2_parser.y" /* yacc.c:1646  */
     { gcp_pop_state( scanner ); }
-#line 1477 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1465 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
 #line 103 "gcp_v2_parser.y" /* yacc.c:1646  */
     { gcp_start_UserAgent( scanner ); }
-#line 1483 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1471 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
 #line 105 "gcp_v2_parser.y" /* yacc.c:1646  */
     { gcp_pop_state( scanner ); }
-#line 1489 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1477 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
 #line 107 "gcp_v2_parser.y" /* yacc.c:1646  */
     { gcp_start_URL( scanner ); }
-#line 1495 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1483 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
 #line 109 "gcp_v2_parser.y" /* yacc.c:1646  */
     { gcp_pop_state( scanner ); }
-#line 1501 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1489 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
 #line 110 "gcp_v2_parser.y" /* yacc.c:1646  */
     {
-        lib -> set( LogGCPEvent::uri, (yyvsp[-27].req).path );
+        t_request req = (yyvsp[-27].req);
 
-        // LogGCPEvent ev;
-        // ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
-        // ev . ip = $3;
-        // ev . ip_type = ( $5 . p == nullptr ) ? 0 : atoi( $5 . p );
-        // ev . ip_region = $7;
-        // // $9 (method) goes into ev.request below
-        // ev . uri = $12 . path;
-        // ev . status = ( $15 . p == nullptr ) ? 0 : atol( $15 . p );
-        // ev . request_bytes = ( $17 . p == nullptr ) ? 0 : atol( $17 . p );
-        // ev . result_bytes = ( $19 . p == nullptr ) ? 0 : atol( $19 . p );
-        // ev . time_taken = ( $21 . p == nullptr ) ? 0 : atol( $21 . p );
-        // ev . host = $23;
-        // ev . referer = $25;
-        // ev . agent = $28;
-        // ev . request_id = $31;
-        // ev . operation = $33;
-        // ev . bucket = $35;
+        if ( (yyvsp[-1].req) . accession . n > 0 )
+        {   // the cloud did populate the object-field
+            req = (yyvsp[-1].req);
+        }
 
-        // if ( $38 . accession . n > 0 )
-        // {   // the cloud did populate the object-field
-        //     ev . request = $38;
-        // }
-        // else
-        // {   // no accession found in the object field, use the results of parsing the request field
-        //     ev . request = $12;
-        // }
+        if ( req . filename . n == 0 && req . extension . n == 0 )
+        {   // reuse the accession as the filename
+            req . filename = req . accession;
+        }
 
-        // if ( ev . request . filename . n == 0 && ev . request . extension . n == 0 )
-        // {   // reuse the accession as the filename
-        //     ev . request . filename = ev . request . accession;
-        // }
-
-        // ev . request . method = $9;
-
-        // lib -> acceptLine( ev );
+        req . method = (yyvsp[-30].s);
+        lib -> setRequest( req );
     }
-#line 1545 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1510 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 152 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 129 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::time, (yyvsp[-1].s) ); }
-#line 1551 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1516 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 156 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 133 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::ip, (yyvsp[-1].s) ); }
-#line 1557 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1522 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 157 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 134 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::ip, (yyvsp[-1].s) ); }
-#line 1563 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1528 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 158 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 135 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::ip, EmptyTSTR ); }
-#line 1569 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1534 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 162 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 139 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::ip_type, (yyvsp[0].s) ); }
-#line 1575 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1540 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 166 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 143 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::ip_region, (yyvsp[-1].s) ); }
-#line 1581 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1546 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 167 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 144 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::ip_region, EmptyTSTR ); }
-#line 1587 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1552 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 171 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 148 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); }
-#line 1593 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1558 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 175 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 152 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::status, (yyvsp[0].s) ); }
-#line 1599 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1564 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 179 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 156 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::request_bytes, (yyvsp[0].s) ); }
-#line 1605 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1570 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 183 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 160 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::result_bytes, (yyvsp[0].s) ); }
-#line 1611 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1576 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 187 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 164 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::time_taken, (yyvsp[0].s) ); }
-#line 1617 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1582 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 191 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 168 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::host, (yyvsp[-1].s) ); }
-#line 1623 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1588 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 192 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 169 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::host, EmptyTSTR ); }
-#line 1629 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1594 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 196 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 173 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::referer, (yyvsp[-1].s) ); }
-#line 1635 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1600 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 197 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 174 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::referer, EmptyTSTR ); }
-#line 1641 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1606 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 201 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 178 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1647 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1612 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 203 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 180 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             InitAgent( (yyval.agent) ); 
             (yyval.agent).original = (yyvsp[0].s); 
@@ -1658,35 +1623,35 @@ yyreduce:
             (yyval.agent) . vdb_release . p = dot + 1; 
             (yyval.agent) . vdb_release . n = (yyvsp[0].s) . n - ( dot - (yyvsp[0].s) . p ) - 1; 
         }
-#line 1662 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1627 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 213 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 190 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_libc = (yyvsp[0].s); }
-#line 1668 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1633 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 214 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 191 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_phid_compute_env = (yyvsp[0].s); }
-#line 1674 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1639 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 215 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 192 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1680 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1645 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 220 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 197 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.agent) = (yyvsp[0].agent); }
-#line 1686 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1651 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 222 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 199 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].agent) . original );
@@ -1717,20 +1682,20 @@ yyreduce:
             (yyval.agent) . vdb_release = (yyvsp[0].agent) . vdb_release;
         }
     }
-#line 1721 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1686 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 253 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 230 "gcp_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].s) );
     }
-#line 1730 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1695 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 261 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 238 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             t_agent temp;
             InitAgent( temp ); 
@@ -1740,124 +1705,126 @@ yyreduce:
             (yyval.agent) . original = temp . original;
 
             (yyval.agent) . vdb_os = (yyvsp[-2].s);
+            lib->setAgent( (yyval.agent) );
         }
-#line 1745 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1711 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 272 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 250 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.agent) = (yyvsp[-1].agent);
+            lib->setAgent( (yyval.agent) );
         }
-#line 1753 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1720 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 276 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 255 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             InitAgent( (yyval.agent) ); 
             lib->setAgent( (yyval.agent) );
         }
-#line 1762 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1729 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 283 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 262 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::request_id, (yyvsp[-1].s) ); }
-#line 1768 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1735 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 284 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 263 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::request_id, (yyvsp[-1].s) ); }
-#line 1774 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1741 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 285 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 264 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::request_id, EmptyTSTR ); }
-#line 1780 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1747 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 289 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 268 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::operation, (yyvsp[-1].s) ); }
-#line 1786 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1753 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 290 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 269 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::operation, EmptyTSTR ); }
-#line 1792 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1759 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 294 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 273 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::bucket, (yyvsp[-1].s) ); }
-#line 1798 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1765 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 295 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 274 "gcp_v2_parser.y" /* yacc.c:1646  */
     { lib->set( LogGCPEvent::bucket, EmptyTSTR ); }
-#line 1804 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1771 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 314 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 293 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
-#line 1810 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1777 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 315 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 294 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1816 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1783 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 316 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 295 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1822 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1789 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 317 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 296 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1828 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1795 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 318 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 297 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
-#line 1834 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1801 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 320 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 299 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             InitRequest( (yyval.req) ); 
             (yyval.req) . path = (yyvsp[0].s); 
             (yyval.req) . accession = (yyvsp[0].s); 
             (yyval.req) . accession_mode = acc_inside; 
         }
-#line 1845 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1812 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 326 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 305 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . filename = (yyvsp[0].s); }
-#line 1851 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1818 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 327 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 306 "gcp_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . extension = (yyvsp[0].s); }
-#line 1857 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1824 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 334 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 313 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[0].req); 
             if ( (yyvsp[0].req) . accession_mode == acc_after )            
@@ -1865,11 +1832,11 @@ yyreduce:
                 (yyval.req) . accession_mode = acc_before;
             }
         }
-#line 1869 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1836 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 342 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 321 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[-1].req); 
             MERGE_TSTR( (yyval.req) . path, (yyvsp[0].req) . path );
@@ -1898,198 +1865,199 @@ yyreduce:
                 break;
             }
         }
-#line 1902 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1869 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 374 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 353 "gcp_v2_parser.y" /* yacc.c:1646  */
     {
             (yyval.req) = (yyvsp[-1].req);
+            lib -> set( LogGCPEvent::uri, (yyval.req).path );
         }
-#line 1910 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1878 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 378 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 358 "gcp_v2_parser.y" /* yacc.c:1646  */
     {
-        InitRequest( (yyval.req) );
-        lib->setRequest( (yyval.req) );
-    }
-#line 1919 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+            InitRequest( (yyval.req) );
+            lib -> set( LogGCPEvent::uri, (yyval.req).path );
+        }
+#line 1887 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 385 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 365 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1925 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1893 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 386 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 366 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1931 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1899 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 387 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 367 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1937 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1905 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 388 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 368 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1943 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1911 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 389 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 369 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1949 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1917 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 390 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 370 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1955 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1923 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 391 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 371 "gcp_v2_parser.y" /* yacc.c:1646  */
+    { (yyval.s) = (yyvsp[0].s); }
+#line 1929 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 74:
+#line 376 "gcp_v2_parser.y" /* yacc.c:1646  */
+    {
+        (yyval.s) = (yyvsp[0].s);
+    }
+#line 1937 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 75:
+#line 380 "gcp_v2_parser.y" /* yacc.c:1646  */
+    {
+        (yyval.s) = (yyvsp[-1].s);
+        MERGE_TSTR( (yyval.s), (yyvsp[0].s) );
+    }
+#line 1946 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 76:
+#line 385 "gcp_v2_parser.y" /* yacc.c:1646  */
+    {
+        (yyval.s) = (yyvsp[-1].s);
+        MERGE_TSTR( (yyval.s), (yyvsp[0].s) );
+    }
+#line 1955 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 77:
+#line 392 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
 #line 1961 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 74:
-#line 396 "gcp_v2_parser.y" /* yacc.c:1646  */
-    {
-        (yyval.s) = (yyvsp[0].s);
-    }
-#line 1969 "gcp_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 75:
-#line 400 "gcp_v2_parser.y" /* yacc.c:1646  */
-    {
-        (yyval.s) = (yyvsp[-1].s);
-        MERGE_TSTR( (yyval.s), (yyvsp[0].s) );
-    }
-#line 1978 "gcp_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 76:
-#line 405 "gcp_v2_parser.y" /* yacc.c:1646  */
-    {
-        (yyval.s) = (yyvsp[-1].s);
-        MERGE_TSTR( (yyval.s), (yyvsp[0].s) );
-    }
-#line 1987 "gcp_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 77:
-#line 412 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { (yyval.s) = (yyvsp[0].s); }
-#line 1993 "gcp_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
   case 78:
-#line 413 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 393 "gcp_v2_parser.y" /* yacc.c:1646  */
     { EMPTY_TSTR((yyval.s)); }
-#line 1999 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1967 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 417 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 397 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2005 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1973 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 418 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 398 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); MERGE_TSTR( (yyval.s), (yyvsp[0].s) ); }
-#line 2011 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1979 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 422 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 402 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2017 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1985 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 423 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 403 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2023 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1991 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 424 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 404 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2029 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 1997 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 425 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 405 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2035 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2003 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 429 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 409 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2041 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2009 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 430 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 410 "gcp_v2_parser.y" /* yacc.c:1646  */
     { EMPTY_TSTR((yyval.s)); }
-#line 2047 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2015 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 434 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 414 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2053 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2021 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 435 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 415 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); MERGE_TSTR( (yyval.s), (yyvsp[0].s) ); }
-#line 2059 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2027 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 439 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 419 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2065 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2033 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 440 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 420 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2071 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2039 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 441 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 421 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2077 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2045 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 442 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 422 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2083 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2051 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 443 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 423 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 2089 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2057 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 448 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 428 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
             InitRequest( (yyval.req) );
              
@@ -2100,56 +2068,56 @@ yyreduce:
             (yyval.req).filename  = (yyvsp[-2].s);
             (yyval.req).extension = (yyvsp[-1].s);
         }
-#line 2104 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2072 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 459 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 439 "gcp_v2_parser.y" /* yacc.c:1646  */
     {   // TODO: somehow signal to the back end that we did not understand the pre-parsed object
             InitRequest( (yyval.req) );
             (yyval.req) . path = (yyvsp[-1].s);
         }
-#line 2113 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2081 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 464 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 444 "gcp_v2_parser.y" /* yacc.c:1646  */
     { 
              InitRequest( (yyval.req) );
         }
-#line 2121 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2089 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 468 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 448 "gcp_v2_parser.y" /* yacc.c:1646  */
     {   // TODO: somehow signal to the back end that we did not understand the pre-parsed object
             InitRequest( (yyval.req) );
         }
-#line 2129 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2097 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 472 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 452 "gcp_v2_parser.y" /* yacc.c:1646  */
     {   // TODO: somehow signal to the back end that we did not understand the pre-parsed object
             InitRequest( (yyval.req) );
         }
-#line 2137 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2105 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 478 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 458 "gcp_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); }
-#line 2143 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2111 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 479 "gcp_v2_parser.y" /* yacc.c:1646  */
+#line 459 "gcp_v2_parser.y" /* yacc.c:1646  */
     { EMPTY_TSTR((yyval.s)); }
-#line 2149 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2117 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2153 "gcp_v2_parser.cpp" /* yacc.c:1646  */
+#line 2121 "gcp_v2_parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2377,7 +2345,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 482 "gcp_v2_parser.y" /* yacc.c:1906  */
+#line 462 "gcp_v2_parser.y" /* yacc.c:1906  */
 
 
 void gcp_error( yyscan_t locp, NCBI::Logging::LogGCPEvent * lib, const char * msg )

@@ -102,11 +102,21 @@ GCPParseBlock::SetDebug( bool onOff )
     gcp_set_debug( onOff ? 1 : 0, m_sc );   // flex
 }
 
+static string DefaultHeader = "\"time_micros\",\"c_ip\",\"c_ip_type\",\"c_ip_region\",\"cs_method\",\"cs_uri\",\"sc_status\",\"cs_bytes\",\"sc_bytes\",\"time_taken_micros\",\"cs_host\",\"cs_referer\",\"cs_user_agent\",\"s_request_id\",\"cs_operation\",\"cs_bucket\",\"cs_object\"";
+
 bool 
 GCPParseBlock::Parse( const string & line )
 {
     YY_BUFFER_STATE bs = gcp_scan_reset( line.c_str(), m_sc );
     int ret = gcp_parse( m_sc, & m_receiver );
+    //TODO: if header, validate; set cat to ignore (good) or review (bad)
+    if ( m_receiver.GetCategory() == LogLinesInterface::cat_ignored )
+    {
+        if ( DefaultHeader != line )
+        {
+            m_receiver.SetCategory( LogLinesInterface::cat_review );
+        }
+    }
     gcp__delete_buffer( bs, m_sc );
     return ret == 0;
 }

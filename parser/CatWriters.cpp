@@ -8,7 +8,7 @@ using namespace std;
 CatCounter::CatCounter()
 : total ( 0 )
 {
-    cat_counts.resize( 4 );
+    cat_counts.resize( LogLinesInterface::cat_max );
     for ( auto& i : cat_counts )
     {
         i = 0;
@@ -26,6 +26,18 @@ CatCounter::count( LogLinesInterface::Category cat )
 {
     ++ cat_counts.at( cat );
     ++ total;
+}
+
+string 
+CatCounter::report( FormatterInterface & fmt ) const
+{
+    fmt.addNameValue("_total", get_total());
+    fmt.addNameValue("good", get_cat_count( LogLinesInterface::cat_good ) );
+    fmt.addNameValue("review", get_cat_count( LogLinesInterface::cat_review ) );
+    fmt.addNameValue("bad", get_cat_count( LogLinesInterface::cat_bad ) );
+    fmt.addNameValue("ignored", get_cat_count( LogLinesInterface::cat_ignored ) );
+    fmt.addNameValue("ugly", get_cat_count( LogLinesInterface::cat_ugly ) );
+    return fmt.format();
 }
 
 // CatWriterInterface
@@ -48,13 +60,13 @@ FileCatWriter :: ~FileCatWriter()
 
 void FileCatWriter :: write( LogLinesInterface::Category cat, const string & s )
 {
-    lock_guard<mutex> lock( mut );
     switch ( cat )    
     {
     case LogLinesInterface::cat_review :    review << s << endl; break;
     case LogLinesInterface::cat_good :      good.write( s.c_str(), s.size() ); good.put( '\n' ); break;
     case LogLinesInterface::cat_bad :       bad << s << endl; break;
     case LogLinesInterface::cat_ugly :      ugly << s << endl; break;
+    case LogLinesInterface::cat_ignored :   break;
     default: throw logic_error( "Unknown Category" ); break;
     }
     ctr.count( cat ); 
@@ -68,13 +80,13 @@ StringCatWriter :: ~StringCatWriter()
 
 void StringCatWriter :: write( LogLinesInterface::Category cat, const string & s )
 {
-    lock_guard<mutex> lock( mut );
     switch ( cat )    
     {
     case LogLinesInterface::cat_review :    review << s << endl; break;
     case LogLinesInterface::cat_good :      good << s << endl; break;
     case LogLinesInterface::cat_bad :       bad << s << endl; break;
     case LogLinesInterface::cat_ugly :      ugly << s << endl; break;
+    case LogLinesInterface::cat_ignored :   break;
     default: throw logic_error( "Unknown Category" ); break;
     }
 }

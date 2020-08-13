@@ -64,10 +64,9 @@ TEST(LogOPEventTest, Setters)
     INIT_TSTR( v, "rqc"); e.set(LogOPEvent::res_code, v);
     INIT_TSTR( v, "res"); e.set(LogOPEvent::res_len, v);
 
-    stringstream out;
     ASSERT_EQ ( 
         "{\"accession\":\"a\",\"agent\":\"o\",\"extension\":\"e\",\"filename\":\"f\",\"forwarded\":\"fwd\",\"ip\":\"i_p\",\"method\":\"m\",\"owner\":\"own\",\"path\":\"p\",\"port\":\"prt\",\"referer\":\"ref\",\"req_len\":\"rql\",\"req_time\":\"rqt\",\"res_code\":\"rqc\",\"res_len\":\"res\",\"time\":\"tim\",\"unparsed\":\"unp\",\"user\":\"use\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}", 
-        e.GetFormatter().format( out ).str() );    
+        e.GetFormatter().format() );    
 }
 
 class LogOPEventFixture : public ::testing::Test

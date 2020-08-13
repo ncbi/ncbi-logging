@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <mutex>
 
 namespace NCBI
 {
@@ -20,6 +19,8 @@ namespace NCBI
 
                 unsigned long int get_total( void ) const { return total; }
                 unsigned long int get_cat_count( LogLinesInterface::Category cat ) const;
+
+                std::string report( FormatterInterface & fmt ) const;
 
             private :
                 unsigned long int total;
@@ -47,9 +48,6 @@ namespace NCBI
         private:
             std::ofstream review, good, bad, ugly;
             CatCounter ctr;
-            //TODO: conside placing this object on a separate thread, or
-            // having one writer per category, running on a separate thread.
-            std::mutex mut; 
         };
 
         class StringCatWriter : public CatWriterInterface
@@ -67,7 +65,6 @@ namespace NCBI
 
         private:
             std::stringstream review, good, bad, ugly;
-            std::mutex mut;
         };
 
     }

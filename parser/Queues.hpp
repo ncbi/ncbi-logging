@@ -68,6 +68,7 @@ namespace NCBI
         class OneWriterManyReadersQueue
         {   
             public :
+                //TODO: experiment with unique_ptr and/or naked pointers
                 typedef std::shared_ptr<std::string> value_type;
 
                 OneWriterManyReadersQueue( size_t limit );
@@ -94,6 +95,7 @@ namespace NCBI
         class OutputQueue
         {
             public :
+                //TODO: experiment with unique_ptr and/or naked pointers
                 typedef std::shared_ptr< std::string > string_type;
 
                 OutputQueue( size_t limit );

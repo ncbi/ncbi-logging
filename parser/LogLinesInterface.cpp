@@ -114,8 +114,7 @@ SingleThreadedParser::parse()
             fmt.addNameValue("_unparsed", line);
         }
 
-        stringstream out;
-        m_outputs. write ( receiver . GetCategory(), fmt . format ( out ).str() );
+        m_outputs. write ( receiver . GetCategory(), fmt . format () );
     }
 }
 
@@ -174,9 +173,9 @@ void parser( ParseBlockFactoryInterface * factory,
                 fmt.addNameValue( "_unparsed", *line );
             }
 
-            stringstream out;
             LogLinesInterface::Category cat = receiver . GetCategory();
-            shared_ptr< string > output( make_shared< string >( fmt . format( out ).str() ) );
+            //TODO: experiment with unique_ptr and/or naked pointers (also see Queues.hpp)
+            shared_ptr< string > output( make_shared< string >( fmt . format() ) );
 
             while ( ! out_q -> enqueue( output, cat ) )
             {

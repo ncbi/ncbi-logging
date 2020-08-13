@@ -27,13 +27,14 @@ JsonLibFormatter::~JsonLibFormatter()
 {
 }
 
-std::stringstream & 
-JsonLibFormatter::format( std::stringstream & out )
+string 
+JsonLibFormatter::format()
 {
     //TODO: j->addValue(...)
+    stringstream out;
     out << j->toJSON().toSTLString();
     j = JSON::makeObject();
-    return out; 
+    return out.str(); 
 }
 
 JSONValueRef ToJsonString( const t_str & in )
@@ -73,8 +74,10 @@ JsonFastFormatter::~JsonFastFormatter()
 
 }
 
-std::stringstream & JsonFastFormatter::format( std::stringstream & s )
+string 
+JsonFastFormatter::format()
 {
+    stringstream s;
     s . put ( '{' );
     std::sort( kv.begin(), kv.end() );
     bool first = true;
@@ -88,7 +91,7 @@ std::stringstream & JsonFastFormatter::format( std::stringstream & s )
     }
     kv.clear();
     s . put ( '}' );
-    return s;
+    return s.str();
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const t_str & value )
@@ -119,7 +122,3 @@ void JsonFastFormatter::addNameValue( const std::string & name, const std::strin
     addNameValue( name, tmp );
 }
 
-std::string JsonFastFormatter::escape( const std::string & s ) const
-{
-    return s;
-}

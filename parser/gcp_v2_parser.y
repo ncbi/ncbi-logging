@@ -63,7 +63,7 @@ using namespace NCBI::Logging;
 line
     :
     | log_gcp       { YYACCEPT; }
-    | log_hdr       { /*lib -> headerLine(); YYACCEPT;*/ }
+    | log_hdr       { lib -> SetCategory( LogLinesInterface::cat_ignored ); YYACCEPT; }
     | log_err       { YYACCEPT; }
     ;
 
@@ -78,8 +78,8 @@ log_err
     ;
 
 log_hdr
-    : hdr_item_text             {} 
-    | log_hdr COMMA hdr_item    {} 
+    : hdr_item_text            
+    | log_hdr COMMA hdr_item   
     ;
 
 hdr_item_text
@@ -108,43 +108,20 @@ log_gcp
       object
       { gcp_pop_state( scanner ); } 
     {
-        lib -> set( LogGCPEvent::uri, $12.path );
+        t_request req = $12;
 
-        // LogGCPEvent ev;
-        // ev . time = ( $1 . p == nullptr ) ? 0 : atol( $1 . p );
-        // ev . ip = $3;
-        // ev . ip_type = ( $5 . p == nullptr ) ? 0 : atoi( $5 . p );
-        // ev . ip_region = $7;
-        // // $9 (method) goes into ev.request below
-        // ev . uri = $12 . path;
-        // ev . status = ( $15 . p == nullptr ) ? 0 : atol( $15 . p );
-        // ev . request_bytes = ( $17 . p == nullptr ) ? 0 : atol( $17 . p );
-        // ev . result_bytes = ( $19 . p == nullptr ) ? 0 : atol( $19 . p );
-        // ev . time_taken = ( $21 . p == nullptr ) ? 0 : atol( $21 . p );
-        // ev . host = $23;
-        // ev . referer = $25;
-        // ev . agent = $28;
-        // ev . request_id = $31;
-        // ev . operation = $33;
-        // ev . bucket = $35;
+        if ( $38 . accession . n > 0 )
+        {   // the cloud did populate the object-field
+            req = $38;
+        }
 
-        // if ( $38 . accession . n > 0 )
-        // {   // the cloud did populate the object-field
-        //     ev . request = $38;
-        // }
-        // else
-        // {   // no accession found in the object field, use the results of parsing the request field
-        //     ev . request = $12;
-        // }
+        if ( req . filename . n == 0 && req . extension . n == 0 )
+        {   // reuse the accession as the filename
+            req . filename = req . accession;
+        }
 
-        // if ( ev . request . filename . n == 0 && ev . request . extension . n == 0 )
-        // {   // reuse the accession as the filename
-        //     ev . request . filename = ev . request . accession;
-        // }
-
-        // ev . request . method = $9;
-
-        // lib -> acceptLine( ev );
+        req . method = $9;
+        lib -> setRequest( req );
     }
     ;
 
@@ -267,10 +244,12 @@ agent
             $$ . original = temp . original;
 
             $$ . vdb_os = $2;
+            lib->setAgent( $$ );
         }
     | QUOTE vdb_agent QUOTE
         { 
             $$ = $2;
+            lib->setAgent( $$ );
         }
     | QUOTE QUOTE                                           
         { 
@@ -373,12 +352,13 @@ url
     : QUOTE url_list QUOTE
         {
             $$ = $2;
+            lib -> set( LogGCPEvent::uri, $$.path );
         }
     | QUOTE QUOTE
-    {
-        InitRequest( $$ );
-        lib->setRequest( $$ );
-    }
+        {
+            InitRequest( $$ );
+            lib -> set( LogGCPEvent::uri, $$.path );
+        }
     ;
 
 object_token

@@ -17,64 +17,54 @@ public:
     virtual void TearDown() {}
 
     JsonLibFormatter f;
-    stringstream s;
 };
 
 TEST_F( JsonLibFormatter_Fixture, FormatEmpty )
 {
-    f.format(s);
-    ASSERT_EQ("{}", s.str());
+    ASSERT_EQ("{}", f.format());
 }
 
 TEST_F( JsonLibFormatter_Fixture, Format_t_str )
 {
     const t_str str = { "v", 1, false };
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\"}", f.format());
 
     // make sure the data was deleted
-    stringstream s1;
-    f.format(s1);
-    ASSERT_EQ("{}", s1.str());
+    ASSERT_EQ("{}", f.format());
 }
 
 TEST_F( JsonLibFormatter_Fixture, Format_string )
 {
     const string str ( "v" );
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\"}", f.format());
 }
 
 TEST_F( JsonLibFormatter_Fixture, Format_t_str_quote )
 {
     const t_str str = { "v\"", 2, true };
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\\\"\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\\\"\"}", f.format());
 }
 
 TEST_F( JsonLibFormatter_Fixture, Format_string_quote )
 {
     const string str = ( "v\"" );
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\\\"\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\\\"\"}", f.format());
 }
 
 TEST_F( JsonLibFormatter_Fixture, Format_int )
 {
     f.addNameValue("a", 12345);
-    f.format(s);
-    ASSERT_EQ("{\"a\":12345}", s.str());
+    ASSERT_EQ("{\"a\":12345}", f.format());
 }
 
 TEST_F( JsonLibFormatter_Fixture, Format_neg_int )
 {
     f.addNameValue("a", -12345);
-    f.format(s);
-    ASSERT_EQ("{\"a\":-12345}", s.str());
+    ASSERT_EQ("{\"a\":-12345}", f.format());
 }
 
 /* -------------------------------------------------------------- */
@@ -86,62 +76,52 @@ public:
     virtual void TearDown() {}
 
     JsonFastFormatter f;
-    stringstream s;
 };
 
 TEST_F( JsonFastFormatter_Fixture, FormatEmpty )
 {
-    f.format( s );
-    ASSERT_EQ( "{}", s.str() );
+    ASSERT_EQ( "{}", f.format() );
 }
 
 TEST_F( JsonFastFormatter_Fixture, Format_t_str )
 {
     const t_str str = { "v", 1, false };
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\"}", f.format());
 
     // make sure the data was deleted
-    stringstream s1;
-    f.format(s1);
-    ASSERT_EQ("{}", s1.str());
+    ASSERT_EQ("{}", f.format());
 }
 
 TEST_F( JsonFastFormatter_Fixture, Format_string )
 {
     const string str ( "v" );
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\"}", f.format());
 }
 
 TEST_F( JsonFastFormatter_Fixture, Format_t_str_quote )
 {
     const t_str str = { "v\"", 2, true };
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\\\"\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\\\"\"}", f.format());
 }
 
 TEST_F( JsonFastFormatter_Fixture, Format_string_quote )
 {
     const string str = ( "v\"" );
     f.addNameValue("a", str);
-    f.format(s);
-    ASSERT_EQ("{\"a\":\"v\\\"\"}", s.str());
+    ASSERT_EQ("{\"a\":\"v\\\"\"}", f.format());
 }
 
 TEST_F( JsonFastFormatter_Fixture, Format_int )
 {
     f.addNameValue("a", 12345);
-    f.format(s);
-    ASSERT_EQ("{\"a\":12345}", s.str());
+    ASSERT_EQ("{\"a\":12345}", f.format());
 }
 
 TEST_F( JsonFastFormatter_Fixture, Format_neg_int )
 {
     f.addNameValue("a", -12345);
-    f.format(s);
-    ASSERT_EQ("{\"a\":-12345}", s.str());
+    ASSERT_EQ("{\"a\":-12345}", f.format());
 }
