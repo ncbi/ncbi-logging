@@ -74,10 +74,9 @@ TEST(LogAWSEventTest, Setters)
     INIT_TSTR( v, "hos"); e.set(LogAWSEvent::host_header, v);
     INIT_TSTR( v, "tls"); e.set(LogAWSEvent::tls_version, v);
 
-    stringstream out;
     ASSERT_EQ ( 
         "{\"accession\":\"a\",\"agent\":\"o\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"extension\":\"e\",\"filename\":\"f\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\",\"version_id\":\"ver\"}", 
-        e.GetFormatter().format( out ).str() );    
+        e.GetFormatter().format() );    
 }
 
 class LogAWSEventFixture : public ::testing::Test
@@ -86,7 +85,7 @@ class LogAWSEventFixture : public ::testing::Test
         void try_to_parse( std::string line, bool debug = false )
         {
             istringstream ss( line );
-            AWSParseBlockFactory pbFact;
+            AWSParseBlockFactory pbFact( false );
             SingleThreadedParser p( ss, s_outputs, pbFact );
             p . setDebug( debug );
             p . parse(); // does the parsing and generates the report
@@ -588,7 +587,7 @@ TEST_F( LogAWSEventFixture, MultiThreading )
     );
 
     FILE * ss = fmemopen( (void*) input.c_str(), input.size(), "r");
-    AWSParseBlockFactory pbFact;
+    AWSParseBlockFactory pbFact(false);
     MultiThreadedParser p( ss, s_outputs, 100, 2, pbFact );
     p . parse();
 

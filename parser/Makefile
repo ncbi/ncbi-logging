@@ -653,7 +653,7 @@ GCP2JSON = $(BINDIR)/gcp2jsn-dbg
 
 v2: aws op gcp
 
-test_v2: v2
+test_v2: v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test
 	mkdir -p  actual/$(PREFIX_AWS_V2)unrecognized
 	cat data/aws_unrecognized.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)unrecognized/ >./actual/$(PREFIX_AWS_V2)unrecognized/stdout 2>./actual/$(PREFIX_AWS_V2)unrecognized/stderr \
 						&& diff ./expected/$(PREFIX_AWS_V2)unrecognized ./actual/$(PREFIX_AWS_V2)unrecognized
@@ -683,20 +683,20 @@ VG_OPTIONS := --leak-check=full --error-exitcode=1
 BUILD = dbg
 #BUILD = rel
 
-vg_op : $(BINDIR)/log2jsn-$(BUILD) $(BINDIR)/op_test_flex-$(BUILD) $(BINDIR)/op_test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/op_test_parse-$(BUILD)
-	cat data/op_two_events.txt | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn-$(BUILD) op
+vg_op : $(BINDIR)/op2jsn-$(BUILD) $(BINDIR)/$(PREFIX_OP_V2)test_flex-$(BUILD) $(BINDIR)/op_test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP_V2)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP_V2)test_parse-$(BUILD)
+	cat data/op_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/op2jsn-$(BUILD) actual/op
 
-vg_gcp : $(BINDIR)/log2jsn-$(BUILD) $(BINDIR)/gcp_test_flex-$(BUILD) $(BINDIR)/gcp_test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/gcp_test_parse-$(BUILD)
-	cat data/gcp_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn-$(BUILD) gcp
+vg_gcp : $(BINDIR)/gcp2jsn-$(BUILD) $(BINDIR)/$(PREFIX_GCP_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_GCP_V2)test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_GCP_V2)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_GCP_V2)test_parse-$(BUILD)
+	cat data/gcp_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/gcp2jsn-$(BUILD) actual/gcp
 
-vg_aws : $(BINDIR)/log2jsn-$(BUILD) $(BINDIR)/aws_test_flex-$(BUILD) $(BINDIR)/aws_test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/aws_test_parse-$(BUILD)
-	cat data/aws_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/log2jsn-$(BUILD) aws
+vg_aws : $(BINDIR)/aws2jsn-$(BUILD) $(BINDIR)/$(PREFIX_AWS_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_AWS_V2)test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS_V2)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS_V2)test_parse-$(BUILD)
+	cat data/aws_unrecognized.log | valgrind $(VG_OPTIONS) $(BINDIR)/aws2jsn-$(BUILD) actual/aws
 
 vg_all : vg_op vg_gcp vg_aws
 
