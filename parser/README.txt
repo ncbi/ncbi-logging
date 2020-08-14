@@ -21,8 +21,12 @@ $cd ../..
 
 $$git clone https://github.com/ncbi/ncbi-logging
 $cd ncbi-logging/parser
-$git checkout VDB-4214
+$git checkout LOGMON-65
+!!! this is likely to change to engineering or master (LOGMON)
 
+-------------------------------------------------
+--- for the older ( aka 1 tool for all formats )
+-------------------------------------------------
 $make
 # there are 2 versions build: log2jsn-dbg ( debug-version ) and log2jsn-rel ( release-version )
 # the release-version is about 2.5 times faster
@@ -40,3 +44,44 @@ $ cat data/aws_bucket_log.log | bin/log2jsn-rel aws readable
 
 # to process a gcp log (default)
 $ cat data/gcp_bucket_log.log | bin/log2jsn-rel gcp
+
+-------------------------------------------------
+--- for the new ( aka 1 tool for each format )
+-------------------------------------------------
+$make v2
+
+#the run the tests ( depends on google-test! )
+$make test_v2
+
+#how to run the new tools:
+#there are 3 of them now: aws2jsn-rel, gcp2jsn-rel and op2jsn-rel
+#they are again in the bin-subdir of the repository
+
+zcat XXX.gz | aws2jsn-rel basename
+or
+zcat XXX.gz | gcp2jsn-rel basename
+or
+zcat XXX.gz | op2jsn-rel basename
+
+#each tool produces it's output now into multiple files:
+#basename.good ... this is the file you want to use for loading into your database
+#basename.review ... this file contains questionable log-lines, for instance wrong ip-format,url...
+#basename.bad ... this file contains log-lines recognized as unusable
+#basename.ugly ... this file contains log-lines, where the parser failed
+
+#the tool produces a report on stderr, in json-format
+#this report has line-counts for each of the categories above
+#example:
+{"_total":9,"bad":0,"good":9,"ignored":0,"review":0,"ugly":0}
+#_total = bad + good + ignored + review + ugly
+
+#the ignored lines are GCP's header-lines.
+#the ignored lines are not written into a file.
+#the gcp2jsn compares the headerlines against a hardcoded default.
+#if the line matches we discard it and count it as ignored
+#if it does not match, we write it out and count it as 'review'
+
+#the tools can run single-threaded or multi-threaded
+#the default is single-threaded
+#but we highly recommend to use the "-t n" option where n is the number of threads
+#we run tests with 10..13 threads on large-memory-machines, resulting in a speed up of 6 - 8 times relative to version 1
