@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LogLinesInterface.hpp"
+#include "ReceiverInterface.hpp"
 
 #include <memory>
 
@@ -8,11 +8,11 @@ namespace NCBI
 {
     namespace Logging
     {
-        struct LogAWSEvent : public LogLinesInterface
+        struct AWSReceiver : public ReceiverInterface
         {
-            using LogLinesInterface::set;
+            using ReceiverInterface::set;
             
-            LogAWSEvent( std::unique_ptr<FormatterInterface> & fmt );
+            AWSReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
             typedef enum { 
                 owner = LastMemberId+1,
@@ -37,7 +37,7 @@ namespace NCBI
                 tls_version,
                 AWS_LastMemberId = tls_version
             } AWS_Members; // all are t_str values
-            virtual void set( AWS_Members m, const t_str & ); // will invoke set( LogLinesInterface::Members ) if necessary
+            virtual void set( AWS_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
 
             virtual void reportField( const char * message );
 

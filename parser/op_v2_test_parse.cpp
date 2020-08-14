@@ -16,21 +16,21 @@ using namespace NCBI::Logging;
 TEST(LogOPEventTest, Create)
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    LogOPEvent e ( f );
+    OPReceiver e ( f );
 }
 
 TEST(LogOPEventTest, Setters)
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    LogOPEvent e ( f );
+    OPReceiver e ( f );
     
     t_str v;
     INIT_TSTR( v, "i_p");
-    e.set( LogLinesInterface::ip, v );
+    e.set( ReceiverInterface::ip, v );
     INIT_TSTR( v, "ref");
-    e.set( LogLinesInterface::referer, v );
+    e.set( ReceiverInterface::referer, v );
     INIT_TSTR( v, "unp");
-    e.set( LogLinesInterface::unparsed, v );
+    e.set( ReceiverInterface::unparsed, v );
     t_agent a = { 
         {"o", 1, false },
         {"v_o", 3, false },
@@ -54,15 +54,15 @@ TEST(LogOPEventTest, Setters)
     };
     e.setRequest( r );
 
-    INIT_TSTR( v, "own"); e.set(LogOPEvent::owner, v);
-    INIT_TSTR( v, "tim"); e.set(LogOPEvent::time, v);
-    INIT_TSTR( v, "use"); e.set(LogOPEvent::user, v);
-    INIT_TSTR( v, "rqt");e.set(LogOPEvent::req_time, v);
-    INIT_TSTR( v, "fwd"); e.set(LogOPEvent::forwarded, v);
-    INIT_TSTR( v, "prt"); e.set(LogOPEvent::port, v);
-    INIT_TSTR( v, "rql"); e.set(LogOPEvent::req_len, v);
-    INIT_TSTR( v, "rqc"); e.set(LogOPEvent::res_code, v);
-    INIT_TSTR( v, "res"); e.set(LogOPEvent::res_len, v);
+    INIT_TSTR( v, "own"); e.set(OPReceiver::owner, v);
+    INIT_TSTR( v, "tim"); e.set(OPReceiver::time, v);
+    INIT_TSTR( v, "use"); e.set(OPReceiver::user, v);
+    INIT_TSTR( v, "rqt");e.set(OPReceiver::req_time, v);
+    INIT_TSTR( v, "fwd"); e.set(OPReceiver::forwarded, v);
+    INIT_TSTR( v, "prt"); e.set(OPReceiver::port, v);
+    INIT_TSTR( v, "rql"); e.set(OPReceiver::req_len, v);
+    INIT_TSTR( v, "rqc"); e.set(OPReceiver::res_code, v);
+    INIT_TSTR( v, "res"); e.set(OPReceiver::res_len, v);
 
     ASSERT_EQ ( 
         "{\"accession\":\"a\",\"agent\":\"o\",\"extension\":\"e\",\"filename\":\"f\",\"forwarded\":\"fwd\",\"ip\":\"i_p\",\"method\":\"m\",\"owner\":\"own\",\"path\":\"p\",\"port\":\"prt\",\"referer\":\"ref\",\"req_len\":\"rql\",\"req_time\":\"rqt\",\"res_code\":\"rqc\",\"res_len\":\"res\",\"time\":\"tim\",\"unparsed\":\"unp\",\"user\":\"use\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}", 

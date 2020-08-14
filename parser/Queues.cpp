@@ -43,7 +43,7 @@ NCBI::Logging::OutputQueue::OutputQueue( size_t limit )
     m_open.store( true );
 }
 
-bool NCBI::Logging::OutputQueue::enqueue( string_type s, LogLinesInterface::Category cat )
+bool NCBI::Logging::OutputQueue::enqueue( string_type s, ReceiverInterface::Category cat )
 {
     lock_guard< std::mutex > guard( m_mutex ); 
     if ( m_queue.size() >= m_limit )
@@ -53,7 +53,7 @@ bool NCBI::Logging::OutputQueue::enqueue( string_type s, LogLinesInterface::Cate
     return true;
 }
 
-NCBI::Logging::OutputQueue::string_type NCBI::Logging::OutputQueue::dequeue( LogLinesInterface::Category &cat )
+NCBI::Logging::OutputQueue::string_type NCBI::Logging::OutputQueue::dequeue( ReceiverInterface::Category &cat )
 {
     lock_guard< std::mutex > guard( m_mutex ); 
     if ( m_queue.empty() )

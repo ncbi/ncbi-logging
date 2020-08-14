@@ -8,12 +8,12 @@ extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
 using namespace NCBI::Logging;
 using namespace std;
 
-LogAWSEvent::LogAWSEvent( unique_ptr<FormatterInterface> & fmt )
-: LogLinesInterface ( fmt )
+AWSReceiver::AWSReceiver( unique_ptr<FormatterInterface> & fmt )
+: ReceiverInterface ( fmt )
 {
 }
 
-void LogAWSEvent::set( AWS_Members m, const t_str & v ) 
+void AWSReceiver::set( AWS_Members m, const t_str & v ) 
 {
 #define CASE(mem) case mem: m_fmt -> addNameValue(#mem, v); break;
     switch( m )
@@ -38,14 +38,14 @@ void LogAWSEvent::set( AWS_Members m, const t_str & v )
     CASE( auth_type )
     CASE( host_header )
     CASE( tls_version )
-    default: LogLinesInterface::set((LogLinesInterface::Members)m, v); 
+    default: ReceiverInterface::set((ReceiverInterface::Members)m, v); 
     }
 #undef CASE
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }
 
-void LogAWSEvent::reportField( const char * message ) 
+void AWSReceiver::reportField( const char * message ) 
 {
     if ( m_cat == cat_unknown || m_cat == cat_good )
         m_cat = cat_review;
@@ -69,12 +69,12 @@ namespace NCBI
         public:
             AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
             virtual ~AWSParseBlock();
-            virtual LogLinesInterface & GetReceiver() { return m_receiver; }
+            virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
-            LogAWSEvent m_receiver;
+            AWSReceiver m_receiver;
         };
     }
 }

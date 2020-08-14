@@ -8,12 +8,12 @@ extern YY_BUFFER_STATE op_scan_reset( const char * input, yyscan_t yyscanner );
 using namespace NCBI::Logging;
 using namespace std;
 
-LogOPEvent::LogOPEvent( unique_ptr<FormatterInterface> & fmt )
-: LogLinesInterface ( fmt )
+OPReceiver::OPReceiver( unique_ptr<FormatterInterface> & fmt )
+: ReceiverInterface ( fmt )
 {
 }
 
-void LogOPEvent::set( OP_Members m, const t_str & v ) 
+void OPReceiver::set( OP_Members m, const t_str & v ) 
 {
 #define CASE(mem) case mem: m_fmt -> addNameValue(#mem, v); break;
     switch( m )
@@ -28,14 +28,14 @@ void LogOPEvent::set( OP_Members m, const t_str & v )
     CASE( req_len )
     CASE( res_code )
     CASE( res_len )
-    default: LogLinesInterface::set((LogLinesInterface::Members)m, v); 
+    default: ReceiverInterface::set((ReceiverInterface::Members)m, v); 
     }
 #undef CASE
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }
 
-void LogOPEvent::reportField( const char * message ) 
+void OPReceiver::reportField( const char * message ) 
 {
     if ( m_cat == cat_unknown || m_cat == cat_good )
         m_cat = cat_review;
@@ -59,12 +59,12 @@ namespace NCBI
         public:
             OPParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
             virtual ~OPParseBlock();
-            virtual LogLinesInterface & GetReceiver() { return m_receiver; }
+            virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
-            LogOPEvent m_receiver;
+            OPReceiver m_receiver;
         };
     }
 }

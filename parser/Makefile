@@ -427,7 +427,7 @@ run_test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
 COMMON_V2_SRC = \
 	CatWriters.cpp \
 	Formatters.cpp \
-	LogLinesInterface.cpp \
+	ReceiverInterface.cpp \
 	Queues.cpp
 
 DBG_TOOL_OBJ = $(OBJDIR)/Tool.dbg.o $(DBG_CMD_OBJ)

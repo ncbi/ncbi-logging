@@ -1,6 +1,6 @@
 %define api.pure full
 %lex-param { void * scanner }
-%parse-param { void * scanner }{ NCBI::Logging::LogOPEvent * lib }
+%parse-param { void * scanner }{ NCBI::Logging::OPReceiver * lib }
 
 %define parse.trace
 %define parse.error verbose
@@ -17,7 +17,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void op_error( yyscan_t locp, NCBI::Logging::LogOPEvent * lib, const char* msg );
+void op_error( yyscan_t locp, NCBI::Logging::OPReceiver * lib, const char* msg );
 
 const t_str EmptyTSTR = { "", 0, false };
 
@@ -88,21 +88,6 @@ log_onprem
       port  SPACE
       req_len
     {
-        // LogOPEvent ev;
-        // ev . ip = $1;
-        // ev . user = $3;
-        // ev . time = $4;
-        // ev . request = $5;
-        // ev . res_code = ToInt64( $6 );
-        // ev . res_len = ToInt64( $7 );
-        // ev . req_time = $8;
-        // ev . referer = $9;
-        // ev . agent = $12;
-        // ev . forwarded = $14;
-        // ev . port = ToInt64( $15 );
-        // ev . req_len = ToInt64( $16 );
-
-        // lib -> acceptLine( ev );
     }
     ;
 
@@ -111,17 +96,17 @@ log_onprem_err
     ;
 
 ip
-    : IPV4  { SET_VALUE( LogOPEvent::ip, $1 ); }
-    | IPV6  { SET_VALUE( LogOPEvent::ip, $1 ); }
+    : IPV4  { SET_VALUE( OPReceiver::ip, $1 ); }
+    | IPV6  { SET_VALUE( OPReceiver::ip, $1 ); }
     ;
 
 user
-    : DASH  { SET_VALUE( LogOPEvent::user, EmptyTSTR ); }
-    | STR   { SET_VALUE( LogOPEvent::user, $1 ); }
+    : DASH  { SET_VALUE( OPReceiver::user, EmptyTSTR ); }
+    | STR   { SET_VALUE( OPReceiver::user, $1 ); }
     ;
 
 time
-    : TIME_FMT { SET_VALUE( LogOPEvent::time, $1 ); }
+    : TIME_FMT { SET_VALUE( OPReceiver::time, $1 ); }
     ;
 
 method
@@ -129,8 +114,8 @@ method
     ;
 
 server 
-    : QUOTE QSTR QUOTE  { SET_VALUE( LogOPEvent::server, $2 ); }
-    | STR               { SET_VALUE( LogOPEvent::server, $1 ); }
+    : QUOTE QSTR QUOTE  { SET_VALUE( OPReceiver::server, $2 ); }
+    | STR               { SET_VALUE( OPReceiver::server, $1 ); }
     ;
 
 url_token
@@ -306,7 +291,7 @@ server_and_request
     }    
     | request
     {
-        SET_VALUE( LogOPEvent::server, EmptyTSTR );
+        SET_VALUE( OPReceiver::server, EmptyTSTR );
         lib->setRequest( $1 );
     }
     ;
@@ -330,17 +315,17 @@ quoted_list_body
     ;
 
 result_code
-    : I64 { SET_VALUE( LogOPEvent::res_code, $1 ); }
+    : I64 { SET_VALUE( OPReceiver::res_code, $1 ); }
     ;
 
 result_len
-    : I64   { SET_VALUE( LogOPEvent::res_len, $1 ); }
-    | DASH  { SET_VALUE( LogOPEvent::res_len, EmptyTSTR ); } //TODO: review? bad?
+    : I64   { SET_VALUE( OPReceiver::res_len, $1 ); }
+    | DASH  { SET_VALUE( OPReceiver::res_len, EmptyTSTR ); } //TODO: review? bad?
     ;
 
 req_time
-    : FLOAT { SET_VALUE( LogOPEvent::req_time, $1 ); }
-    | I64   { SET_VALUE( LogOPEvent::req_time, $1 ); }
+    : FLOAT { SET_VALUE( OPReceiver::req_time, $1 ); }
+    | I64   { SET_VALUE( OPReceiver::req_time, $1 ); }
     ;
 
 referer_token
@@ -357,8 +342,8 @@ referer_list
     ;
 
 referer
-    : QUOTE referer_list QUOTE  { SET_VALUE( LogOPEvent::referer, $2 ); }
-    | QUOTE QUOTE               { SET_VALUE( LogOPEvent::referer, EmptyTSTR ); } 
+    : QUOTE referer_list QUOTE  { SET_VALUE( OPReceiver::referer, $2 ); }
+    | QUOTE QUOTE               { SET_VALUE( OPReceiver::referer, EmptyTSTR ); } 
     ;
 
 vdb_agent_token
@@ -440,20 +425,20 @@ agent
     ;
 
 forwarded
-    : QUOTE QSTR QUOTE { SET_VALUE( LogOPEvent::forwarded, $2 ); }
+    : QUOTE QSTR QUOTE { SET_VALUE( OPReceiver::forwarded, $2 ); }
     ;
 
 port
-    : PORT I64 { SET_VALUE( LogOPEvent::port, $2 ); }
+    : PORT I64 { SET_VALUE( OPReceiver::port, $2 ); }
     ;
 
 req_len
-    : RL I64 { SET_VALUE( LogOPEvent::req_len, $2 ); }
+    : RL I64 { SET_VALUE( OPReceiver::req_len, $2 ); }
     ;
 
 %%
 
-void op_error( yyscan_t locp, NCBI::Logging::LogOPEvent * lib, const char * msg )
+void op_error( yyscan_t locp, NCBI::Logging::OPReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors rejected lines
 }

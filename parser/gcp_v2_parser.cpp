@@ -79,7 +79,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void gcp_error( yyscan_t locp, NCBI::Logging::LogGCPEvent * lib, const char* msg );
+void gcp_error( yyscan_t locp, NCBI::Logging::GCPReceiver * lib, const char* msg );
 
 const t_str EmptyTSTR = { "", 0, false };
 
@@ -179,7 +179,7 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int gcp_parse (void * scanner, NCBI::Logging::LogGCPEvent * lib);
+int gcp_parse (void * scanner, NCBI::Logging::GCPReceiver * lib);
 
 #endif /* !YY_GCP_GCP_V2_PARSER_HPP_INCLUDED  */
 
@@ -785,7 +785,7 @@ do {                                                                      \
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogGCPEvent * lib)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::GCPReceiver * lib)
 {
   FILE *yyo = yyoutput;
   YYUSE (yyo);
@@ -806,7 +806,7 @@ yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvalue
 `--------------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogGCPEvent * lib)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::GCPReceiver * lib)
 {
   YYFPRINTF (yyoutput, "%s %s (",
              yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
@@ -844,7 +844,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::LogGCPEvent * lib)
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::GCPReceiver * lib)
 {
   unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1124,7 +1124,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::LogGCPEvent * lib)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::GCPReceiver * lib)
 {
   YYUSE (yyvaluep);
   YYUSE (scanner);
@@ -1146,7 +1146,7 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NC
 `----------*/
 
 int
-yyparse (void * scanner, NCBI::Logging::LogGCPEvent * lib)
+yyparse (void * scanner, NCBI::Logging::GCPReceiver * lib)
 {
 /* The lookahead symbol.  */
 int yychar;
@@ -1401,7 +1401,7 @@ yyreduce:
 
   case 4:
 #line 66 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib -> SetCategory( LogLinesInterface::cat_ignored ); YYACCEPT; }
+    { lib -> SetCategory( ReceiverInterface::cat_ignored ); YYACCEPT; }
 #line 1406 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1518,43 +1518,43 @@ yyreduce:
 
   case 21:
 #line 123 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::time, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::time, (yyvsp[-1].s) ); }
 #line 1523 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 127 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::ip, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::ip, (yyvsp[-1].s) ); }
 #line 1529 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
 #line 128 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::ip, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::ip, (yyvsp[-1].s) ); }
 #line 1535 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 129 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::ip, EmptyTSTR ); }
+    { lib->set( GCPReceiver::ip, EmptyTSTR ); }
 #line 1541 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
 #line 133 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::ip_type, (yyvsp[0].s) ); }
+    { lib->set( GCPReceiver::ip_type, (yyvsp[0].s) ); }
 #line 1547 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 137 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::ip_region, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::ip_region, (yyvsp[-1].s) ); }
 #line 1553 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
 #line 138 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::ip_region, EmptyTSTR ); }
+    { lib->set( GCPReceiver::ip_region, EmptyTSTR ); }
 #line 1559 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1566,49 +1566,49 @@ yyreduce:
 
   case 29:
 #line 146 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::status, (yyvsp[0].s) ); }
+    { lib->set( GCPReceiver::status, (yyvsp[0].s) ); }
 #line 1571 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
 #line 150 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::request_bytes, (yyvsp[0].s) ); }
+    { lib->set( GCPReceiver::request_bytes, (yyvsp[0].s) ); }
 #line 1577 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
 #line 154 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::result_bytes, (yyvsp[0].s) ); }
+    { lib->set( GCPReceiver::result_bytes, (yyvsp[0].s) ); }
 #line 1583 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
 #line 158 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::time_taken, (yyvsp[0].s) ); }
+    { lib->set( GCPReceiver::time_taken, (yyvsp[0].s) ); }
 #line 1589 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
 #line 162 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::host, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::host, (yyvsp[-1].s) ); }
 #line 1595 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
 #line 163 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::host, EmptyTSTR ); }
+    { lib->set( GCPReceiver::host, EmptyTSTR ); }
 #line 1601 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
 #line 167 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::referer, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::referer, (yyvsp[-1].s) ); }
 #line 1607 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
 #line 168 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::referer, EmptyTSTR ); }
+    { lib->set( GCPReceiver::referer, EmptyTSTR ); }
 #line 1613 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1737,43 +1737,43 @@ yyreduce:
 
   case 48:
 #line 256 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::request_id, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::request_id, (yyvsp[-1].s) ); }
 #line 1742 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
 #line 257 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::request_id, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::request_id, (yyvsp[-1].s) ); }
 #line 1748 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
 #line 258 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::request_id, EmptyTSTR ); }
+    { lib->set( GCPReceiver::request_id, EmptyTSTR ); }
 #line 1754 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
 #line 262 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::operation, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::operation, (yyvsp[-1].s) ); }
 #line 1760 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
 #line 263 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::operation, EmptyTSTR ); }
+    { lib->set( GCPReceiver::operation, EmptyTSTR ); }
 #line 1766 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
 #line 267 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::bucket, (yyvsp[-1].s) ); }
+    { lib->set( GCPReceiver::bucket, (yyvsp[-1].s) ); }
 #line 1772 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 54:
 #line 268 "gcp_v2_parser.y" /* yacc.c:1646  */
-    { lib->set( LogGCPEvent::bucket, EmptyTSTR ); }
+    { lib->set( GCPReceiver::bucket, EmptyTSTR ); }
 #line 1778 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1879,7 +1879,7 @@ yyreduce:
 #line 347 "gcp_v2_parser.y" /* yacc.c:1646  */
     {
             (yyval.req) = (yyvsp[-1].req);
-            lib -> set( LogGCPEvent::uri, (yyval.req).path );
+            lib -> set( GCPReceiver::uri, (yyval.req).path );
         }
 #line 1885 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
@@ -1888,7 +1888,7 @@ yyreduce:
 #line 352 "gcp_v2_parser.y" /* yacc.c:1646  */
     {
             InitRequest( (yyval.req) );
-            lib -> set( LogGCPEvent::uri, (yyval.req).path );
+            lib -> set( GCPReceiver::uri, (yyval.req).path );
         }
 #line 1894 "gcp_v2_parser.cpp" /* yacc.c:1646  */
     break;
@@ -2355,7 +2355,7 @@ yyreturn:
 #line 456 "gcp_v2_parser.y" /* yacc.c:1906  */
 
 
-void gcp_error( yyscan_t locp, NCBI::Logging::LogGCPEvent * lib, const char * msg )
+void gcp_error( yyscan_t locp, NCBI::Logging::GCPReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors by rejecting lines
 }

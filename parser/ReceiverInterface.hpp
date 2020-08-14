@@ -12,7 +12,7 @@ namespace NCBI
 {
     namespace Logging
     {
-        class LogLinesInterface;
+        class ReceiverInterface;
         class CatWriterInterface;
 
         typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
@@ -46,11 +46,11 @@ namespace NCBI
 
         inline void InitAgent( t_agent & r ) { memset( & r, 0, sizeof ( r ) ); }
 
-        struct LogLinesInterface
+        struct ReceiverInterface
         {
-            LogLinesInterface( std::unique_ptr<FormatterInterface> & p_fmt );
+            ReceiverInterface( std::unique_ptr<FormatterInterface> & p_fmt );
 
-            virtual ~LogLinesInterface();
+            virtual ~ReceiverInterface();
 
             typedef enum { 
                 cat_review = 0, 
@@ -90,7 +90,7 @@ namespace NCBI
         {
         public:
             virtual ~ParseBlockInterface() = 0;
-            virtual LogLinesInterface & GetReceiver() = 0;
+            virtual ReceiverInterface & GetReceiver() = 0;
             virtual bool Parse( const std :: string & line ) = 0;
             virtual void SetDebug( bool onOff ) = 0;
         };

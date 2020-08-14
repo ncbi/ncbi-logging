@@ -81,7 +81,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg );
+void aws_error( yyscan_t locp, NCBI::Logging::AWSReceiver * lib, const char* msg );
 
 #define SET_VALUE( selector, source ) ( lib -> set( (selector), (source) ) )
 
@@ -203,7 +203,7 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int aws_parse (void * scanner, NCBI::Logging::LogAWSEvent * lib);
+int aws_parse (void * scanner, NCBI::Logging::AWSReceiver * lib);
 
 #endif /* !YY_AWS_AWS_V2_PARSER_HPP_INCLUDED  */
 
@@ -809,7 +809,7 @@ do {                                                                      \
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogAWSEvent * lib)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::AWSReceiver * lib)
 {
   FILE *yyo = yyoutput;
   YYUSE (yyo);
@@ -830,7 +830,7 @@ yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvalue
 `--------------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogAWSEvent * lib)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::AWSReceiver * lib)
 {
   YYFPRINTF (yyoutput, "%s %s (",
              yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
@@ -868,7 +868,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::LogAWSEvent * lib)
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::AWSReceiver * lib)
 {
   unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1148,7 +1148,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::LogAWSEvent * lib)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::AWSReceiver * lib)
 {
   YYUSE (yyvaluep);
   YYUSE (scanner);
@@ -1170,7 +1170,7 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NC
 `----------*/
 
 int
-yyparse (void * scanner, NCBI::Logging::LogAWSEvent * lib)
+yyparse (void * scanner, NCBI::Logging::AWSReceiver * lib)
 {
 /* The lookahead symbol.  */
 int yychar;
@@ -1499,11 +1499,11 @@ yyreduce:
         {
             t_str empty;
             EMPTY_TSTR( empty );
-            SET_VALUE( LogAWSEvent::key, empty );
+            SET_VALUE( AWSReceiver::key, empty );
         }
         else
         {
-            SET_VALUE( LogAWSEvent::key, (yyvsp[-38].req) . path );
+            SET_VALUE( AWSReceiver::key, (yyvsp[-38].req) . path );
         }
 
         t_request req = (yyvsp[-36].req);
@@ -1539,67 +1539,67 @@ yyreduce:
 
   case 21:
 #line 153 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::owner, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::owner, (yyvsp[0].s) ); }
 #line 1544 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 154 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::bucket, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::bucket, (yyvsp[0].s) ); }
 #line 1550 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
 #line 155 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::requester, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::requester, (yyvsp[0].s) ); }
 #line 1556 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 156 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::request_id, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::request_id, (yyvsp[0].s) ); }
 #line 1562 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
 #line 157 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::operation, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::operation, (yyvsp[0].s) ); }
 #line 1568 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 158 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::error, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::error, (yyvsp[0].s) ); }
 #line 1574 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
 #line 159 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::version_id, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::version_id, (yyvsp[0].s) ); }
 #line 1580 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
 #line 160 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::sig_ver, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::sig_ver, (yyvsp[0].s) ); }
 #line 1586 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
 #line 161 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::cipher_suite, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::cipher_suite, (yyvsp[0].s) ); }
 #line 1592 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
 #line 162 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::auth_type, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::auth_type, (yyvsp[0].s) ); }
 #line 1598 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
 #line 163 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::host_header, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::host_header, (yyvsp[0].s) ); }
 #line 1604 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1684,49 +1684,49 @@ yyreduce:
 
   case 40:
 #line 216 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::res_len, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::res_len, (yyvsp[0].s) ); }
 #line 1689 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
 #line 217 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::res_len, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::res_len, (yyvsp[0].s) ); }
 #line 1695 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
 #line 221 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::obj_size, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::obj_size, (yyvsp[0].s) ); }
 #line 1701 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
 #line 222 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::obj_size, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::obj_size, (yyvsp[0].s) ); }
 #line 1707 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
 #line 226 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::total_time, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::total_time, (yyvsp[0].s) ); }
 #line 1713 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
 #line 227 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::total_time, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::total_time, (yyvsp[0].s) ); }
 #line 1719 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
 #line 231 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::turnaround_time, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::turnaround_time, (yyvsp[0].s) ); }
 #line 1725 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
 #line 232 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::turnaround_time, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::turnaround_time, (yyvsp[0].s) ); }
 #line 1731 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1744,7 +1744,7 @@ yyreduce:
     { 
             (yyval.s) = (yyvsp[-2].s); // keep the space between the 2 parts of the Id
             MERGE_TSTR( (yyval.s) , (yyvsp[-1].s) );
-            SET_VALUE( LogAWSEvent::host_id, (yyval.s) );
+            SET_VALUE( AWSReceiver::host_id, (yyval.s) );
         }
 #line 1750 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
@@ -1755,7 +1755,7 @@ yyreduce:
             (yyval.s) = (yyvsp[0].s);
             // trim the trailing space
             (yyval.s) . n --;
-            SET_VALUE( LogAWSEvent::host_id, (yyval.s) );
+            SET_VALUE( AWSReceiver::host_id, (yyval.s) );
         }
 #line 1761 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
@@ -1763,7 +1763,7 @@ yyreduce:
   case 51:
 #line 257 "aws_v2_parser.y" /* yacc.c:1646  */
     {
-            SET_VALUE( LogAWSEvent::host_id, (yyvsp[-1].s) );
+            SET_VALUE( AWSReceiver::host_id, (yyvsp[-1].s) );
         }
 #line 1769 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
@@ -1771,38 +1771,38 @@ yyreduce:
   case 52:
 #line 261 "aws_v2_parser.y" /* yacc.c:1646  */
     {
-            SET_VALUE( LogAWSEvent::host_id, (yyvsp[-1].s) );
+            SET_VALUE( AWSReceiver::host_id, (yyvsp[-1].s) );
         }
 #line 1777 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
 #line 267 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::tls_version, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::tls_version, (yyvsp[0].s) ); }
 #line 1783 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 54:
 #line 268 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::tls_version, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::tls_version, (yyvsp[0].s) ); }
 #line 1789 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 55:
 #line 272 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::ip, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::ip, (yyvsp[0].s) ); }
 #line 1795 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 56:
 #line 273 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::ip, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::ip, (yyvsp[0].s) ); }
 #line 1801 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
 #line 274 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::ip, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::ip, (yyvsp[0].s) ); }
 #line 1807 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1969,13 +1969,13 @@ yyreduce:
 
   case 78:
 #line 390 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::res_code, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::res_code, (yyvsp[0].s) ); }
 #line 1974 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 79:
 #line 391 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::res_code, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::res_code, (yyvsp[0].s) ); }
 #line 1980 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -2000,7 +2000,7 @@ yyreduce:
   case 83:
 #line 402 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
-            SET_VALUE( LogAWSEvent::referer, (yyvsp[-1].s) ); 
+            SET_VALUE( AWSReceiver::referer, (yyvsp[-1].s) ); 
             aws_pop_state( scanner ); // out of QUOTED into the global state
         }
 #line 2007 "aws_v2_parser.cpp" /* yacc.c:1646  */
@@ -2009,7 +2009,7 @@ yyreduce:
   case 84:
 #line 407 "aws_v2_parser.y" /* yacc.c:1646  */
     { 
-            SET_VALUE( LogAWSEvent::referer, (yyvsp[0].s) ); 
+            SET_VALUE( AWSReceiver::referer, (yyvsp[0].s) ); 
         }
 #line 2015 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
@@ -2153,13 +2153,13 @@ yyreduce:
 
   case 98:
 #line 501 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::time, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::time, (yyvsp[0].s) ); }
 #line 2158 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 99:
 #line 502 "aws_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogAWSEvent::time, (yyvsp[0].s) ); }
+    { SET_VALUE( AWSReceiver::time, (yyvsp[0].s) ); }
 #line 2164 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -2395,7 +2395,7 @@ yyreturn:
 #line 505 "aws_v2_parser.y" /* yacc.c:1906  */
 
 
-void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char * msg )
+void aws_error( yyscan_t locp, NCBI::Logging::AWSReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors via rejected lines
 }

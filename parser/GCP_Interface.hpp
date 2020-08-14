@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LogLinesInterface.hpp"
+#include "ReceiverInterface.hpp"
 
 #include <memory>
 
@@ -8,11 +8,11 @@ namespace NCBI
 {
     namespace Logging
     {
-        struct LogGCPEvent : public LogLinesInterface
+        struct GCPReceiver : public ReceiverInterface
         {
-            using LogLinesInterface::set;
+            using ReceiverInterface::set;
             
-            LogGCPEvent( std::unique_ptr<FormatterInterface> & fmt );
+            GCPReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
             typedef enum { 
                 time = LastMemberId+1,
@@ -29,7 +29,7 @@ namespace NCBI
                 bucket,
                 GCP_LastMemberId = bucket
             } GCP_Members; // all are t_str values
-            virtual void set( GCP_Members m, const t_str & v ); // will invoke set( LogLinesInterface::Members ) if necessary
+            virtual void set( GCP_Members m, const t_str & v ); // will invoke set( ReceiverInterface::Members ) if necessary
 
             virtual void reportField( const char * message );
 

@@ -1,6 +1,6 @@
 %define api.pure full
 %lex-param { void * scanner }
-%parse-param { void * scanner }{ NCBI::Logging::LogAWSEvent * lib }
+%parse-param { void * scanner }{ NCBI::Logging::AWSReceiver * lib }
 
 %define parse.trace
 %define parse.error verbose
@@ -19,7 +19,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char* msg );
+void aws_error( yyscan_t locp, NCBI::Logging::AWSReceiver * lib, const char* msg );
 
 #define SET_VALUE( selector, source ) ( lib -> set( (selector), (source) ) )
 
@@ -116,11 +116,11 @@ log_aws
         {
             t_str empty;
             EMPTY_TSTR( empty );
-            SET_VALUE( LogAWSEvent::key, empty );
+            SET_VALUE( AWSReceiver::key, empty );
         }
         else
         {
-            SET_VALUE( LogAWSEvent::key, $18 . path );
+            SET_VALUE( AWSReceiver::key, $18 . path );
         }
 
         t_request req = $20;
@@ -150,17 +150,17 @@ log_aws_err
     : aws_owner error       {  YYABORT; }
     ;
 
-aws_owner      : string_or_dash             { SET_VALUE( LogAWSEvent::owner, $1 ); };
-aws_bucket     : string_or_dash             { SET_VALUE( LogAWSEvent::bucket, $1 ); };
-aws_requester  : string_or_dash             { SET_VALUE( LogAWSEvent::requester, $1 ); };
-aws_request_id : string_or_dash             { SET_VALUE( LogAWSEvent::request_id, $1 ); };
-aws_operation  : string_or_dash             { SET_VALUE( LogAWSEvent::operation, $1 ); };
-aws_error      : string_or_dash             { SET_VALUE( LogAWSEvent::error, $1 ); };
-aws_version_id : string_or_dash             { SET_VALUE( LogAWSEvent::version_id, $1 ); };
-aws_sig        : string_or_dash             { SET_VALUE( LogAWSEvent::sig_ver, $1 ); };
-aws_cipher     : string_or_dash             { SET_VALUE( LogAWSEvent::cipher_suite, $1 ); };
-aws_auth       : string_or_dash             { SET_VALUE( LogAWSEvent::auth_type, $1 ); };
-aws_host_hdr   : string_or_dash             { SET_VALUE( LogAWSEvent::host_header, $1 ); };
+aws_owner      : string_or_dash             { SET_VALUE( AWSReceiver::owner, $1 ); };
+aws_bucket     : string_or_dash             { SET_VALUE( AWSReceiver::bucket, $1 ); };
+aws_requester  : string_or_dash             { SET_VALUE( AWSReceiver::requester, $1 ); };
+aws_request_id : string_or_dash             { SET_VALUE( AWSReceiver::request_id, $1 ); };
+aws_operation  : string_or_dash             { SET_VALUE( AWSReceiver::operation, $1 ); };
+aws_error      : string_or_dash             { SET_VALUE( AWSReceiver::error, $1 ); };
+aws_version_id : string_or_dash             { SET_VALUE( AWSReceiver::version_id, $1 ); };
+aws_sig        : string_or_dash             { SET_VALUE( AWSReceiver::sig_ver, $1 ); };
+aws_cipher     : string_or_dash             { SET_VALUE( AWSReceiver::cipher_suite, $1 ); };
+aws_auth       : string_or_dash             { SET_VALUE( AWSReceiver::auth_type, $1 ); };
+aws_host_hdr   : string_or_dash             { SET_VALUE( AWSReceiver::host_header, $1 ); };
 
 key_token
     : SLASH         { InitRequest( $$ ); $$ . path = $1; }
@@ -213,23 +213,23 @@ aws_quoted_key
     ;
 
 aws_bytes_sent
-    : STR                   { SET_VALUE( LogAWSEvent::res_len, $1 ); }
-    | dash                  { SET_VALUE( LogAWSEvent::res_len, $1 ); }
+    : STR                   { SET_VALUE( AWSReceiver::res_len, $1 ); }
+    | dash                  { SET_VALUE( AWSReceiver::res_len, $1 ); }
     ;
 
 aws_obj_size
-    : STR                   { SET_VALUE( LogAWSEvent::obj_size, $1 ); }
-    | dash                  { SET_VALUE( LogAWSEvent::obj_size, $1 ); }
+    : STR                   { SET_VALUE( AWSReceiver::obj_size, $1 ); }
+    | dash                  { SET_VALUE( AWSReceiver::obj_size, $1 ); }
     ;
 
 aws_total_time
-    : STR                   { SET_VALUE( LogAWSEvent::total_time, $1 ); }
-    | dash                  { SET_VALUE( LogAWSEvent::total_time, $1 ); }
+    : STR                   { SET_VALUE( AWSReceiver::total_time, $1 ); }
+    | dash                  { SET_VALUE( AWSReceiver::total_time, $1 ); }
     ;
 
 aws_turnaround_time
-    : STR                   { SET_VALUE( LogAWSEvent::turnaround_time, $1 ); }
-    | dash                  { SET_VALUE( LogAWSEvent::turnaround_time, $1 ); }
+    : STR                   { SET_VALUE( AWSReceiver::turnaround_time, $1 ); }
+    | dash                  { SET_VALUE( AWSReceiver::turnaround_time, $1 ); }
     ;
 
 x_amz_id_2: X_AMZ_ID_2 SPACE
@@ -244,34 +244,34 @@ aws_host_id
         { 
             $$ = $1; // keep the space between the 2 parts of the Id
             MERGE_TSTR( $$ , $2 );
-            SET_VALUE( LogAWSEvent::host_id, $$ );
+            SET_VALUE( AWSReceiver::host_id, $$ );
         }
     | x_amz_id_2
         {
             $$ = $1;
             // trim the trailing space
             $$ . n --;
-            SET_VALUE( LogAWSEvent::host_id, $$ );
+            SET_VALUE( AWSReceiver::host_id, $$ );
         }
     | S3_EXT_REQ_ID SPACE
         {
-            SET_VALUE( LogAWSEvent::host_id, $1 );
+            SET_VALUE( AWSReceiver::host_id, $1 );
         }
     | dash SPACE
         {
-            SET_VALUE( LogAWSEvent::host_id, $1 );
+            SET_VALUE( AWSReceiver::host_id, $1 );
         }
     ;
 
 aws_tls_vers 
-    : TLS_VERSION           { SET_VALUE( LogAWSEvent::tls_version, $1 ); }
-    | dash                  { SET_VALUE( LogAWSEvent::tls_version, $1 ); }
+    : TLS_VERSION           { SET_VALUE( AWSReceiver::tls_version, $1 ); }
+    | dash                  { SET_VALUE( AWSReceiver::tls_version, $1 ); }
     ;
 
 ip
-    : IPV4      { SET_VALUE( LogAWSEvent::ip, $1 ); }
-    | IPV6      { SET_VALUE( LogAWSEvent::ip, $1 ); }
-    | dash      { SET_VALUE( LogAWSEvent::ip, $1 ); }
+    : IPV4      { SET_VALUE( AWSReceiver::ip, $1 ); }
+    | IPV6      { SET_VALUE( AWSReceiver::ip, $1 ); }
+    | dash      { SET_VALUE( AWSReceiver::ip, $1 ); }
     ;
 
 method
@@ -387,8 +387,8 @@ request
     ;
 
 result_code
-    : RESULTCODE        { SET_VALUE( LogAWSEvent::res_code, $1 ); }
-    | dash              { SET_VALUE( LogAWSEvent::res_code, $1 ); }
+    : RESULTCODE        { SET_VALUE( AWSReceiver::res_code, $1 ); }
+    | dash              { SET_VALUE( AWSReceiver::res_code, $1 ); }
     ;
 
 qstr_list
@@ -400,12 +400,12 @@ referer
     : QUOTE { aws_start_referer( scanner ); } 
         qstr_list QUOTE                 
         { 
-            SET_VALUE( LogAWSEvent::referer, $3 ); 
+            SET_VALUE( AWSReceiver::referer, $3 ); 
             aws_pop_state( scanner ); // out of QUOTED into the global state
         }
     | string_or_dash                        
         { 
-            SET_VALUE( LogAWSEvent::referer, $1 ); 
+            SET_VALUE( AWSReceiver::referer, $1 ); 
         }
     ;
 
@@ -498,13 +498,13 @@ agent
     ;
 
 time
-    : TIME_FMT              { SET_VALUE( LogAWSEvent::time, $1 ); }
-    | dash                  { SET_VALUE( LogAWSEvent::time, $1 ); }
+    : TIME_FMT              { SET_VALUE( AWSReceiver::time, $1 ); }
+    | dash                  { SET_VALUE( AWSReceiver::time, $1 ); }
     ;
 
 %%
 
-void aws_error( yyscan_t locp, NCBI::Logging::LogAWSEvent * lib, const char * msg )
+void aws_error( yyscan_t locp, NCBI::Logging::AWSReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors via rejected lines
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "LogLinesInterface.hpp"
+#include "ReceiverInterface.hpp"
 
 #include <cstdint>
 #include <string>
@@ -102,16 +102,16 @@ namespace NCBI
 
                 // called by the worker-threads to put output in
                 // returns false if the queue is full
-                bool enqueue( string_type s, LogLinesInterface::Category cat );
+                bool enqueue( string_type s, ReceiverInterface::Category cat );
 
                 // called by the worker-threads aka the consumers
-                string_type dequeue( LogLinesInterface::Category &cat );
+                string_type dequeue( ReceiverInterface::Category &cat );
 
                 void close() { m_open.store( false ); }
                 bool is_open() const { return m_open.load(); }
 
             private :
-                typedef std::pair< string_type, LogLinesInterface::Category > output_pair;
+                typedef std::pair< string_type, ReceiverInterface::Category > output_pair;
                 std::queue< output_pair > m_queue;
                 std::atomic< bool > m_open;
                 std::mutex m_mutex;

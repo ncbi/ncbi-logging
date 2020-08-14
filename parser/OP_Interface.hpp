@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LogLinesInterface.hpp"
+#include "ReceiverInterface.hpp"
 
 #include <memory>
 
@@ -8,11 +8,11 @@ namespace NCBI
 {
     namespace Logging
     {
-        struct LogOPEvent : public LogLinesInterface
+        struct OPReceiver : public ReceiverInterface
         {
-            using LogLinesInterface::set;
+            using ReceiverInterface::set;
             
-            LogOPEvent( std::unique_ptr<FormatterInterface> & fmt );
+            OPReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
             typedef enum { 
                 owner = LastMemberId+1,
@@ -27,7 +27,7 @@ namespace NCBI
                 res_len,
                 OP_LastMemberId = res_len
             } OP_Members; // all are t_str values
-            virtual void set( OP_Members m, const t_str & ); // will invoke set( LogLinesInterface::Members ) if necessary
+            virtual void set( OP_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
 
             virtual void reportField( const char * message );
 

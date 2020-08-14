@@ -105,6 +105,6 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int gcp_parse (void * scanner, NCBI::Logging::LogGCPEvent * lib);
+int gcp_parse (void * scanner, NCBI::Logging::GCPReceiver * lib);
 
 #endif /* !YY_GCP_GCP_V2_PARSER_HPP_INCLUDED  */

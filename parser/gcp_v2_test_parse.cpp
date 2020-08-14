@@ -13,24 +13,24 @@ using namespace NCBI::Logging;
 #define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); (t).escaped = false; } while (false)
 #define INIT_TSTR_ESC(t, s) do { (t).p = s; (t).n = strlen(s); (t).escaped = true; } while (false)
 
-TEST(LogGCPEventTest, Create)
+TEST(GCPReceiverTest, Create)
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    LogGCPEvent e ( f );
+    GCPReceiver e ( f );
 }
 
-TEST(LogOPEventTest, Setters)
+TEST(LogGCPEventTest, Setters)
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    LogGCPEvent e ( f );
+    GCPReceiver e ( f );
     
     t_str v;
     INIT_TSTR( v, "i_p");
-    e.set( LogLinesInterface::ip, v );
+    e.set( ReceiverInterface::ip, v );
     INIT_TSTR( v, "ref");
-    e.set( LogLinesInterface::referer, v );
+    e.set( ReceiverInterface::referer, v );
     INIT_TSTR( v, "unp");
-    e.set( LogLinesInterface::unparsed, v );
+    e.set( ReceiverInterface::unparsed, v );
     t_agent a = { 
         {"o", 1, false },
         {"v_o", 3, false },
@@ -54,18 +54,18 @@ TEST(LogOPEventTest, Setters)
     };
     e.setRequest( r );
 
-    INIT_TSTR( v, "tim"); e.set(LogGCPEvent::time, v);
-    INIT_TSTR( v, "ipt"); e.set(LogGCPEvent::ip_type, v);
-    INIT_TSTR( v, "ipr");e.set(LogGCPEvent::ip_region, v);
-    INIT_TSTR( v, "uri"); e.set(LogGCPEvent::uri, v);
-    INIT_TSTR( v, "sta"); e.set(LogGCPEvent::status, v);
-    INIT_TSTR( v, "rqb"); e.set(LogGCPEvent::request_bytes, v);
-    INIT_TSTR( v, "rsb"); e.set(LogGCPEvent::result_bytes, v);
-    INIT_TSTR( v, "tt"); e.set(LogGCPEvent::time_taken, v);
-    INIT_TSTR( v, "h"); e.set(LogGCPEvent::host, v);
-    INIT_TSTR( v, "rid"); e.set(LogGCPEvent::request_id, v);
-    INIT_TSTR( v, "ope"); e.set(LogGCPEvent::operation, v);
-    INIT_TSTR( v, "buc"); e.set(LogGCPEvent::bucket, v);
+    INIT_TSTR( v, "tim"); e.set(GCPReceiver::time, v);
+    INIT_TSTR( v, "ipt"); e.set(GCPReceiver::ip_type, v);
+    INIT_TSTR( v, "ipr");e.set(GCPReceiver::ip_region, v);
+    INIT_TSTR( v, "uri"); e.set(GCPReceiver::uri, v);
+    INIT_TSTR( v, "sta"); e.set(GCPReceiver::status, v);
+    INIT_TSTR( v, "rqb"); e.set(GCPReceiver::request_bytes, v);
+    INIT_TSTR( v, "rsb"); e.set(GCPReceiver::result_bytes, v);
+    INIT_TSTR( v, "tt"); e.set(GCPReceiver::time_taken, v);
+    INIT_TSTR( v, "h"); e.set(GCPReceiver::host, v);
+    INIT_TSTR( v, "rid"); e.set(GCPReceiver::request_id, v);
+    INIT_TSTR( v, "ope"); e.set(GCPReceiver::operation, v);
+    INIT_TSTR( v, "buc"); e.set(GCPReceiver::bucket, v);
 
     ASSERT_EQ ( 
         "{\"accession\":\"a\",\"agent\":\"o\",\"bucket\":\"buc\",\"extension\":\"e\",\"filename\":\"f\",\"host\":\"h\",\"ip\":\"i_p\",\"ip_region\":\"ipr\",\"ip_type\":\"ipt\",\"method\":\"m\",\"operation\":\"ope\",\"path\":\"p\",\"referer\":\"ref\",\"request_bytes\":\"rqb\",\"request_id\":\"rid\",\"result_bytes\":\"rsb\",\"status\":\"sta\",\"time\":\"tim\",\"time_taken\":\"tt\",\"unparsed\":\"unp\",\"uri\":\"uri\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}", 
@@ -75,9 +75,9 @@ TEST(LogOPEventTest, Setters)
 class TestCatWriter : public StringCatWriter
 {   // capture "ignored"
 public:
-    virtual void write( LogLinesInterface::Category cat, const std::string & s )
+    virtual void write( ReceiverInterface::Category cat, const std::string & s )
     {
-        if ( cat == LogLinesInterface::cat_ignored )
+        if ( cat == ReceiverInterface::cat_ignored )
         {
             ignored << s << endl;
         }
@@ -93,7 +93,7 @@ public:
     stringstream ignored;
 };
 
-class LogGCPEventFixture : public ::testing::Test
+class GCPReceiverFixture : public ::testing::Test
 {
     public :
         void try_to_parse( std::string line, bool debug = false )
@@ -155,7 +155,7 @@ class LogGCPEventFixture : public ::testing::Test
         TestCatWriter s_outputs;
 };
 
-TEST_F( LogGCPEventFixture, LineRejecting )
+TEST_F( GCPReceiverFixture, LineRejecting )
 {
     std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );
     ASSERT_EQ( 
@@ -164,7 +164,7 @@ TEST_F( LogGCPEventFixture, LineRejecting )
         "{\"_line_nr\":3,\"_unparsed\":\"line3\"}\n", res );
 }
 
-TEST_F( LogGCPEventFixture, ErrorRecovery )
+TEST_F( GCPReceiverFixture, ErrorRecovery )
 {
     try_to_parse( 
         "line1 blah\n" 
@@ -175,125 +175,125 @@ TEST_F( LogGCPEventFixture, ErrorRecovery )
                 s_outputs.get_good() );
 }
 
-TEST_F( LogGCPEventFixture, unrecognized_char )
+TEST_F( GCPReceiverFixture, unrecognized_char )
 {
     std::string res = try_to_parse_ugly( "1 \07" );
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"1 \\u0007\"}\n", res );
 }
 
-TEST_F( LogGCPEventFixture, time )
+TEST_F( GCPReceiverFixture, time )
 {
     string res = try_to_parse_good(
         "\"123\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "123", extract_value( res, "time" ) );
 }
 
-TEST_F( LogGCPEventFixture, ipv4 )
+TEST_F( GCPReceiverFixture, ipv4 )
 {
     string res = try_to_parse_good(
         "\"1\",\"18.207.254.142\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "18.207.254.142", extract_value( res, "ip" ) );
 }
 
-TEST_F( LogGCPEventFixture, ipv6 )
+TEST_F( GCPReceiverFixture, ipv6 )
 {
     string res = try_to_parse_good(
         "\"1\",\"0123:4567:89ab:cdef::1.2.3.4\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "0123:4567:89ab:cdef::1.2.3.4", extract_value( res, "ip" ) );
 }
 
-TEST_F( LogGCPEventFixture, ip_type )
+TEST_F( GCPReceiverFixture, ip_type )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"42\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "42", extract_value( res, "ip_type" ) );
 }
 
-TEST_F( LogGCPEventFixture, ip_region )
+TEST_F( GCPReceiverFixture, ip_region )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"area42\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "area42", extract_value( res, "ip_region" ) );
 }
 
-TEST_F( LogGCPEventFixture, status )
+TEST_F( GCPReceiverFixture, status )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"200\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "200", extract_value( res, "status" ) );
 }
 
-TEST_F( LogGCPEventFixture, req_bytes )
+TEST_F( GCPReceiverFixture, req_bytes )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"201\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "201", extract_value( res, "request_bytes" ) );
 }
 
-TEST_F( LogGCPEventFixture, res_bytes )
+TEST_F( GCPReceiverFixture, res_bytes )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"5000\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "5000", extract_value( res, "result_bytes" ) );
 }
 
-TEST_F( LogGCPEventFixture, time_taken )
+TEST_F( GCPReceiverFixture, time_taken )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"10\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "10", extract_value( res, "time_taken" ) );
 }
 
-TEST_F( LogGCPEventFixture, host )
+TEST_F( GCPReceiverFixture, host )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"host0\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "host0", extract_value( res, "host" ) );
 }
 
-TEST_F( LogGCPEventFixture, referer )
+TEST_F( GCPReceiverFixture, referer )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"referrer\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "referrer", extract_value( res, "referer" ) );
 }
 
-TEST_F( LogGCPEventFixture, req_id_int )
+TEST_F( GCPReceiverFixture, req_id_int )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"123\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "123", extract_value( res, "request_id" ) );
 }
 
-TEST_F( LogGCPEventFixture, req_id_str )
+TEST_F( GCPReceiverFixture, req_id_str )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"abc\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "abc", extract_value( res, "request_id" ) );
 }
 
-TEST_F( LogGCPEventFixture, operation )
+TEST_F( GCPReceiverFixture, operation )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"oper\",\"\",\"\"\n");
     ASSERT_EQ( "oper", extract_value( res, "operation" ) );
 }
 
-TEST_F( LogGCPEventFixture, bucket )
+TEST_F( GCPReceiverFixture, bucket )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"kickme\",\"\"\n");
     ASSERT_EQ( "kickme", extract_value( res, "bucket" ) );
 }
 
-TEST_F( LogGCPEventFixture, method )
+TEST_F( GCPReceiverFixture, method )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_object )
+TEST_F( GCPReceiverFixture, accession_from_object )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/qwe.2\"\n");
@@ -304,7 +304,7 @@ TEST_F( LogGCPEventFixture, accession_from_object )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_object_as_file )
+TEST_F( GCPReceiverFixture, accession_from_object_as_file )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/SRR002994.2\"\n");
@@ -314,7 +314,7 @@ TEST_F( LogGCPEventFixture, accession_from_object_as_file )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_object_no_file )
+TEST_F( GCPReceiverFixture, accession_from_object_no_file )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/.2\"\n");
@@ -324,7 +324,7 @@ TEST_F( LogGCPEventFixture, accession_from_object_no_file )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_object_no_extension )
+TEST_F( GCPReceiverFixture, accession_from_object_no_extension )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/2\"\n");
@@ -334,7 +334,7 @@ TEST_F( LogGCPEventFixture, accession_from_object_no_extension )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_url )
+TEST_F( GCPReceiverFixture, accession_from_url )
 {   // no accession found in the object, go to URL
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/SRR002994/qwe.2\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
@@ -345,7 +345,7 @@ TEST_F( LogGCPEventFixture, accession_from_url )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_url_in_params )
+TEST_F( GCPReceiverFixture, accession_from_url_in_params )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&anothrPrefix=SRR77777777&maxResults=1000&delimiter=%2F&alt=json\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
@@ -356,7 +356,7 @@ TEST_F( LogGCPEventFixture, accession_from_url_in_params )
     ASSERT_EQ( ".fastq.gz", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_url_in_params_no_file )
+TEST_F( GCPReceiverFixture, accession_from_url_in_params_no_file )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
@@ -366,7 +366,7 @@ TEST_F( LogGCPEventFixture, accession_from_url_in_params_no_file )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_object_with_equal_sign )
+TEST_F( GCPReceiverFixture, accession_from_object_with_equal_sign )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11453435/run1912_lane2_read1_indexN705-S506=122016_Cell94-F12.fastq.gz.1\"\n");
@@ -375,7 +375,7 @@ TEST_F( LogGCPEventFixture, accession_from_object_with_equal_sign )
     ASSERT_EQ( ".fastq.gz.1", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_object_with_equal_sign_in_extension )
+TEST_F( GCPReceiverFixture, accession_from_object_with_equal_sign_in_extension )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11453435/run1912_lane2_read1_indexN705-S506_122016_Cell94-F12.fastq.gz=1\"\n");
@@ -384,7 +384,7 @@ TEST_F( LogGCPEventFixture, accession_from_object_with_equal_sign_in_extension )
     ASSERT_EQ( ".fastq.gz=1", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_object_spaces_ampersands )
+TEST_F( GCPReceiverFixture, accession_from_object_spaces_ampersands )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11509941/LZ017&LZ018&LZ019_2 sample taq.fast&q.gz.1\"\n");
@@ -393,7 +393,7 @@ TEST_F( LogGCPEventFixture, accession_from_object_spaces_ampersands )
     ASSERT_EQ( ".fast&q.gz.1", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, accession_from_url_double_accession )
+TEST_F( GCPReceiverFixture, accession_from_url_double_accession )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-sars-cov2/o/sra-src%SRR123456%2FSRR004257?fields=updated%2Cname%2CtimeCreated%2Csize&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n" );
@@ -402,7 +402,7 @@ TEST_F( LogGCPEventFixture, accession_from_url_double_accession )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, bad_object )
+TEST_F( GCPReceiverFixture, bad_object )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR004257&\"\n" );
@@ -411,7 +411,7 @@ TEST_F( LogGCPEventFixture, bad_object )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogGCPEventFixture, agent )
+TEST_F( GCPReceiverFixture, agent )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\",\"\",\"\",\"\",\"\"" );
@@ -425,7 +425,7 @@ TEST_F( LogGCPEventFixture, agent )
     ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
 }
 
-TEST_F( LogGCPEventFixture, agent_no_os )
+TEST_F( GCPReceiverFixture, agent_no_os )
 {   
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\",\"\",\"\",\"\",\"\"" );
@@ -439,7 +439,7 @@ TEST_F( LogGCPEventFixture, agent_no_os )
     ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
 }
 
-TEST_F( LogGCPEventFixture, header )
+TEST_F( GCPReceiverFixture, header )
 {
     string s = try_to_parse_ignored( 
         "\"time_micros\",\"c_ip\",\"c_ip_type\",\"c_ip_region\",\"cs_method\",\"cs_uri\",\"sc_status\",\"cs_bytes\",\"sc_bytes\",\"time_taken_micros\",\"cs_host\",\"cs_referer\",\"cs_user_agent\",\"s_request_id\",\"cs_operation\",\"cs_bucket\",\"cs_object\""
@@ -447,7 +447,7 @@ TEST_F( LogGCPEventFixture, header )
     ASSERT_NE( "", s );
 }
 
-TEST_F( LogGCPEventFixture, header_bad )
+TEST_F( GCPReceiverFixture, header_bad )
 {   
     string s = try_to_parse_review( "\"blah\"" );
     ASSERT_NE( "", s );

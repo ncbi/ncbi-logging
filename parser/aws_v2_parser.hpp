@@ -127,6 +127,6 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int aws_parse (void * scanner, NCBI::Logging::LogAWSEvent * lib);
+int aws_parse (void * scanner, NCBI::Logging::AWSReceiver * lib);
 
 #endif /* !YY_AWS_AWS_V2_PARSER_HPP_INCLUDED  */

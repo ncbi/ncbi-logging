@@ -79,7 +79,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void op_error( yyscan_t locp, NCBI::Logging::LogOPEvent * lib, const char* msg );
+void op_error( yyscan_t locp, NCBI::Logging::OPReceiver * lib, const char* msg );
 
 const t_str EmptyTSTR = { "", 0, false };
 
@@ -199,7 +199,7 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int op_parse (void * scanner, NCBI::Logging::LogOPEvent * lib);
+int op_parse (void * scanner, NCBI::Logging::OPReceiver * lib);
 
 #endif /* !YY_OP_OP_V2_PARSER_HPP_INCLUDED  */
 
@@ -506,15 +506,15 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    72,    72,    73,    80,    85,    86,    77,   110,   114,
-     115,   119,   120,   124,   128,   132,   133,   137,   142,   148,
-     154,   163,   164,   165,   166,   167,   168,   172,   180,   211,
-     215,   223,   223,   231,   237,   242,   247,   252,   260,   262,
-     271,   277,   282,   291,   299,   303,   307,   315,   316,   320,
-     321,   322,   326,   327,   328,   329,   333,   337,   338,   342,
-     343,   347,   348,   349,   350,   351,   355,   356,   360,   361,
-     365,   366,   377,   378,   379,   380,   384,   385,   416,   424,
-     431,   435,   443,   447,   451
+       0,    72,    72,    73,    80,    85,    86,    77,    95,    99,
+     100,   104,   105,   109,   113,   117,   118,   122,   127,   133,
+     139,   148,   149,   150,   151,   152,   153,   157,   165,   196,
+     200,   208,   208,   216,   222,   227,   232,   237,   245,   247,
+     256,   262,   267,   276,   284,   288,   292,   300,   301,   305,
+     306,   307,   311,   312,   313,   314,   318,   322,   323,   327,
+     328,   332,   333,   334,   335,   336,   340,   341,   345,   346,
+     350,   351,   362,   363,   364,   365,   369,   370,   401,   409,
+     416,   420,   428,   432,   436
 };
 #endif
 
@@ -780,7 +780,7 @@ do {                                                                      \
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogOPEvent * lib)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::OPReceiver * lib)
 {
   FILE *yyo = yyoutput;
   YYUSE (yyo);
@@ -801,7 +801,7 @@ yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvalue
 `--------------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::LogOPEvent * lib)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * scanner, NCBI::Logging::OPReceiver * lib)
 {
   YYFPRINTF (yyoutput, "%s %s (",
              yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
@@ -839,7 +839,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::LogOPEvent * lib)
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * scanner, NCBI::Logging::OPReceiver * lib)
 {
   unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1119,7 +1119,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::LogOPEvent * lib)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NCBI::Logging::OPReceiver * lib)
 {
   YYUSE (yyvaluep);
   YYUSE (scanner);
@@ -1141,7 +1141,7 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * scanner, NC
 `----------*/
 
 int
-yyparse (void * scanner, NCBI::Logging::LogOPEvent * lib)
+yyparse (void * scanner, NCBI::Logging::OPReceiver * lib)
 {
 /* The lookahead symbol.  */
 int yychar;
@@ -1421,150 +1421,135 @@ yyreduce:
   case 7:
 #line 90 "op_v2_parser.y" /* yacc.c:1646  */
     {
-        // LogOPEvent ev;
-        // ev . ip = $1;
-        // ev . user = $3;
-        // ev . time = $4;
-        // ev . request = $5;
-        // ev . res_code = ToInt64( $6 );
-        // ev . res_len = ToInt64( $7 );
-        // ev . req_time = $8;
-        // ev . referer = $9;
-        // ev . agent = $12;
-        // ev . forwarded = $14;
-        // ev . port = ToInt64( $15 );
-        // ev . req_len = ToInt64( $16 );
-
-        // lib -> acceptLine( ev );
     }
-#line 1441 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1426 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 114 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::ip, (yyvsp[0].s) ); }
-#line 1447 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 99 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::ip, (yyvsp[0].s) ); }
+#line 1432 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 115 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::ip, (yyvsp[0].s) ); }
-#line 1453 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 100 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::ip, (yyvsp[0].s) ); }
+#line 1438 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 119 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::user, EmptyTSTR ); }
-#line 1459 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 104 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::user, EmptyTSTR ); }
+#line 1444 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 120 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::user, (yyvsp[0].s) ); }
-#line 1465 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 105 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::user, (yyvsp[0].s) ); }
+#line 1450 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 124 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::time, (yyvsp[0].s) ); }
-#line 1471 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 109 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::time, (yyvsp[0].s) ); }
+#line 1456 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 128 "op_v2_parser.y" /* yacc.c:1646  */
+#line 113 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1477 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1462 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 132 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::server, (yyvsp[-1].s) ); }
-#line 1483 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 117 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::server, (yyvsp[-1].s) ); }
+#line 1468 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 133 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::server, (yyvsp[0].s) ); }
-#line 1489 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 118 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::server, (yyvsp[0].s) ); }
+#line 1474 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 138 "op_v2_parser.y" /* yacc.c:1646  */
+#line 123 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             InitRequest( (yyval.req) );
             (yyval.req) . path = (yyvsp[0].s); 
         }
-#line 1498 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1483 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 143 "op_v2_parser.y" /* yacc.c:1646  */
+#line 128 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             InitRequest( (yyval.req) );
             (yyval.req) . path = (yyvsp[0].s); 
             (yyval.req) . accession = (yyvsp[0].s); 
         }
-#line 1508 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1493 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 149 "op_v2_parser.y" /* yacc.c:1646  */
+#line 134 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             InitRequest( (yyval.req) );
             (yyval.req) . path = (yyvsp[0].s); 
             (yyval.req) . filename = (yyvsp[0].s); 
         }
-#line 1518 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1503 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 155 "op_v2_parser.y" /* yacc.c:1646  */
+#line 140 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             InitRequest( (yyval.req) );
             (yyval.req) . path = (yyvsp[0].s); 
             (yyval.req) . extension = (yyvsp[0].s); 
         }
-#line 1528 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1513 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 163 "op_v2_parser.y" /* yacc.c:1646  */
+#line 148 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1534 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1519 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 164 "op_v2_parser.y" /* yacc.c:1646  */
+#line 149 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); (yyval.s) . n += (yyvsp[0].s) . n; }
-#line 1540 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1525 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 165 "op_v2_parser.y" /* yacc.c:1646  */
+#line 150 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); (yyval.s) . n += (yyvsp[0].s) . n; }
-#line 1546 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1531 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 166 "op_v2_parser.y" /* yacc.c:1646  */
+#line 151 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); (yyval.s) . n += (yyvsp[0].s) . n; }
-#line 1552 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1537 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 167 "op_v2_parser.y" /* yacc.c:1646  */
+#line 152 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); (yyval.s) . n += (yyvsp[0].s) . n; }
-#line 1558 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1543 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 168 "op_v2_parser.y" /* yacc.c:1646  */
+#line 153 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); (yyval.s) . n += (yyvsp[0].s) . n; }
-#line 1564 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1549 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 173 "op_v2_parser.y" /* yacc.c:1646  */
+#line 158 "op_v2_parser.y" /* yacc.c:1646  */
     {
             (yyval.req) = (yyvsp[0].req);
             if ( (yyvsp[0].req) . accession . n > 0 )
@@ -1572,11 +1557,11 @@ yyreduce:
                 (yyval.req) . filename  = (yyvsp[0].req) . accession;
             }
         }
-#line 1576 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1561 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 181 "op_v2_parser.y" /* yacc.c:1646  */
+#line 166 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[-1].req);
             (yyval.req) . path . n += (yyvsp[0].req) . path . n;
@@ -1604,124 +1589,124 @@ yyreduce:
                 (yyval.req) . extension = (yyvsp[0].req) . extension;
             }
         }
-#line 1608 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1593 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 212 "op_v2_parser.y" /* yacc.c:1646  */
+#line 197 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[0].req); 
         }
-#line 1616 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1601 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 216 "op_v2_parser.y" /* yacc.c:1646  */
+#line 201 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[-1].req);
             (yyval.req) . path . n += (yyvsp[0].s) . n;
         }
-#line 1625 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1610 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 223 "op_v2_parser.y" /* yacc.c:1646  */
+#line 208 "op_v2_parser.y" /* yacc.c:1646  */
     { op_start_URL ( scanner ); }
-#line 1631 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1616 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 224 "op_v2_parser.y" /* yacc.c:1646  */
+#line 209 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[0].req); 
             op_pop_state ( scanner );
         }
-#line 1640 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1625 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 232 "op_v2_parser.y" /* yacc.c:1646  */
+#line 217 "op_v2_parser.y" /* yacc.c:1646  */
     {
             InitRequest( (yyval.req) );
             (yyval.req) . path = (yyvsp[0].s);
             (yyval.req) . vers = (yyvsp[0].s);
         }
-#line 1650 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1635 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
+#line 223 "op_v2_parser.y" /* yacc.c:1646  */
+    {
+            InitRequest( (yyval.req) );
+            (yyval.req) . path = (yyvsp[0].s);
+        }
+#line 1644 "op_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 228 "op_v2_parser.y" /* yacc.c:1646  */
+    {
+            InitRequest( (yyval.req) );
+            (yyval.req) . path = (yyvsp[0].s);
+        }
+#line 1653 "op_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 233 "op_v2_parser.y" /* yacc.c:1646  */
+    {
+            InitRequest( (yyval.req) );
+            (yyval.req) . path = (yyvsp[0].s);
+        }
+#line 1662 "op_v2_parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 37:
 #line 238 "op_v2_parser.y" /* yacc.c:1646  */
     {
             InitRequest( (yyval.req) );
             (yyval.req) . path = (yyvsp[0].s);
         }
-#line 1659 "op_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 35:
-#line 243 "op_v2_parser.y" /* yacc.c:1646  */
-    {
-            InitRequest( (yyval.req) );
-            (yyval.req) . path = (yyvsp[0].s);
-        }
-#line 1668 "op_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 36:
-#line 248 "op_v2_parser.y" /* yacc.c:1646  */
-    {
-            InitRequest( (yyval.req) );
-            (yyval.req) . path = (yyvsp[0].s);
-        }
-#line 1677 "op_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 37:
-#line 253 "op_v2_parser.y" /* yacc.c:1646  */
-    {
-            InitRequest( (yyval.req) );
-            (yyval.req) . path = (yyvsp[0].s);
-        }
-#line 1686 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1671 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 261 "op_v2_parser.y" /* yacc.c:1646  */
+#line 246 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.req) = (yyvsp[0].req); }
-#line 1692 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1677 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 263 "op_v2_parser.y" /* yacc.c:1646  */
+#line 248 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyval.req) = (yyvsp[-1].req); 
             (yyval.req) . path . n += (yyvsp[0].req) . path .n; 
             (yyval.req) . path . escaped = (yyvsp[-1].req) . path . escaped || (yyvsp[0].req) . path . escaped; 
         }
-#line 1702 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1687 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 272 "op_v2_parser.y" /* yacc.c:1646  */
+#line 257 "op_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.req) = (yyvsp[-3].req);
         (yyval.req).method = (yyvsp[-4].s);
         (yyval.req).vers   = (yyvsp[-1].req) . vers;
     }
-#line 1712 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1697 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 278 "op_v2_parser.y" /* yacc.c:1646  */
+#line 263 "op_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.req) = (yyvsp[-2].req);
         (yyval.req).method = (yyvsp[-3].s);
     }
-#line 1721 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1706 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 283 "op_v2_parser.y" /* yacc.c:1646  */
+#line 268 "op_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.req) = (yyvsp[-1].req);
         (yyval.req).method = (yyvsp[-2].s);
@@ -1730,153 +1715,153 @@ yyreduce:
         // returning to the QUOTED state which we should get out of as well
         op_pop_state ( scanner );
     }
-#line 1734 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1719 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 292 "op_v2_parser.y" /* yacc.c:1646  */
+#line 277 "op_v2_parser.y" /* yacc.c:1646  */
     {
         InitRequest( (yyval.req) );
         (yyval.req).method = (yyvsp[-1].s);
     }
-#line 1743 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1728 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 300 "op_v2_parser.y" /* yacc.c:1646  */
+#line 285 "op_v2_parser.y" /* yacc.c:1646  */
     {
         lib->setRequest( (yyvsp[0].req) );
     }
-#line 1751 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1736 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 304 "op_v2_parser.y" /* yacc.c:1646  */
+#line 289 "op_v2_parser.y" /* yacc.c:1646  */
     { 
         //TODO: reportField(request, $3)
     }
-#line 1759 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1744 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 308 "op_v2_parser.y" /* yacc.c:1646  */
+#line 293 "op_v2_parser.y" /* yacc.c:1646  */
     {
-        SET_VALUE( LogOPEvent::server, EmptyTSTR );
+        SET_VALUE( OPReceiver::server, EmptyTSTR );
         lib->setRequest( (yyvsp[0].req) );
     }
-#line 1768 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1753 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 315 "op_v2_parser.y" /* yacc.c:1646  */
+#line 300 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); }
-#line 1774 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1759 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 316 "op_v2_parser.y" /* yacc.c:1646  */
+#line 301 "op_v2_parser.y" /* yacc.c:1646  */
     { EMPTY_TSTR((yyval.s)); }
-#line 1780 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1765 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 320 "op_v2_parser.y" /* yacc.c:1646  */
+#line 305 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1786 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1771 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 321 "op_v2_parser.y" /* yacc.c:1646  */
+#line 306 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1792 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1777 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 322 "op_v2_parser.y" /* yacc.c:1646  */
+#line 307 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1798 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1783 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 326 "op_v2_parser.y" /* yacc.c:1646  */
+#line 311 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1804 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1789 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 327 "op_v2_parser.y" /* yacc.c:1646  */
+#line 312 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-2].s); (yyval.s).n += 1 + (yyvsp[0].s).n; (yyval.s).escaped = (yyvsp[-2].s).escaped || (yyvsp[0].s).escaped; }
-#line 1810 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1795 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 328 "op_v2_parser.y" /* yacc.c:1646  */
+#line 313 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); (yyval.s).n += 1; }
-#line 1816 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1801 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 329 "op_v2_parser.y" /* yacc.c:1646  */
+#line 314 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); (yyval.s).n += (yyvsp[0].s).n; (yyval.s).escaped = (yyvsp[-1].s).escaped || (yyvsp[0].s).escaped; }
-#line 1822 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1807 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 333 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::res_code, (yyvsp[0].s) ); }
-#line 1828 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 318 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::res_code, (yyvsp[0].s) ); }
+#line 1813 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 337 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::res_len, (yyvsp[0].s) ); }
-#line 1834 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 322 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::res_len, (yyvsp[0].s) ); }
+#line 1819 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 338 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::res_len, EmptyTSTR ); }
-#line 1840 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 323 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::res_len, EmptyTSTR ); }
+#line 1825 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 342 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::req_time, (yyvsp[0].s) ); }
-#line 1846 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 327 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::req_time, (yyvsp[0].s) ); }
+#line 1831 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 343 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::req_time, (yyvsp[0].s) ); }
-#line 1852 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 328 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::req_time, (yyvsp[0].s) ); }
+#line 1837 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 356 "op_v2_parser.y" /* yacc.c:1646  */
+#line 341 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); MERGE_TSTR( (yyval.s), (yyvsp[0].s) ); }
-#line 1858 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1843 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 360 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::referer, (yyvsp[-1].s) ); }
-#line 1864 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 345 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::referer, (yyvsp[-1].s) ); }
+#line 1849 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 361 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::referer, EmptyTSTR ); }
-#line 1870 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 346 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::referer, EmptyTSTR ); }
+#line 1855 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 365 "op_v2_parser.y" /* yacc.c:1646  */
+#line 350 "op_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1876 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1861 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 367 "op_v2_parser.y" /* yacc.c:1646  */
+#line 352 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             InitAgent( (yyval.agent) ); 
             (yyval.agent).original = (yyvsp[0].s); 
@@ -1887,41 +1872,41 @@ yyreduce:
             (yyval.agent) . vdb_release . p = dot + 1; 
             (yyval.agent) . vdb_release . n = (yyvsp[0].s) . n - ( dot - (yyvsp[0].s) . p ) - 1; 
         }
-#line 1891 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1876 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 377 "op_v2_parser.y" /* yacc.c:1646  */
+#line 362 "op_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_libc = (yyvsp[0].s); }
-#line 1897 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1882 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 378 "op_v2_parser.y" /* yacc.c:1646  */
+#line 363 "op_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_phid_compute_env = (yyvsp[0].s); }
-#line 1903 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1888 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 379 "op_v2_parser.y" /* yacc.c:1646  */
+#line 364 "op_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1909 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1894 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 380 "op_v2_parser.y" /* yacc.c:1646  */
+#line 365 "op_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 1915 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1900 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 384 "op_v2_parser.y" /* yacc.c:1646  */
+#line 369 "op_v2_parser.y" /* yacc.c:1646  */
     { (yyval.agent) = (yyvsp[0].agent); }
-#line 1921 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1906 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 386 "op_v2_parser.y" /* yacc.c:1646  */
+#line 371 "op_v2_parser.y" /* yacc.c:1646  */
     { 
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].agent) . original );
@@ -1952,66 +1937,66 @@ yyreduce:
             (yyval.agent) . vdb_release = (yyvsp[0].agent) . vdb_release;
         }
     }
-#line 1956 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1941 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 417 "op_v2_parser.y" /* yacc.c:1646  */
+#line 402 "op_v2_parser.y" /* yacc.c:1646  */
     {
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].s) );
     }
-#line 1965 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1950 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 425 "op_v2_parser.y" /* yacc.c:1646  */
+#line 410 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             (yyvsp[-1].agent) . vdb_os = (yyvsp[-2].s);
             MERGE_TSTR( (yyvsp[-2].s), (yyvsp[-1].agent) . original );
             (yyvsp[-1].agent) . original = (yyvsp[-2].s);
             lib->setAgent( (yyvsp[-1].agent) );
         }
-#line 1976 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1961 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 432 "op_v2_parser.y" /* yacc.c:1646  */
+#line 417 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             lib->setAgent( (yyvsp[-1].agent) );
         }
-#line 1984 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1969 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 436 "op_v2_parser.y" /* yacc.c:1646  */
+#line 421 "op_v2_parser.y" /* yacc.c:1646  */
     { 
             InitAgent( (yyval.agent) ); 
             lib->setAgent( (yyval.agent) );
         }
-#line 1993 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 1978 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 443 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::forwarded, (yyvsp[-1].s) ); }
-#line 1999 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 428 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::forwarded, (yyvsp[-1].s) ); }
+#line 1984 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 447 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::port, (yyvsp[0].s) ); }
-#line 2005 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 432 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::port, (yyvsp[0].s) ); }
+#line 1990 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 451 "op_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( LogOPEvent::req_len, (yyvsp[0].s) ); }
-#line 2011 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 436 "op_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( OPReceiver::req_len, (yyvsp[0].s) ); }
+#line 1996 "op_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2015 "op_v2_parser.cpp" /* yacc.c:1646  */
+#line 2000 "op_v2_parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2239,10 +2224,10 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 454 "op_v2_parser.y" /* yacc.c:1906  */
+#line 439 "op_v2_parser.y" /* yacc.c:1906  */
 
 
-void op_error( yyscan_t locp, NCBI::Logging::LogOPEvent * lib, const char * msg )
+void op_error( yyscan_t locp, NCBI::Logging::OPReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors rejected lines
 }

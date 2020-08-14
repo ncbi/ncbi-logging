@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LogLinesInterface.hpp"
+#include "ReceiverInterface.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -15,10 +15,10 @@ namespace NCBI
             public :
                 CatCounter();
 
-                void count( LogLinesInterface::Category cat );
+                void count( ReceiverInterface::Category cat );
 
                 unsigned long int get_total( void ) const { return total; }
-                unsigned long int get_cat_count( LogLinesInterface::Category cat ) const;
+                unsigned long int get_cat_count( ReceiverInterface::Category cat ) const;
 
                 std::string report( FormatterInterface & fmt ) const;
 
@@ -32,7 +32,7 @@ namespace NCBI
         public:
             virtual ~CatWriterInterface() = 0;
 
-            virtual void write( LogLinesInterface::Category cat, const std::string & s ) = 0;
+            virtual void write( ReceiverInterface::Category cat, const std::string & s ) = 0;
         };
 
         class FileCatWriter : public CatWriterInterface
@@ -41,7 +41,7 @@ namespace NCBI
             FileCatWriter( const std::string & basename );
             virtual ~FileCatWriter();
 
-            virtual void write( LogLinesInterface::Category cat, const std::string & s );
+            virtual void write( ReceiverInterface::Category cat, const std::string & s );
 
             const CatCounter& getCounter() const { return ctr; }
 
@@ -56,7 +56,7 @@ namespace NCBI
             StringCatWriter() {}
             virtual ~StringCatWriter();
 
-            virtual void write( LogLinesInterface::Category cat, const std::string & s );
+            virtual void write( ReceiverInterface::Category cat, const std::string & s );
 
             const std::string get_review() { return review . str(); }
             const std::string get_good()   { return good . str(); }

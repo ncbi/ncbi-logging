@@ -1,4 +1,4 @@
-#include "LogLinesInterface.hpp"
+#include "ReceiverInterface.hpp"
 
 #include <stdexcept>
 #include <sstream>
@@ -10,17 +10,17 @@
 using namespace NCBI::Logging;
 using namespace std;
 
-LogLinesInterface::LogLinesInterface( unique_ptr<FormatterInterface> & p_fmt ) 
+ReceiverInterface::ReceiverInterface( unique_ptr<FormatterInterface> & p_fmt ) 
 : m_fmt ( p_fmt.release() ), m_cat ( cat_unknown ) 
 {
 }
 
-LogLinesInterface::~LogLinesInterface() 
+ReceiverInterface::~ReceiverInterface() 
 {
 }
 
 void 
-LogLinesInterface::set( Members m, const t_str & v )
+ReceiverInterface::set( Members m, const t_str & v )
 {
     switch( m )
     {
@@ -31,14 +31,14 @@ LogLinesInterface::set( Members m, const t_str & v )
     case agent:
     case request:
     default:
-        throw std::logic_error( "invalid LogLinesInterface::Member" ); 
+        throw std::logic_error( "invalid ReceiverInterface::Member" ); 
     }
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }
 
 void 
-LogLinesInterface::setAgent( const t_agent & a )
+ReceiverInterface::setAgent( const t_agent & a )
 {
     m_fmt -> addNameValue( "agent",                  a . original );
     m_fmt -> addNameValue( "vdb_os",                 a . vdb_os );
@@ -53,7 +53,7 @@ LogLinesInterface::setAgent( const t_agent & a )
 }
 
 void 
-LogLinesInterface::setRequest( const t_request & r )
+ReceiverInterface::setRequest( const t_request & r )
 {
     m_fmt -> addNameValue( "method",    r . method );
     m_fmt -> addNameValue( "path",      r . path );
@@ -101,14 +101,14 @@ SingleThreadedParser::parse()
     {   // TODO: the body of the loop is almost identical to a block in AWSMultiThreadedParser::parser()
         line_nr++;
 
-        receiver . SetCategory( LogLinesInterface::cat_unknown );
+        receiver . SetCategory( ReceiverInterface::cat_unknown );
 
         if ( ! m_pb -> Parse( line ) )
         {
-            receiver . SetCategory( LogLinesInterface::cat_ugly );
+            receiver . SetCategory( ReceiverInterface::cat_ugly );
         }
         
-        if ( receiver . GetCategory() != LogLinesInterface::cat_good )
+        if ( receiver . GetCategory() != ReceiverInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
             fmt.addNameValue("_unparsed", line);
@@ -160,20 +160,20 @@ void parser( ParseBlockFactoryInterface * factory,
         }
         else
         {   // TODO: this block replicates much of AWSParser::parse()
-            receiver . SetCategory( LogLinesInterface::cat_unknown );
+            receiver . SetCategory( ReceiverInterface::cat_unknown );
 
             if ( ! pb -> Parse( *line ) )
             {
-                receiver . SetCategory( LogLinesInterface::cat_ugly );
+                receiver . SetCategory( ReceiverInterface::cat_ugly );
             }
 
-            if ( receiver . GetCategory() != LogLinesInterface::cat_good )
+            if ( receiver . GetCategory() != ReceiverInterface::cat_good )
             {
                 fmt.addNameValue( "_line_nr", line_nr );
                 fmt.addNameValue( "_unparsed", *line );
             }
 
-            LogLinesInterface::Category cat = receiver . GetCategory();
+            ReceiverInterface::Category cat = receiver . GetCategory();
             //TODO: experiment with unique_ptr and/or naked pointers (also see Queues.hpp)
             shared_ptr< string > output( make_shared< string >( fmt . format() ) );
 
@@ -193,7 +193,7 @@ void writer( OutputQueue * q,
 
     while ( true )
     {
-        LogLinesInterface::Category cat;
+        ReceiverInterface::Category cat;
         shared_ptr< string > line = q -> dequeue( cat );
         if ( !line )
         {

@@ -123,6 +123,6 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int op_parse (void * scanner, NCBI::Logging::LogOPEvent * lib);
+int op_parse (void * scanner, NCBI::Logging::OPReceiver * lib);
 
 #endif /* !YY_OP_OP_V2_PARSER_HPP_INCLUDED  */

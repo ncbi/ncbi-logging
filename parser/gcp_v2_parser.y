@@ -1,6 +1,6 @@
 %define api.pure full
 %lex-param { void * scanner }
-%parse-param { void * scanner }{ NCBI::Logging::LogGCPEvent * lib }
+%parse-param { void * scanner }{ NCBI::Logging::GCPReceiver * lib }
 
 %define parse.trace
 %define parse.error verbose
@@ -17,7 +17,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-void gcp_error( yyscan_t locp, NCBI::Logging::LogGCPEvent * lib, const char* msg );
+void gcp_error( yyscan_t locp, NCBI::Logging::GCPReceiver * lib, const char* msg );
 
 const t_str EmptyTSTR = { "", 0, false };
 
@@ -63,7 +63,7 @@ using namespace NCBI::Logging;
 line
     :
     | log_gcp       { YYACCEPT; }
-    | log_hdr       { lib -> SetCategory( LogLinesInterface::cat_ignored ); YYACCEPT; }
+    | log_hdr       { lib -> SetCategory( ReceiverInterface::cat_ignored ); YYACCEPT; }
     | log_err       { YYABORT; }
     ;
 
@@ -120,22 +120,22 @@ log_gcp
     ;
 
 time
-    : QUOTE I64 QUOTE       { lib->set( LogGCPEvent::time, $2 ); } /* if empty, would conflict with the log_hdr rule */
+    : QUOTE I64 QUOTE       { lib->set( GCPReceiver::time, $2 ); } /* if empty, would conflict with the log_hdr rule */
     ;
 
 ip
-    : QUOTE IPV4 QUOTE      { lib->set( LogGCPEvent::ip, $2 ); }
-    | QUOTE IPV6 QUOTE      { lib->set( LogGCPEvent::ip, $2 ); }
-    | QUOTE QUOTE           { lib->set( LogGCPEvent::ip, EmptyTSTR ); }
+    : QUOTE IPV4 QUOTE      { lib->set( GCPReceiver::ip, $2 ); }
+    | QUOTE IPV6 QUOTE      { lib->set( GCPReceiver::ip, $2 ); }
+    | QUOTE QUOTE           { lib->set( GCPReceiver::ip, EmptyTSTR ); }
     ;
 
 ip_type
-    : q_i64 { lib->set( LogGCPEvent::ip_type, $1 ); } 
+    : q_i64 { lib->set( GCPReceiver::ip_type, $1 ); } 
     ;
 
 ip_region
-    : QUOTE QSTR QUOTE      { lib->set( LogGCPEvent::ip_region, $2 ); } 
-    | QUOTE QUOTE           { lib->set( LogGCPEvent::ip_region, EmptyTSTR ); } 
+    : QUOTE QSTR QUOTE      { lib->set( GCPReceiver::ip_region, $2 ); } 
+    | QUOTE QUOTE           { lib->set( GCPReceiver::ip_region, EmptyTSTR ); } 
     ;
 
 method
@@ -143,29 +143,29 @@ method
     ;
 
 status
-    : q_i64 { lib->set( LogGCPEvent::status, $1 ); }
+    : q_i64 { lib->set( GCPReceiver::status, $1 ); }
     ;
 
 req_bytes
-    : q_i64 { lib->set( LogGCPEvent::request_bytes, $1 ); }
+    : q_i64 { lib->set( GCPReceiver::request_bytes, $1 ); }
     ;
 
 res_bytes
-    : q_i64 { lib->set( LogGCPEvent::result_bytes, $1 ); }
+    : q_i64 { lib->set( GCPReceiver::result_bytes, $1 ); }
     ;
 
 time_taken
-    : q_i64 { lib->set( LogGCPEvent::time_taken, $1 ); }
+    : q_i64 { lib->set( GCPReceiver::time_taken, $1 ); }
     ;
 
 host
-    : QUOTE QSTR QUOTE  { lib->set( LogGCPEvent::host, $2 ); }
-    | QUOTE QUOTE       { lib->set( LogGCPEvent::host, EmptyTSTR ); }
+    : QUOTE QSTR QUOTE  { lib->set( GCPReceiver::host, $2 ); }
+    | QUOTE QUOTE       { lib->set( GCPReceiver::host, EmptyTSTR ); }
     ;
 
 referrer
-    : QUOTE QSTR QUOTE  { lib->set( LogGCPEvent::referer, $2 ); }
-    | QUOTE QUOTE       { lib->set( LogGCPEvent::referer, EmptyTSTR ); }
+    : QUOTE QSTR QUOTE  { lib->set( GCPReceiver::referer, $2 ); }
+    | QUOTE QUOTE       { lib->set( GCPReceiver::referer, EmptyTSTR ); }
     ;
 
 vdb_agent_token
@@ -253,19 +253,19 @@ agent
     ;
 
 req_id
-    : QUOTE QSTR QUOTE      { lib->set( LogGCPEvent::request_id, $2 ); }
-    | QUOTE I64 QUOTE       { lib->set( LogGCPEvent::request_id, $2 ); }
-    | QUOTE QUOTE           { lib->set( LogGCPEvent::request_id, EmptyTSTR ); }
+    : QUOTE QSTR QUOTE      { lib->set( GCPReceiver::request_id, $2 ); }
+    | QUOTE I64 QUOTE       { lib->set( GCPReceiver::request_id, $2 ); }
+    | QUOTE QUOTE           { lib->set( GCPReceiver::request_id, EmptyTSTR ); }
     ;
 
 operation
-    : QUOTE QSTR QUOTE      { lib->set( LogGCPEvent::operation, $2 ); }
-    | QUOTE QUOTE           { lib->set( LogGCPEvent::operation, EmptyTSTR ); }
+    : QUOTE QSTR QUOTE      { lib->set( GCPReceiver::operation, $2 ); }
+    | QUOTE QUOTE           { lib->set( GCPReceiver::operation, EmptyTSTR ); }
     ;
 
 bucket
-    : QUOTE QSTR QUOTE      { lib->set( LogGCPEvent::bucket, $2 ); }
-    | QUOTE QUOTE           { lib->set( LogGCPEvent::bucket, EmptyTSTR ); }
+    : QUOTE QSTR QUOTE      { lib->set( GCPReceiver::bucket, $2 ); }
+    | QUOTE QUOTE           { lib->set( GCPReceiver::bucket, EmptyTSTR ); }
     ;
 
 /* 
@@ -346,12 +346,12 @@ url
     : QUOTE url_list QUOTE
         {
             $$ = $2;
-            lib -> set( LogGCPEvent::uri, $$.path );
+            lib -> set( GCPReceiver::uri, $$.path );
         }
     | QUOTE QUOTE
         {
             InitRequest( $$ );
-            lib -> set( LogGCPEvent::uri, $$.path );
+            lib -> set( GCPReceiver::uri, $$.path );
         }
     ;
 
@@ -455,7 +455,7 @@ q_i64
 
 %%
 
-void gcp_error( yyscan_t locp, NCBI::Logging::LogGCPEvent * lib, const char * msg )
+void gcp_error( yyscan_t locp, NCBI::Logging::GCPReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors by rejecting lines
 }
