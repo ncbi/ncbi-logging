@@ -422,18 +422,26 @@ run_test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
 .PHONY: test_support run_test_support
 
 #################################################
-# stand alone AWS parser
+# V2 parsers
 
-AWS2JSN_CMN_SRC = \
-	$(PREFIX_AWS_V2)parser.cpp \
-	$(PREFIX_AWS_V2)scanner.cpp \
+COMMON_V2_SRC = \
 	CatWriters.cpp \
 	Formatters.cpp \
 	LogLinesInterface.cpp \
-	AWS_Interface.cpp \
 	Queues.cpp
 
-#	helper.cpp \
+DBG_TOOL_OBJ = $(OBJDIR)/Tool.dbg.o $(DBG_CMD_OBJ)
+REL_TOOL_OBJ = $(OBJDIR)/Tool.rel.o $(REL_CMD_OBJ)
+PROF_TOOL_OBJ = $(OBJDIR)/Tool.prof.o $(PROF_CMD_OBJ)
+
+#################################################
+# stand alone AWS parser
+
+AWS2JSN_CMN_SRC = \
+	$(COMMON_V2_SRC) \
+	$(PREFIX_AWS_V2)parser.cpp \
+	$(PREFIX_AWS_V2)scanner.cpp \
+	AWS_Interface.cpp 
 
 AWS2JSN_SRC = $(AWS2JSN_CMN_SRC) aws2jsn.cpp 
 
@@ -451,13 +459,13 @@ $(PREFIX_AWS_V2)scanner.cpp: $(PREFIX_AWS_V2)scanner.l $(PREFIX_AWS_V2)parser.hp
 $(PREFIX_AWS_V2)parser.cpp: $(PREFIX_AWS_V2)parser.y
 	bison --report all -d $(PREFIX_AWS_V2)parser.y --output-file $(PREFIX_AWS_V2)parser.cpp
 
-$(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_CMD_OBJ)
+$(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_TOOL_OBJ) 
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
 
-$(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_CMD_OBJ) 
+$(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_TOOL_OBJ) 
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
-$(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
+$(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(PROF_TOOL_OBJ)
 	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
 aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
@@ -499,15 +507,10 @@ run_$(PREFIX_AWS_V2)flex_test: $(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg $(BINDIR)
 # stand alone OP parser
 
 OP2JSN_CMN_SRC = \
+	$(COMMON_V2_SRC) \
 	$(PREFIX_OP_V2)parser.cpp \
 	$(PREFIX_OP_V2)scanner.cpp \
-	CatWriters.cpp \
-	Formatters.cpp \
-	LogLinesInterface.cpp \
-	OP_Interface.cpp \
-	Queues.cpp
-
-#	helper.cpp \
+	OP_Interface.cpp 
 
 OP2JSN_SRC = $(OP2JSN_CMN_SRC) op2jsn.cpp 
 
@@ -525,13 +528,13 @@ $(PREFIX_OP_V2)scanner.cpp: $(PREFIX_OP_V2)scanner.l $(PREFIX_OP_V2)parser.hpp
 $(PREFIX_OP_V2)parser.cpp: $(PREFIX_OP_V2)parser.y
 	bison --report all -d $(PREFIX_OP_V2)parser.y --output-file $(PREFIX_OP_V2)parser.cpp
 
-$(BINDIR)/op2jsn-dbg: $(OP2JSN_DBG_OBJ) $(DBG_CMD_OBJ)
+$(BINDIR)/op2jsn-dbg: $(OP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
 
-$(BINDIR)/op2jsn-rel: $(OP2JSN_REL_OBJ) $(REL_CMD_OBJ) 
+$(BINDIR)/op2jsn-rel: $(OP2JSN_REL_OBJ) $(REL_TOOL_OBJ) 
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
-$(BINDIR)/op2jsn-prof: $(OP2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
+$(BINDIR)/op2jsn-prof: $(OP2JSN_PROF_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
 op: mkdir $(BINDIR)/op2jsn-dbg $(BINDIR)/op2jsn-rel
@@ -573,15 +576,10 @@ run_$(PREFIX_OP_V2)flex_test: $(BINDIR)/$(PREFIX_OP_V2)test_flex-dbg $(BINDIR)/$
 # stand alone GCP parser
 
 GCP2JSN_CMN_SRC = \
+	$(COMMON_V2_SRC) \
 	$(PREFIX_GCP_V2)parser.cpp \
 	$(PREFIX_GCP_V2)scanner.cpp \
-	CatWriters.cpp \
-	Formatters.cpp \
-	LogLinesInterface.cpp \
-	GCP_Interface.cpp \
-	Queues.cpp
-
-#	helper.cpp \
+	GCP_Interface.cpp
 
 GCP2JSN_SRC = $(GCP2JSN_CMN_SRC) gcp2jsn.cpp 
 
@@ -599,13 +597,13 @@ $(PREFIX_GCP_V2)scanner.cpp: $(PREFIX_GCP_V2)scanner.l $(PREFIX_GCP_V2)parser.hp
 $(PREFIX_GCP_V2)parser.cpp: $(PREFIX_GCP_V2)parser.y
 	bison --report all -d $(PREFIX_GCP_V2)parser.y --output-file $(PREFIX_GCP_V2)parser.cpp
 
-$(BINDIR)/gcp2jsn-dbg: $(GCP2JSN_DBG_OBJ) $(DBG_CMD_OBJ)
+$(BINDIR)/gcp2jsn-dbg: $(GCP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
 
-$(BINDIR)/gcp2jsn-rel: $(GCP2JSN_REL_OBJ) $(REL_CMD_OBJ) 
+$(BINDIR)/gcp2jsn-rel: $(GCP2JSN_REL_OBJ) $(REL_TOOL_OBJ) 
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
-$(BINDIR)/gcp2jsn-prof: $(GCP2JSN_PROF_OBJ) $(DBG_CMD_OBJ)
+$(BINDIR)/gcp2jsn-prof: $(GCP2JSN_PROF_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
 
 gcp: mkdir $(BINDIR)/gcp2jsn-dbg $(BINDIR)/gcp2jsn-rel
@@ -653,7 +651,7 @@ GCP2JSON = $(BINDIR)/gcp2jsn-dbg
 
 v2: aws op gcp
 
-test_v2: v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test
+test_v2: v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test 
 	mkdir -p  actual/$(PREFIX_AWS_V2)unrecognized
 	cat data/aws_unrecognized.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)unrecognized/ >./actual/$(PREFIX_AWS_V2)unrecognized/stdout 2>./actual/$(PREFIX_AWS_V2)unrecognized/stderr \
 						&& diff ./expected/$(PREFIX_AWS_V2)unrecognized ./actual/$(PREFIX_AWS_V2)unrecognized

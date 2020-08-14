@@ -47,7 +47,6 @@ namespace NCBI
         class AWSParseBlockFactory : public ParseBlockFactoryInterface
         {
         public:
-            AWSParseBlockFactory( bool fast ) : ParseBlockFactoryInterface( fast ) {}
             virtual ~AWSParseBlockFactory();
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
         };

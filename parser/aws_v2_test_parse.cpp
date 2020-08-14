@@ -85,7 +85,7 @@ class LogAWSEventFixture : public ::testing::Test
         void try_to_parse( std::string line, bool debug = false )
         {
             istringstream ss( line );
-            AWSParseBlockFactory pbFact( false );
+            AWSParseBlockFactory pbFact;
             SingleThreadedParser p( ss, s_outputs, pbFact );
             p . setDebug( debug );
             p . parse(); // does the parsing and generates the report
@@ -587,7 +587,7 @@ TEST_F( LogAWSEventFixture, MultiThreading )
     );
 
     FILE * ss = fmemopen( (void*) input.c_str(), input.size(), "r");
-    AWSParseBlockFactory pbFact(false);
+    AWSParseBlockFactory pbFact;
     MultiThreadedParser p( ss, s_outputs, 100, 2, pbFact );
     p . parse();
 

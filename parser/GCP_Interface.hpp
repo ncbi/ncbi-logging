@@ -39,7 +39,6 @@ namespace NCBI
         class GCPParseBlockFactory : public ParseBlockFactoryInterface
         {
         public:
-            GCPParseBlockFactory( bool fast ) : ParseBlockFactoryInterface( fast ) {}
             virtual ~GCPParseBlockFactory();
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
         };

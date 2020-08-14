@@ -98,8 +98,10 @@ namespace NCBI
         class ParseBlockFactoryInterface
         {
         public:
-            ParseBlockFactoryInterface( bool fast ) : m_fast( fast ) {}
+            ParseBlockFactoryInterface() : m_fast( true ) {}
             virtual ~ParseBlockFactoryInterface() = 0;
+
+            void setFast( bool onOff ) { m_fast = onOff; }
 
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const = 0;
 

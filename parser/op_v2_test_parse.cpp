@@ -75,7 +75,7 @@ class LogOPEventFixture : public ::testing::Test
         void try_to_parse( std::string line, bool debug = false )
         {
             istringstream ss( line );
-            OPParseBlockFactory pbFact( false );
+            OPParseBlockFactory pbFact;
             SingleThreadedParser p( ss, s_outputs, pbFact );
             p . setDebug( debug );
             p . parse(); // does the parsing and generates the report
