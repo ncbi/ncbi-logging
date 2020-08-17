@@ -54,6 +54,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "Processing $LOG_BUCKET"
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
     BUCKET_NAME=$(sqlcmd "select distinct bucket_name from buckets where cloud_provider='$PROVIDER' and log_bucket='$LOG_BUCKET' limit 1")
+    echo "BUCKET_NAME is $BUCKET_NAME"
 
     if [ "$PROVIDER" = "GS" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
