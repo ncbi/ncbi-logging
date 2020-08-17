@@ -490,6 +490,13 @@ values ('OP', 'traceweb11',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/*.gz',
     '', 'false', 'nginx log', 'hot');
 
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sweb',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/weblog/local_archive/*/*/*/sweb*/*.gz',
+    '', 'false', 'nginx log', 'hot');
+
 -- SRA-8546
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)

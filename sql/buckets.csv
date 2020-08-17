@@ -100,6 +100,7 @@ OP,srafiles33,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_
 OP,srafiles34,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
 OP,srafiles35,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
 OP,srafiles36,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
+OP,sweb,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/weblog/local_archive/*/*/*/sweb*/*.gz,"",public,false,"nginx log",hot
 OP,traceweb11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/*.gz,"",public,false,"nginx log",hot
 S3,sra-ca-run-1,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
 S3,sra-ca-run-10,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
