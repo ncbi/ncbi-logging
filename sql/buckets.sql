@@ -485,10 +485,88 @@ values ('OP', 'ftp',
 -- LOGMON-21
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)
-values ('OP', 'traceweb11',
+values ('OP', 'sdl-sra-err',
     'applog rotated', 'Applog',
-    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/*.gz',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra-err*.gz',
     '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-sra-log',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra-log*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-sra-trace',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra-trace*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-names-err',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/names-err*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-names-log',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/names-log*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-sdlr-err',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr-err*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-sdlr-log',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr-log*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-sdlr-trace',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr-trace*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-index-err',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index-err*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-index-log',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index-log*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-index-trace',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index-trace*.gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'sdl-jwt-cart',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/jwt-cart-builder*.gz',
+    '', 'false', 'nginx log', 'hot');
+
 
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)

@@ -70,6 +70,10 @@ for LOG_BUCKET in "${buckets[@]}"; do
     fi
 
     if [ "$PROVIDER" = "OP" ]; then
+        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
+            BUCKET_NAME="srafiles"
+        fi
+
         if [ "$YESTERDAY" -lt "20180701" ]; then
             files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
         elif [ "$YESTERDAY" -gt "20200706" ]; then
