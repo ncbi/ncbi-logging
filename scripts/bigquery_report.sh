@@ -166,3 +166,14 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from strides_analytics.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from strides_analytics.objects) order by unlisted_bucket"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select datetime_trunc(start_ts, day) as day, count(distinct remote_ip) as uniq_ips, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export where domain not like '%nih.gov%' and source='S3' and bucket like '%cov2%' group by day order by day"
+
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select datetime_trunc(start_ts, day) as day, count(distinct remote_ip) as uniq_ips_to_cloud from strides_analytics.summary_export where domain not like '%nih.gov%' and (source='S3' or source='GS') group by day order by day desc"
