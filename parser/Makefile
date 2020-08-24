@@ -17,6 +17,7 @@ PREFIX_AWS := aws_
 PREFIX_AWS_V2 := aws_v2_
 PREFIX_GCP := gcp_
 PREFIX_GCP_V2 := gcp_v2_
+PREFIX_TW_V2 := tw_v2_
 
 all: log2jsn_
 	@echo "done"
@@ -41,6 +42,12 @@ clean:
 	rm -f $(PREFIX_GCP)parser.hpp $(PREFIX_GCP)parser.cpp
 	rm -f $(PREFIX_GCP)scanner.hpp $(PREFIX_GCP)scanner.cpp
 	rm -f $(PREFIX_GCP)parser.output
+	rm -f $(PREFIX_GCP_V2)parser.hpp $(PREFIX_GCP_V2)parser.cpp
+	rm -f $(PREFIX_GCP_V2)scanner.hpp $(PREFIX_GCP_V2)scanner.cpp
+	rm -f $(PREFIX_GCP_V2)parser.output
+	rm -f $(PREFIX_TW_V2)parser.hpp $(PREFIX_TW_V2)parser.cpp
+	rm -f $(PREFIX_TW_V2)scanner.hpp $(PREFIX_TW_V2)scanner.cpp
+	rm -f $(PREFIX_TW_V2)parser.output
 
 mkdir:
 	@ mkdir -p $(LIBDIR) $(BINDIR) $(OBJDIR)
@@ -639,17 +646,87 @@ run_$(PREFIX_GCP_V2)flex_test: $(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg $(BINDIR)
 	$(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg
 	$(BINDIR)/$(PREFIX_GCP_V2)test_flex-rel
 
-.PHONY: op op_prof run_$(PREFIX_GCP_V2)test_parse run_$(PREFIX_GCP_V2)test_flex
+.PHONY: gcp gcp_prof run_$(PREFIX_GCP_V2)test_parse run_$(PREFIX_GCP_V2)test_flex
+
+#################################################
+# stand alone TW parser
+
+TW2JSN_CMN_SRC = \
+	$(COMMON_V2_SRC) \
+	$(PREFIX_TW_V2)parser.cpp \
+	$(PREFIX_TW_V2)scanner.cpp \
+	TW_Interface.cpp
+
+TW2JSN_SRC = $(TW2JSN_CMN_SRC) tw2jsn.cpp 
+
+TW2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TW2JSN_SRC)))
+TW2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(TW2JSN_SRC)))
+TW2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(TW2JSN_SRC)))
+
+$(OBJDIR)/$(PREFIX_TW_V2)parser.dbg.o:  $(OBJDIR)/$(PREFIX_TW_V2)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_TW_V2)parser.rel.o:  $(OBJDIR)/$(PREFIX_TW_V2)scanner.rel.o
+$(OBJDIR)/$(PREFIX_TW_V2)parser.prof.o:  $(OBJDIR)/$(PREFIX_TW_V2)scanner.prof.o
+
+$(PREFIX_TW_V2)scanner.cpp: $(PREFIX_TW_V2)scanner.l $(PREFIX_TW_V2)parser.hpp
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_TW_V2)scanner.hpp --outfile=$(PREFIX_TW_V2)scanner.cpp $(PREFIX_TW_V2)scanner.l
+
+$(PREFIX_TW_V2)parser.cpp: $(PREFIX_TW_V2)parser.y
+	bison --report all -d $(PREFIX_TW_V2)parser.y --output-file $(PREFIX_TW_V2)parser.cpp
+
+$(BINDIR)/tw2jsn-dbg: $(TW2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+
+$(BINDIR)/tw2jsn-rel: $(TW2JSN_REL_OBJ) $(REL_TOOL_OBJ) 
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+
+$(BINDIR)/tw2jsn-prof: $(TW2JSN_PROF_OBJ) $(DBG_TOOL_OBJ)
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+
+tw: mkdir $(BINDIR)/tw2jsn-dbg $(BINDIR)/tw2jsn-rel
+
+tw_prof: mkdir $(BINDIR)/tw2jsn-prof
+
+$(PREFIX_TW_V2)_TEST_PARSE_SRC = $(TW2JSN_CMN_SRC) $(PREFIX_TW_V2)test_parse.cpp 
+$(PREFIX_TW_V2)_TEST_FLEX_SRC = $(PREFIX_TW_V2)test_flex.cpp $(PREFIX_TW_V2)scanner.cpp
+
+$(PREFIX_TW_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_TW_V2)_TEST_PARSE_SRC)))
+$(PREFIX_TW_V2)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_TW_V2)_TEST_PARSE_SRC)))
+
+$(PREFIX_TW_V2)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_TW_V2)_TEST_FLEX_SRC)))
+$(PREFIX_TW_V2)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_TW_V2)_TEST_FLEX_SRC)))
+
+$(BINDIR)/$(PREFIX_TW_V2)test_parse-dbg: $($(PREFIX_TW_V2)_TEST_PARSE_DBG_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
+
+$(BINDIR)/$(PREFIX_TW_V2)test_parse-rel: $($(PREFIX_TW_V2)_TEST_PARSE_REL_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
+
+$(BINDIR)/$(PREFIX_TW_V2)test_flex-dbg: $($(PREFIX_TW_V2)_TEST_FLEX_DBG_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread
+
+$(BINDIR)/$(PREFIX_TW_V2)test_flex-rel: $($(PREFIX_TW_V2)_TEST_FLEX_REL_OBJ)
+	$(LD) -o $@ $^ -lgtest -lpthread
+
+run_$(PREFIX_TW_V2)parse_test: run_test_support run_$(PREFIX_TW_V2)flex_test $(BINDIR)/$(PREFIX_TW_V2)test_parse-dbg $(BINDIR)/$(PREFIX_TW_V2)test_parse-rel
+	$(BINDIR)/$(PREFIX_TW_V2)test_parse-dbg
+	$(BINDIR)/$(PREFIX_TW_V2)test_parse-rel
+
+run_$(PREFIX_TW_V2)flex_test: $(BINDIR)/$(PREFIX_TW_V2)test_flex-dbg $(BINDIR)/$(PREFIX_TW_V2)test_flex-rel
+	$(BINDIR)/$(PREFIX_TW_V2)test_flex-dbg
+	$(BINDIR)/$(PREFIX_TW_V2)test_flex-rel
+
+.PHONY: tw tw_prof run_$(PREFIX_TW_V2)test_parse run_$(PREFIX_TW_V2)test_flex
 
 #################################################
 #################################################
-# V2 acceptance 
+# V2 acceptance ( TODO TW* )
 
 AWS2JSON = $(BINDIR)/aws2jsn-dbg
 OP2JSON = $(BINDIR)/op2jsn-dbg
 GCP2JSON = $(BINDIR)/gcp2jsn-dbg
+TW2JSON = $(BINDIR)/tw2jsn-dbg
 
-v2: aws op gcp
+v2: aws op gcp tw
 
 test_v2: v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test 
 	mkdir -p  actual/$(PREFIX_AWS_V2)unrecognized

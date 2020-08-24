@@ -45,6 +45,7 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
+/* should be lifted into ReceiverInterface.cpp, because the same for every format */
 void AWSReceiver::reportField( const char * message ) 
 {
     if ( m_cat == cat_unknown || m_cat == cat_good )

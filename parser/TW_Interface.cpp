@@ -1,33 +1,33 @@
-#include "OP_Interface.hpp"
+#include "TW_Interface.hpp"
 
-#include "op_v2_parser.hpp"
-#include "op_v2_scanner.hpp"
+#include "tw_v2_parser.hpp"
+#include "tw_v2_scanner.hpp"
 
-extern YY_BUFFER_STATE op_scan_reset( const char * input, yyscan_t yyscanner );
+extern YY_BUFFER_STATE tw_scan_reset( const char * input, yyscan_t yyscanner );
 
 using namespace NCBI::Logging;
 using namespace std;
 
-OPReceiver::OPReceiver( unique_ptr<FormatterInterface> & fmt )
+TWReceiver::TWReceiver( unique_ptr<FormatterInterface> & fmt )
 : ReceiverInterface ( fmt )
 {
 }
 
-void OPReceiver::set( OP_Members m, const t_str & v ) 
+void TWReceiver::set( TW_Members m, const t_str & v ) 
 {
 #define CASE(mem) case mem: m_fmt -> addNameValue(#mem, v); break;
     switch( m )
     {
-    CASE( owner )
+    CASE( id1 )
+    CASE( id2 )
+    CASE( id3 )
     CASE( time )
     CASE( server )
-    CASE( user )
-    CASE( req_time )
-    CASE( forwarded )
-    CASE( port )
-    CASE( req_len )
-    CASE( res_code )
-    CASE( res_len )
+    CASE( ip )
+    CASE( sid )
+    CASE( service )
+    CASE( event )
+    CASE( msg )
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v); 
     }
 #undef CASE
@@ -36,7 +36,7 @@ void OPReceiver::set( OP_Members m, const t_str & v )
 }
 
 /* should be lifted into ReceiverInterface.cpp, because the same for every format */
-void OPReceiver::reportField( const char * message ) 
+void TWReceiver::reportField( const char * message ) 
 {
     if ( m_cat == cat_unknown || m_cat == cat_good )
         m_cat = cat_review;
@@ -55,58 +55,57 @@ namespace NCBI
 {
     namespace Logging
     {
-        class OPParseBlock : public ParseBlockInterface
+        class TWParseBlock : public ParseBlockInterface
         {
         public:
-            OPParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
-            virtual ~OPParseBlock();
+            TWParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
+            virtual ~TWParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
-            OPReceiver m_receiver;
+            TWReceiver m_receiver;
         };
     }
 }
 
-OPParseBlockFactory::~OPParseBlockFactory() {}
+TWParseBlockFactory::~TWParseBlockFactory() {}
 
 std::unique_ptr<ParseBlockInterface> 
-OPParseBlockFactory::MakeParseBlock() const
+TWParseBlockFactory::MakeParseBlock() const
 {
     std::unique_ptr<FormatterInterface> fmt;
     if ( m_fast )
         fmt = std::make_unique<JsonFastFormatter>();
     else
         fmt = std::make_unique<JsonLibFormatter>();
-    return std::make_unique<OPParseBlock>( fmt );     
+    return std::make_unique<TWParseBlock>( fmt );     
 }
 
-OPParseBlock::OPParseBlock( std::unique_ptr<FormatterInterface> & fmt ) 
+TWParseBlock::TWParseBlock( std::unique_ptr<FormatterInterface> & fmt ) 
 : m_receiver ( fmt )
 {
-    op_lex_init( &m_sc );
+    tw_lex_init( &m_sc );
 }
 
-OPParseBlock::~OPParseBlock() 
+TWParseBlock::~TWParseBlock() 
 {
-    op_lex_destroy( m_sc );
+    tw_lex_destroy( m_sc );
 }
 
 void 
-OPParseBlock::SetDebug( bool onOff )
+TWParseBlock::SetDebug( bool onOff )
 {
-    op_debug = onOff ? 1 : 0;            // bison (op_debug is global)
-    op_set_debug( onOff ? 1 : 0, m_sc );   // flex
+    tw_debug = onOff ? 1 : 0;            // bison (op_debug is global)
+    tw_set_debug( onOff ? 1 : 0, m_sc );   // flex
 }
 
 bool 
-OPParseBlock::Parse( const string & line )
+TWParseBlock::Parse( const string & line )
 {
-    YY_BUFFER_STATE bs = op_scan_reset( line.c_str(), m_sc );
-    int ret = op_parse( m_sc, & m_receiver );
-    op__delete_buffer( bs, m_sc );
+    YY_BUFFER_STATE bs = tw_scan_reset( line.c_str(), m_sc );
+    int ret = tw_parse( m_sc, & m_receiver );
+    tw__delete_buffer( bs, m_sc );
     return ret == 0;
 }
-

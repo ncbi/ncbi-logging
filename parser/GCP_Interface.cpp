@@ -37,6 +37,7 @@ void GCPReceiver::set( GCP_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
+/* should be lifted into ReceiverInterface.cpp, because the same for every format */
 void GCPReceiver::reportField( const char * message ) 
 {
     if ( m_cat == cat_unknown || m_cat == cat_good )
