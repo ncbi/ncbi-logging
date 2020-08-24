@@ -114,7 +114,7 @@ server
     ;
 
 ipaddr
-    : { tw_start_IPADDR( scanner ); } IPADDR  { SET_VALUE( TWReceiver::ip, $2 ); }
+    : { tw_start_IPADDR( scanner ); } IPADDR  { SET_VALUE( ReceiverInterface::ip, $2 ); }
     ;
 
 sid

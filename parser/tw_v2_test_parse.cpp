@@ -13,70 +13,42 @@ using namespace NCBI::Logging;
 #define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); (t).escaped = false; } while (false)
 #define INIT_TSTR_ESC(t, s) do { (t).p = s; (t).n = strlen(s); (t).escaped = true; } while (false)
 
-TEST(LogOPEventTest, Create)
+TEST( LogTWEventTest, Create )
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
     TWReceiver e ( f );
 }
 
-/*
-TEST(LogOPEventTest, Setters)
+TEST( LogTWEventTest, Setters )
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    OPReceiver e ( f );
+    TWReceiver e ( f );
     
     t_str v;
-    INIT_TSTR( v, "i_p");
-    e.set( ReceiverInterface::ip, v );
-    INIT_TSTR( v, "ref");
-    e.set( ReceiverInterface::referer, v );
-    INIT_TSTR( v, "unp");
-    e.set( ReceiverInterface::unparsed, v );
-    t_agent a = { 
-        {"o", 1, false },
-        {"v_o", 3, false },
-        {"v_t", 3, false },
-        {"v_r", 3, false },
-        {"v_c", 3, false },
-        {"v_g", 3, false },
-        {"v_s", 3, false },
-        {"v_l", 3, false }
-    };
-    e.setAgent( a );
 
-    t_request r = {
-        { "m", 1, false },
-        { "p", 1, false },
-        { "v", 1, false },
-        { "a", 1, false },
-        { "f", 1, false },
-        { "e", 1, false },
-        acc_before
-    };
-    e.setRequest( r );
-
-    INIT_TSTR( v, "own"); e.set(OPReceiver::owner, v);
-    INIT_TSTR( v, "tim"); e.set(OPReceiver::time, v);
-    INIT_TSTR( v, "use"); e.set(OPReceiver::user, v);
-    INIT_TSTR( v, "rqt");e.set(OPReceiver::req_time, v);
-    INIT_TSTR( v, "fwd"); e.set(OPReceiver::forwarded, v);
-    INIT_TSTR( v, "prt"); e.set(OPReceiver::port, v);
-    INIT_TSTR( v, "rql"); e.set(OPReceiver::req_len, v);
-    INIT_TSTR( v, "rqc"); e.set(OPReceiver::res_code, v);
-    INIT_TSTR( v, "res"); e.set(OPReceiver::res_len, v);
+    INIT_TSTR( v, "77619/000/0000/R" );     e.set( TWReceiver::id1, v );
+    INIT_TSTR( v, "CC952F33EE2FDBD1" );     e.set( TWReceiver::id2, v );
+    INIT_TSTR( v, "0008/0008" );            e.set( TWReceiver::id3, v );
+    INIT_TSTR( v, "2020-06-11T23:59:58.079949" ); e.set( TWReceiver::time, v );
+    INIT_TSTR( v, "traceweb22" );           e.set( TWReceiver::server, v );
+    INIT_TSTR( v, "185.151.196.174" );      e.set( ReceiverInterface::ip, v );
+    INIT_TSTR( v, "CC952F33EE2FDBD1_0000SID" );   e.set( TWReceiver::sid, v );
+    INIT_TSTR( v, "sra" );                  e.set( TWReceiver::service, v );
+    INIT_TSTR( v, "extra " );               e.set( TWReceiver::event, v );
+    INIT_TSTR( v, "issued_subhit=m_1" );    e.set( TWReceiver::msg, v );
 
     ASSERT_EQ ( 
-        "{\"accession\":\"a\",\"agent\":\"o\",\"extension\":\"e\",\"filename\":\"f\",\"forwarded\":\"fwd\",\"ip\":\"i_p\",\"method\":\"m\",\"owner\":\"own\",\"path\":\"p\",\"port\":\"prt\",\"referer\":\"ref\",\"req_len\":\"rql\",\"req_time\":\"rqt\",\"res_code\":\"rqc\",\"res_len\":\"res\",\"time\":\"tim\",\"unparsed\":\"unp\",\"user\":\"use\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}", 
+        "{\"event\":\"extra \",\"id1\":\"77619/000/0000/R\",\"id2\":\"CC952F33EE2FDBD1\",\"id3\":\"0008/0008\",\"ip\":\"185.151.196.174\",\"msg\":\"issued_subhit=m_1\",\"server\":\"traceweb22\",\"service\":\"sra\",\"sid\":\"CC952F33EE2FDBD1_0000SID\",\"time\":\"2020-06-11T23:59:58.079949\"}",
         e.GetFormatter().format() );    
 }
 
-class LogOPEventFixture : public ::testing::Test
+class TWEventFixture : public ::testing::Test
 {
     public :
         void try_to_parse( std::string line, bool debug = false )
         {
             istringstream ss( line );
-            OPParseBlockFactory pbFact;
+            TWParseBlockFactory pbFact;
             SingleThreadedParser p( ss, s_outputs, pbFact );
             p . setDebug( debug );
             p . parse(); // does the parsing and generates the report
@@ -126,7 +98,7 @@ class LogOPEventFixture : public ::testing::Test
         StringCatWriter s_outputs;
 };
 
-TEST_F( LogOPEventFixture, LineRejecting )
+TEST_F( TWEventFixture, LineRejecting )
 {
     std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );
     ASSERT_EQ( 
@@ -135,6 +107,7 @@ TEST_F( LogOPEventFixture, LineRejecting )
         "{\"_line_nr\":3,\"_unparsed\":\"line3\"}\n", res );
 }
 
+/*
 TEST_F( LogOPEventFixture, ErrorRecovery )
 {
     try_to_parse( 

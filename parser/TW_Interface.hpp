@@ -20,7 +20,6 @@ namespace NCBI
                 id3,
                 time,
                 server,
-                ip,
                 sid,
                 service,
                 event,

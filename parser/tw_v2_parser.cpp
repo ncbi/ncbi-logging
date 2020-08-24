@@ -1390,7 +1390,7 @@ yyreduce:
 
   case 34:
 #line 117 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::ip, (yyvsp[0].s) ); }
+    { SET_VALUE( ReceiverInterface::ip, (yyvsp[0].s) ); }
 #line 1395 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
