@@ -511,16 +511,15 @@ void yyfree ( void * , yyscan_t yyscanner );
 
 #ifdef YY_HEADER_EXPORT_START_CONDITIONS
 #define INITIAL 0
-#define TW_ID1 1
-#define TW_ID2 2
-#define TW_ID3 3
-#define TW_TIME 4
-#define TW_SERVER 5
-#define TW_IPADDR 6
-#define TW_SID 7
-#define TW_SERVICE 8
-#define TW_EVENT 9
-#define TW_MSG 10
+#define TW_ID2 1
+#define TW_ID3 2
+#define TW_TIME 3
+#define TW_SERVER 4
+#define TW_IPADDR 5
+#define TW_SID 6
+#define TW_SERVICE 7
+#define TW_EVENT 8
+#define TW_MSG 9
 
 #endif
 
@@ -839,9 +838,9 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 106 "tw_v2_scanner.l"
+#line 104 "tw_v2_scanner.l"
 
 
-#line 846 "tw_v2_scanner.hpp"
+#line 845 "tw_v2_scanner.hpp"
 #undef tw_IN_HEADER
 #endif /* tw_HEADER_H */

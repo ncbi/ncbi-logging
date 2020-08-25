@@ -66,14 +66,14 @@ EVENT       [a-zA-Z_\-:]+
 
 MSG         .+
 
-%x TW_ID1 TW_ID2 TW_ID3 TW_TIME TW_SERVER TW_IPADDR TW_SID TW_SERVICE TW_EVENT TW_MSG
+%x TW_ID2 TW_ID3 TW_TIME TW_SERVER TW_IPADDR TW_SID TW_SERVICE TW_EVENT TW_MSG
 
 %%
 
 {SEP}               { MAKE_STR(); return SEP; }
 
-<TW_ID1>{ID1}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID1; }
-<TW_ID1>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID1\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+{ID1}               { MAKE_STR(); return ID1; }
+.                   { fprintf(stderr, "Unexpected character '%c' (%x) in ID1\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 <TW_ID2>{ID2}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID2; }
 <TW_ID2>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID2\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
@@ -101,8 +101,6 @@ MSG         .+
 
 <TW_MSG>{MSG}       { MAKE_STR(); yy_pop_state( yyscanner ); return MSG; }
 
-.                   { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
-
 %%
 
 YY_BUFFER_STATE tw_scan_reset( const char * input, yyscan_t yyscanner )
@@ -120,11 +118,6 @@ void tw_get_scanner_input( yyscan_t yyscanner, t_str & str )
     const char * input = (const char*) ( yyg -> yyextra_r );
     str . p = input;
     str . n = strlen( input ); // looks wasteful but only happens when we report errors 
-}
-
-void tw_start_ID1( yyscan_t yyscanner )
-{
-    yy_push_state( TW_ID1, yyscanner ); 
 }
 
 void tw_start_ID2( yyscan_t yyscanner )

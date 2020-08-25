@@ -31,7 +31,6 @@ const t_str EmptyTSTR = { "", 0, false };
 #include "TW_Interface.hpp"
 
 extern void tw_get_scanner_input( void * yyscanner, t_str & str );
-extern void tw_start_ID1( void * yyscanner );
 extern void tw_start_ID2( void * yyscanner );
 extern void tw_start_ID3( void * yyscanner );
 extern void tw_start_TIME( void * yyscanner );
@@ -57,80 +56,70 @@ using namespace NCBI::Logging;
 
 %type<s> id1 id2 id3 time server ipaddr sid service event msg
 
-%start tw_line
+%start log_tw
 
 %%
 
-tw_line
-    : log_tw        { YYACCEPT; }
-    | log_tw_err    { YYABORT; }
-    ;
-
 log_tw
-    : id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP sid SEP service SEP event SEP msg
+    : id1 id2 id3 time server ipaddr sid service event SEP { tw_start_MSG( scanner ); } msg
     {
+        YYACCEPT;
+    }
+    | id1 id2 id3 time server ipaddr sid service event
+    {
+        SET_VALUE( TWReceiver::msg, EmptyTSTR );
+        YYACCEPT;
     }
     ;
 
-log_tw_err
-    : id1 error
-    | id1 SEP error
-    | id1 SEP id2 error
-    | id1 SEP id2 SEP error
-    | id1 SEP id2 SEP id3 error
-    | id1 SEP id2 SEP id3 SEP error
-    | id1 SEP id2 SEP id3 SEP time error
-    | id1 SEP id2 SEP id3 SEP time SEP error
-    | id1 SEP id2 SEP id3 SEP time SEP server error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP sid error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP sid SEP error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP sid SEP service error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP sid SEP service SEP error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP sid SEP service SEP event error
-    | id1 SEP id2 SEP id3 SEP time SEP server SEP ipaddr SEP sid SEP service SEP event SEP error
-    ;
-
 id1
-    : { tw_start_ID1( scanner ); } ID1      { SET_VALUE( TWReceiver::id1, $2 ); }
+    : ID1       { SET_VALUE( TWReceiver::id1, $1 ); }
+    | error     { YYABORT; }
     ;
 
 id2
-    : { tw_start_ID2( scanner ); } ID2      { SET_VALUE( TWReceiver::id2, $2 ); }
+    : SEP { tw_start_ID2( scanner ); } ID2 { SET_VALUE( TWReceiver::id2, $3 ); }
+    | error     { YYABORT; }
     ;
 
 id3
-    : { tw_start_ID3( scanner ); } ID3      { SET_VALUE( TWReceiver::id3, $2 ); }
+    : SEP { tw_start_ID3( scanner ); } ID3 { SET_VALUE( TWReceiver::id3, $3 ); }
+    | error    { YYABORT; }
     ;
 
 time
-    : { tw_start_TIME( scanner ); } TIME    { SET_VALUE( TWReceiver::time, $2 ); }
+    : SEP { tw_start_TIME( scanner ); } TIME { SET_VALUE( TWReceiver::time, $3 ); }
+    | error    { YYABORT; }    
     ;
 
 server
-    : { tw_start_SERVER( scanner ); } SERVER  { SET_VALUE( TWReceiver::server, $2 ); }
+    : SEP { tw_start_SERVER( scanner ); } SERVER { SET_VALUE( TWReceiver::server, $3 ); }
+    | error    { YYABORT; }
     ;
 
 ipaddr
-    : { tw_start_IPADDR( scanner ); } IPADDR  { SET_VALUE( ReceiverInterface::ip, $2 ); }
+    : SEP { tw_start_IPADDR( scanner ); } IPADDR { SET_VALUE( ReceiverInterface::ip, $3 ); }
+    | error    { YYABORT; }
     ;
 
 sid
-    : { tw_start_SID( scanner ); } IPADDR  { SET_VALUE( TWReceiver::sid, $2 ); }
+    : SEP { tw_start_SID( scanner ); } SID { SET_VALUE( TWReceiver::sid, $3 ); }
+    | error    { YYABORT; }
     ;
 
 service
-    : { tw_start_SERVICE( scanner ); } IPADDR  { SET_VALUE( TWReceiver::service, $2 ); }
+    : SEP { tw_start_SERVICE( scanner ); } SERVICE { SET_VALUE( TWReceiver::service, $3 ); }
+    | error    { YYABORT; }
     ;
 
 event
-    : { tw_start_EVENT( scanner ); } IPADDR  { SET_VALUE( TWReceiver::event, $2 ); }
+    : SEP { tw_start_EVENT( scanner ); } EVENT { SET_VALUE( TWReceiver::event, $3 ); }
+    | error    { YYABORT; }
     ;
 
 msg
-    : { tw_start_MSG( scanner ); } IPADDR  { SET_VALUE( TWReceiver::msg, $2 ); }
+    : MSG        { SET_VALUE( TWReceiver::msg, $1 ); }
+    | %empty     { SET_VALUE( TWReceiver::msg, EmptyTSTR ); }
     ;
 
 %%

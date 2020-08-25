@@ -35,11 +35,11 @@ TEST( LogTWEventTest, Setters )
     INIT_TSTR( v, "185.151.196.174" );      e.set( ReceiverInterface::ip, v );
     INIT_TSTR( v, "CC952F33EE2FDBD1_0000SID" );   e.set( TWReceiver::sid, v );
     INIT_TSTR( v, "sra" );                  e.set( TWReceiver::service, v );
-    INIT_TSTR( v, "extra " );               e.set( TWReceiver::event, v );
+    INIT_TSTR( v, "extra" );               e.set( TWReceiver::event, v );
     INIT_TSTR( v, "issued_subhit=m_1" );    e.set( TWReceiver::msg, v );
 
     ASSERT_EQ ( 
-        "{\"event\":\"extra \",\"id1\":\"77619/000/0000/R\",\"id2\":\"CC952F33EE2FDBD1\",\"id3\":\"0008/0008\",\"ip\":\"185.151.196.174\",\"msg\":\"issued_subhit=m_1\",\"server\":\"traceweb22\",\"service\":\"sra\",\"sid\":\"CC952F33EE2FDBD1_0000SID\",\"time\":\"2020-06-11T23:59:58.079949\"}",
+        "{\"event\":\"extra\",\"id1\":\"77619/000/0000/R\",\"id2\":\"CC952F33EE2FDBD1\",\"id3\":\"0008/0008\",\"ip\":\"185.151.196.174\",\"msg\":\"issued_subhit=m_1\",\"server\":\"traceweb22\",\"service\":\"sra\",\"sid\":\"CC952F33EE2FDBD1_0000SID\",\"time\":\"2020-06-11T23:59:58.079949\"}",
         e.GetFormatter().format() );    
 }
 
@@ -56,24 +56,97 @@ TEST_F( TWEventFixture, LineRejecting )
         "{\"_line_nr\":3,\"_unparsed\":\"line3\"}\n", res );
 }
 
-/*
-TEST_F( LogOPEventFixture, ErrorRecovery )
+TEST_F( TWEventFixture, OneGoodLine )
 {
-    try_to_parse( 
-        "line1 blah\n" 
-        "18.207.254.142 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
-    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n",
-                s_outputs.get_ugly() );
-    ASSERT_EQ( "{\"accession\":\"\",\"agent\":\"\",\"extension\":\"\",\"filename\":\"\",\"forwarded\":\"-\",\"ip\":\"18.207.254.142\",\"method\":\"GET\",\"path\":\"\",\"port\":\"4\",\"referer\":\"-\",\"req_len\":\"5\",\"req_time\":\"3\",\"res_code\":\"1\",\"res_len\":\"2\",\"server\":\"sra-download.ncbi.nlm.nih.gov\",\"time\":\"[01/Jan/2020:02:50:24 -0500]\",\"user\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\"}\n", 
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 CC952F33EE2FDBD1_0000SID sra extra         issued_subhit=m_1\n" );
+    ASSERT_EQ( "{\"event\":\"extra\",\"id1\":\"77619/000/0000/R\",\"id2\":\"CC952F33EE2FDBD1\",\"id3\":\"0008/0008\",\"ip\":\"185.151.196.174\",\"msg\":\"issued_subhit=m_1\",\"server\":\"traceweb22\",\"service\":\"sra\",\"sid\":\"CC952F33EE2FDBD1_0000SID\",\"time\":\"2020-06-11T23:59:58.079949\"}\n", 
                 s_outputs.get_good() );
 }
 
-TEST_F( LogOPEventFixture, unrecognized_char )
+TEST_F( TWEventFixture, ErrorRecovery )
+{
+    try_to_parse( 
+        "line1 blah\n" 
+        "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 CC952F33EE2FDBD1_0000SID sra extra         issued_subhit=m_1\n" );
+    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n",
+                s_outputs.get_ugly() );
+    ASSERT_EQ( "{\"event\":\"extra\",\"id1\":\"77619/000/0000/R\",\"id2\":\"CC952F33EE2FDBD1\",\"id3\":\"0008/0008\",\"ip\":\"185.151.196.174\",\"msg\":\"issued_subhit=m_1\",\"server\":\"traceweb22\",\"service\":\"sra\",\"sid\":\"CC952F33EE2FDBD1_0000SID\",\"time\":\"2020-06-11T23:59:58.079949\"}\n", 
+                s_outputs.get_good() );
+}
+
+TEST_F( TWEventFixture, unrecognized_char )
 {
     std::string res = try_to_parse_ugly( "line1 \07" );
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\"}\n", res );
 }
 
+TEST_F( TWEventFixture, NoMessage )
+{
+    std::string res = try_to_parse_good( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 CC952F33EE2FDBD1_0000SID sra extra         \n" );
+    ASSERT_EQ( "", extract_value( res, "msg" ) );
+}
+
+TEST_F( TWEventFixture, NoMessage2 )
+{
+    std::string res = try_to_parse_good( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 CC952F33EE2FDBD1_0000SID sra extra\n" );
+    ASSERT_EQ( "", extract_value( res, "msg" ) );
+}
+
+TEST_F( TWEventFixture, NoEvent )
+{
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 CC952F33EE2FDBD1_0000SID sra \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoService )
+{
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 CC952F33EE2FDBD1_0000SID \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoSID )
+{
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoIP )
+{
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoServer )
+{
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoTime )
+{
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoID3 )
+{
+    try_to_parse( "77619/000/0000/R  CC952F33EE2FDBD1 \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoID2 )
+{
+    try_to_parse( "77619/000/0000/R  \n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+TEST_F( TWEventFixture, NoID1 )
+{
+    try_to_parse( "\n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+
+/*
 TEST_F( LogOPEventFixture, parse_ip4 )
 {
     std::string res = try_to_parse_good( "18.207.254.142 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5\n" );

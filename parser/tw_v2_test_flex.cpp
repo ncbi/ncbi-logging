@@ -60,6 +60,12 @@ public:
         ASSERT_EQ( txt, TokenValue() );
     }
 
+    void token_test( int tt, const char * txt )
+    {
+        ASSERT_EQ( tt, StartScan( txt ) );
+        ASSERT_EQ( txt, TokenValue() );
+    }
+
     yyscan_t sc;
     YYSTYPE token;
 };
@@ -69,19 +75,19 @@ TEST_F ( TW_TestFlexFixture, SEP1 )            { ASSERT_EQ( SEP,  StartScan( " "
 TEST_F ( TW_TestFlexFixture, SEP2 )            { ASSERT_EQ( SEP,  StartScan( "\t" ) ); }
 TEST_F ( TW_TestFlexFixture, SEP3 )            { ASSERT_EQ( SEP,  StartScan( " \t " ) ); }
 
-TEST_F ( TW_TestFlexFixture, ID1_1 )    { token_test( ID1, "77619/000/0000/R", tw_start_ID1 ); }
-TEST_F ( TW_TestFlexFixture, ID1_2 )    { token_test( ID1, "77945/000/0000/PB", tw_start_ID1 ); }
+TEST_F ( TW_TestFlexFixture, ID1_1 )    { token_test( ID1, "77619/000/0000/R" ); }
+TEST_F ( TW_TestFlexFixture, ID1_2 )    { token_test( ID1, "77945/000/0000/PB" ); }
 
 TEST_F ( TW_TestFlexFixture, ID1_3 )
 {
-    ASSERT_EQ( UNRECOGNIZED, StartScanF( "XXX", tw_start_ID1 ) );
+    ASSERT_EQ( UNRECOGNIZED, StartScan( "XXX") );
 }
 
 TEST_F ( TW_TestFlexFixture, ID2 )      { token_test( ID2, "CC952F33EE2FDBD1", tw_start_ID2 ); }
 
 TEST_F ( TW_TestFlexFixture, ID1_ID2 )
 {
-    ASSERT_EQ( ID1, StartScanF( "77945/000/0000/PB CC952F33EE2FDBD1", tw_start_ID1 ) );
+    ASSERT_EQ( ID1, StartScan( "77945/000/0000/PB CC952F33EE2FDBD1" ) );
     ASSERT_EQ( "77945/000/0000/PB", TokenValue() );
     ASSERT_EQ( SEP, NextTokenType() );
     ASSERT_EQ( ID2, NextTokenTypeF( tw_start_ID2 ) );

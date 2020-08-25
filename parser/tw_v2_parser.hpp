@@ -46,7 +46,6 @@ extern int tw_debug;
 #include "TW_Interface.hpp"
 
 extern void tw_get_scanner_input( void * yyscanner, t_str & str );
-extern void tw_start_ID1( void * yyscanner );
 extern void tw_start_ID2( void * yyscanner );
 extern void tw_start_ID3( void * yyscanner );
 extern void tw_start_TIME( void * yyscanner );
@@ -61,7 +60,7 @@ extern void tw_pop_state( void * yyscanner );
 
 using namespace NCBI::Logging;
 
-#line 65 "tw_v2_parser.hpp" /* yacc.c:1909  */
+#line 64 "tw_v2_parser.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -88,11 +87,11 @@ using namespace NCBI::Logging;
 
 union YYSTYPE
 {
-#line 51 "tw_v2_parser.y" /* yacc.c:1909  */
+#line 50 "tw_v2_parser.y" /* yacc.c:1909  */
 
     t_str s;
 
-#line 96 "tw_v2_parser.hpp" /* yacc.c:1909  */
+#line 95 "tw_v2_parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
