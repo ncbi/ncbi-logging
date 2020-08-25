@@ -162,6 +162,14 @@ TEST_F( TWEventFixture, problem2 )
     ASSERT_EQ( "TR_SraSub", extract_value( res, "service" ) );   
 }
 
+TEST_F( TWEventFixture, problem3 )
+{
+    const char * txt = 
+"184295/000/0000/RB CC95CFE7F3655F01 0004/0004 2020-08-14T05:14:24.564335 traceweb22      2001:981:83ac:1:f449:e4d2:b6d9:57b A9F5023FF361C403_11555SID tracequery request-start fields=1&ncbi_role=production&ncbi_location=be-md";
+    std::string res = try_to_parse_good( txt );
+    ASSERT_EQ( "A9F5023FF361C403_11555SID", extract_value( res, "sid" ) );   
+}
+
 /*
 TEST_F( LogOPEventFixture, parse_ip4 )
 {

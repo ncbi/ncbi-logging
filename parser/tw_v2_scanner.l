@@ -58,7 +58,7 @@ SERVER      "traceweb"{NUM2}
 
 IPADDR      {IPV4ADDR}|{IPV6ADDR}|"UNK_CLIENT"
 
-SID         ({ID2}"_"{HEXCHAR}{4}"SID")|"UNK_SESSION"
+SID         ({ID2}"_"{HEXCHAR}+"SID")|"UNK_SESSION"
 
 SERVICE     [A-Za-z_]+
 
