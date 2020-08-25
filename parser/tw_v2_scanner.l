@@ -60,7 +60,7 @@ IPADDR      {IPV4ADDR}|{IPV6ADDR}|"UNK_CLIENT"
 
 SID         ({ID2}"_"{HEXCHAR}{4}"SID")|"UNK_SESSION"
 
-SERVICE     [a-z_]+
+SERVICE     [A-Za-z_]+
 
 EVENT       [a-zA-Z_\-:]+
 

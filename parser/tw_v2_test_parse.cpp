@@ -154,6 +154,14 @@ TEST_F( TWEventFixture, problem1 )
     ASSERT_EQ( "Warning:", extract_value( res, "event" ) );   
 }
 
+TEST_F( TWEventFixture, problem2 )
+{
+    const char * txt = 
+"222026/000/0000/R  CC95634AEF04AE01 0008/0008 2020-06-22T02:08:32.559587 traceweb22      61.144.145.31   396A25C583BEBAA1_0091SID TR_SraSub Error:  \"app.cpp\", line 187: CXApp::GetSelfUrl() --- [222026] Cannot take self url by key trace.ncbi.nlm.nih.gov/export/home/web/public/htdocs/Traces/sra_sub/index.cgi from [CGI_SELF_URL_MAP]";
+    std::string res = try_to_parse_good( txt );
+    ASSERT_EQ( "TR_SraSub", extract_value( res, "service" ) );   
+}
+
 /*
 TEST_F( LogOPEventFixture, parse_ip4 )
 {

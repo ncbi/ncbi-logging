@@ -105,6 +105,7 @@ TEST_F ( TW_TestFlexFixture, SID_1 )    { token_test( SID, "CC952F33EE2FDBD1_00A
 TEST_F ( TW_TestFlexFixture, SID_2 )    { token_test( SID, "UNK_SESSION", tw_start_SID ); }
 TEST_F ( TW_TestFlexFixture, SRV_1 )    { token_test( SERVICE, "sra", tw_start_SERVICE ); }
 TEST_F ( TW_TestFlexFixture, SRV_2 )    { token_test( SERVICE, "sra_data_locator", tw_start_SERVICE ); }
+TEST_F ( TW_TestFlexFixture, SRV_3)    { token_test( SERVICE, "SRA_Data_locator", tw_start_SERVICE ); }
 TEST_F ( TW_TestFlexFixture, EVENT_1 )  { token_test( EVENT, "extra", tw_start_EVENT ); }
 TEST_F ( TW_TestFlexFixture, EVENT_2 )  { token_test( EVENT, "Trace:", tw_start_EVENT ); }
 
