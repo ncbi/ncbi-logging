@@ -6,6 +6,7 @@
 #include "OP_Interface.hpp"
 #include "Formatters.hpp"
 #include "CatWriters.hpp"
+#include "parse_test_fixture.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
@@ -69,60 +70,8 @@ TEST(LogOPEventTest, Setters)
         e.GetFormatter().format() );    
 }
 
-class LogOPEventFixture : public ::testing::Test
+class LogOPEventFixture : public ParseTestFixture< OPParseBlockFactory >
 {
-    public :
-        void try_to_parse( std::string line, bool debug = false )
-        {
-            istringstream ss( line );
-            OPParseBlockFactory pbFact;
-            SingleThreadedParser p( ss, s_outputs, pbFact );
-            p . setDebug( debug );
-            p . parse(); // does the parsing and generates the report
-        }
-
-        std::string try_to_parse_good( std::string line, bool debug = false )
-        {
-            try_to_parse( line, debug );
-            return s_outputs.get_good();
-        }
-
-        std::string try_to_parse_bad( std::string line, bool debug = false )
-        {
-            try_to_parse( line, debug );
-            return s_outputs.get_bad();
-        }
-
-        std::string try_to_parse_ugly( std::string line, bool debug = false )
-        {
-            try_to_parse( line, debug );
-            return s_outputs.get_ugly();
-        }
-
-        std::string try_to_parse_review( std::string line, bool debug = false )
-        {
-            try_to_parse( line, debug );
-            return s_outputs.get_review();
-        }
-
-        std::string extract_value( const std::string & src, std::string key )
-        {
-            try
-            {
-                const ncbi::String input ( src );
-                ncbi::JSONObjectRef obj = ncbi::JSON::parseObject ( input );
-                const ncbi::String name ( key );
-                ncbi::JSONValue & val = obj -> getValue( name );
-                return val.toString().toSTLString();
-            }
-            catch(const ncbi::Exception & ex)
-            {
-                cerr << "extract_value():" << ex.what() << endl;
-                throw;
-            }
-        }
-
-        StringCatWriter s_outputs;
 };
 
 TEST_F( LogOPEventFixture, LineRejecting )

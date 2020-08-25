@@ -73,47 +73,36 @@ TEST(CatCounter, Count_BadCategory)
     ASSERT_THROW( cc.count(ReceiverInterface::cat_max), std::exception );
     ASSERT_EQ( 0, cc.get_total() );
 }
+
 // CatWriters
+
+void verify_file( const std::string & filename, const std::string & content )
+{
+    ifstream in( filename );
+    ASSERT_TRUE( in.good() );
+    string s; in >> s;
+    ASSERT_EQ( content, s );
+    remove( filename.c_str() );
+}
 
 TEST(FileCatWriter, Write)
 {
     {
         FileCatWriter f( "test" );
-        f.write( ReceiverInterface::cat_review, "review");
-        f.write( ReceiverInterface::cat_good, "good");
-        f.write( ReceiverInterface::cat_bad, "bad");
-        f.write( ReceiverInterface::cat_ugly, "ugly");
-        f.write( ReceiverInterface::cat_ignored, "ignored");
+        f.write( ReceiverInterface::cat_review, "review" );
+        f.write( ReceiverInterface::cat_good, "good" );
+        f.write( ReceiverInterface::cat_bad, "bad" );
+        f.write( ReceiverInterface::cat_ugly, "ugly" );
+        f.write( ReceiverInterface::cat_ignored, "ignored" );
     }
 
-    {
-        ifstream in("test.review"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("review"), s);
-    }
-    remove("test.review");
+    verify_file( "test.review" + FileCatWriter::extension, "review" );
+    verify_file( "test.good" + FileCatWriter::extension, "good" );
+    verify_file( "test.bad" + FileCatWriter::extension, "bad" );
+    verify_file( "test.unrecog" + FileCatWriter::extension, "ugly" );
 
-    {
-        ifstream in("test.good"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("good"), s);
-    }
-    remove("test.good");
-
-    {
-        ifstream in("test.bad"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("bad"), s);
-    }
-    remove("test.bad");
-
-    {
-        ifstream in("test.unrecog"); ASSERT_TRUE( in.good() );
-        string s; in >> s;
-        ASSERT_EQ( string("ugly"), s);
-    }
-
-    remove("test.unrecog");
+    /* verify that the ignored-file does not exist */
+    ASSERT_FALSE( ifstream( "test.ignored" + FileCatWriter::extension ).good() );
 }
 
 TEST(FileCatWriter, Count)

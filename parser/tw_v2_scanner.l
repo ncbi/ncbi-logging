@@ -79,7 +79,7 @@ MSG         .+
 <TW_ID2>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID2\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 <TW_ID3>{ID3}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID3; }
-<TW_ID2>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID3\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_ID3>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID3\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
 <TW_TIME>{TIME}     { MAKE_STR(); yy_pop_state( yyscanner ); return TIME; }
 <TW_TIME>.          { fprintf(stderr, "Unexpected character '%c' (%x) in TIME\n", yytext[0], yytext[0]); return UNRECOGNIZED; }

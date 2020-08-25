@@ -61,7 +61,7 @@ Tool::run ( int argc, char * argv [] )
                 // std::cout << "thread-sleeps = " << MultiThreadedParser :: thread_sleeps . load() << endl;        
             }
 
-            std::ofstream report( outputBaseName . toSTLString () + ".report" );
+            std::ofstream report( outputBaseName . toSTLString () + ".stats" + FileCatWriter::extension );
             JsonLibFormatter f;
             report << outputs.getCounter().report( f ) << endl; 
         }
