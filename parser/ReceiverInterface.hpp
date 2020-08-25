@@ -77,7 +77,7 @@ namespace NCBI
             void setAgent( const t_agent & a );
             void setRequest( const t_request & r );
 
-            virtual void reportField( const char * message ) = 0;
+            void reportField( const char * message );
 
             FormatterInterface & GetFormatter() { return * m_fmt.get(); }
 

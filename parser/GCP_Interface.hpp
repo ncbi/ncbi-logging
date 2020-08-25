@@ -31,8 +31,6 @@ namespace NCBI
             } GCP_Members; // all are t_str values
             virtual void set( GCP_Members m, const t_str & v ); // will invoke set( ReceiverInterface::Members ) if necessary
 
-            virtual void reportField( const char * message );
-
         private:
         };
 

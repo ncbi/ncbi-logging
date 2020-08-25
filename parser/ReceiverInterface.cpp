@@ -65,6 +65,21 @@ ReceiverInterface::setRequest( const t_request & r )
         m_cat = cat_good;
 }
 
+void ReceiverInterface::reportField( const char * message )
+{
+    if ( m_cat == cat_unknown || m_cat == cat_good )
+        m_cat = cat_review;
+    try
+    {
+        t_str msg { message, (int)strlen( message ), false };
+        m_fmt -> addNameValue( "_error", msg );
+    }
+    catch( const ncbi::JSONUniqueConstraintViolation & e )
+    {
+        // in case we already inserted a parse-error value, we do nothing...
+    }
+}
+
 ParseBlockInterface :: ~ ParseBlockInterface ()
 {
 }
