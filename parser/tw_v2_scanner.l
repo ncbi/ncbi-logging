@@ -52,7 +52,7 @@ ID1         {NUM}{SLASH}{NUM}{SLASH}{NUM}{SLASH}{ALPHACAP2}
 ID2         {HEXCHAR}+
 ID3         {NUM}{SLASH}{NUM}
 
-TIME        {NUM4}{DASH}{NUM2}{DASH}{NUM2}T{NUM2}{COLON}{NUM2}{COLON}{NUM2}{DOT}{NUM6}
+TIME        {NUM4}{DASH}{NUM2}{DASH}{NUM2}T{NUM2}{COLON}{NUM2}{COLON}{NUM2}{DOT}{NUM}
 
 SERVER      "traceweb"{NUM2}
 
@@ -106,7 +106,7 @@ MSG         .+
 YY_BUFFER_STATE tw_scan_reset( const char * input, yyscan_t yyscanner )
 {
     YY_BUFFER_STATE ret = tw__scan_string( input, yyscanner );
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
     return ret;
@@ -114,58 +114,58 @@ YY_BUFFER_STATE tw_scan_reset( const char * input, yyscan_t yyscanner )
 
 void tw_get_scanner_input( yyscan_t yyscanner, t_str & str )
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     const char * input = (const char*) ( yyg -> yyextra_r );
     str . p = input;
-    str . n = strlen( input ); // looks wasteful but only happens when we report errors 
+    str . n = strlen( input ); // looks wasteful but only happens when we report errors
 }
 
 void tw_start_ID2( yyscan_t yyscanner )
 {
-    yy_push_state( TW_ID2, yyscanner ); 
+    yy_push_state( TW_ID2, yyscanner );
 }
 
 void tw_start_ID3( yyscan_t yyscanner )
 {
-    yy_push_state( TW_ID3, yyscanner ); 
+    yy_push_state( TW_ID3, yyscanner );
 }
 
 void tw_start_TIME( yyscan_t yyscanner )
 {
-    yy_push_state( TW_TIME, yyscanner ); 
+    yy_push_state( TW_TIME, yyscanner );
 }
 
 void tw_start_SERVER( yyscan_t yyscanner )
 {
-    yy_push_state( TW_SERVER, yyscanner ); 
+    yy_push_state( TW_SERVER, yyscanner );
 }
 
 void tw_start_IPADDR( yyscan_t yyscanner )
 {
-    yy_push_state( TW_IPADDR, yyscanner ); 
+    yy_push_state( TW_IPADDR, yyscanner );
 }
 
 void tw_start_SID( yyscan_t yyscanner )
 {
-    yy_push_state( TW_SID, yyscanner ); 
+    yy_push_state( TW_SID, yyscanner );
 }
 
 void tw_start_SERVICE( yyscan_t yyscanner )
 {
-    yy_push_state( TW_SERVICE, yyscanner ); 
+    yy_push_state( TW_SERVICE, yyscanner );
 }
 
 void tw_start_EVENT( yyscan_t yyscanner )
 {
-    yy_push_state( TW_EVENT, yyscanner ); 
+    yy_push_state( TW_EVENT, yyscanner );
 }
 
 void tw_start_MSG( yyscan_t yyscanner )
 {
-    yy_push_state( TW_MSG, yyscanner ); 
+    yy_push_state( TW_MSG, yyscanner );
 }
 
 void tw_pop_state( yyscan_t yyscanner )
 {
-    yy_pop_state( yyscanner ); 
+    yy_pop_state( yyscanner );
 }

@@ -95,7 +95,8 @@ TEST_F ( TW_TestFlexFixture, ID1_ID2 )
 }
 
 TEST_F ( TW_TestFlexFixture, ID3 )      { token_test( ID3, "0009/0009", tw_start_ID3 ); }
-TEST_F ( TW_TestFlexFixture, TIME )     { token_test( TIME, "2020-06-11T23:59:58.079949", tw_start_TIME ); }
+TEST_F ( TW_TestFlexFixture, TIME6 )     { token_test( TIME, "2020-06-11T23:59:58.079949", tw_start_TIME ); }
+TEST_F ( TW_TestFlexFixture, TIME3 )     { token_test( TIME, "2020-06-11T23:59:58.079", tw_start_TIME ); }
 TEST_F ( TW_TestFlexFixture, SERVER )   { token_test( SERVER, "traceweb22", tw_start_SERVER ); }
 TEST_F ( TW_TestFlexFixture, IP1 )      { token_test( IPADDR, "185.151.196.174", tw_start_IPADDR ); }
 TEST_F ( TW_TestFlexFixture, IP2 )      { token_test( IPADDR, "UNK_CLIENT", tw_start_IPADDR ); }
