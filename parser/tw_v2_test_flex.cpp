@@ -101,7 +101,7 @@ TEST_F ( TW_TestFlexFixture, SERVER )   { token_test( SERVER, "traceweb22", tw_s
 TEST_F ( TW_TestFlexFixture, IP1 )      { token_test( IPADDR, "185.151.196.174", tw_start_IPADDR ); }
 TEST_F ( TW_TestFlexFixture, IP2 )      { token_test( IPADDR, "UNK_CLIENT", tw_start_IPADDR ); }
 TEST_F ( TW_TestFlexFixture, IP3 )      { token_test( IPADDR, "2001:250:3412:c081:756d:9a01:87ef:dc69", tw_start_IPADDR ); }
-TEST_F ( TW_TestFlexFixture, SID_1 )    { token_test( SID, "CC952F33EE2FDBD1_0000SID", tw_start_SID ); }
+TEST_F ( TW_TestFlexFixture, SID_1 )    { token_test( SID, "CC952F33EE2FDBD1_00AFSID", tw_start_SID ); }
 TEST_F ( TW_TestFlexFixture, SID_2 )    { token_test( SID, "UNK_SESSION", tw_start_SID ); }
 TEST_F ( TW_TestFlexFixture, SRV_1 )    { token_test( SERVICE, "sra", tw_start_SERVICE ); }
 TEST_F ( TW_TestFlexFixture, SRV_2 )    { token_test( SERVICE, "sra_data_locator", tw_start_SERVICE ); }

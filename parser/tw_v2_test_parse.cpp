@@ -146,6 +146,14 @@ TEST_F( TWEventFixture, NoID1 )
     ASSERT_FALSE( s_outputs.get_ugly().empty() );
 }
 
+TEST_F( TWEventFixture, problem1 )
+{
+    const char * txt = 
+"214533/000/0000/R  CC954605EF0486E1 0009/0009 2020-06-22T01:58:06.783792 traceweb22      58.250.174.76   02C52D95FC7A04E6_74E0SID run_selector Warning: CONNECT(313.4) \"ncbi_localip.c\", line 191: UNK_FUNC --- [214533] Local IP spec at line 111, '10.65/16' overlaps with already defined one: 10.65.0.0-10.65.1.255";
+    std::string res = try_to_parse_good( txt );
+    ASSERT_EQ( "Warning:", extract_value( res, "event" ) );   
+}
+
 /*
 TEST_F( LogOPEventFixture, parse_ip4 )
 {
