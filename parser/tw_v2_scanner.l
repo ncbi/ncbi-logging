@@ -62,7 +62,7 @@ SID         ({ID2}"_"{HEXCHAR}+"SID")|"UNK_SESSION"
 
 SERVICE     [A-Za-z_]+
 
-EVENT       [a-zA-Z_\-:]+
+EVENT       [^ \t]+
 
 MSG         .+
 

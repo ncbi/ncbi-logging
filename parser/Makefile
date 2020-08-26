@@ -729,7 +729,7 @@ TW2JSON = $(BINDIR)/tw2jsn-dbg
 
 v2: aws op gcp tw
 
-test_v2: v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test
+test_v2: v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test run_$(PREFIX_TW_V2)parse_test
 	mkdir -p  actual/$(PREFIX_AWS_V2)testlines
 	cat data/$(PREFIX_AWS)testlines.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)testlines/ >./actual/$(PREFIX_AWS_V2)testlines/stdout 2>./actual/$(PREFIX_AWS_V2)testlines/stderr \
 						&& diff ./expected/$(PREFIX_AWS_V2)testlines ./actual/$(PREFIX_AWS_V2)testlines
