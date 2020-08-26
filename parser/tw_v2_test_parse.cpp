@@ -204,14 +204,6 @@ TEST_F( TWEventFixture, errorLine )
     ASSERT_EQ( "\"helper_sra.cpp\", line 56: ncbi::CSraHelper::CheckSignal() --- Signal SIGPIPE was cought", extract_value( res, "msg" ) );
 }
 
-TEST_F( TWEventFixture, letters_in_SID )
-{
-    const char * txt =
-"62725/000/0000/PB CC95F505F2E23E71 0001/0001 2020-08-08T00:02:47.550205 traceweb22      UNK_CLIENT      3F691B0D3E2426B2_00QASID sra start";
-    std::string res = try_to_parse_good( txt );
-    ASSERT_EQ( "3F691B0D3E2426B2_00QASID", extract_value( res, "sid" ) );
-}
-
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
