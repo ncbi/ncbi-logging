@@ -432,9 +432,9 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  21
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  33
+#define YYNRULES  34
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  51
+#define YYNSTATES  52
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -481,10 +481,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    64,    64,    64,    68,    73,    77,    78,    82,    82,
-      83,    87,    87,    88,    92,    92,    93,    97,    97,    98,
-     102,   102,   103,   107,   107,   108,   112,   112,   113,   117,
-     117,   118,   122,   123
+       0,    64,    64,    64,    68,    73,    77,    78,    82,    86,
+      87,    88,    93,    93,    94,    98,    98,    99,   103,   103,
+     104,   108,   108,   109,   113,   113,   114,   118,   118,   119,
+     123,   123,   124,   128,   129
 };
 #endif
 
@@ -495,9 +495,9 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "ID1", "ID2", "ID3", "TIME", "SERVER",
   "IPADDR", "SID", "SERVICE", "EVENT", "MSG", "SEP", "UNRECOGNIZED",
-  "$accept", "log_tw", "$@1", "id1", "id2", "$@2", "id3", "$@3", "time",
-  "$@4", "server", "$@5", "ipaddr", "$@6", "sid", "$@7", "service", "$@8",
-  "event", "$@9", "msg", YY_NULLPTR
+  "$accept", "log_tw", "$@1", "id1", "id2_pref", "id2", "id3", "$@2",
+  "time", "$@3", "server", "$@4", "ipaddr", "$@5", "sid", "$@6", "service",
+  "$@7", "event", "$@8", "msg", YY_NULLPTR
 };
 #endif
 
@@ -525,12 +525,12 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -1,   -11,   -11,   -11,    20,   -10,   -11,   -11,   -11,    -8,
-      -3,   -11,   -11,    -6,   -11,    16,   -11,   -11,    -4,   -11,
-      17,   -11,   -11,    -2,   -11,    15,   -11,   -11,     1,   -11,
-      18,   -11,   -11,     3,   -11,    19,   -11,   -11,     5,   -11,
-      14,   -11,   -11,    12,   -11,    21,   -11,   -11,    22,   -11,
-     -11
+      -1,   -11,   -11,   -11,    12,   -10,   -11,   -11,   -11,    -3,
+      -8,   -11,   -11,   -11,   -11,    -6,    17,   -11,   -11,    -4,
+     -11,    18,   -11,   -11,     1,   -11,    16,   -11,   -11,     3,
+     -11,    19,   -11,   -11,     5,   -11,    20,   -11,   -11,     7,
+     -11,    15,   -11,   -11,    13,   -11,    21,   -11,   -11,    22,
+     -11,   -11
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -538,12 +538,12 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     5,     6,     7,     0,     0,     1,     8,    10,     0,
-       0,    11,    13,     0,     9,     0,    14,    16,     0,    12,
-       0,    17,    19,     0,    15,     0,    20,    22,     0,    18,
-       0,    23,    25,     0,    21,     0,    26,    28,     0,    24,
-       0,    29,    31,     4,    27,     0,     2,    30,    33,    32,
-       3
+       0,     5,     6,     7,     0,     0,     1,     8,    11,     0,
+       0,     9,    10,    12,    14,     0,     0,    15,    17,     0,
+      13,     0,    18,    20,     0,    16,     0,    21,    23,     0,
+      19,     0,    24,    26,     0,    22,     0,    27,    29,     0,
+      25,     0,    30,    32,     4,    28,     0,     2,    31,    34,
+      33,     3
 };
 
   /* YYPGOTO[NTERM-NUM].  */
@@ -557,9 +557,9 @@ static const yytype_int8 yypgoto[] =
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,    48,     5,     9,    10,    13,    15,    18,    20,
-      23,    25,    28,    30,    33,    35,    38,    40,    43,    45,
-      50
+      -1,     4,    49,     5,     9,    10,    15,    16,    19,    21,
+      24,    26,    29,    31,    34,    36,    39,    41,    44,    46,
+      51
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -567,17 +567,17 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,    14,     2,     7,     8,    11,    12,    16,    17,    21,
-      22,    26,    27,     3,    31,    32,    36,    37,    41,    42,
-       6,    19,    29,    24,    44,    46,    34,     0,    39,     0,
-       0,     0,    47,     0,    49
+       1,    11,     2,     7,     8,    13,    14,    17,    18,    22,
+      23,    12,     6,     3,    27,    28,    32,    33,    37,    38,
+      42,    43,    20,    30,    25,    45,    47,    35,     0,    40,
+       0,     0,    48,     0,    50
 };
 
 static const yytype_int8 yycheck[] =
 {
        1,     4,     3,    13,    14,    13,    14,    13,    14,    13,
-      14,    13,    14,    14,    13,    14,    13,    14,    13,    14,
-       0,     5,     7,     6,    10,    13,     8,    -1,     9,    -1,
+      14,    14,     0,    14,    13,    14,    13,    14,    13,    14,
+      13,    14,     5,     7,     6,    10,    13,     8,    -1,     9,
       -1,    -1,    11,    -1,    12
 };
 
@@ -586,29 +586,29 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     1,     3,    14,    16,    18,     0,    13,    14,    19,
-      20,    13,    14,    21,     4,    22,    13,    14,    23,     5,
-      24,    13,    14,    25,     6,    26,    13,    14,    27,     7,
-      28,    13,    14,    29,     8,    30,    13,    14,    31,     9,
-      32,    13,    14,    33,    10,    34,    13,    11,    17,    12,
-      35
+      20,     4,    14,    13,    14,    21,    22,    13,    14,    23,
+       5,    24,    13,    14,    25,     6,    26,    13,    14,    27,
+       7,    28,    13,    14,    29,     8,    30,    13,    14,    31,
+       9,    32,    13,    14,    33,    10,    34,    13,    11,    17,
+      12,    35
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    15,    17,    16,    16,    16,    18,    18,    20,    19,
-      19,    22,    21,    21,    24,    23,    23,    26,    25,    25,
-      28,    27,    27,    30,    29,    29,    32,    31,    31,    34,
-      33,    33,    35,    35
+       0,    15,    17,    16,    16,    16,    18,    18,    19,    20,
+      20,    20,    22,    21,    21,    24,    23,    23,    26,    25,
+      25,    28,    27,    27,    30,    29,    29,    32,    31,    31,
+      34,    33,    33,    35,    35
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     0,    12,     9,     1,     1,     1,     0,     3,
+       0,     2,     0,    12,     9,     1,     1,     1,     1,     2,
+       2,     1,     0,     3,     1,     0,     3,     1,     0,     3,
        1,     0,     3,     1,     0,     3,     1,     0,     3,     1,
-       0,     3,     1,     0,     3,     1,     0,     3,     1,     0,
-       3,     1,     1,     0
+       0,     3,     1,     1,     0
 };
 
 
@@ -1340,157 +1340,163 @@ yyreduce:
     break;
 
   case 9:
-#line 82 "tw_v2_parser.y" /* yacc.c:1646  */
+#line 86 "tw_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( TWReceiver::id2, (yyvsp[0].s) ); }
 #line 1346 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 83 "tw_v2_parser.y" /* yacc.c:1646  */
+#line 87 "tw_v2_parser.y" /* yacc.c:1646  */
     { lib -> reportField( "invalid ID2" ); YYACCEPT; }
 #line 1352 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 87 "tw_v2_parser.y" /* yacc.c:1646  */
-    { tw_start_ID3( scanner ); }
+#line 88 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid ID1" ); YYACCEPT; }
 #line 1358 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 87 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::id3, (yyvsp[0].s) ); }
+#line 93 "tw_v2_parser.y" /* yacc.c:1646  */
+    { tw_start_ID3( scanner ); }
 #line 1364 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 88 "tw_v2_parser.y" /* yacc.c:1646  */
-    { lib -> reportField( "invalid ID3" ); YYACCEPT; }
+#line 93 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::id3, (yyvsp[0].s) ); }
 #line 1370 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 92 "tw_v2_parser.y" /* yacc.c:1646  */
-    { tw_start_TIME( scanner ); }
+#line 94 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid ID3" ); YYACCEPT; }
 #line 1376 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 92 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::time, (yyvsp[0].s) ); }
+#line 98 "tw_v2_parser.y" /* yacc.c:1646  */
+    { tw_start_TIME( scanner ); }
 #line 1382 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 93 "tw_v2_parser.y" /* yacc.c:1646  */
-    { lib -> reportField( "invalid TIME" ); YYACCEPT; }
+#line 98 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::time, (yyvsp[0].s) ); }
 #line 1388 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 97 "tw_v2_parser.y" /* yacc.c:1646  */
-    { tw_start_SERVER( scanner ); }
+#line 99 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid TIME" ); YYACCEPT; }
 #line 1394 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 97 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::server, (yyvsp[0].s) ); }
+#line 103 "tw_v2_parser.y" /* yacc.c:1646  */
+    { tw_start_SERVER( scanner ); }
 #line 1400 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 98 "tw_v2_parser.y" /* yacc.c:1646  */
-    { lib -> reportField( "invalid SERVER" ); YYACCEPT; }
+#line 103 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::server, (yyvsp[0].s) ); }
 #line 1406 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 102 "tw_v2_parser.y" /* yacc.c:1646  */
-    { tw_start_IPADDR( scanner ); }
+#line 104 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid SERVER" ); YYACCEPT; }
 #line 1412 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 102 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( ReceiverInterface::ip, (yyvsp[0].s) ); }
+#line 108 "tw_v2_parser.y" /* yacc.c:1646  */
+    { tw_start_IPADDR( scanner ); }
 #line 1418 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 103 "tw_v2_parser.y" /* yacc.c:1646  */
-    { lib -> reportField( "invalid IPADDR" ); YYACCEPT; }
+#line 108 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( ReceiverInterface::ip, (yyvsp[0].s) ); }
 #line 1424 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 107 "tw_v2_parser.y" /* yacc.c:1646  */
-    { tw_start_SID( scanner ); }
+#line 109 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid IPADDR" ); YYACCEPT; }
 #line 1430 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 107 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::sid, (yyvsp[0].s) ); }
+#line 113 "tw_v2_parser.y" /* yacc.c:1646  */
+    { tw_start_SID( scanner ); }
 #line 1436 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 108 "tw_v2_parser.y" /* yacc.c:1646  */
-    { lib -> reportField( "invalid SID" ); YYACCEPT; }
+#line 113 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::sid, (yyvsp[0].s) ); }
 #line 1442 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 112 "tw_v2_parser.y" /* yacc.c:1646  */
-    { tw_start_SERVICE( scanner ); }
+#line 114 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid SID" ); YYACCEPT; }
 #line 1448 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 112 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::service, (yyvsp[0].s) ); }
+#line 118 "tw_v2_parser.y" /* yacc.c:1646  */
+    { tw_start_SERVICE( scanner ); }
 #line 1454 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 113 "tw_v2_parser.y" /* yacc.c:1646  */
-    { lib -> reportField( "invalid SERVICE" ); YYACCEPT; }
+#line 118 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::service, (yyvsp[0].s) ); }
 #line 1460 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 117 "tw_v2_parser.y" /* yacc.c:1646  */
-    { tw_start_EVENT( scanner ); }
+#line 119 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid SERVICE" ); YYACCEPT; }
 #line 1466 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 117 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::event, (yyvsp[0].s) ); }
+#line 123 "tw_v2_parser.y" /* yacc.c:1646  */
+    { tw_start_EVENT( scanner ); }
 #line 1472 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 118 "tw_v2_parser.y" /* yacc.c:1646  */
-    { lib -> reportField( "invalid EVENT" ); YYACCEPT; }
+#line 123 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::event, (yyvsp[0].s) ); }
 #line 1478 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 122 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::msg, (yyvsp[0].s) ); }
+#line 124 "tw_v2_parser.y" /* yacc.c:1646  */
+    { lib -> reportField( "invalid EVENT" ); YYACCEPT; }
 #line 1484 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 123 "tw_v2_parser.y" /* yacc.c:1646  */
-    { SET_VALUE( TWReceiver::msg, EmptyTSTR ); }
+#line 128 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::msg, (yyvsp[0].s) ); }
 #line 1490 "tw_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
+  case 34:
+#line 129 "tw_v2_parser.y" /* yacc.c:1646  */
+    { SET_VALUE( TWReceiver::msg, EmptyTSTR ); }
+#line 1496 "tw_v2_parser.cpp" /* yacc.c:1646  */
+    break;
 
-#line 1494 "tw_v2_parser.cpp" /* yacc.c:1646  */
+
+#line 1500 "tw_v2_parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1718,7 +1724,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 126 "tw_v2_parser.y" /* yacc.c:1906  */
+#line 132 "tw_v2_parser.y" /* yacc.c:1906  */
 
 
 void tw_error( yyscan_t locp, NCBI::Logging::TWReceiver * lib, const char * msg )

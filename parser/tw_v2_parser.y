@@ -70,19 +70,25 @@ log_tw
         SET_VALUE( TWReceiver::msg, EmptyTSTR );
         YYACCEPT;
     }
-    | error     { YYABORT; }    
+    | error     { YYABORT; }
     ;
 
 id1
-    : ID1       { SET_VALUE( TWReceiver::id1, $1 ); }
+    : ID1           { SET_VALUE( TWReceiver::id1, $1 ); }
     | UNRECOGNIZED  { lib -> reportField( "invalid ID1" ); YYACCEPT; }
     ;
 
-id2
-    : SEP { tw_start_ID2( scanner ); } ID2 { SET_VALUE( TWReceiver::id2, $3 ); }
-    | UNRECOGNIZED  { lib -> reportField( "invalid ID2" ); YYACCEPT; }
+id2_pref
+    : SEP { tw_start_ID2( scanner ); }
     ;
 
+id2
+    : id2_pref ID2 { SET_VALUE( TWReceiver::id2, $2 ); }
+    | id2_pref UNRECOGNIZED { lib -> reportField( "invalid ID2" ); YYACCEPT; }
+    | UNRECOGNIZED          { lib -> reportField( "invalid ID1" ); YYACCEPT; }
+    ;
+
+ /*TODO: Update error handling of all fields, a la id2 */
 id3
     : SEP { tw_start_ID3( scanner ); } ID3 { SET_VALUE( TWReceiver::id3, $3 ); }
     | UNRECOGNIZED  { lib -> reportField( "invalid ID3" ); YYACCEPT; }
@@ -115,7 +121,7 @@ service
 
 event
     : SEP { tw_start_EVENT( scanner ); } EVENT { SET_VALUE( TWReceiver::event, $3 ); }
-    | UNRECOGNIZED  { lib -> reportField( "invalid EVENT" ); YYACCEPT; }    
+    | UNRECOGNIZED  { lib -> reportField( "invalid EVENT" ); YYACCEPT; }
     ;
 
 msg

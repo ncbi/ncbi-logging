@@ -136,8 +136,23 @@ TEST_F( TWEventFixture, NoID3 )
 
 TEST_F( TWEventFixture, NoID2 )
 {
+    try_to_parse( "77619/000/0000/R\n" );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+TEST_F( TWEventFixture, NoID2_after_SEP )
+{
     try_to_parse( "77619/000/0000/R  \n" );
     ASSERT_FALSE( s_outputs.get_ugly().empty() );
+}
+TEST_F( TWEventFixture, BadID2_after_SEP )
+{
+    std::string res = try_to_parse_review( "77619/000/0000/R  .\n" );
+    ASSERT_EQ( "invalid ID2", extract_value( res, "_error" ) );
+}
+TEST_F( TWEventFixture, BadID2 )
+{
+    std::string res = try_to_parse_review( "77619/000/0000/R.\n" );
+    ASSERT_EQ( "invalid ID1", extract_value( res, "_error" ) );
 }
 
 TEST_F( TWEventFixture, NoID1 )
@@ -150,9 +165,11 @@ TEST_F( TWEventFixture, BadId1 )
 {
     const char * txt =
 "214533/000/X/R  CC954605EF0486E1 0009/0009 2020-06-22T01:58:06.783792 traceweb22      58.250.174.76   02C52D95FC7A04E6_74E0SID run_selector Warning: CONNECT(313.4) \"ncbi_localip.c\", line 191: UNK_FUNC --- [214533] Local IP spec at line 111, '10.65/16' overlaps with already defined one: 10.65.0.0-10.65.1.255";
-    try_to_parse( txt );
-    ASSERT_FALSE( s_outputs.get_review().empty() );
+    std::string res = try_to_parse_review( "txt" );
+    ASSERT_EQ( "invalid ID1", extract_value( res, "_error" ) );
 }
+
+ /*TODO: Add tests for error handliong of all fields, a la id2 */
 
 TEST_F( TWEventFixture, problem1 )
 {
@@ -185,6 +202,14 @@ TEST_F( TWEventFixture, errorLine )
     std::string res = try_to_parse_good( txt );
     ASSERT_EQ( "Note[E]:", extract_value( res, "event" ) );
     ASSERT_EQ( "\"helper_sra.cpp\", line 56: ncbi::CSraHelper::CheckSignal() --- Signal SIGPIPE was cought", extract_value( res, "msg" ) );
+}
+
+TEST_F( TWEventFixture, letters_in_SID )
+{
+    const char * txt =
+"62725/000/0000/PB CC95F505F2E23E71 0001/0001 2020-08-08T00:02:47.550205 traceweb22      UNK_CLIENT      3F691B0D3E2426B2_00QASID sra start";
+    std::string res = try_to_parse_good( txt );
+    ASSERT_EQ( "3F691B0D3E2426B2_00QASID", extract_value( res, "sid" ) );
 }
 
 extern "C"

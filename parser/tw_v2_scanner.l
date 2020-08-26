@@ -58,7 +58,7 @@ SERVER      "traceweb"{NUM2}
 
 IPADDR      {IPV4ADDR}|{IPV6ADDR}|"UNK_CLIENT"
 
-SID         ({ID2}"_"{HEXCHAR}+"SID")|"UNK_SESSION"
+SID         ({ID2}"_"[A-Za-z0-9]+)|"UNK_SESSION"
 
 SERVICE     [A-Za-z_]+
 
@@ -76,8 +76,9 @@ MSG         .+
 .                   { return UNRECOGNIZED; }
 
 <TW_ID2>{ID2}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID2; }
-<TW_ID2>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID2\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_ID2>.           { return UNRECOGNIZED; }
 
+  /*TODO: remove the fprintfs, update .y to report (a la ID2) */
 <TW_ID3>{ID3}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID3; }
 <TW_ID3>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID3\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
