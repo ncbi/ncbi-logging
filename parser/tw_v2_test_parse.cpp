@@ -49,11 +49,11 @@ class TWEventFixture : public ParseTestFixture< TWParseBlockFactory >
 
 TEST_F( TWEventFixture, LineRejecting )
 {
-    std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );
+    std::string res = try_to_parse_review( "line1 blah\nline2\nline3\n" );
     ASSERT_EQ( 
-        "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n"
-        "{\"_line_nr\":2,\"_unparsed\":\"line2\"}\n"
-        "{\"_line_nr\":3,\"_unparsed\":\"line3\"}\n", res );
+        "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n"
+        "{\"_error\":\"invalid ID1\",\"_line_nr\":2,\"_unparsed\":\"line2\"}\n"
+        "{\"_error\":\"invalid ID1\",\"_line_nr\":3,\"_unparsed\":\"line3\"}\n", res );
 }
 
 TEST_F( TWEventFixture, OneGoodLine )
@@ -68,16 +68,16 @@ TEST_F( TWEventFixture, ErrorRecovery )
     try_to_parse( 
         "line1 blah\n" 
         "77619/000/0000/R  CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22      185.151.196.174 CC952F33EE2FDBD1_0000SID sra extra         issued_subhit=m_1\n" );
-    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n",
-                s_outputs.get_ugly() );
+    ASSERT_EQ( "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n",
+                s_outputs.get_review() );
     ASSERT_EQ( "{\"event\":\"extra\",\"id1\":\"77619/000/0000/R\",\"id2\":\"CC952F33EE2FDBD1\",\"id3\":\"0008/0008\",\"ip\":\"185.151.196.174\",\"msg\":\"issued_subhit=m_1\",\"server\":\"traceweb22\",\"service\":\"sra\",\"sid\":\"CC952F33EE2FDBD1_0000SID\",\"time\":\"2020-06-11T23:59:58.079949\"}\n", 
                 s_outputs.get_good() );
 }
 
-TEST_F( TWEventFixture, unrecognized_char )
+TEST_F( TWEventFixture, unrecognized_char_escaped_in_json_ouput )
 {
-    std::string res = try_to_parse_ugly( "line1 \07" );
-    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\"}\n", res );
+    std::string res = try_to_parse_review( "line1 \07" );
+    ASSERT_EQ( "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\"}\n", res );
 }
 
 TEST_F( TWEventFixture, NoMessage )
@@ -146,6 +146,14 @@ TEST_F( TWEventFixture, NoID1 )
     ASSERT_FALSE( s_outputs.get_ugly().empty() );
 }
 
+TEST_F( TWEventFixture, BadId1 )
+{
+    const char * txt = 
+"214533/000/X/R  CC954605EF0486E1 0009/0009 2020-06-22T01:58:06.783792 traceweb22      58.250.174.76   02C52D95FC7A04E6_74E0SID run_selector Warning: CONNECT(313.4) \"ncbi_localip.c\", line 191: UNK_FUNC --- [214533] Local IP spec at line 111, '10.65/16' overlaps with already defined one: 10.65.0.0-10.65.1.255";
+    try_to_parse( txt );
+    ASSERT_FALSE( s_outputs.get_review().empty() );
+}
+
 TEST_F( TWEventFixture, problem1 )
 {
     const char * txt = 
@@ -168,6 +176,14 @@ TEST_F( TWEventFixture, problem3 )
 "184295/000/0000/RB CC95CFE7F3655F01 0004/0004 2020-08-14T05:14:24.564335 traceweb22      2001:981:83ac:1:f449:e4d2:b6d9:57b A9F5023FF361C403_11555SID tracequery request-start fields=1&ncbi_role=production&ncbi_location=be-md";
     std::string res = try_to_parse_good( txt );
     ASSERT_EQ( "A9F5023FF361C403_11555SID", extract_value( res, "sid" ) );   
+}
+
+TEST_F( TWEventFixture, problem4 )
+{
+    const char * txt =
+"55032/000/0000/R  CC95D6F8EF06E6B1 0010/0010 2020-06-22T04:40:13.429395 traceweb22      193.144.35.5    C7A484EAEE3230D1_0000SID sra Note[E]:  \"helper_sra.cpp\", line 56: ncbi::CSraHelper::CheckSignal() --- Signal SIGPIPE was cought";
+    try_to_parse( txt );
+    ASSERT_FALSE( s_outputs.get_ugly().empty() );
 }
 
 /*

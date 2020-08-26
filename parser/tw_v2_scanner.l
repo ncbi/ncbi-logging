@@ -73,7 +73,7 @@ MSG         .+
 {SEP}               { MAKE_STR(); return SEP; }
 
 {ID1}               { MAKE_STR(); return ID1; }
-.                   { fprintf(stderr, "Unexpected character '%c' (%x) in ID1\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+.                   { return UNRECOGNIZED; }
 
 <TW_ID2>{ID2}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID2; }
 <TW_ID2>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID2\n", yytext[0], yytext[0]); return UNRECOGNIZED; }

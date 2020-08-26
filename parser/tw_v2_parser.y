@@ -70,51 +70,52 @@ log_tw
         SET_VALUE( TWReceiver::msg, EmptyTSTR );
         YYACCEPT;
     }
+    | error     { YYABORT; }    
     ;
 
 id1
     : ID1       { SET_VALUE( TWReceiver::id1, $1 ); }
-    | error     { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid ID1" ); YYACCEPT; }
     ;
 
 id2
     : SEP { tw_start_ID2( scanner ); } ID2 { SET_VALUE( TWReceiver::id2, $3 ); }
-    | error     { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid ID2" ); YYACCEPT; }
     ;
 
 id3
     : SEP { tw_start_ID3( scanner ); } ID3 { SET_VALUE( TWReceiver::id3, $3 ); }
-    | error    { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid ID3" ); YYACCEPT; }
     ;
 
 time
     : SEP { tw_start_TIME( scanner ); } TIME { SET_VALUE( TWReceiver::time, $3 ); }
-    | error    { YYABORT; }    
+    | UNRECOGNIZED  { lib -> reportField( "invalid TIME" ); YYACCEPT; }
     ;
 
 server
     : SEP { tw_start_SERVER( scanner ); } SERVER { SET_VALUE( TWReceiver::server, $3 ); }
-    | error    { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid SERVER" ); YYACCEPT; }
     ;
 
 ipaddr
     : SEP { tw_start_IPADDR( scanner ); } IPADDR { SET_VALUE( ReceiverInterface::ip, $3 ); }
-    | error    { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid IPADDR" ); YYACCEPT; }
     ;
 
 sid
     : SEP { tw_start_SID( scanner ); } SID { SET_VALUE( TWReceiver::sid, $3 ); }
-    | error    { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid SID" ); YYACCEPT; }
     ;
 
 service
     : SEP { tw_start_SERVICE( scanner ); } SERVICE { SET_VALUE( TWReceiver::service, $3 ); }
-    | error    { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid SERVICE" ); YYACCEPT; }
     ;
 
 event
     : SEP { tw_start_EVENT( scanner ); } EVENT { SET_VALUE( TWReceiver::event, $3 ); }
-    | error    { YYABORT; }
+    | UNRECOGNIZED  { lib -> reportField( "invalid EVENT" ); YYACCEPT; }    
     ;
 
 msg

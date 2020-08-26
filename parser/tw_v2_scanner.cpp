@@ -4915,7 +4915,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 76 "tw_v2_scanner.l"
-{ fprintf(stderr, "Unexpected character '%c' (%x) in ID1\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+{ return UNRECOGNIZED; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
