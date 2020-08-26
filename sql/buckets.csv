@@ -1,185 +1,185 @@
-GS,sra-ca-run-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-run-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS",hot
-GS,sra-ca-src-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,hot
-GS,sra-ca-src-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-src-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,cold
-GS,sra-ca-zq-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS",hot
-GS,sra-ca-zq-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS",hot
-GS,sra-ca-zq-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS",hot
-GS,sra-ca-zq-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS",hot
-GS,sra-ca-zq-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS",hot
-GS,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS",hot
-GS,sra-pub-run-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-1-logs,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-run-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS",cold
-GS,sra-pub-src-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,hot
-GS,sra-pub-src-10,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-11,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-12,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-13,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-14,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,hot
-GS,sra-pub-src-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-src-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,cold
-GS,sra-pub-zq-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-GS,sra-pub-zq-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS",cold
-OP,faspgap,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fasp*/access_*.gz,"",public,false,"nginx log",hot
-OP,faspgap1,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,faspgap11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,faspgap12,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,faspgap21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,faspgap22,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,faspgap3,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,faspgap31,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,faspgap32,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp*/access_*gz,"",public,false,"nginx log",hot
-OP,ftp1,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp12,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp13,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp2,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp22,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp31,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp32,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,ftp33,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,gapsview,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gaps*/access_*.gz,"",public,false,"nginx log",hot
-OP,gapsview11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,gapsview21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,sdl-index-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*err_*.gz,"",public,false,"nginx log",hot
-OP,sdl-index-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*log_*.gz,"",public,false,"nginx log",hot
-OP,sdl-index-trace,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*trace_*.gz,"",public,false,"nginx log",hot
-OP,sdl-jwt-cart,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/jwt_cart_builder*.gz,"",public,false,"nginx log",hot
-OP,sdl-names-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/names.*err_*.gz,"",public,false,"nginx log",hot
-OP,sdl-names-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/names.*log_*.gz,"",public,false,"nginx log",hot
-OP,sdl-sdlr-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr.*err_*.gz,"",public,false,"nginx log",hot
-OP,sdl-sdlr-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr.*log_*.gz,"",public,false,"nginx log",hot
-OP,sdl-sdlr-trace,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr.*trace_*.gz,"",public,false,"nginx log",hot
-OP,sdl-sra-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra.*.err*.gz,"",public,false,"nginx log",hot
-OP,sdl-sra-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra.*.log_*.gz,"",public,false,"nginx log",hot
-OP,sdl-sra-trace,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/trace.*.gz,"",public,false,"nginx log",hot
-OP,srafiles11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles12,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles13,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles22,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles23,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles31,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles32,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles33,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles34,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles35,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,srafiles36,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log",hot
-OP,sweb,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/weblog/local_archive/*/*/*/sweb*/*.gz,"",public,false,"nginx log",hot
-S3,sra-ca-run-1,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-10,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-11,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-12,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-13,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-14,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-2,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-3,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-4,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-5,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-6,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-7,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-8,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-run-9,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS",hot
-S3,sra-ca-src-1,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,hot
-S3,sra-ca-src-10,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-11,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-12,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-13,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-14,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-2,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-3,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-4,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-5,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-6,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-7,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-8,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-src-9,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,cold
-S3,sra-ca-zq-1,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS",hot
-S3,sra-ca-zq-2,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS",hot
-S3,sra-ca-zq-3,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS",hot
-S3,sra-ca-zq-4,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS",hot
-S3,sra-ca-zq-5,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS",hot
-S3,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS",hot
-S3,sra-pub-metadata-us-east-1,"Athena metadata",Efremov,sra-pub-src-1-logs,s3_readers,public,false,metadata,hot
-S3,sra-pub-run-1,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-1-logs,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-2,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-5,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-6,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-7,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-8,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-run-9,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS",cold
-S3,sra-pub-sars-cov2,CoViD-19,Efremov,sra-pub-run-1-logs,s3_readers,public,true,Original,hot
-S3,sra-pub-sars-cov2-metadata-us-east-1,CoViD-19,Efremov,sra-pub-run-1-logs,s3_readers,public,true,Original,hot
-S3,sra-pub-src-1,,nih-nlm-ncbi-sra-opendata,sra-pub-src-1-logs,s3_readers,public,true,Original,hot
-S3,sra-pub-src-10,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-11,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-12,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-13,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-14,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-2,,nih-nlm-ncbi-sra-opendata,sra-pub-src-1-logs,s3_readers,public,true,Original,hot
-S3,sra-pub-src-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-5,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-6,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-7,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-8,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-src-9,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,cold
-S3,sra-pub-zq-1,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-2,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-5,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-6,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-7,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-8,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
-S3,sra-pub-zq-9,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS",cold
+GS,sra-ca-run-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-run-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL + BQS","GS log",hot
+GS,sra-ca-src-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",hot
+GS,sra-ca-src-10,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-11,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-12,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-13,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-14,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-7,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-8,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-src-9,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,Original,"GS log",cold
+GS,sra-ca-zq-1,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS","GS log",hot
+GS,sra-ca-zq-2,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS","GS log",hot
+GS,sra-ca-zq-3,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS","GS log",hot
+GS,sra-ca-zq-4,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS","GS log",hot
+GS,sra-ca-zq-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS","GS log",hot
+GS,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS","GS log",hot
+GS,sra-pub-run-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-1-logs,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-src-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",hot
+GS,sra-pub-src-10,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-11,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-12,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-13,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-14,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",hot
+GS,sra-pub-src-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-zq-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-5,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-6,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-7,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-8,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+GS,sra-pub-zq-9,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL - BQS","GS log",cold
+OP,faspgap,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fasp*/access_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap1,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap12,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap22,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap3,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap31,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,faspgap32,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp*/access_*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp1,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp12,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp13,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp2,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp22,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp31,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp32,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,ftp33,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,gapsview,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gaps*/access_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,gapsview11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,gapsview21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-index-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*err_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-index-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*log_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-index-trace,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*trace_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-jwt-cart,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/jwt_cart_builder*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-names-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/names.*err_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-names-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/names.*log_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-sdlr-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr.*err_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-sdlr-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr.*log_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-sdlr-trace,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sdlr.*trace_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-sra-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra.*.err*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-sra-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra.*.log_*.gz,"",public,false,"nginx log","nginx log",hot
+OP,sdl-sra-trace,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/trace.*.gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles11,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles12,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles13,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles21,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles22,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles23,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles31,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles32,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles33,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles34,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles35,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,srafiles36,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
+OP,sweb,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/weblog/local_archive/*/*/*/sweb*/*.gz,"",public,false,"nginx log","nginx log",hot
+S3,sra-ca-run-1,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-10,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-11,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-12,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-13,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-14,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-2,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-3,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-4,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-5,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-6,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-7,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-8,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-run-9,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL + BQS","S3 log",hot
+S3,sra-ca-src-1,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",hot
+S3,sra-ca-src-10,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-11,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-12,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-13,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-14,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-2,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-3,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-4,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-5,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-6,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-7,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-8,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-src-9,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,Original,"S3 log",cold
+S3,sra-ca-zq-1,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS","S3 log",hot
+S3,sra-ca-zq-2,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS","S3 log",hot
+S3,sra-ca-zq-3,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS","S3 log",hot
+S3,sra-ca-zq-4,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS","S3 log",hot
+S3,sra-ca-zq-5,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS","S3 log",hot
+S3,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,"ETL - BQS","S3 log",hot
+S3,sra-pub-metadata-us-east-1,"Athena metadata",Efremov,sra-pub-src-1-logs,s3_readers,public,false,metadata,"S3 log",hot
+S3,sra-pub-run-1,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-1-logs,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-2,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-5,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-6,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-7,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-8,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-9,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-sars-cov2,CoViD-19,Efremov,sra-pub-run-1-logs,s3_readers,public,true,Original,"S3 log",hot
+S3,sra-pub-sars-cov2-metadata-us-east-1,CoViD-19,Efremov,sra-pub-run-1-logs,s3_readers,public,true,Original,"S3 log",hot
+S3,sra-pub-src-1,,nih-nlm-ncbi-sra-opendata,sra-pub-src-1-logs,s3_readers,public,true,Original,"S3 log",hot
+S3,sra-pub-src-10,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-11,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-12,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-13,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-14,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-2,,nih-nlm-ncbi-sra-opendata,sra-pub-src-1-logs,s3_readers,public,true,Original,"S3 log",hot
+S3,sra-pub-src-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-5,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-6,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-7,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-8,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-9,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-zq-1,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-2,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-5,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-6,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-7,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-8,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
+S3,sra-pub-zq-9,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold

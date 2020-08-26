@@ -177,3 +177,9 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "select datetime_trunc(start_ts, day) as day, count(distinct remote_ip) as uniq_ips_to_cloud from strides_analytics.summary_export where domain not like '%nih.gov%' and (source='S3' or source='GS') group by day order by day desc"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    --max_rows 10000 \
+"SELECT case when user_agent like '%toolkit%' then 'toolkit' when user_agent like '%cli%' then 'cli' else user_agent end as agent_type, sum(num_requests) as sessions FROM strides_analytics.summary_export export group by agent_type order by sessions desc limit 50"

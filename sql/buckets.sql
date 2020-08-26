@@ -17,6 +17,18 @@ insert into service_accounts (service_account) values ('opendata');
 insert into service_accounts (service_account) values ('s3_readers');
 insert into service_accounts (service_account) values ('logmon');
 
+create table log_formats (
+    log_format text primary key,
+    parser_binary text default '',
+    parser_options text default ''
+);
+
+insert into log_formats values ('GS log', 'gcp2jsn-rel', '');
+insert into log_formats values ('S3 log', 'aws2jsn-rel', '');
+insert into log_formats values ('nginx log', 'op2jsn-rel', '');
+insert into log_formats values ('apache log', 'op2jsn-rel', '');
+insert into log_formats values ('applog', 'tw2jsn-rel', '');
+
 create table formats (
     format text primary key
 );
@@ -68,6 +80,7 @@ create table buckets (
     scope text references scopes (scope) default 'public',
     immutable text default "false",
     format text references formats (format),
+    log_format text references logs_formats (log_format) default 'nginx log',
     storage_class text references storage_classes (storage_class) default 'hot',
 
     unique (cloud_provider, bucket_name)
@@ -581,6 +594,9 @@ insert into buckets (cloud_provider, bucket_name, description,
 values ('S3', 'sra-pub-metadata-us-east-1', 'Athena metadata', 'Efremov', 'sra-pub-src-1-logs',
     's3_readers', 'false', 'metadata', 'hot');
 
+update buckets set log_format='S3 log' where cloud_provider='S3';
+update buckets set log_format='GS log' where cloud_provider='GS';
+update buckets set log_format='nginx log' where cloud_provider='OP';
 
 
 .headers on
