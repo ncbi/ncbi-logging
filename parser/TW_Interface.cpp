@@ -13,9 +13,9 @@ TWReceiver::TWReceiver( unique_ptr<FormatterInterface> & fmt )
 {
 }
 
-void TWReceiver::set( TW_Members m, const t_str & v ) 
+void TWReceiver::set( TW_Members m, const t_str & v )
 {
-#define CASE(mem) case mem: m_fmt -> addNameValue(#mem, v); break;
+#define CASE(mem) case mem: setMember( #mem, v ); break;
     switch( m )
     {
     CASE( id1 )
@@ -28,7 +28,7 @@ void TWReceiver::set( TW_Members m, const t_str & v )
     CASE( service )
     CASE( event )
     CASE( msg )
-    default: ReceiverInterface::set((ReceiverInterface::Members)m, v); 
+    default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
     if ( m_cat == cat_unknown )
@@ -42,7 +42,7 @@ namespace NCBI
         class TWParseBlock : public ParseBlockInterface
         {
         public:
-            TWParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
+            TWParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~TWParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
@@ -56,7 +56,7 @@ namespace NCBI
 
 TWParseBlockFactory::~TWParseBlockFactory() {}
 
-std::unique_ptr<ParseBlockInterface> 
+std::unique_ptr<ParseBlockInterface>
 TWParseBlockFactory::MakeParseBlock() const
 {
     std::unique_ptr<FormatterInterface> fmt;
@@ -64,28 +64,28 @@ TWParseBlockFactory::MakeParseBlock() const
         fmt = std::make_unique<JsonFastFormatter>();
     else
         fmt = std::make_unique<JsonLibFormatter>();
-    return std::make_unique<TWParseBlock>( fmt );     
+    return std::make_unique<TWParseBlock>( fmt );
 }
 
-TWParseBlock::TWParseBlock( std::unique_ptr<FormatterInterface> & fmt ) 
+TWParseBlock::TWParseBlock( std::unique_ptr<FormatterInterface> & fmt )
 : m_receiver ( fmt )
 {
     tw_lex_init( &m_sc );
 }
 
-TWParseBlock::~TWParseBlock() 
+TWParseBlock::~TWParseBlock()
 {
     tw_lex_destroy( m_sc );
 }
 
-void 
+void
 TWParseBlock::SetDebug( bool onOff )
 {
     tw_debug = onOff ? 1 : 0;            // bison (op_debug is global)
     tw_set_debug( onOff ? 1 : 0, m_sc );   // flex
 }
 
-bool 
+bool
 TWParseBlock::Parse( const string & line )
 {
     YY_BUFFER_STATE bs = tw_scan_reset( line.c_str(), m_sc );

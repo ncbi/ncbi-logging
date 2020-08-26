@@ -115,6 +115,8 @@ TEST_F ( TW_TestFlexFixture, MSG )
     token_test( MSG, txt, tw_start_MSG );
 }
 
+//TODO: support UTF-8, handle/report invalid UTF-8 characters
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

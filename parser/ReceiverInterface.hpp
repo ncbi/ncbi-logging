@@ -41,7 +41,7 @@ namespace NCBI
             t_str       vdb_phid_compute_env;
             t_str       vdb_phid_guid;
             t_str       vdb_phid_session_id;
-            t_str       vdb_libc;     
+            t_str       vdb_libc;
         } t_agent;
 
         inline void InitAgent( t_agent & r ) { memset( & r, 0, sizeof ( r ) ); }
@@ -52,11 +52,11 @@ namespace NCBI
 
             virtual ~ReceiverInterface();
 
-            typedef enum { 
-                cat_review = 0, 
-                cat_good, 
-                cat_bad, 
-                cat_ugly, 
+            typedef enum {
+                cat_review = 0,
+                cat_good,
+                cat_bad,
+                cat_ugly,
                 cat_ignored,
                 cat_unknown,
                 cat_max } Category;
@@ -64,14 +64,14 @@ namespace NCBI
             Category GetCategory() const { return m_cat; }
             void SetCategory( Category p_cat ) { m_cat = p_cat; }
 
-            typedef enum { 
+            typedef enum {
                 ip,
                 referer,
                 unparsed,
                 agent,
                 request,
                 LastMemberId = unparsed
-            } Members; 
+            } Members;
 
             void set( Members m, const t_str & v ); // for agent and request, use the methods below
             void setAgent( const t_agent & a );
@@ -82,6 +82,8 @@ namespace NCBI
             FormatterInterface & GetFormatter() { return * m_fmt.get(); }
 
         protected:
+            void setMember( const char * mem, const t_str & v );
+
             std::unique_ptr<FormatterInterface> m_fmt;
             Category m_cat;
         };
@@ -108,10 +110,10 @@ namespace NCBI
             bool m_fast;
         };
 
-        class SingleThreadedParser 
+        class SingleThreadedParser
         {
         public:
-            SingleThreadedParser( std::istream & input,  
+            SingleThreadedParser( std::istream & input,
                     CatWriterInterface & outputs,
                     ParseBlockFactoryInterface & pbFact );
 
@@ -130,7 +132,7 @@ namespace NCBI
         class MultiThreadedParser
         {
         public:
-            MultiThreadedParser( 
+            MultiThreadedParser(
                 FILE * input,  // need for speed
                 CatWriterInterface & outputs,
                 size_t queueLimit,

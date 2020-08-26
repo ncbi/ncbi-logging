@@ -47,6 +47,18 @@ class TWEventFixture : public ParseTestFixture< TWParseBlockFactory >
 {
 };
 
+TEST_F( TWEventFixture, Setters_BadUTF8 )
+{
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+    TWReceiver e ( f );
+
+    t_str v;
+    INIT_TSTR( v, "\xFF" );
+    e.set( TWReceiver::id1, v );
+    ASSERT_EQ( ReceiverInterface::cat_review, e.GetCategory() );
+    ASSERT_EQ( "badly formed UTF-8 character in 'id1'", extract_value( e . GetFormatter() . format(), "_error" ) );
+}
+
 TEST_F( TWEventFixture, LineRejecting )
 {
     std::string res = try_to_parse_review( "line1 blah\nline2\nline3\n" );

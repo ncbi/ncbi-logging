@@ -10,34 +10,49 @@
 using namespace NCBI::Logging;
 using namespace std;
 
-ReceiverInterface::ReceiverInterface( unique_ptr<FormatterInterface> & p_fmt ) 
-: m_fmt ( p_fmt.release() ), m_cat ( cat_unknown ) 
+ReceiverInterface::ReceiverInterface( unique_ptr<FormatterInterface> & p_fmt )
+: m_fmt ( p_fmt.release() ), m_cat ( cat_unknown )
 {
 }
 
-ReceiverInterface::~ReceiverInterface() 
+ReceiverInterface::~ReceiverInterface()
 {
 }
 
-void 
+void
+ReceiverInterface::setMember( const char * mem, const t_str & v )
+{
+    try
+    {
+        m_fmt -> addNameValue( mem, v );
+    }
+    catch ( const ncbi::InvalidUTF8String & ex )
+    {
+        stringstream msg;
+        msg << ex.what().zmsg << " in '" << mem << "'";
+        reportField( msg.str().c_str() );
+    }
+}
+
+void
 ReceiverInterface::set( Members m, const t_str & v )
 {
     switch( m )
-    {
+    { //TODO: use setMember
     case ip:        m_fmt -> addNameValue("ip",        v); break;
     case referer:   m_fmt -> addNameValue("referer",   v); break;
     case unparsed:  m_fmt -> addNameValue("unparsed",  v); break;
-    
+
     case agent:
     case request:
     default:
-        throw std::logic_error( "invalid ReceiverInterface::Member" ); 
+        throw std::logic_error( "invalid ReceiverInterface::Member" );
     }
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }
 
-void 
+void
 ReceiverInterface::setAgent( const t_agent & a )
 {
     m_fmt -> addNameValue( "agent",                  a . original );
@@ -52,7 +67,7 @@ ReceiverInterface::setAgent( const t_agent & a )
         m_cat = cat_good;
 }
 
-void 
+void
 ReceiverInterface::setRequest( const t_request & r )
 {
     m_fmt -> addNameValue( "method",    r . method );
@@ -88,7 +103,7 @@ ParseBlockFactoryInterface :: ~ParseBlockFactoryInterface()
 {
 }
 
-SingleThreadedParser::SingleThreadedParser( std::istream & input,  
+SingleThreadedParser::SingleThreadedParser( std::istream & input,
         CatWriterInterface & outputs,
         ParseBlockFactoryInterface & pbFact )
 :   m_input ( input ),
@@ -102,7 +117,7 @@ SingleThreadedParser::~SingleThreadedParser()
 {
 }
 
-void 
+void
 SingleThreadedParser::parse()
 {
     auto & receiver = m_pb -> GetReceiver();
@@ -122,7 +137,7 @@ SingleThreadedParser::parse()
         {
             receiver . SetCategory( ReceiverInterface::cat_ugly );
         }
-        
+
         if ( receiver . GetCategory() != ReceiverInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
@@ -135,12 +150,12 @@ SingleThreadedParser::parse()
 
 std::atomic< size_t > MultiThreadedParser :: thread_sleeps;
 
-MultiThreadedParser :: MultiThreadedParser( 
-    FILE * input,  
+MultiThreadedParser :: MultiThreadedParser(
+    FILE * input,
     CatWriterInterface & outputs,
     size_t queueLimit,
     size_t threadNum,
-    ParseBlockFactoryInterface & pbFact ) 
+    ParseBlockFactoryInterface & pbFact )
 :   m_input ( input ),
     m_outputs ( outputs ),
     m_queueLimit ( queueLimit ),
@@ -150,8 +165,8 @@ MultiThreadedParser :: MultiThreadedParser(
     thread_sleeps . store( 0 );
 }
 
-void parser( ParseBlockFactoryInterface * factory, 
-             OneWriterManyReadersQueue * in_q, 
+void parser( ParseBlockFactoryInterface * factory,
+             OneWriterManyReadersQueue * in_q,
              OutputQueue * out_q )
 {
     auto pb = factory -> MakeParseBlock();
@@ -229,7 +244,7 @@ void writer( OutputQueue * q,
 void MultiThreadedParser::parse( )
 {
     OneWriterManyReadersQueue Q ( m_queueLimit );
-    OutputQueue Q_out ( m_queueLimit );    
+    OutputQueue Q_out ( m_queueLimit );
 
     thread writer_thread( writer, &Q_out, &m_outputs );
 
