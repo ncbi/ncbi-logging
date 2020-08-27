@@ -19,11 +19,10 @@ namespace NCBI
             // formats, returns the result forgets the data
             virtual std::string format() = 0;
 
-            // t_str may have '\' inserted by the original input format (t.str.escaped == true), 
+            // t_str may have '\' inserted by the original input format (t.str.escaped == true),
             // these will be removed before conversion into the implementation-specific output format
-            // TODO: decide if throw on invald UTF-8 in value
-            virtual void addNameValue( const std::string & name, const t_str & value ) = 0;   
-            virtual void addNameValue( const std::string & name, int64_t value ) = 0;         
+            virtual void addNameValue( const std::string & name, const t_str & value ) = 0;
+            virtual void addNameValue( const std::string & name, int64_t value ) = 0;
             virtual void addNameValue( const std::string & name, const std::string & value ) = 0;
 
         protected:
@@ -40,8 +39,9 @@ namespace NCBI
             virtual std::string format();
 
             // these may throw if 'name' already exists
-            virtual void addNameValue( const std::string & name, const t_str & value ); 
-            virtual void addNameValue( const std::string & name, int64_t value );    
+            // these may throw if 'value' contains an invald UTF-8 character
+            virtual void addNameValue( const std::string & name, const t_str & value );
+            virtual void addNameValue( const std::string & name, int64_t value );
             virtual void addNameValue( const std::string & name, const std::string & value );
 
         private:
@@ -55,8 +55,8 @@ namespace NCBI
 
             virtual std::string format();
 
-            virtual void addNameValue( const std::string & name, const t_str & value ); 
-            virtual void addNameValue( const std::string & name, int64_t value );    
+            virtual void addNameValue( const std::string & name, const t_str & value );
+            virtual void addNameValue( const std::string & name, int64_t value );
             virtual void addNameValue( const std::string & name, const std::string & value );
 
         private:

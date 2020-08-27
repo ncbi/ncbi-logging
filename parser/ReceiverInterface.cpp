@@ -19,6 +19,29 @@ ReceiverInterface::~ReceiverInterface()
 {
 }
 
+static
+string
+sanitize( const t_str & s )
+{   // escape non-ASCII characters, including invalid UTF8
+    stringstream os;
+    for ( auto i = 0; i < s.n; ++i )
+    {
+        if ( s.p[i] < 0x20 )
+        {
+            std::ostringstream temp;
+            temp << "\\u";
+            temp << std::hex << std::setfill('0') << std::setw(4);
+            temp << (int)s.p[i];
+            os << temp.str();
+        }
+        else
+        {
+            os << s.p[i];
+        }
+    }
+    return os.str();
+}
+
 void
 ReceiverInterface::setMember( const char * mem, const t_str & v )
 {
@@ -28,9 +51,13 @@ ReceiverInterface::setMember( const char * mem, const t_str & v )
     }
     catch ( const ncbi::InvalidUTF8String & ex )
     {
+        // report
         stringstream msg;
         msg << ex.what().zmsg << " in '" << mem << "'";
         reportField( msg.str().c_str() );
+
+        // sanitize and retry
+        m_fmt -> addNameValue( mem, sanitize( v ) );
     }
 }
 
@@ -38,10 +65,10 @@ void
 ReceiverInterface::set( Members m, const t_str & v )
 {
     switch( m )
-    { //TODO: use setMember
-    case ip:        m_fmt -> addNameValue("ip",        v); break;
-    case referer:   m_fmt -> addNameValue("referer",   v); break;
-    case unparsed:  m_fmt -> addNameValue("unparsed",  v); break;
+    {
+    case ip:        setMember( "ip", v); break;
+    case referer:   setMember( "referer", v); break;
+    case unparsed:  setMember( "unparsed", v); break;
 
     case agent:
     case request:
@@ -55,14 +82,14 @@ ReceiverInterface::set( Members m, const t_str & v )
 void
 ReceiverInterface::setAgent( const t_agent & a )
 {
-    m_fmt -> addNameValue( "agent",                  a . original );
-    m_fmt -> addNameValue( "vdb_os",                 a . vdb_os );
-    m_fmt -> addNameValue( "vdb_tool",               a . vdb_tool );
-    m_fmt -> addNameValue( "vdb_release",            a . vdb_release );
-    m_fmt -> addNameValue( "vdb_phid_compute_env",   a . vdb_phid_compute_env );
-    m_fmt -> addNameValue( "vdb_phid_guid",          a . vdb_phid_guid );
-    m_fmt -> addNameValue( "vdb_phid_session_id",    a . vdb_phid_session_id );
-    m_fmt -> addNameValue( "vdb_libc",               a . vdb_libc );
+    setMember( "agent",                  a . original );
+    setMember( "vdb_os",                 a . vdb_os );
+    setMember( "vdb_tool",               a . vdb_tool );
+    setMember( "vdb_release",            a . vdb_release );
+    setMember( "vdb_phid_compute_env",   a . vdb_phid_compute_env );
+    setMember( "vdb_phid_guid",          a . vdb_phid_guid );
+    setMember( "vdb_phid_session_id",    a . vdb_phid_session_id );
+    setMember( "vdb_libc",               a . vdb_libc );
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }
@@ -70,12 +97,12 @@ ReceiverInterface::setAgent( const t_agent & a )
 void
 ReceiverInterface::setRequest( const t_request & r )
 {
-    m_fmt -> addNameValue( "method",    r . method );
-    m_fmt -> addNameValue( "path",      r . path );
-    m_fmt -> addNameValue( "vers",      r . vers );
-    m_fmt -> addNameValue( "accession", r . accession );
-    m_fmt -> addNameValue( "filename",  r . filename );
-    m_fmt -> addNameValue( "extension", r . extension );
+    setMember( "method",    r . method );
+    setMember( "path",      r . path );
+    setMember( "vers",      r . vers );
+    setMember( "accession", r . accession );
+    setMember( "filename",  r . filename );
+    setMember( "extension", r . extension );
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }
@@ -86,8 +113,12 @@ void ReceiverInterface::reportField( const char * message )
         m_cat = cat_review;
     try
     {
-        t_str msg { message, (int)strlen( message ), false };
+        t_str msg { message, strlen( message ), false };
         m_fmt -> addNameValue( "_error", msg );
+    }
+    catch ( const ncbi::InvalidUTF8String & ex )
+    {   // msg has an invalid UTF8 caharacter
+        //TODO: m_fmt -> addNameValue( "_error", sanitize(msg) );
     }
     catch( const ncbi::JSONUniqueConstraintViolation & e )
     {
@@ -141,7 +172,7 @@ SingleThreadedParser::parse()
         if ( receiver . GetCategory() != ReceiverInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
-            fmt.addNameValue("_unparsed", line);
+            receiver.setMember( "_unparsed", { line.c_str(), line.size(), false } );
         }
 
         m_outputs. write ( receiver . GetCategory(), fmt . format () );
@@ -199,8 +230,8 @@ void parser( ParseBlockFactoryInterface * factory,
 
             if ( receiver . GetCategory() != ReceiverInterface::cat_good )
             {
-                fmt.addNameValue( "_line_nr", line_nr );
-                fmt.addNameValue( "_unparsed", *line );
+                fmt . addNameValue( "_line_nr", line_nr );
+                receiver . setMember( "_unparsed", { line -> c_str(), line -> size(), false } );
             }
 
             ReceiverInterface::Category cat = receiver . GetCategory();

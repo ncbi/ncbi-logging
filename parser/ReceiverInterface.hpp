@@ -77,13 +77,13 @@ namespace NCBI
             void setAgent( const t_agent & a );
             void setRequest( const t_request & r );
 
+            void setMember( const char * mem, const t_str & v );
+
             void reportField( const char * message );
 
             FormatterInterface & GetFormatter() { return * m_fmt.get(); }
 
         protected:
-            void setMember( const char * mem, const t_str & v );
-
             std::unique_ptr<FormatterInterface> m_fmt;
             Category m_cat;
         };

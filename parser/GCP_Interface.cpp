@@ -13,9 +13,9 @@ GCPReceiver::GCPReceiver( unique_ptr<FormatterInterface> & fmt )
 {
 }
 
-void GCPReceiver::set( GCP_Members m, const t_str & v ) 
+void GCPReceiver::set( GCP_Members m, const t_str & v )
 {
-#define CASE(mem) case mem: m_fmt -> addNameValue(#mem, v); break;
+#define CASE(mem) case mem: setMember( #mem, v ); break;
     switch( m )
     {
     CASE( time )
@@ -29,8 +29,8 @@ void GCPReceiver::set( GCP_Members m, const t_str & v )
     CASE( host )
     CASE( request_id )
     CASE( operation )
-    CASE( bucket )    
-    default: ReceiverInterface::set((ReceiverInterface::Members)m, v); 
+    CASE( bucket )
+    default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
     if ( m_cat == cat_unknown )
@@ -44,7 +44,7 @@ namespace NCBI
         class GCPParseBlock : public ParseBlockInterface
         {
         public:
-            GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
+            GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~GCPParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
@@ -58,7 +58,7 @@ namespace NCBI
 
 GCPParseBlockFactory::~GCPParseBlockFactory() {}
 
-std::unique_ptr<ParseBlockInterface> 
+std::unique_ptr<ParseBlockInterface>
 GCPParseBlockFactory::MakeParseBlock() const
 {
     std::unique_ptr<FormatterInterface> fmt;
@@ -66,21 +66,21 @@ GCPParseBlockFactory::MakeParseBlock() const
         fmt = std::make_unique<JsonFastFormatter>();
     else
         fmt = std::make_unique<JsonLibFormatter>();
-    return std::make_unique<GCPParseBlock>( fmt );     
+    return std::make_unique<GCPParseBlock>( fmt );
 }
 
-GCPParseBlock::GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt ) 
+GCPParseBlock::GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt )
 : m_receiver ( fmt )
 {
     gcp_lex_init( &m_sc );
 }
 
-GCPParseBlock::~GCPParseBlock() 
+GCPParseBlock::~GCPParseBlock()
 {
     gcp_lex_destroy( m_sc );
 }
 
-void 
+void
 GCPParseBlock::SetDebug( bool onOff )
 {
     gcp_debug = onOff ? 1 : 0;            // bison (gcp_debug is global)
@@ -89,7 +89,7 @@ GCPParseBlock::SetDebug( bool onOff )
 
 static string DefaultHeader = "\"time_micros\",\"c_ip\",\"c_ip_type\",\"c_ip_region\",\"cs_method\",\"cs_uri\",\"sc_status\",\"cs_bytes\",\"sc_bytes\",\"time_taken_micros\",\"cs_host\",\"cs_referer\",\"cs_user_agent\",\"s_request_id\",\"cs_operation\",\"cs_bucket\",\"cs_object\"";
 
-bool 
+bool
 GCPParseBlock::Parse( const string & line )
 {
     YY_BUFFER_STATE bs = gcp_scan_reset( line.c_str(), m_sc );

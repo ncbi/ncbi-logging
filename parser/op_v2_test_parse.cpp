@@ -24,7 +24,7 @@ TEST(LogOPEventTest, Setters)
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
     OPReceiver e ( f );
-    
+
     t_str v;
     INIT_TSTR( v, "i_p");
     e.set( ReceiverInterface::ip, v );
@@ -32,7 +32,7 @@ TEST(LogOPEventTest, Setters)
     e.set( ReceiverInterface::referer, v );
     INIT_TSTR( v, "unp");
     e.set( ReceiverInterface::unparsed, v );
-    t_agent a = { 
+    t_agent a = {
         {"o", 1, false },
         {"v_o", 3, false },
         {"v_t", 3, false },
@@ -65,84 +65,98 @@ TEST(LogOPEventTest, Setters)
     INIT_TSTR( v, "rqc"); e.set(OPReceiver::res_code, v);
     INIT_TSTR( v, "res"); e.set(OPReceiver::res_len, v);
 
-    ASSERT_EQ ( 
-        "{\"accession\":\"a\",\"agent\":\"o\",\"extension\":\"e\",\"filename\":\"f\",\"forwarded\":\"fwd\",\"ip\":\"i_p\",\"method\":\"m\",\"owner\":\"own\",\"path\":\"p\",\"port\":\"prt\",\"referer\":\"ref\",\"req_len\":\"rql\",\"req_time\":\"rqt\",\"res_code\":\"rqc\",\"res_len\":\"res\",\"time\":\"tim\",\"unparsed\":\"unp\",\"user\":\"use\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}", 
-        e.GetFormatter().format() );    
+    ASSERT_EQ (
+        "{\"accession\":\"a\",\"agent\":\"o\",\"extension\":\"e\",\"filename\":\"f\",\"forwarded\":\"fwd\",\"ip\":\"i_p\",\"method\":\"m\",\"owner\":\"own\",\"path\":\"p\",\"port\":\"prt\",\"referer\":\"ref\",\"req_len\":\"rql\",\"req_time\":\"rqt\",\"res_code\":\"rqc\",\"res_len\":\"res\",\"time\":\"tim\",\"unparsed\":\"unp\",\"user\":\"use\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}",
+        e.GetFormatter().format() );
 }
 
-class LogOPEventFixture : public ParseTestFixture< OPParseBlockFactory >
+class OPTestFixture : public ParseTestFixture< OPParseBlockFactory >
 {
 };
 
-TEST_F( LogOPEventFixture, LineRejecting )
+TEST_F( OPTestFixture, Setters_BadUTF8 )
+{
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+    OPReceiver e ( f );
+
+    t_str v;
+    INIT_TSTR( v, "7dd\xFFga" );
+    e.set( OPReceiver::owner, v );
+    ASSERT_EQ( ReceiverInterface::cat_review, e.GetCategory() );
+    string text = e . GetFormatter() . format();
+    ASSERT_EQ( "badly formed UTF-8 character in 'owner'", extract_value( text, "_error" ) );
+    ASSERT_EQ( "7dd\\uffffffffga", extract_value( text, "owner" ) );
+}
+
+TEST_F( OPTestFixture, LineRejecting )
 {
     std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );
-    ASSERT_EQ( 
+    ASSERT_EQ(
         "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n"
         "{\"_line_nr\":2,\"_unparsed\":\"line2\"}\n"
         "{\"_line_nr\":3,\"_unparsed\":\"line3\"}\n", res );
 }
 
-TEST_F( LogOPEventFixture, ErrorRecovery )
+TEST_F( OPTestFixture, ErrorRecovery )
 {
-    try_to_parse( 
-        "line1 blah\n" 
+    try_to_parse(
+        "line1 blah\n"
         "18.207.254.142 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n",
                 s_outputs.get_ugly() );
-    ASSERT_EQ( "{\"accession\":\"\",\"agent\":\"\",\"extension\":\"\",\"filename\":\"\",\"forwarded\":\"-\",\"ip\":\"18.207.254.142\",\"method\":\"GET\",\"path\":\"\",\"port\":\"4\",\"referer\":\"-\",\"req_len\":\"5\",\"req_time\":\"3\",\"res_code\":\"1\",\"res_len\":\"2\",\"server\":\"sra-download.ncbi.nlm.nih.gov\",\"time\":\"[01/Jan/2020:02:50:24 -0500]\",\"user\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\"}\n", 
+    ASSERT_EQ( "{\"accession\":\"\",\"agent\":\"\",\"extension\":\"\",\"filename\":\"\",\"forwarded\":\"-\",\"ip\":\"18.207.254.142\",\"method\":\"GET\",\"path\":\"\",\"port\":\"4\",\"referer\":\"-\",\"req_len\":\"5\",\"req_time\":\"3\",\"res_code\":\"1\",\"res_len\":\"2\",\"server\":\"sra-download.ncbi.nlm.nih.gov\",\"time\":\"[01/Jan/2020:02:50:24 -0500]\",\"user\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\"}\n",
                 s_outputs.get_good() );
 }
 
-TEST_F( LogOPEventFixture, unrecognized_char )
+TEST_F( OPTestFixture, unrecognized_char )
 {
     std::string res = try_to_parse_ugly( "line1 \07" );
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\"}\n", res );
 }
 
-TEST_F( LogOPEventFixture, parse_ip4 )
+TEST_F( OPTestFixture, parse_ip4 )
 {
     std::string res = try_to_parse_good( "18.207.254.142 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5\n" );
     ASSERT_EQ( "18.207.254.142", extract_value( res, "ip" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_ip6 )
+TEST_F( OPTestFixture, parse_ip6 )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "0123:4567:89ab:cdef::1.2.3.4", extract_value( res, "ip" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_user_dash )
+TEST_F( OPTestFixture, parse_user_dash )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "", extract_value( res, "user" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_user )
+TEST_F( OPTestFixture, parse_user )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "usr", extract_value( res, "user" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_time )
+TEST_F( OPTestFixture, parse_time )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "[01/Jan/2020:02:50:24 -0500]", extract_value( res, "time" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_server_quoted )
+TEST_F( OPTestFixture, parse_server_quoted )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "sra-download.ncbi.nlm.nih.gov", extract_value( res, "server" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_server_unquoted )
+TEST_F( OPTestFixture, parse_server_unquoted )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] sra-download.ncbi.nlm.nih.gov \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "sra-download.ncbi.nlm.nih.gov", extract_value( res, "server" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_noserver_request_full )
+TEST_F( OPTestFixture, parse_noserver_request_full )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"GET url HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "", extract_value( res, "server" ) );
@@ -151,7 +165,7 @@ TEST_F( LogOPEventFixture, parse_noserver_request_full )
     ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_server_request_method_only )
+TEST_F( OPTestFixture, parse_server_request_method_only )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "srv", extract_value( res, "server" ) );
@@ -160,7 +174,7 @@ TEST_F( LogOPEventFixture, parse_server_request_method_only )
     ASSERT_EQ( "", extract_value( res, "vers" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_server_request_method_url )
+TEST_F( OPTestFixture, parse_server_request_method_url )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "srv", extract_value( res, "server" ) );
@@ -169,7 +183,7 @@ TEST_F( LogOPEventFixture, parse_server_request_method_url )
     ASSERT_EQ( "", extract_value( res, "vers" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_server_request_method_url_space )
+TEST_F( OPTestFixture, parse_server_request_method_url_space )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url \" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "srv", extract_value( res, "server" ) );
@@ -178,7 +192,7 @@ TEST_F( LogOPEventFixture, parse_server_request_method_url_space )
     ASSERT_EQ( "", extract_value( res, "vers" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_server_request_full_extra )
+TEST_F( OPTestFixture, parse_server_request_full_extra )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1 qstr# qstr_esc\\\" POST\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "srv", extract_value( res, "server" ) );
@@ -187,7 +201,7 @@ TEST_F( LogOPEventFixture, parse_server_request_full_extra )
     ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_server_bad_request )
+TEST_F( OPTestFixture, parse_server_bad_request )
 {   // TODO: report as bad or review
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"me bad\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "srv", extract_value( res, "server" ) );
@@ -196,7 +210,7 @@ TEST_F( LogOPEventFixture, parse_server_bad_request )
     ASSERT_THROW( extract_value( res, "vers" ), ncbi::Exception );
 }
 
-TEST_F( LogOPEventFixture, parse_request_accession )
+TEST_F( OPTestFixture, parse_request_accession )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"GET /srapub/SRR5385591.sra HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "/srapub/SRR5385591.sra", extract_value( res, "path" ) );
@@ -205,7 +219,7 @@ TEST_F( LogOPEventFixture, parse_request_accession )
     ASSERT_EQ( ".sra", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_request_accession_with_params )
+TEST_F( OPTestFixture, parse_request_accession_with_params )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"GET /srapub/SRR5385591.sra?qqq/SRR000123?qqq.ext HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "/srapub/SRR5385591.sra?qqq/SRR000123?qqq.ext", extract_value( res, "path" ) );
@@ -214,7 +228,7 @@ TEST_F( LogOPEventFixture, parse_request_accession_with_params )
     ASSERT_EQ( ".sra", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_request_accession_with_params_no_ext )
+TEST_F( OPTestFixture, parse_request_accession_with_params_no_ext )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"GET /srapub/SRR5385591?qqq HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "/srapub/SRR5385591?qqq", extract_value( res, "path" ) );
@@ -223,7 +237,7 @@ TEST_F( LogOPEventFixture, parse_request_accession_with_params_no_ext )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_request_accession_with_params_no_file )
+TEST_F( OPTestFixture, parse_request_accession_with_params_no_file )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"GET .ext?qqq HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( ".ext?qqq", extract_value( res, "path" ) );
@@ -232,7 +246,7 @@ TEST_F( LogOPEventFixture, parse_request_accession_with_params_no_file )
     ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_request_accession_in_params )
+TEST_F( OPTestFixture, parse_request_accession_in_params )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] \"GET /?/srapub/SRR5385591.sra HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "/?/srapub/SRR5385591.sra", extract_value( res, "path" ) );
@@ -241,49 +255,49 @@ TEST_F( LogOPEventFixture, parse_request_accession_in_params )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_result_code )
+TEST_F( OPTestFixture, parse_result_code )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "1", extract_value( res, "res_code" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_result_len )
+TEST_F( OPTestFixture, parse_result_len )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "2", extract_value( res, "res_len" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_result_len_dash )
+TEST_F( OPTestFixture, parse_result_len_dash )
 {   //TODO: review? bad?
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 - 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "", extract_value( res, "res_len" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_req_time_float )
+TEST_F( OPTestFixture, parse_req_time_float )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3.14 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "3.14", extract_value( res, "req_time" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_req_time_int )
+TEST_F( OPTestFixture, parse_req_time_int )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "3", extract_value( res, "req_time" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_referer )
+TEST_F( OPTestFixture, parse_referer )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"qstr# HTTP/1.1 qstr+esc\\\" PUT\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "qstr# HTTP/1.1 qstr+esc\\\" PUT", extract_value( res, "referer" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_referer_empty )
+TEST_F( OPTestFixture, parse_referer_empty )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "", extract_value( res, "referer" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_agent )
+TEST_F( OPTestFixture, parse_agent )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"\" \"linux64 sra-toolkit abi-dump.1.2 libc=1.2.3 phid=nocnognos agentstring ()\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "linux64 sra-toolkit abi-dump.1.2 libc=1.2.3 phid=nocnognos agentstring ()", extract_value( res, "agent" ) );
@@ -296,7 +310,7 @@ TEST_F( LogOPEventFixture, parse_agent )
     ASSERT_EQ( "1.2.3", extract_value( res, "vdb_libc" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_agent_no_os )
+TEST_F( OPTestFixture, parse_agent_no_os )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"\" \"sra-toolkit abi-dump.1.2 libc=1.2.3 phid=nocnognos agentstring ()\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "sra-toolkit abi-dump.1.2 libc=1.2.3 phid=nocnognos agentstring ()", extract_value( res, "agent" ) );
@@ -309,7 +323,7 @@ TEST_F( LogOPEventFixture, parse_agent_no_os )
     ASSERT_EQ( "1.2.3", extract_value( res, "vdb_libc" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_agent_empty )
+TEST_F( OPTestFixture, parse_agent_empty )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "", extract_value( res, "agent" ) );
@@ -322,19 +336,19 @@ TEST_F( LogOPEventFixture, parse_agent_empty )
     ASSERT_EQ( "", extract_value( res, "vdb_libc" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_forwarded )
+TEST_F( OPTestFixture, parse_forwarded )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"\" \"\" \"fwd\" port=4 rl=5" );
     ASSERT_EQ( "fwd", extract_value( res, "forwarded" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_port )
+TEST_F( OPTestFixture, parse_port )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"\" \"\" \"fwd\" port=4 rl=5" );
     ASSERT_EQ( "4", extract_value( res, "port" ) );
 }
 
-TEST_F( LogOPEventFixture, parse_req_len )
+TEST_F( OPTestFixture, parse_req_len )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 2 3 \"\" \"\" \"fwd\" port=4 rl=5" );
     ASSERT_EQ( "5", extract_value( res, "req_len" ) );

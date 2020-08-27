@@ -13,9 +13,9 @@ AWSReceiver::AWSReceiver( unique_ptr<FormatterInterface> & fmt )
 {
 }
 
-void AWSReceiver::set( AWS_Members m, const t_str & v ) 
+void AWSReceiver::set( AWS_Members m, const t_str & v )
 {
-#define CASE(mem) case mem: m_fmt -> addNameValue(#mem, v); break;
+#define CASE(mem) case mem: setMember( #mem, v ); break;
     switch( m )
     {
     CASE( owner )
@@ -38,7 +38,7 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
     CASE( auth_type )
     CASE( host_header )
     CASE( tls_version )
-    default: ReceiverInterface::set((ReceiverInterface::Members)m, v); 
+    default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
     if ( m_cat == cat_unknown )
@@ -52,7 +52,7 @@ namespace NCBI
         class AWSParseBlock : public ParseBlockInterface
         {
         public:
-            AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt ); 
+            AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~AWSParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
@@ -66,7 +66,7 @@ namespace NCBI
 
 AWSParseBlockFactory::~AWSParseBlockFactory() {}
 
-std::unique_ptr<ParseBlockInterface> 
+std::unique_ptr<ParseBlockInterface>
 AWSParseBlockFactory::MakeParseBlock() const
 {
     std::unique_ptr<FormatterInterface> fmt;
@@ -74,28 +74,28 @@ AWSParseBlockFactory::MakeParseBlock() const
         fmt = std::make_unique<JsonFastFormatter>();
     else
         fmt = std::make_unique<JsonLibFormatter>();
-    return std::make_unique<AWSParseBlock>( fmt );     
+    return std::make_unique<AWSParseBlock>( fmt );
 }
 
-AWSParseBlock::AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt ) 
+AWSParseBlock::AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt )
 : m_receiver ( fmt )
 {
     aws_lex_init( &m_sc );
 }
 
-AWSParseBlock::~AWSParseBlock() 
+AWSParseBlock::~AWSParseBlock()
 {
     aws_lex_destroy( m_sc );
 }
 
-void 
+void
 AWSParseBlock::SetDebug( bool onOff )
 {
     aws_debug = onOff ? 1 : 0;            // bison (aws_debug is global)
     aws_set_debug( onOff ? 1 : 0, m_sc );   // flex
 }
 
-bool 
+bool
 AWSParseBlock::Parse( const string & line )
 {
     YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), m_sc );

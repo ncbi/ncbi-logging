@@ -24,7 +24,7 @@ TEST(LogGCPEventTest, Setters)
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
     GCPReceiver e ( f );
-    
+
     t_str v;
     INIT_TSTR( v, "i_p");
     e.set( ReceiverInterface::ip, v );
@@ -32,7 +32,7 @@ TEST(LogGCPEventTest, Setters)
     e.set( ReceiverInterface::referer, v );
     INIT_TSTR( v, "unp");
     e.set( ReceiverInterface::unparsed, v );
-    t_agent a = { 
+    t_agent a = {
         {"o", 1, false },
         {"v_o", 3, false },
         {"v_t", 3, false },
@@ -68,154 +68,168 @@ TEST(LogGCPEventTest, Setters)
     INIT_TSTR( v, "ope"); e.set(GCPReceiver::operation, v);
     INIT_TSTR( v, "buc"); e.set(GCPReceiver::bucket, v);
 
-    ASSERT_EQ ( 
-        "{\"accession\":\"a\",\"agent\":\"o\",\"bucket\":\"buc\",\"extension\":\"e\",\"filename\":\"f\",\"host\":\"h\",\"ip\":\"i_p\",\"ip_region\":\"ipr\",\"ip_type\":\"ipt\",\"method\":\"m\",\"operation\":\"ope\",\"path\":\"p\",\"referer\":\"ref\",\"request_bytes\":\"rqb\",\"request_id\":\"rid\",\"result_bytes\":\"rsb\",\"status\":\"sta\",\"time\":\"tim\",\"time_taken\":\"tt\",\"unparsed\":\"unp\",\"uri\":\"uri\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}", 
-        e.GetFormatter().format() );    
+    ASSERT_EQ (
+        "{\"accession\":\"a\",\"agent\":\"o\",\"bucket\":\"buc\",\"extension\":\"e\",\"filename\":\"f\",\"host\":\"h\",\"ip\":\"i_p\",\"ip_region\":\"ipr\",\"ip_type\":\"ipt\",\"method\":\"m\",\"operation\":\"ope\",\"path\":\"p\",\"referer\":\"ref\",\"request_bytes\":\"rqb\",\"request_id\":\"rid\",\"result_bytes\":\"rsb\",\"status\":\"sta\",\"time\":\"tim\",\"time_taken\":\"tt\",\"unparsed\":\"unp\",\"uri\":\"uri\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}",
+        e.GetFormatter().format() );
 }
 
-class GCPReceiverFixture : public ParseTestFixture< GCPParseBlockFactory >
+class GCPTestFixture : public ParseTestFixture< GCPParseBlockFactory >
 {
 };
 
-TEST_F( GCPReceiverFixture, LineRejecting )
+TEST_F( GCPTestFixture, Setters_BadUTF8 )
+{
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+    GCPReceiver e ( f );
+
+    t_str v;
+    INIT_TSTR( v, "7dd\xFFga" );
+    e.set( GCPReceiver::host, v );
+    ASSERT_EQ( ReceiverInterface::cat_review, e.GetCategory() );
+    string text = e . GetFormatter() . format();
+    ASSERT_EQ( "badly formed UTF-8 character in 'host'", extract_value( text, "_error" ) );
+    ASSERT_EQ( "7dd\\uffffffffga", extract_value( text, "host" ) );
+}
+
+TEST_F( GCPTestFixture, LineRejecting )
 {
     std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );
-    ASSERT_EQ( 
+    ASSERT_EQ(
         "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n"
         "{\"_line_nr\":2,\"_unparsed\":\"line2\"}\n"
         "{\"_line_nr\":3,\"_unparsed\":\"line3\"}\n", res );
 }
 
-TEST_F( GCPReceiverFixture, ErrorRecovery )
+TEST_F( GCPTestFixture, ErrorRecovery )
 {
-    try_to_parse( 
-        "line1 blah\n" 
+    try_to_parse(
+        "line1 blah\n"
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n",
                 s_outputs.get_ugly() );
-    ASSERT_EQ( "{\"accession\":\"\",\"agent\":\"\",\"bucket\":\"\",\"extension\":\"\",\"filename\":\"\",\"host\":\"\",\"ip\":\"\",\"ip_region\":\"\",\"ip_type\":\"\",\"method\":\"GET\",\"operation\":\"\",\"path\":\"\",\"referer\":\"\",\"request_bytes\":\"\",\"request_id\":\"\",\"result_bytes\":\"\",\"status\":\"\",\"time\":\"1\",\"time_taken\":\"\",\"uri\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\"}\n", 
+    ASSERT_EQ( "{\"accession\":\"\",\"agent\":\"\",\"bucket\":\"\",\"extension\":\"\",\"filename\":\"\",\"host\":\"\",\"ip\":\"\",\"ip_region\":\"\",\"ip_type\":\"\",\"method\":\"GET\",\"operation\":\"\",\"path\":\"\",\"referer\":\"\",\"request_bytes\":\"\",\"request_id\":\"\",\"result_bytes\":\"\",\"status\":\"\",\"time\":\"1\",\"time_taken\":\"\",\"uri\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\"}\n",
                 s_outputs.get_good() );
 }
 
-TEST_F( GCPReceiverFixture, unrecognized_char )
+TEST_F( GCPTestFixture, unrecognized_char )
 {
     std::string res = try_to_parse_ugly( "1 \07" );
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"1 \\u0007\"}\n", res );
 }
 
-TEST_F( GCPReceiverFixture, time )
+TEST_F( GCPTestFixture, time )
 {
     string res = try_to_parse_good(
         "\"123\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "123", extract_value( res, "time" ) );
 }
 
-TEST_F( GCPReceiverFixture, ipv4 )
+TEST_F( GCPTestFixture, ipv4 )
 {
     string res = try_to_parse_good(
         "\"1\",\"18.207.254.142\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "18.207.254.142", extract_value( res, "ip" ) );
 }
 
-TEST_F( GCPReceiverFixture, ipv6 )
+TEST_F( GCPTestFixture, ipv6 )
 {
     string res = try_to_parse_good(
         "\"1\",\"0123:4567:89ab:cdef::1.2.3.4\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "0123:4567:89ab:cdef::1.2.3.4", extract_value( res, "ip" ) );
 }
 
-TEST_F( GCPReceiverFixture, ip_type )
+TEST_F( GCPTestFixture, ip_type )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"42\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "42", extract_value( res, "ip_type" ) );
 }
 
-TEST_F( GCPReceiverFixture, ip_region )
+TEST_F( GCPTestFixture, ip_region )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"area42\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "area42", extract_value( res, "ip_region" ) );
 }
 
-TEST_F( GCPReceiverFixture, status )
+TEST_F( GCPTestFixture, status )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"200\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "200", extract_value( res, "status" ) );
 }
 
-TEST_F( GCPReceiverFixture, req_bytes )
+TEST_F( GCPTestFixture, req_bytes )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"201\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "201", extract_value( res, "request_bytes" ) );
 }
 
-TEST_F( GCPReceiverFixture, res_bytes )
+TEST_F( GCPTestFixture, res_bytes )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"5000\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "5000", extract_value( res, "result_bytes" ) );
 }
 
-TEST_F( GCPReceiverFixture, time_taken )
+TEST_F( GCPTestFixture, time_taken )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"10\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "10", extract_value( res, "time_taken" ) );
 }
 
-TEST_F( GCPReceiverFixture, host )
+TEST_F( GCPTestFixture, host )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"host0\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "host0", extract_value( res, "host" ) );
 }
 
-TEST_F( GCPReceiverFixture, referer )
+TEST_F( GCPTestFixture, referer )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"referrer\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "referrer", extract_value( res, "referer" ) );
 }
 
-TEST_F( GCPReceiverFixture, req_id_int )
+TEST_F( GCPTestFixture, req_id_int )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"123\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "123", extract_value( res, "request_id" ) );
 }
 
-TEST_F( GCPReceiverFixture, req_id_str )
+TEST_F( GCPTestFixture, req_id_str )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"abc\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "abc", extract_value( res, "request_id" ) );
 }
 
-TEST_F( GCPReceiverFixture, operation )
+TEST_F( GCPTestFixture, operation )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"oper\",\"\",\"\"\n");
     ASSERT_EQ( "oper", extract_value( res, "operation" ) );
 }
 
-TEST_F( GCPReceiverFixture, bucket )
+TEST_F( GCPTestFixture, bucket )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"kickme\",\"\"\n");
     ASSERT_EQ( "kickme", extract_value( res, "bucket" ) );
 }
 
-TEST_F( GCPReceiverFixture, method )
+TEST_F( GCPTestFixture, method )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_object )
+TEST_F( GCPTestFixture, accession_from_object )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/qwe.2\"\n");
@@ -226,7 +240,7 @@ TEST_F( GCPReceiverFixture, accession_from_object )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_object_as_file )
+TEST_F( GCPTestFixture, accession_from_object_as_file )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/SRR002994.2\"\n");
@@ -236,7 +250,7 @@ TEST_F( GCPReceiverFixture, accession_from_object_as_file )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_object_no_file )
+TEST_F( GCPTestFixture, accession_from_object_no_file )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/.2\"\n");
@@ -246,7 +260,7 @@ TEST_F( GCPReceiverFixture, accession_from_object_no_file )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_object_no_extension )
+TEST_F( GCPTestFixture, accession_from_object_no_extension )
 {
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR002994/2\"\n");
@@ -256,7 +270,7 @@ TEST_F( GCPReceiverFixture, accession_from_object_no_extension )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_url )
+TEST_F( GCPTestFixture, accession_from_url )
 {   // no accession found in the object, go to URL
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/SRR002994/qwe.2\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
@@ -267,8 +281,8 @@ TEST_F( GCPReceiverFixture, accession_from_url )
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_url_in_params )
-{   
+TEST_F( GCPTestFixture, accession_from_url_in_params )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&anothrPrefix=SRR77777777&maxResults=1000&delimiter=%2F&alt=json\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
@@ -278,8 +292,8 @@ TEST_F( GCPReceiverFixture, accession_from_url_in_params )
     ASSERT_EQ( ".fastq.gz", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_url_in_params_no_file )
-{   
+TEST_F( GCPTestFixture, accession_from_url_in_params_no_file )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
     ASSERT_EQ( "/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353", extract_value( res, "path" ) );
@@ -288,8 +302,8 @@ TEST_F( GCPReceiverFixture, accession_from_url_in_params_no_file )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_object_with_equal_sign )
-{   
+TEST_F( GCPTestFixture, accession_from_object_with_equal_sign )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11453435/run1912_lane2_read1_indexN705-S506=122016_Cell94-F12.fastq.gz.1\"\n");
     ASSERT_EQ( "SRR11453435", extract_value( res, "accession" ) );
@@ -297,8 +311,8 @@ TEST_F( GCPReceiverFixture, accession_from_object_with_equal_sign )
     ASSERT_EQ( ".fastq.gz.1", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_object_with_equal_sign_in_extension )
-{   
+TEST_F( GCPTestFixture, accession_from_object_with_equal_sign_in_extension )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11453435/run1912_lane2_read1_indexN705-S506_122016_Cell94-F12.fastq.gz=1\"\n");
     ASSERT_EQ( "SRR11453435", extract_value( res, "accession" ) );
@@ -306,8 +320,8 @@ TEST_F( GCPReceiverFixture, accession_from_object_with_equal_sign_in_extension )
     ASSERT_EQ( ".fastq.gz=1", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_object_spaces_ampersands )
-{   
+TEST_F( GCPTestFixture, accession_from_object_spaces_ampersands )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11509941/LZ017&LZ018&LZ019_2 sample taq.fast&q.gz.1\"\n");
     ASSERT_EQ( "SRR11509941", extract_value( res, "accession" ) );
@@ -315,8 +329,8 @@ TEST_F( GCPReceiverFixture, accession_from_object_spaces_ampersands )
     ASSERT_EQ( ".fast&q.gz.1", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, accession_from_url_double_accession )
-{   
+TEST_F( GCPTestFixture, accession_from_url_double_accession )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-sars-cov2/o/sra-src%SRR123456%2FSRR004257?fields=updated%2Cname%2CtimeCreated%2Csize&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n" );
     ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
@@ -324,8 +338,8 @@ TEST_F( GCPReceiverFixture, accession_from_url_double_accession )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, bad_object )
-{   
+TEST_F( GCPTestFixture, bad_object )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR004257&\"\n" );
     ASSERT_EQ( "", extract_value( res, "accession" ) );
@@ -333,8 +347,8 @@ TEST_F( GCPReceiverFixture, bad_object )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( GCPReceiverFixture, agent )
-{   
+TEST_F( GCPTestFixture, agent )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\",\"\",\"\",\"\",\"\"" );
     ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
@@ -347,8 +361,8 @@ TEST_F( GCPReceiverFixture, agent )
     ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
 }
 
-TEST_F( GCPReceiverFixture, agent_no_os )
-{   
+TEST_F( GCPTestFixture, agent_no_os )
+{
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\",\"\",\"\",\"\",\"\"" );
     ASSERT_EQ( "sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
@@ -361,16 +375,16 @@ TEST_F( GCPReceiverFixture, agent_no_os )
     ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
 }
 
-TEST_F( GCPReceiverFixture, header )
+TEST_F( GCPTestFixture, header )
 {
-    string s = try_to_parse_ignored( 
+    string s = try_to_parse_ignored(
         "\"time_micros\",\"c_ip\",\"c_ip_type\",\"c_ip_region\",\"cs_method\",\"cs_uri\",\"sc_status\",\"cs_bytes\",\"sc_bytes\",\"time_taken_micros\",\"cs_host\",\"cs_referer\",\"cs_user_agent\",\"s_request_id\",\"cs_operation\",\"cs_bucket\",\"cs_object\""
     );
     ASSERT_NE( "", s );
 }
 
-TEST_F( GCPReceiverFixture, header_bad )
-{   
+TEST_F( GCPTestFixture, header_bad )
+{
     string s = try_to_parse_review( "\"blah\"" );
     ASSERT_NE( "", s );
 }

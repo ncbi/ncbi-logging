@@ -8,11 +8,11 @@ using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
 
-FormatterInterface::~FormatterInterface() 
+FormatterInterface::~FormatterInterface()
 {
 }
 
-string & 
+string &
 FormatterInterface::unEscape( const t_str & value, std::string & str ) const
 {
     return str;
@@ -27,14 +27,14 @@ JsonLibFormatter::~JsonLibFormatter()
 {
 }
 
-string 
+string
 JsonLibFormatter::format()
 {
     //TODO: j->addValue(...)
     stringstream out;
     out << j->toJSON().toSTLString();
     j = JSON::makeObject();
-    return out.str(); 
+    return out.str();
 }
 
 JSONValueRef ToJsonString( const t_str & in )
@@ -49,19 +49,19 @@ JSONValueRef ToJsonString( const t_str & in )
     }
 }
 
-void 
+void
 JsonLibFormatter::addNameValue( const std::string & name, const t_str & value )
 {
     j -> addValue( String ( name.c_str(), name.size() ), ToJsonString ( value ) );
 }
 
-void 
+void
 JsonLibFormatter::addNameValue( const std::string & name, int64_t value )
 {
     j -> addValue( String ( name.c_str(), name.size() ), JSON::makeInteger( value ) );
 }
 
-void 
+void
 JsonLibFormatter::addNameValue( const std::string & name, const std::string & value )
 {
     j -> addValue( String ( name.c_str(), name.size() ), JSON::makeString( String( value.c_str(), value.size() ) ) );
@@ -74,7 +74,7 @@ JsonFastFormatter::~JsonFastFormatter()
 
 }
 
-string 
+string
 JsonFastFormatter::format()
 {
     stringstream s;
@@ -99,7 +99,7 @@ void JsonFastFormatter::addNameValue( const std::string & name, const t_str & va
     ss . put( '"' );
     ss . write( name.c_str(), name.size() );
     ss . put( '"' );
-    ss . put( ':' );    
+    ss . put( ':' );
     ss << value;
     kv.push_back( ss.str() );
     ss.str( "" );
@@ -110,7 +110,7 @@ void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
     ss . put( '"' );
     ss . write( name.c_str(), name.size() );
     ss . put( '"' );
-    ss . put( ':' );    
+    ss . put( ':' );
     ss << value;
     kv.push_back( ss.str() );
     ss.str( "" );
@@ -118,7 +118,7 @@ void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 
 void JsonFastFormatter::addNameValue( const std::string & name, const std::string & value )
 {
-    t_str tmp { value.c_str(), (int)value.size(), false };
+    t_str tmp { value.c_str(), value.size(), false };
     addNameValue( name, tmp );
 }
 

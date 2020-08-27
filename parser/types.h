@@ -2,11 +2,12 @@
 #define _h_types_
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef struct t_str
 {
     const char * p;
-    int n;
+    size_t n;
     bool escaped;
 } t_str;
 
