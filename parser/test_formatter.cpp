@@ -67,6 +67,12 @@ TEST_F( JsonLibFormatter_Fixture, Format_neg_int )
     ASSERT_EQ("{\"a\":-12345}", f.format());
 }
 
+TEST_F( JsonLibFormatter_Fixture, Format_ctrl_char )
+{
+    f.addNameValue( "a", "some\007text" );
+    ASSERT_EQ( "{\"a\":\"some\\u0007text\"}", f.format() );
+}
+
 /* -------------------------------------------------------------- */
 
 class JsonFastFormatter_Fixture : public ::testing::Test
@@ -124,4 +130,10 @@ TEST_F( JsonFastFormatter_Fixture, Format_neg_int )
 {
     f.addNameValue("a", -12345);
     ASSERT_EQ("{\"a\":-12345}", f.format());
+}
+
+TEST_F( JsonFastFormatter_Fixture, Format_ctrl_char )
+{
+    f.addNameValue( "a", "some\007text" );
+    ASSERT_EQ( "{\"a\":\"some\\u0007text\"}", f.format() );
 }
