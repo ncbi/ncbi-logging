@@ -27,7 +27,7 @@ insert into log_formats values ('GS log', 'gcp2jsn-rel', '');
 insert into log_formats values ('S3 log', 'aws2jsn-rel', '');
 insert into log_formats values ('nginx log', 'op2jsn-rel', '');
 insert into log_formats values ('apache log', 'op2jsn-rel', '');
-insert into log_formats values ('applog', 'tw2jsn-rel', '');
+insert into log_formats values ('traceweb', 'tw2jsn-rel', '');
 
 create table formats (
     format text primary key
@@ -597,6 +597,7 @@ values ('S3', 'sra-pub-metadata-us-east-1', 'Athena metadata', 'Efremov', 'sra-p
 update buckets set log_format='S3 log' where cloud_provider='S3';
 update buckets set log_format='GS log' where cloud_provider='GS';
 update buckets set log_format='nginx log' where cloud_provider='OP';
+update buckets set log_format='traceweb' where log_bucket like '%traceweb%';
 
 
 .headers on
