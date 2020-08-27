@@ -729,32 +729,35 @@ TW2JSON = $(BINDIR)/tw2jsn-dbg
 
 v2: aws op gcp tw
 
-test_v2: v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test run_$(PREFIX_TW_V2)parse_test
+jq:
+	jq -e . ./expected/*/*.jsonl > /dev/null
+
+test_v2: jq v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test run_$(PREFIX_TW_V2)parse_test
 	mkdir -p  actual/$(PREFIX_AWS_V2)testlines
-	cat data/$(PREFIX_AWS)testlines.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)testlines/ >./actual/$(PREFIX_AWS_V2)testlines/stdout 2>./actual/$(PREFIX_AWS_V2)testlines/stderr \
+	cat data/$(PREFIX_AWS)testlines.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)testlines/aws >./actual/$(PREFIX_AWS_V2)testlines/stdout 2>./actual/$(PREFIX_AWS_V2)testlines/stderr \
 						&& diff ./expected/$(PREFIX_AWS_V2)testlines ./actual/$(PREFIX_AWS_V2)testlines
 	@ echo "test_aws v2 passed"
 	@ rm -rf actual/$(PREFIX_AWS_V2)*
 	#
 	mkdir -p  actual/$(PREFIX_OP_V2)testlines
-	cat data/$(PREFIX_OP)testlines.log | $(OP2JSON) actual/$(PREFIX_OP_V2)testlines/ >./actual/$(PREFIX_OP_V2)testlines/stdout 2>./actual/$(PREFIX_OP_V2)testlines/stderr \
+	cat data/$(PREFIX_OP)testlines.log | $(OP2JSON) actual/$(PREFIX_OP_V2)testlines/op >./actual/$(PREFIX_OP_V2)testlines/stdout 2>./actual/$(PREFIX_OP_V2)testlines/stderr \
 						&& diff ./expected/$(PREFIX_OP_V2)testlines ./actual/$(PREFIX_OP_V2)testlines
 	@ echo "test_op v2 passed"
 	@ rm -rf actual/$(PREFIX_OP_V2)*
 	#
 	mkdir -p  actual/$(PREFIX_GCP_V2)testlines
-	cat data/$(PREFIX_GCP)testlines.log | $(GCP2JSON) actual/$(PREFIX_GCP_V2)testlines/ >./actual/$(PREFIX_GCP_V2)testlines/stdout 2>./actual/$(PREFIX_GCP_V2)testlines/stderr \
+	cat data/$(PREFIX_GCP)testlines.log | $(GCP2JSON) actual/$(PREFIX_GCP_V2)testlines/gcp >./actual/$(PREFIX_GCP_V2)testlines/stdout 2>./actual/$(PREFIX_GCP_V2)testlines/stderr \
 						&& diff ./expected/$(PREFIX_GCP_V2)testlines ./actual/$(PREFIX_GCP_V2)testlines
 	@ echo "test_gcp v2 passed"
 	@ rm -rf actual/$(PREFIX_GCP_V2)*
 	#
 	mkdir -p  actual/$(PREFIX_TW_V2)testlines
-	cat data/$(PREFIX_TW)testlines.log | $(TW2JSON) actual/$(PREFIX_TW_V2)testlines/ >./actual/$(PREFIX_TW_V2)testlines/stdout 2>./actual/$(PREFIX_TW_V2)testlines/stderr \
+	cat data/$(PREFIX_TW)testlines.log | $(TW2JSON) actual/$(PREFIX_TW_V2)testlines/tw >./actual/$(PREFIX_TW_V2)testlines/stdout 2>./actual/$(PREFIX_TW_V2)testlines/stderr \
 						&& diff ./expected/$(PREFIX_TW_V2)testlines ./actual/$(PREFIX_TW_V2)testlines
 	@ echo "test_tw v2 passed"
 	@ rm -rf actual/$(PREFIX_TW_V2)*
 
-.PHONY: v2 test_v2
+.PHONY: v2 test_v2 jq
 
 #################################################
 # some valgrind checks...
