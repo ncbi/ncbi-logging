@@ -96,24 +96,24 @@ JsonFastFormatter::format()
 
 void JsonFastFormatter::addNameValue( const std::string & name, const t_str & value )
 {
+    ss.str( "" );
     ss . put( '"' );
     ss . write( name.c_str(), name.size() );
     ss . put( '"' );
     ss . put( ':' );
-    ss << value;
+    ss << value;    /* here exception can happen */
     kv.push_back( ss.str() );
-    ss.str( "" );
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 {
+    ss.str( "" );
     ss . put( '"' );
     ss . write( name.c_str(), name.size() );
     ss . put( '"' );
     ss . put( ':' );
     ss << value;
     kv.push_back( ss.str() );
-    ss.str( "" );
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const std::string & value )

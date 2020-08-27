@@ -47,9 +47,23 @@ class TWTestFixture : public ParseTestFixture< TWParseBlockFactory >
 {
 };
 
-TEST_F( TWTestFixture, Setters_BadUTF8 )
+TEST_F( TWTestFixture, Setters_BadUTF8_lib )
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+    TWReceiver e ( f );
+
+    t_str v;
+    INIT_TSTR( v, "issued_su\377hit=m_1" );
+    e.set( TWReceiver::id1, v );
+    ASSERT_EQ( ReceiverInterface::cat_review, e.GetCategory() );
+    string text = e . GetFormatter() . format();
+    ASSERT_EQ( "badly formed UTF-8 character in 'id1'", extract_value( text, "_error" ) );
+    ASSERT_EQ( "issued_su\\uffffffffhit=m_1", extract_value( text, "id1" ) );
+}
+
+TEST_F( TWTestFixture, Setters_BadUTF8_fast )
+{
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonFastFormatter>();
     TWReceiver e ( f );
 
     t_str v;

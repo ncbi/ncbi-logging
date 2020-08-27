@@ -87,7 +87,7 @@ namespace NCBI
                     }
                     catch( const ncbi::Exception & ex )
                     {
-                        std::cerr << "extract_value():" << ex.what() << std::endl;
+                        std::cerr << "extract_value():" << ex.what() << " src:'" << src << "'" << std::endl;
                         throw;
                     }
                 }

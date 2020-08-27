@@ -40,7 +40,11 @@ namespace NCBI
                     os << s.p[i];
                     break;
                 default:
-                    if ( s.p[i] < 0x20 )
+                    if ( s.p[i] < 0 )
+                    {
+                        throw ncbi::InvalidUTF8String( ncbi::XP(XLOC) << "badly formed UTF-8 character" );
+                    }
+                    else if ( s.p[i] < 0x20 )
                     {
                         std::ostringstream temp;
                         temp << "\\u";
