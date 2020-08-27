@@ -62,7 +62,7 @@ TEST(CatCounter, Report)
 
     JsonLibFormatter fmt; 
     ASSERT_EQ( 
-        "{\"_total\":15,\"bad\":3,\"good\":2,\"ignored\":5,\"review\":1,\"ugly\":4}", 
+        "{\"_total\":15,\"bad\":3,\"good\":2,\"ignored\":5,\"review\":1,\"unrecog\":4}", 
         cc.report( fmt ) 
     );
 }
@@ -92,14 +92,14 @@ TEST(FileCatWriter, Write)
         f.write( ReceiverInterface::cat_review, "review" );
         f.write( ReceiverInterface::cat_good, "good" );
         f.write( ReceiverInterface::cat_bad, "bad" );
-        f.write( ReceiverInterface::cat_ugly, "ugly" );
+        f.write( ReceiverInterface::cat_ugly, "unrecog" );
         f.write( ReceiverInterface::cat_ignored, "ignored" );
     }
 
     verify_file( "test.review" + FileCatWriter::extension, "review" );
     verify_file( "test.good" + FileCatWriter::extension, "good" );
     verify_file( "test.bad" + FileCatWriter::extension, "bad" );
-    verify_file( "test.unrecog" + FileCatWriter::extension, "ugly" );
+    verify_file( "test.unrecog" + FileCatWriter::extension, "unrecog" );
 
     /* verify that the ignored-file does not exist */
     ASSERT_FALSE( ifstream( "test.ignored" + FileCatWriter::extension ).good() );

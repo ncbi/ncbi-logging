@@ -36,7 +36,7 @@ CatCounter::report( FormatterInterface & fmt ) const
     fmt.addNameValue("review", get_cat_count( ReceiverInterface::cat_review ) );
     fmt.addNameValue("bad", get_cat_count( ReceiverInterface::cat_bad ) );
     fmt.addNameValue("ignored", get_cat_count( ReceiverInterface::cat_ignored ) );
-    fmt.addNameValue("ugly", get_cat_count( ReceiverInterface::cat_ugly ) );
+    fmt.addNameValue("unrecog", get_cat_count( ReceiverInterface::cat_ugly ) );
     return fmt.format();
 }
 
