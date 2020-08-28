@@ -115,6 +115,12 @@ TEST_F ( TW_TestFlexFixture, MSG )
     token_test( MSG, txt, tw_start_MSG );
 }
 
+TEST_F ( TW_TestFlexFixture, UTF8 )
+{
+    const char * txt = u8"попробуем 产品公司求购";
+    token_test( MSG, txt, tw_start_MSG );
+}
+
 //TODO: support UTF-8, handle/report invalid UTF-8 characters (?). Right now the scanner is transparent and handling of invalid UTF8 happens at the Receiver level and only if the JsonLib is used.
 
 extern "C"

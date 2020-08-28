@@ -59,6 +59,14 @@ ReceiverInterface::setMember( const char * mem, const t_str & v )
         // sanitize and retry
         m_fmt -> addNameValue( mem, sanitize( v ) );
     }
+    catch( const ncbi::Exception & ex)
+    {
+cout<<"ncbi::Exception "<<ex.what()<<endl;
+    }
+    catch( const std::exception & ex)
+    {
+cout<<"std::exception "<<ex.what()<<endl;
+    }
 }
 
 void

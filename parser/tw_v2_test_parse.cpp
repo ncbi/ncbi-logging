@@ -53,12 +53,12 @@ TEST_F( TWTestFixture, Setters_BadUTF8_lib )
     TWReceiver e ( f );
 
     t_str v;
-    INIT_TSTR( v, "issued_su\377hit=m_1" );
+    INIT_TSTR( v, "issued_su\xe2\x28\xa1hit=m_1" );
     e.set( TWReceiver::id1, v );
     ASSERT_EQ( ReceiverInterface::cat_review, e.GetCategory() );
     string text = e . GetFormatter() . format();
     ASSERT_EQ( "badly formed UTF-8 character in 'id1'", extract_value( text, "_error" ) );
-    ASSERT_EQ( "issued_su\\uffffffffhit=m_1", extract_value( text, "id1" ) );
+    ASSERT_EQ( "issued_su\\uffffffe2(\\uffffffa1hit=m_1", extract_value( text, "id1" ) );
 }
 
 TEST_F( TWTestFixture, Setters_BadUTF8_fast )
@@ -67,12 +67,38 @@ TEST_F( TWTestFixture, Setters_BadUTF8_fast )
     TWReceiver e ( f );
 
     t_str v;
-    INIT_TSTR( v, "issued_su\377hit=m_1" );
+    INIT_TSTR( v, "issued_su\xe2\x28\xa1hit=m_1" );
     e.set( TWReceiver::id1, v );
     ASSERT_EQ( ReceiverInterface::cat_review, e.GetCategory() );
     string text = e . GetFormatter() . format();
     ASSERT_EQ( "badly formed UTF-8 character in 'id1'", extract_value( text, "_error" ) );
-    ASSERT_EQ( "issued_su\\uffffffffhit=m_1", extract_value( text, "id1" ) );
+    ASSERT_EQ( "issued_su\\uffffffe2(\\uffffffa1hit=m_1", extract_value( text, "id1" ) );
+}
+
+TEST_F( TWTestFixture, Setters_GoodUTF8_lib )
+{
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+    TWReceiver e ( f );
+
+    t_str v;
+    auto s = u8"попробуем 产品公司求购 ";
+    INIT_TSTR( v, s );
+    e.set( TWReceiver::msg, v );
+    string text = e . GetFormatter() . format();
+    ASSERT_EQ( s, extract_value( text, "msg" ) );
+}
+
+TEST_F( TWTestFixture, Setters_GoodUTF8_fast )
+{
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonFastFormatter>();
+    TWReceiver e ( f );
+
+    t_str v;
+    auto s = u8"попробуем 产品公司求购 ";
+    INIT_TSTR( v, s );
+    e.set( TWReceiver::msg, v );
+    string text = e . GetFormatter() . format();
+    ASSERT_EQ( s, extract_value( text, "msg" ) );
 }
 
 TEST_F( TWTestFixture, LineRejecting )
@@ -105,7 +131,7 @@ TEST_F( TWTestFixture, ErrorRecovery )
 TEST_F( TWTestFixture, unrecognized_char_escaped_in_json_ouput )
 {
     std::string res = try_to_parse_review( "line1 \07" );
-    ASSERT_EQ( "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\"}\n", res );
+    ASSERT_EQ( "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 \07\"}\n", res );
 }
 
 TEST_F( TWTestFixture, NoMessage )
@@ -230,6 +256,15 @@ TEST_F( TWTestFixture, errorLine )
     std::string res = try_to_parse_good( txt );
     ASSERT_EQ( "Note[E]:", extract_value( res, "event" ) );
     ASSERT_EQ( "\"helper_sra.cpp\", line 56: ncbi::CSraHelper::CheckSignal() --- Signal SIGPIPE was cought", extract_value( res, "msg" ) );
+}
+
+;
+TEST_F( TWTestFixture, UTF8 )
+{
+    const char * txt =
+u8"55032/000/0000/R  CC95D6F8EF06E6B1 0010/0010 2020-06-22T04:40:13.429395 traceweb22      193.144.35.5    C7A484EAEE3230D1_0000SID sra Note[E]: попробуем 产品公司求购 ";
+    std::string res = try_to_parse_good( txt );
+    ASSERT_EQ( u8"попробуем 产品公司求购 ", extract_value( res, "msg" ) );
 }
 
 extern "C"

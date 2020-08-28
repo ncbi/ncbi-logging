@@ -24,7 +24,7 @@ namespace NCBI
                 {
                     return StringCatWriter::write(cat, s);
                 }
-                
+
             }
 
             const std::string get_ignored()   { return ignored . str(); }
@@ -40,6 +40,7 @@ namespace NCBI
                 {
                     std::istringstream ss( line );
                     ParseBlockFactory pbFact;
+                    //pbFact.setFast(false);
                     SingleThreadedParser p( ss, s_outputs, pbFact );
                     p . setDebug( debug );
                     p . parse(); // does the parsing and generates the report

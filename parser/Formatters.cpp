@@ -70,37 +70,25 @@ JsonLibFormatter::addNameValue( const std::string & name, const std::string & va
 
 std::ostream& operator<< (std::ostream& os, const t_str & s)
 {
-    os << "\"";
-    for ( auto i = 0; i < s.n; ++i )
-    {
-        switch ( s.p[i] )
+    os . put ( '"' );
+    ncbi::String k( s.p, s.n ); // throws if invalid UTF8; escapes control characters
+    ncbi::StringBuffer out;
+    for ( auto i = 0; i < k.count(); ++i )
+    {   // To JSON-ify, escape quotes and backslashes
+        auto ch = k . getChar ( i );
+        switch ( ch )
         {
         case '\\':
         case '\"':
-            os << '\\';
-            os << s.p[i];
+            out . append( '\\' );
             break;
         default:
-            if ( s.p[i] < 0 )
-            {
-                throw ncbi::InvalidUTF8String( ncbi::XP(XLOC) << "badly formed UTF-8 character" );
-            }
-            else if ( s.p[i] < 0x20 )
-            {
-                std::ostringstream temp;
-                temp << "\\u";
-                temp << std::hex << std::setfill('0') << std::setw(4);
-                temp << (int)s.p[i];
-                os << temp.str();
-            }
-            else
-            {
-                os << s.p[i];
-            }
             break;
         }
+        out . append( ch );
     }
-    os << "\"";
+    os . write( out.data(), out.size() );
+    os . put ( '"' );
     return os;
 }
 

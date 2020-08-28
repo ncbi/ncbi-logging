@@ -134,6 +134,6 @@ TEST_F( JsonFastFormatter_Fixture, Format_neg_int )
 
 TEST_F( JsonFastFormatter_Fixture, Format_ctrl_char )
 {
-    f.addNameValue( "a", "some\007text" );
-    ASSERT_EQ( "{\"a\":\"some\\u0007text\"}", f.format() );
+    f.addNameValue( "a", "some\x09text" );
+    ASSERT_EQ( "{\"a\":\"some\ttext\"}", f.format() );
 }
