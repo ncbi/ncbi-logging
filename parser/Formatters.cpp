@@ -73,7 +73,26 @@ std::ostream& operator<< (std::ostream& os, const t_str & s)
     os . put ( '"' );
     ncbi::String k( s.p, s.n ); // throws if invalid UTF8; escapes control characters
     ncbi::StringBuffer out;
-    for ( auto i = 0; i < k.count(); ++i )
+
+    ncbi::String::Iterator iter( k.makeIterator() );
+    while( iter.isValid() )
+    {
+        auto ch = iter.get();
+        switch ( ch )
+        {
+        case '\\':
+        case '\"':
+            out . append( '\\' );
+            break;
+        default:
+            break;
+        }
+        out . append( ch );
+        ++iter;
+    }
+/*
+    auto cnt = k.count();
+    for ( auto i = 0; i < cnt; ++i )
     {   // To JSON-ify, escape quotes and backslashes
         auto ch = k . getChar ( i );
         switch ( ch )
@@ -87,6 +106,8 @@ std::ostream& operator<< (std::ostream& os, const t_str & s)
         }
         out . append( ch );
     }
+*/
+
     os . write( out.data(), out.size() );
     os . put ( '"' );
     return os;
