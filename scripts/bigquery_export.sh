@@ -480,6 +480,7 @@ ENDOFQUERY
 
     bq show --schema strides_analytics.summary_grouped
 
+# LOGMON-85: op_fixed is 4/21->, excluding 4/24, 6/25, 6/260
 echo " ###  op_sess"
     QUERY=$(cat <<-ENDOFQUERY
     INSERT INTO strides_analytics.summary_grouped
@@ -496,7 +497,7 @@ echo " ###  op_sess"
         '', bytecount, current_datetime()
     FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
     WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
-    AND start > '2019-03-01'
+    AND start between '2019-03-01' and '2020-04-21'
     AND domain not like '%amazon%'
     AND domain not like '%gap%'
 

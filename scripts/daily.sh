@@ -27,10 +27,14 @@ date; echo "parse OP"
 date; echo "s3_lister"
 
 ./s3_lister.sh | ts >> "$HOME"/s3_lister.log 2>&1
-date; echo "bigquery_export"
-./bigquery_export.sh | ts >> "$HOME"/bigquery_export.log 2>&1
-./bigquery_report.sh | ts >> "$HOME"/bigquery_report.log 2>&1
-./bigquery_summary.sh | ts >> "$HOME"/bigquery_summary.log 2>&1
+
+dow=$(date +%u)
+if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
+    date; echo "bigquery_export"
+    ./bigquery_export.sh | ts >> "$HOME"/bigquery_export.log 2>&1
+    ./bigquery_report.sh | ts >> "$HOME"/bigquery_report.log 2>&1
+    ./bigquery_summary.sh | ts >> "$HOME"/bigquery_summary.log 2>&1
+fi
 
 echo "    --- Daily Processing Complete ($$) ---"
 date
