@@ -3,7 +3,7 @@
 #include "aws_v2_parser.hpp"
 #include "aws_v2_scanner.hpp"
 
-extern YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner );
+extern YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
 using namespace NCBI::Logging;
 using namespace std;
@@ -56,6 +56,7 @@ namespace NCBI
             virtual ~AWSParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
+            virtual bool Parse( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
@@ -98,9 +99,14 @@ AWSParseBlock::SetDebug( bool onOff )
 bool
 AWSParseBlock::Parse( const string & line )
 {
-    YY_BUFFER_STATE bs = aws_scan_reset( line.c_str(), m_sc );
+    return Parse( line.c_str(), line.size() );
+}
+
+bool
+AWSParseBlock::Parse( const char * line, size_t line_size )
+{
+    YY_BUFFER_STATE bs = aws_scan_bytes( line, line_size, m_sc );
     int ret = aws_parse( m_sc, & m_receiver );
     aws__delete_buffer( bs, m_sc );
     return ret == 0;
 }
-

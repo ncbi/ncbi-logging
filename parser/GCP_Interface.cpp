@@ -3,7 +3,7 @@
 #include "gcp_v2_parser.hpp"
 #include "gcp_v2_scanner.hpp"
 
-extern YY_BUFFER_STATE gcp_scan_reset( const char * input, yyscan_t yyscanner );
+extern YY_BUFFER_STATE gcp_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
 using namespace NCBI::Logging;
 using namespace std;
@@ -48,6 +48,7 @@ namespace NCBI
             virtual ~GCPParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
+            virtual bool Parse( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
@@ -92,12 +93,17 @@ static string DefaultHeader = "\"time_micros\",\"c_ip\",\"c_ip_type\",\"c_ip_reg
 bool
 GCPParseBlock::Parse( const string & line )
 {
-    YY_BUFFER_STATE bs = gcp_scan_reset( line.c_str(), m_sc );
+    return Parse( line.c_str(), line.size() );
+}
+
+bool
+GCPParseBlock::Parse( const char * line, size_t line_size )
+{
+    YY_BUFFER_STATE bs = gcp_scan_bytes( line, line_size, m_sc );
     int ret = gcp_parse( m_sc, & m_receiver );
-    //TODO: if header, validate; set cat to ignore (good) or review (bad)
     if ( m_receiver.GetCategory() == ReceiverInterface::cat_ignored )
     {
-        if ( 0 != strncmp( DefaultHeader.c_str(), line.c_str(), DefaultHeader.size() ) )
+        if ( 0 != strncmp( DefaultHeader.c_str(), line, DefaultHeader.size() ) )
         {
             m_receiver.SetCategory( ReceiverInterface::cat_review );
         }
@@ -105,4 +111,3 @@ GCPParseBlock::Parse( const string & line )
     gcp__delete_buffer( bs, m_sc );
     return ret == 0;
 }
-

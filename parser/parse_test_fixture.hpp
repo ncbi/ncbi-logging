@@ -36,9 +36,10 @@ namespace NCBI
         class ParseTestFixture : public ::testing::Test
         {
             public :
-                void try_to_parse( std::string line, bool debug = false )
+                void try_to_parse( const std::string &line, bool debug = false )
                 {
-                    std::istringstream ss( line );
+                    std::stringstream ss;
+                    ss << line;
                     ParseBlockFactory pbFact;
                     //pbFact.setFast(false);
                     SingleThreadedParser p( ss, s_outputs, pbFact );
@@ -46,31 +47,31 @@ namespace NCBI
                     p . parse(); // does the parsing and generates the report
                 }
 
-                std::string try_to_parse_good( std::string line, bool debug = false )
+                std::string try_to_parse_good( const std::string &line, bool debug = false )
                 {
                     try_to_parse( line, debug );
                     return s_outputs.get_good();
                 }
 
-                std::string try_to_parse_bad( std::string line, bool debug = false )
+                std::string try_to_parse_bad( const std::string &line, bool debug = false )
                 {
                     try_to_parse( line, debug );
                     return s_outputs.get_bad();
                 }
 
-                std::string try_to_parse_ugly( std::string line, bool debug = false )
+                std::string try_to_parse_ugly( const std::string &line, bool debug = false )
                 {
                     try_to_parse( line, debug );
                     return s_outputs.get_ugly();
                 }
 
-                std::string try_to_parse_review( std::string line, bool debug = false )
+                std::string try_to_parse_review( const std::string &line, bool debug = false )
                 {
                     try_to_parse( line, debug );
                     return s_outputs.get_review();
                 }
 
-                std::string try_to_parse_ignored( std::string line, bool debug = false )
+                std::string try_to_parse_ignored( const std::string &line, bool debug = false )
                 {
                     try_to_parse( line, debug );
                     return s_outputs.get_ignored();

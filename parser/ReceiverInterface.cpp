@@ -59,14 +59,14 @@ ReceiverInterface::setMember( const char * mem, const t_str & v )
         // sanitize and retry
         m_fmt -> addNameValue( mem, sanitize( v ) );
     }
+    /*
     catch( const ncbi::Exception & ex)
     {
-cout<<"ncbi::Exception "<<ex.what()<<endl;
     }
     catch( const std::exception & ex)
     {
-cout<<"std::exception "<<ex.what()<<endl;
     }
+    */
 }
 
 void
@@ -165,15 +165,16 @@ SingleThreadedParser::parse()
     m_pb -> SetDebug( m_debug );
 
     unsigned long int line_nr = 0;
-    string line;
-    while( getline( m_input, line ) )
+
+    StdLineSplitter splitter( m_input );
+    while( splitter.getLine() )
     {   // TODO: the body of the loop is almost identical to a block in AWSMultiThreadedParser::parser()
 
         line_nr++;
 
         receiver . SetCategory( ReceiverInterface::cat_unknown );
 
-        if ( ! m_pb -> Parse( line ) )
+        if ( ! m_pb -> Parse( std::string( splitter.data(), splitter.size() ) ) )
         {
             receiver . SetCategory( ReceiverInterface::cat_ugly );
         }
@@ -181,7 +182,7 @@ SingleThreadedParser::parse()
         if ( receiver . GetCategory() != ReceiverInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
-            receiver.setMember( "_unparsed", { line.c_str(), line.size(), false } );
+            receiver.setMember( "_unparsed", { splitter.data(), splitter.size(), false } );
         }
 
         m_outputs. write ( receiver . GetCategory(), fmt . format () );
@@ -359,3 +360,26 @@ void MultiThreadedParser::parse( )
     writer_thread.join();
 }
 
+StdLineSplitter::StdLineSplitter( std::istream &is ) : m_is( is ) { }
+StdLineSplitter::~StdLineSplitter() { }
+
+bool StdLineSplitter::getLine( void )
+{
+    m_buffer.clear();
+    getline( m_is, m_buffer );
+    if ( m_buffer.empty() )
+    {
+        return m_is.good();
+    }
+    return true;
+}
+
+const char * StdLineSplitter::data( void ) const
+{
+    return m_buffer.c_str();
+}
+
+size_t StdLineSplitter::size( void ) const
+{
+    return m_buffer.size();
+}

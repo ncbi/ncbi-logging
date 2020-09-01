@@ -3,7 +3,7 @@
 #include "tw_v2_parser.hpp"
 #include "tw_v2_scanner.hpp"
 
-extern YY_BUFFER_STATE tw_scan_reset( const char * input, yyscan_t yyscanner );
+extern YY_BUFFER_STATE tw_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
 using namespace NCBI::Logging;
 using namespace std;
@@ -46,6 +46,7 @@ namespace NCBI
             virtual ~TWParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool Parse( const std::string & line );
+            virtual bool Parse( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
@@ -88,7 +89,13 @@ TWParseBlock::SetDebug( bool onOff )
 bool
 TWParseBlock::Parse( const string & line )
 {
-    YY_BUFFER_STATE bs = tw_scan_reset( line.c_str(), m_sc );
+    return Parse( line.c_str(), line.size() );
+}
+
+bool
+TWParseBlock::Parse( const char * line, size_t line_size )
+{
+    YY_BUFFER_STATE bs = tw_scan_bytes( line, line_size, m_sc );
     int ret = tw_parse( m_sc, & m_receiver );
     tw__delete_buffer( bs, m_sc );
     return ret == 0;

@@ -125,6 +125,15 @@ TEST_F( AWSTestFixture, LineRejecting )
         "{\"_line_nr\":3,\"_unparsed\":\"line3\",\"owner\":\"line3\"}\n", res );
 }
 
+TEST_F( AWSTestFixture, LineRejecting_with_embedded_zero )
+{
+    const char * txt = "line1 \000blah\nline2\n";
+    std::string res = try_to_parse_ugly( std::string( txt, 18 ) );
+    ASSERT_EQ(
+        "{\"_line_nr\":1,\"_unparsed\":\"line1 \\u0000blah\",\"owner\":\"line1\"}\n"
+        "{\"_line_nr\":2,\"_unparsed\":\"line2\",\"owner\":\"line2\"}\n", res );
+}
+
 TEST_F( AWSTestFixture, ErrorRecovery )
 {
     try_to_parse(

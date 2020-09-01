@@ -410,6 +410,7 @@ TEST_SUPPORT_SRC = \
 	Formatters.cpp test_formatter.cpp \
 	CatWriters.cpp test_catwriter.cpp \
 	Queues.cpp test_queues.cpp \
+	ReceiverInterface.cpp test_linesplitter.cpp \
 	test_support_main.cpp
 
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))

@@ -105,21 +105,13 @@ MSG         .+
 
 %%
 
-YY_BUFFER_STATE tw_scan_reset( const char * input, yyscan_t yyscanner )
+YY_BUFFER_STATE tw_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
 {
-    YY_BUFFER_STATE ret = tw__scan_string( input, yyscanner );
+    YY_BUFFER_STATE ret = tw__scan_bytes( input, size, yyscanner );    
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
     return ret;
-}
-
-void tw_get_scanner_input( yyscan_t yyscanner, t_str & str )
-{
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    const char * input = (const char*) ( yyg -> yyextra_r );
-    str . p = input;
-    str . n = strlen( input ); // looks wasteful but only happens when we report errors
 }
 
 void tw_start_ID2( yyscan_t yyscanner )

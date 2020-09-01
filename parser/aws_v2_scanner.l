@@ -93,6 +93,7 @@ RESULTCODE      ([0-9]{3})|"-"
 
 %%
 
+"\000"          { return SPACE; }
 "\n"            { }
 [ \t]+          { return SPACE; }
 -               { MAKE_STR(); return DASH; }
@@ -182,21 +183,13 @@ RESULTCODE      ([0-9]{3})|"-"
 
 %%
 
-YY_BUFFER_STATE aws_scan_reset( const char * input, yyscan_t yyscanner )
+YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
 {
-    YY_BUFFER_STATE ret = aws__scan_string( input, yyscanner );
+    YY_BUFFER_STATE ret = aws__scan_bytes( input, size, yyscanner );
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
     return ret;
-}
-
-void aws_get_scanner_input( yyscan_t yyscanner, t_str & str )
-{
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
-    const char * input = (const char*) ( yyg -> yyextra_r );
-    str . p = input;
-    str . n = strlen( input ); // looks wasteful but only happens when we report errors 
 }
 
 void aws_start_URL( yyscan_t yyscanner )

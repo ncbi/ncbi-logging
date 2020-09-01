@@ -261,7 +261,6 @@ TEST_F ( TestParseFixture, AWS_SpaceInReferrer )
     ASSERT_EQ( "referrer with spaces", e.referer );
 }
 
-
 TEST_F ( TestParseFixture, AWS_MultiLine )
 {
     const char * InputLine =
