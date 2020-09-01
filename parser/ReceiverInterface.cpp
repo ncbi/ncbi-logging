@@ -168,6 +168,7 @@ SingleThreadedParser::parse()
     string line;
     while( getline( m_input, line ) )
     {   // TODO: the body of the loop is almost identical to a block in AWSMultiThreadedParser::parser()
+
         line_nr++;
 
         receiver . SetCategory( ReceiverInterface::cat_unknown );
@@ -300,7 +301,7 @@ void MultiThreadedParser::parse( )
         char * line = nullptr;
         while( ( linesz = getline( &line, &allocsz, m_input ) ) > 0 )
         {
-            //if ( line[ linesz - 1 ] == 0x0A ) linesz--;
+            if ( line[ linesz - 1 ] == 0x0A ) linesz--;
 
             OneWriterManyReadersQueue::value_type s = make_shared< string >( line, linesz );
             while ( ! Q.enqueue( s ) )

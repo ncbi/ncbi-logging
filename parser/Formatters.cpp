@@ -1,6 +1,8 @@
 #include "Formatters.hpp"
 
 #include "Queues.hpp"
+#include <utf8proc.h>
+
 #include <sstream>
 #include <algorithm>
 
@@ -71,44 +73,86 @@ JsonLibFormatter::addNameValue( const std::string & name, const std::string & va
 std::ostream& operator<< (std::ostream& os, const t_str & s)
 {
     os . put ( '"' );
-    ncbi::String k( s.p, s.n ); // throws if invalid UTF8; escapes control characters
-    ncbi::StringBuffer out;
 
-    ncbi::String::Iterator iter( k.makeIterator() );
-    while( iter.isValid() )
+    const utf8proc_uint8_t * str = ( const utf8proc_uint8_t * ) s.p;
+    utf8proc_int32_t ch;
+    utf8proc_ssize_t len;
+    utf8proc_ssize_t remain = s.n;
+    while ( remain > 0 && ( len = utf8proc_iterate( str, remain, & ch ) ) )
     {
-        auto ch = iter.get();
-        switch ( ch )
+        if ( utf8proc_codepoint_valid ( ch ) )
         {
-        case '\\':
-        case '\"':
-            out . append( '\\' );
-            break;
-        default:
-            break;
-        }
-        out . append( ch );
-        ++iter;
-    }
-/*
-    auto cnt = k.count();
-    for ( auto i = 0; i < cnt; ++i )
-    {   // To JSON-ify, escape quotes and backslashes
-        auto ch = k . getChar ( i );
-        switch ( ch )
-        {
-        case '\\':
-        case '\"':
-            out . append( '\\' );
-            break;
-        default:
-            break;
-        }
-        out . append( ch );
-    }
-*/
+            switch ( ch )
+            {
+            case '\\':
+            case '\"':
+                os . put( '\\' );
+                os . put( ch );
+                break;
+            case '\b':
+                os . write( "\\b", 2 );
+                break;
+            case '\t':
+                os . write( "\\t", 2 );
+                break;
+            case '\n':
+                os . write( "\\n", 2 );
+                break;
+            case '\f':
+                os . write( "\\f", 2 );
+                break;
+            case '\r':
+                os . write( "\\r", 2 );
+                break;
+            default:
+                if ( ch >= 0 && ch < 32 )
+                {
+                    stringstream tmp;
+                    tmp << "\\u";
+                    tmp << std::hex << std::setfill('0') << std::setw(4);
+                    tmp << ch;
+                    os . write( tmp.str().c_str(), tmp.str().size() );
+                }
+                else
+                {
+                    utf8proc_uint8_t out[4];
+                    utf8proc_ssize_t size = utf8proc_encode_char( ch, out );
+                    os . write( (const char*)out, size );
+                }
 
-    os . write( out.data(), out.size() );
+                break;
+            }
+        }
+        else
+        {
+            throw InvalidUTF8String ( XP ( XLOC ) << "badly formed UTF-8 character" );
+        }
+
+        str += len;
+        remain -= len;
+    }
+
+    // ncbi::String k( s.p, s.n ); // throws if invalid UTF8; escapes control characters
+    // ncbi::StringBuffer out;
+
+    // ncbi::String::Iterator iter( k.makeIterator() );
+    // while( iter.isValid() )
+    // {
+    //     auto ch = iter.get();
+    //     switch ( ch )
+    //     {
+    //     case '\\':
+    //     case '\"':
+    //         out . append( '\\' );
+    //         break;
+    //     default:
+    //         break;
+    //     }
+    //     out . append( ch );
+    //     ++iter;
+    // }
+    // os . write( out.data(), out.size() );
+
     os . put ( '"' );
     return os;
 }

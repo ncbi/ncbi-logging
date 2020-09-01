@@ -329,7 +329,7 @@ run_$(PREFIX_GCP)parsetest: $(BINDIR)/$(PREFIX_GCP)test_parse-dbg $(BINDIR)/$(PR
 # Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
 JWT_TOOL ?= ../../ncbi-vdb3/jwt-tool
 
-CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/tool
+CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/utf8proc -I$(JWT_TOOL)/tool
 
 #################################################
 # VDB3 Command line parsing

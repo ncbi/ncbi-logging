@@ -136,12 +136,6 @@ TEST_F( AWSTestFixture, ErrorRecovery )
                 s_outputs.get_good() );
 }
 
-TEST_F( AWSTestFixture, unrecognized_char )
-{
-    std::string res = try_to_parse_ugly( "line1 \07" );
-    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\",\"owner\":\"line1\"}\n", res );
-}
-
 TEST_F( AWSTestFixture, parse_owner )
 {
     std::string res = try_to_parse_good( "7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 - - - - - - - - - - - - - - - - - - - - - - -" );
@@ -551,6 +545,7 @@ TEST_F( AWSTestFixture, MultiThreading )
 
     FILE * ss = fmemopen( (void*) input.c_str(), input.size(), "r");
     AWSParseBlockFactory pbFact;
+    //pbFact.setFast(false);
     MultiThreadedParser p( ss, s_outputs, 100, 2, pbFact );
     p . parse();
 

@@ -128,10 +128,11 @@ TEST_F( TWTestFixture, ErrorRecovery )
                 s_outputs.get_good() );
 }
 
-TEST_F( TWTestFixture, unrecognized_char_escaped_in_json_ouput )
-{
-    std::string res = try_to_parse_review( "line1 \07" );
-    ASSERT_EQ( "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 \07\"}\n", res );
+TEST_F( TWTestFixture, nul_in_source )
+{   //TODO: now ::getline() truncates the input stream on embedded 0;
+    // implement our own if we want to fix that (LOGMON-86)
+    std::string res = try_to_parse_review( "line1 \000 blah\nline1 blah" );
+    ASSERT_EQ( "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 \"}\n", res );
 }
 
 TEST_F( TWTestFixture, NoMessage )
