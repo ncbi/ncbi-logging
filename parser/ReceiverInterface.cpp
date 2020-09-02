@@ -6,6 +6,7 @@
 
 #include "CatWriters.hpp"
 #include "Queues.hpp"
+#include "LineSplitters.hpp"
 
 using namespace NCBI::Logging;
 using namespace std;
@@ -206,30 +207,6 @@ MultiThreadedParser :: MultiThreadedParser(
     thread_sleeps . store( 0 );
 }
 
-ssize_t readline(FILE *stream, char *buf, size_t size)
-{
-  if (size == 0)
-    return 0;
-
-  size_t count;
-  int c = 0;
-  for (count = 0; c != '\n' && count < size - 1; count++)
-  {
-    c = getc(stream);
-
-    if (c == EOF) {
-      if (count == 0)
-        return -1;
-      break;
-    }
-
-    buf[count] = (char) c;
-  }
-
-  buf[count] = '\0';
-  return (ssize_t) count;
-}
-
 void parser( ParseBlockFactoryInterface * factory,
              OneWriterManyReadersQueue * in_q,
              OutputQueue * out_q )
@@ -321,13 +298,10 @@ void MultiThreadedParser::parse( )
 
     try
     {
-        char line [4096];
-        ssize_t linesz = 0;
-        while( ( linesz = readline( m_input, line, sizeof(line) ) ) > 0 )
+        CLineSplitter splitter( m_input );
+        while( splitter.getLine() )
         {
-            if ( line[ linesz - 1 ] == 0x0A ) linesz--;
-
-            OneWriterManyReadersQueue::value_type s = make_shared< string >( line, linesz );
+            OneWriterManyReadersQueue::value_type s = make_shared< string >( splitter.data(), splitter.size() );
             while ( ! Q.enqueue( s ) )
             {
                 this_thread::sleep_for( chrono::microseconds( 100 ) );
@@ -335,7 +309,6 @@ void MultiThreadedParser::parse( )
             }
 
         }
-        //free( line );
     }
     catch(...)
     {
@@ -358,28 +331,4 @@ void MultiThreadedParser::parse( )
 
     Q_out.close();
     writer_thread.join();
-}
-
-StdLineSplitter::StdLineSplitter( std::istream &is ) : m_is( is ) { }
-StdLineSplitter::~StdLineSplitter() { }
-
-bool StdLineSplitter::getLine( void )
-{
-    m_buffer.clear();
-    getline( m_is, m_buffer );
-    if ( m_buffer.empty() )
-    {
-        return m_is.good();
-    }
-    return true;
-}
-
-const char * StdLineSplitter::data( void ) const
-{
-    return m_buffer.c_str();
-}
-
-size_t StdLineSplitter::size( void ) const
-{
-    return m_buffer.size();
 }

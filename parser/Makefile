@@ -410,7 +410,7 @@ TEST_SUPPORT_SRC = \
 	Formatters.cpp test_formatter.cpp \
 	CatWriters.cpp test_catwriter.cpp \
 	Queues.cpp test_queues.cpp \
-	ReceiverInterface.cpp test_linesplitter.cpp \
+	LineSplitters.cpp test_linesplitter.cpp \
 	test_support_main.cpp
 
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
@@ -437,7 +437,8 @@ COMMON_V2_SRC = \
 	CatWriters.cpp \
 	Formatters.cpp \
 	ReceiverInterface.cpp \
-	Queues.cpp
+	Queues.cpp \
+	LineSplitters.cpp
 
 DBG_TOOL_OBJ = $(OBJDIR)/Tool.dbg.o $(DBG_CMD_OBJ)
 REL_TOOL_OBJ = $(OBJDIR)/Tool.rel.o $(REL_CMD_OBJ)
