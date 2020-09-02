@@ -34,7 +34,7 @@ IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_
 I64     [-+]?[0-9]+
 
 CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\] ^{}]
-QCHARS      [.?&=%/]|{CHARS}
+QCHARS      [.?&=%/\x00-\x1f]|{CHARS}
 
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
@@ -103,7 +103,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 <AGENT>\"               { MAKE_STR(); return QUOTE; }
 <AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
 <AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
-<AGENT>.                { MAKE_STR(); return AGENTSTR; }; 
+<AGENT>.                { MAKE_STR(); return AGENTSTR; };
 
 .                   { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
 
@@ -111,8 +111,8 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 
 YY_BUFFER_STATE gcp_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
 {
-    YY_BUFFER_STATE ret = gcp__scan_bytes( input, size, yyscanner );    
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    YY_BUFFER_STATE ret = gcp__scan_bytes( input, size, yyscanner );
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
     return ret;
@@ -120,15 +120,15 @@ YY_BUFFER_STATE gcp_scan_bytes( const char * input, size_t size, yyscan_t yyscan
 
 void gcp_start_URL( yyscan_t yyscanner )
 {
-    yy_push_state( PATH, yyscanner ); 
+    yy_push_state( PATH, yyscanner );
 }
 
 void gcp_start_UserAgent( yyscan_t yyscanner )
 {
-    yy_push_state( AGENT, yyscanner ); 
+    yy_push_state( AGENT, yyscanner );
 }
 
 void gcp_pop_state( yyscan_t yyscanner )
 {
-    yy_pop_state( yyscanner ); 
+    yy_pop_state( yyscanner );
 }

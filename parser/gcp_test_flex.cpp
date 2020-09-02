@@ -88,7 +88,7 @@ TEST_F ( GCP_TestFlexFixture, QuotedNonAscii )
 TEST_F ( GCP_TestFlexFixture, QuotedEscapedQuote )
 {   // skip non-ascii characters
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
-    ASSERT_EQ( QSTR, NextTokenType() ); 
+    ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_TRUE ( token . s . escaped );
     ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
@@ -98,8 +98,8 @@ TEST_F ( GCP_TestFlexFixture, QuotedEscapedQuote )
 TEST_F ( GCP_TestFlexFixture, IPV4 )
 {
     const char * addr = "\"255.24.110.9\"";
-    ASSERT_EQ( QUOTE, StartScan(addr) ); 
-    ASSERT_EQ( IPV4, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, StartScan(addr) );
+    ASSERT_EQ( IPV4, NextTokenType() );
     ASSERT_EQ( "255.24.110.9", TokenValue() );
 }
 
@@ -122,7 +122,7 @@ TEST_F ( GCP_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1
 
 TEST_F ( GCP_TestFlexFixture, Path_State )
 {
-    ASSERT_EQ( PATHSTR, StartPath( "a" ) ); 
+    ASSERT_EQ( PATHSTR, StartPath( "a" ) );
     ASSERT_EQ( "a", TokenValue() );
 }
 
@@ -157,7 +157,7 @@ TEST_F ( GCP_TestFlexFixture, Path_AccesssionSlashFilename )
     const char * input = "ERR4080068/HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001";
     ASSERT_EQ( ACCESSION, StartPath( input ) ); ASSERT_EQ( "ERR4080068", TokenValue() );
     ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( PATHSTR, NextTokenType() ); 
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001", TokenValue() );
 }
 
@@ -166,9 +166,9 @@ TEST_F ( GCP_TestFlexFixture, Path_AccesssionSlashFilename_Ext )
     const char * input = "ERR4080068/HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001.fq";
     ASSERT_EQ( ACCESSION, StartPath( input ) ); ASSERT_EQ( "ERR4080068", TokenValue() );
     ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( PATHSTR, NextTokenType() ); 
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() ); 
+    ASSERT_EQ( PATHEXT, NextTokenType() );
     ASSERT_EQ( ".fq", TokenValue() );
 }
 
@@ -201,7 +201,7 @@ TEST_F ( GCP_TestFlexFixture, Agent )
     gcp__scan_string( input, sc );
     //gcp_set_debug ( 1, sc );
     gcp_start_UserAgent( sc );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
     ASSERT_EQ( OS, NextTokenType() ); ASSERT_EQ( "linux64", TokenValue() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
     ASSERT_EQ( SRA_TOOLKIT, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
@@ -215,7 +215,7 @@ TEST_F ( GCP_TestFlexFixture, Agent )
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ",", TokenValue() );
     ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "libc=2.17", TokenValue() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ")", TokenValue() );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
 }
 
 TEST_F ( GCP_TestFlexFixture, Agent_2_part_version )

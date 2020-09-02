@@ -29,13 +29,13 @@ public:
 
     int StartScan( const char * input )
     {
-        tw__scan_string( input, sc );
+        tw__scan_bytes( input, strlen( input ), sc );
         return tw_lex( & token, sc );
     }
 
-    int StartScanF(const char * input, std::function< void( yyscan_t ) > f, bool debug = false )
+    int StartScanF(const char * input, size_t size, std::function< void( yyscan_t ) > f, bool debug = false )
     {
-        tw__scan_string( input, sc );
+        tw__scan_bytes( input, size, sc );
         tw_set_debug ( debug, sc );
         f( sc );
         return tw_lex( & token, sc );
@@ -54,9 +54,14 @@ public:
 
     string TokenValue() const { return string( token . s . p, token . s . n ); }
 
+    void token_test( int tt, const char * txt, size_t size, std::function< void( yyscan_t ) > f )
+    {
+        ASSERT_EQ( tt, StartScanF( txt, size, f ) );
+        ASSERT_EQ( txt, TokenValue() );
+    }
     void token_test( int tt, const char * txt, std::function< void( yyscan_t ) > f )
     {
-        ASSERT_EQ( tt, StartScanF( txt, f ) );
+        ASSERT_EQ( tt, StartScanF( txt, strlen( txt ), f ) );
         ASSERT_EQ( txt, TokenValue() );
     }
 
@@ -121,7 +126,12 @@ TEST_F ( TW_TestFlexFixture, UTF8 )
     token_test( MSG, txt, tw_start_MSG );
 }
 
-//TODO: support UTF-8, handle/report invalid UTF-8 characters (?). Right now the scanner is transparent and handling of invalid UTF8 happens at the Receiver level and only if the JsonLib is used.
+TEST_F ( TW_TestFlexFixture, CtrlChars )
+{
+    const char * txt = "\x01\x06\x10\x1e\x1f";
+    token_test( MSG, txt, tw_start_MSG );
+    ASSERT_EQ( 5, token . s . n );
+}
 
 extern "C"
 {

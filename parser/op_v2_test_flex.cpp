@@ -27,15 +27,21 @@ public:
         op_lex_destroy( sc );
     }
 
+    int StartScan( const char * input, size_t size )
+    {
+        op__scan_bytes( input, size, sc );
+        return op_lex( & token, sc );
+    }
+
     int StartScan( const char * input )
     {
-        op__scan_string( input, sc );
+        op__scan_bytes( input, strlen( input ), sc );
         return op_lex( & token, sc );
     }
 
     int StartScanInURL_State(const char * input, bool debug = false )
     {
-        op__scan_string( input, sc );
+        op__scan_bytes( input, strlen( input ), sc );
         op_set_debug ( debug, sc );
         op_start_URL( sc );
         return op_lex( & token, sc );
@@ -92,6 +98,16 @@ TEST_F ( OP_TestFlexFixture, QuotedVersNoNumber )   { TestQuotedToken( VERS, "HT
 TEST_F ( OP_TestFlexFixture, QuotedVersMixedcase )  { TestQuotedToken( VERS, "HttP/1.0" ); }
 TEST_F ( OP_TestFlexFixture, QuotedVersAnyNumber )  { TestQuotedToken( VERS, "HTTP/3.14" ); }
 
+TEST_F ( OP_TestFlexFixture, Embedded_CtlChars )
+{
+    #define str "abc\x00\x01\x02...\x1f-def"
+    ASSERT_EQ( QUOTE, StartScan("\"" str "\"", 16) );
+    ASSERT_EQ( QSTR, NextTokenType() );
+    ASSERT_EQ( 14, token . s . n );
+    ASSERT_EQ( 0, memcmp( str, token . s . p, token . s . n ) );
+    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
+    #undef str
+}
 TEST_F ( OP_TestFlexFixture, QuotedString )
 {
     #define str ".Bl0-_~!*'();:@&=+$,/%#[]?\\<>|`{}^"
@@ -108,9 +124,9 @@ TEST_F ( OP_TestFlexFixture, QuotedNonAscii )
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedEscapedQuote )
-{   
+{
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
-    ASSERT_EQ( QSTR, NextTokenType() ); 
+    ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_TRUE ( token . s . escaped );
     ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
@@ -142,27 +158,28 @@ TEST_F ( OP_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1.
 
 TEST_F ( OP_TestFlexFixture, Path_State )
 {
-    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) ); 
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) );
     ASSERT_EQ( "a", TokenValue() );
 }
 
 TEST_F ( OP_TestFlexFixture, Path_StateReturn )
 {   // scanner state manipulation
-    op__scan_string( "a b", sc );
+    const char * input = "a b";
+    op__scan_bytes( input, strlen( input ), sc );
     op_start_URL( sc ); // into PATH state
-    ASSERT_EQ( PATHSTR, NextTokenType() ); 
-    ASSERT_EQ( "a", TokenValue() ); 
+    ASSERT_EQ( PATHSTR, NextTokenType() );
+    ASSERT_EQ( "a", TokenValue() );
     op_pop_state( sc );    // back to the default state
-    ASSERT_EQ( SPACE, NextTokenType() ); 
+    ASSERT_EQ( SPACE, NextTokenType() );
     ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "b", TokenValue() );
 }
 
 TEST_F ( OP_TestFlexFixture, Path_Accesssion )
 {
     const char * input = "/SRR9154112/%2A.fastq%2A";
-    ASSERT_EQ( SLASH, StartScanInURL_State( input ) ); 
+    ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
     ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType( ) ); 
+    ASSERT_EQ( SLASH, NextTokenType( ) );
     ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%2A", TokenValue() );
     ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
 }
@@ -171,10 +188,10 @@ TEST_F ( OP_TestFlexFixture, Agent )
 {
     const char * input = "\"linux64 sra-toolkit fasterq-dump.2.10.7 (phid=noc86d2998,libc=2.17)\"";
 
-    op__scan_string( input, sc );
+    op__scan_bytes( input, strlen( input ), sc );
     //op_set_debug ( 1, sc );
     op_start_UserAgent( sc );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
     ASSERT_EQ( OS, NextTokenType() ); ASSERT_EQ( "linux64", TokenValue() );
     ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
     ASSERT_EQ( SRA_TOOLKIT, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
@@ -188,7 +205,7 @@ TEST_F ( OP_TestFlexFixture, Agent )
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ",", TokenValue() );
     ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "libc=2.17", TokenValue() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ")", TokenValue() );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
 }
 
 extern "C"

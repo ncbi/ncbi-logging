@@ -118,9 +118,9 @@ TEST_F ( OP_TestFlexFixture, QuotedNonAscii )
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedEscapedQuote )
-{   
+{
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
-    ASSERT_EQ( QSTR, NextTokenType() ); 
+    ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_TRUE ( token . s . escaped );
     ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
@@ -152,7 +152,7 @@ TEST_F ( OP_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1.
 
 TEST_F ( OP_TestFlexFixture, Path_State )
 {
-    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) ); 
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) );
     ASSERT_EQ( "a", TokenValue() );
 }
 
@@ -160,8 +160,8 @@ TEST_F ( OP_TestFlexFixture, Path_StateReturn )
 {   // scanner state manipulation
     op__scan_string( "a b", sc );
     op_start_URL( sc ); // into PATH state
-    ASSERT_EQ( PATHSTR, NextTokenType() ); 
-    ASSERT_EQ( "a", TokenValue() ); 
+    ASSERT_EQ( PATHSTR, NextTokenType() );
+    ASSERT_EQ( "a", TokenValue() );
     op_pop_state( sc );    // back to the default state
     // the default state skips spaces
     ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "b", TokenValue() );
@@ -170,9 +170,9 @@ TEST_F ( OP_TestFlexFixture, Path_StateReturn )
 TEST_F ( OP_TestFlexFixture, Path_Accesssion )
 {
     const char * input = "/SRR9154112/%2A.fastq%2A";
-    ASSERT_EQ( SLASH, StartScanInURL_State( input ) ); 
+    ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
     ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType( ) ); 
+    ASSERT_EQ( SLASH, NextTokenType( ) );
     ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%2A", TokenValue() );
     ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
 }
@@ -184,7 +184,7 @@ TEST_F ( OP_TestFlexFixture, Agent )
     op__scan_string( input, sc );
     //op_set_debug ( 1, sc );
     op_start_UserAgent( sc );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
     ASSERT_EQ( OS, NextTokenType() ); ASSERT_EQ( "linux64", TokenValue() );
     ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
     ASSERT_EQ( SRA_TOOLKIT, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
@@ -198,7 +198,7 @@ TEST_F ( OP_TestFlexFixture, Agent )
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ",", TokenValue() );
     ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "libc=2.17", TokenValue() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ")", TokenValue() );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
 }
 
 extern "C"

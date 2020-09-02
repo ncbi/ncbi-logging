@@ -39,7 +39,7 @@ I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
 
 CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]<>|`{}^]
-STR_CHARS   "?"|"\."|"\/"|"\\"|{CHARS}
+STR_CHARS   "?"|"\."|"\/"|"\\"|{CHARS}|[\x00-\x1f]
 
 QSTR        {STR_CHARS}+
 QSTR_ESC    (\\\"|{STR_CHARS})+
@@ -119,7 +119,7 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <AGENT>\"               { MAKE_STR(); return QUOTE; }
 <AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
 <AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
-<AGENT>.                { MAKE_STR(); return AGENTSTR; }; 
+<AGENT>.                { MAKE_STR(); return AGENTSTR; };
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
@@ -134,8 +134,8 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 
 YY_BUFFER_STATE op_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
 {
-    YY_BUFFER_STATE ret = op__scan_bytes( input, size, yyscanner );    
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    YY_BUFFER_STATE ret = op__scan_bytes( input, size, yyscanner );
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
     return ret;
@@ -143,20 +143,20 @@ YY_BUFFER_STATE op_scan_bytes( const char * input, size_t size, yyscan_t yyscann
 
 void op_start_URL( yyscan_t yyscanner )
 {
-    yy_push_state( PATH, yyscanner ); 
+    yy_push_state( PATH, yyscanner );
 }
 
 void op_start_UserAgent( yyscan_t yyscanner )
 {
-    yy_push_state( AGENT, yyscanner ); 
+    yy_push_state( AGENT, yyscanner );
 }
 
 void op_start_time( yyscan_t yyscanner )
 {
-    yy_push_state( TIMEFMT, yyscanner ); 
+    yy_push_state( TIMEFMT, yyscanner );
 }
 
 void op_pop_state( yyscan_t yyscanner )
 {
-    yy_pop_state( yyscanner ); 
+    yy_pop_state( yyscanner );
 }

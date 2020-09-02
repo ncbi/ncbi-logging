@@ -84,7 +84,7 @@ TLSV           [0-9]+(\.[0-9]+){0,2}
 TLSVERSION     "TLSv"{TLSV}
 
 X_AMZ_ID_2       [A-Z0-9]{21}
-BASE64           [A-Za-z0-9+/]+={0,2}   
+BASE64           [A-Za-z0-9+/]+={0,2}
 S3_EXT_REQ_ID    {BASE64}
 
 RESULTCODE      ([0-9]{3})|"-"
@@ -93,7 +93,6 @@ RESULTCODE      ([0-9]{3})|"-"
 
 %%
 
-"\000"          { return SPACE; }
 "\n"            { }
 [ \t]+          { return SPACE; }
 -               { MAKE_STR(); return DASH; }
@@ -111,7 +110,7 @@ RESULTCODE      ([0-9]{3})|"-"
 
 {STR}           { MAKE_STR(); return STR; }
 {STR1}          { MAKE_STR1(); return STR1; }
-.               { /* fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); */ return UNRECOGNIZED; }
+.               { MAKE_STR(); return UNRECOGNIZED; }
 
 <TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }
 <TIMEFMT>-          { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
@@ -186,7 +185,7 @@ RESULTCODE      ([0-9]{3})|"-"
 YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
 {
     YY_BUFFER_STATE ret = aws__scan_bytes( input, size, yyscanner );
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
     return ret;
@@ -194,50 +193,50 @@ YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscan
 
 void aws_start_URL( yyscan_t yyscanner )
 {
-    yy_push_state( PATH, yyscanner ); 
+    yy_push_state( PATH, yyscanner );
 }
 
 void aws_start_key( yyscan_t yyscanner )
 {
-    yy_push_state( KEY, yyscanner ); 
+    yy_push_state( KEY, yyscanner );
 }
 
 void aws_start_UserAgent( yyscan_t yyscanner )
 {
-    yy_push_state( AGENT, yyscanner ); 
+    yy_push_state( AGENT, yyscanner );
 }
 
 void aws_start_TLS_vers( yyscan_t yyscanner )
 {
-    yy_push_state( TLSVERSION, yyscanner ); 
+    yy_push_state( TLSVERSION, yyscanner );
 }
 
 void aws_start_host_id( yyscan_t yyscanner )
 {
-    yy_push_state( HOSTID, yyscanner ); 
+    yy_push_state( HOSTID, yyscanner );
 }
 
 void aws_start_time( yyscan_t yyscanner )
 {
-    yy_push_state( TIMEFMT, yyscanner ); 
+    yy_push_state( TIMEFMT, yyscanner );
 }
 
 void aws_start_ipaddr( yyscan_t yyscanner )
 {
-    yy_push_state( IPADDR, yyscanner ); 
+    yy_push_state( IPADDR, yyscanner );
 }
 
 void aws_start_rescode( yyscan_t yyscanner )
 {
-    yy_push_state( RESCODE, yyscanner ); 
+    yy_push_state( RESCODE, yyscanner );
 }
 
 void aws_start_referer( yyscan_t yyscanner )
 {
-    yy_push_state( REFERER, yyscanner ); 
+    yy_push_state( REFERER, yyscanner );
 }
 
 void aws_pop_state( yyscan_t yyscanner )
 {
-    yy_pop_state( yyscanner ); 
+    yy_pop_state( yyscanner );
 }
