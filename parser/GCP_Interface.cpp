@@ -47,7 +47,6 @@ namespace NCBI
             GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~GCPParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
-            virtual bool Parse( const std::string & line );
             virtual bool Parse( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
@@ -89,12 +88,6 @@ GCPParseBlock::SetDebug( bool onOff )
 }
 
 static string DefaultHeader = "\"time_micros\",\"c_ip\",\"c_ip_type\",\"c_ip_region\",\"cs_method\",\"cs_uri\",\"sc_status\",\"cs_bytes\",\"sc_bytes\",\"time_taken_micros\",\"cs_host\",\"cs_referer\",\"cs_user_agent\",\"s_request_id\",\"cs_operation\",\"cs_bucket\",\"cs_object\"";
-
-bool
-GCPParseBlock::Parse( const string & line )
-{
-    return Parse( line.c_str(), line.size() );
-}
 
 bool
 GCPParseBlock::Parse( const char * line, size_t line_size )

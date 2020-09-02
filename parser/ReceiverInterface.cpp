@@ -175,7 +175,7 @@ SingleThreadedParser::parse()
 
         receiver . SetCategory( ReceiverInterface::cat_unknown );
 
-        if ( ! m_pb -> Parse( std::string( splitter.data(), splitter.size() ) ) )
+        if ( ! m_pb -> Parse( splitter.data(), splitter.size() ) )
         {
             receiver . SetCategory( ReceiverInterface::cat_ugly );
         }
@@ -234,7 +234,7 @@ void parser( ParseBlockFactoryInterface * factory,
         {   // TODO: this block replicates much of AWSParser::parse()
             receiver . SetCategory( ReceiverInterface::cat_unknown );
 
-            if ( ! pb -> Parse( *line ) )
+            if ( ! pb -> Parse( line -> c_str(), line -> size() ) )
             {
                 receiver . SetCategory( ReceiverInterface::cat_ugly );
             }

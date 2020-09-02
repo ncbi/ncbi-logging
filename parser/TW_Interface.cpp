@@ -45,7 +45,6 @@ namespace NCBI
             TWParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~TWParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
-            virtual bool Parse( const std::string & line );
             virtual bool Parse( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
@@ -84,12 +83,6 @@ TWParseBlock::SetDebug( bool onOff )
 {
     tw_debug = onOff ? 1 : 0;            // bison (op_debug is global)
     tw_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
-bool
-TWParseBlock::Parse( const string & line )
-{
-    return Parse( line.c_str(), line.size() );
 }
 
 bool

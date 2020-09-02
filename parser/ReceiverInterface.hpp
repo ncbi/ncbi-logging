@@ -93,7 +93,6 @@ namespace NCBI
         public:
             virtual ~ParseBlockInterface() = 0;
             virtual ReceiverInterface & GetReceiver() = 0;
-            virtual bool Parse( const std :: string & line ) = 0;
             virtual bool Parse( const char * line, size_t line_size ) = 0;
             virtual void SetDebug( bool onOff ) = 0;
         };
