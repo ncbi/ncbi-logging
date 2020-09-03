@@ -117,7 +117,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 <AGENT>\"               { MAKE_STR(); return QUOTE; }
 <AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
 <AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
-<AGENT>.                { MAKE_STR(); return AGENTSTR; }; 
+<AGENT>.                { MAKE_STR(); return AGENTSTR; };
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
@@ -133,7 +133,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 YY_BUFFER_STATE op_scan_reset( const char * input, yyscan_t yyscanner )
 {
     YY_BUFFER_STATE ret = op__scan_string( input, yyscanner );
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
     return ret;
@@ -141,23 +141,23 @@ YY_BUFFER_STATE op_scan_reset( const char * input, yyscan_t yyscanner )
 
 void op_get_scanner_input( yyscan_t yyscanner, t_str & str )
 {
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;    
+    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     const char * input = (const char*) ( yyg -> yyextra_r );
     str . p = input;
-    str . n = strlen( input ); // looks wasteful but only happens when we report errors 
+    str . n = strlen( input ); // looks wasteful but only happens when we report errors
 }
 
 void op_start_URL( yyscan_t yyscanner )
 {
-    yy_push_state( PATH, yyscanner ); 
+    yy_push_state( PATH, yyscanner );
 }
 
 void op_start_UserAgent( yyscan_t yyscanner )
 {
-    yy_push_state( AGENT, yyscanner ); 
+    yy_push_state( AGENT, yyscanner );
 }
 
 void op_pop_state( yyscan_t yyscanner )
 {
-    yy_pop_state( yyscanner ); 
+    yy_pop_state( yyscanner );
 }

@@ -84,6 +84,12 @@ class AWSTestFixture : public ParseTestFixture< AWSParseBlockFactory >
 {
 };
 
+TEST_F( AWSTestFixture, lonely_eol )
+{
+    std::string res = try_to_parse_ugly( "\n" );
+    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"\"}\n", res );
+}
+
 TEST_F( AWSTestFixture, Setters_BadUTF8 )
 {
     std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();

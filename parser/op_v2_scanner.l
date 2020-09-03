@@ -96,7 +96,7 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <QUOTED>.           ;                                               /* TODO: include in the output token */
 
 <TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }
-<TIMEFMT>.          { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in TIMEFMT '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TIMEFMT>.          { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
 <PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
 <PATH>{SPACE}       { MAKE_STR(); return SPACE; }
@@ -128,7 +128,7 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 {MONTH}         { MAKE_STR(); return MONTH; }
 {STR}           { MAKE_STR(); return STR; }
 
-.               { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+.               { MAKE_STR(); return UNRECOGNIZED; }
 
 %%
 

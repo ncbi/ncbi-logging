@@ -107,7 +107,7 @@ RESULTCODE      ([0-9]{3})|"-"
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
-<QUOTED>.           { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<QUOTED>.           { MAKE_STR(); return UNRECOGNIZED; }
 
 {STR}           { MAKE_STR(); return STR; }
 {STR1}          { MAKE_STR1(); return STR1; }
@@ -116,7 +116,7 @@ RESULTCODE      ([0-9]{3})|"-"
 <TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }
 <TIMEFMT>-          { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
 <TIMEFMT>\"-\"      { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
-<TIMEFMT>.          { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in TIMEFMT '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TIMEFMT>.          { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
 <PATH>{SPACE}       { yy_pop_state( yyscanner ); return SPACE; }
 <PATH>\"            { yy_pop_state( yyscanner ); return QUOTE; }
@@ -168,12 +168,12 @@ RESULTCODE      ([0-9]{3})|"-"
 <IPADDR>{IPV6ADDR}      { yy_pop_state( yyscanner ); MAKE_STR(); return IPV6; }
 <IPADDR>-               { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
 <IPADDR>\"-\"           { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
-<IPADDR>.               { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in IPADDR '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<IPADDR>.               { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
 <RESCODE>{INT3}         { yy_pop_state( yyscanner ); MAKE_STR(); return RESULTCODE; }
 <RESCODE>-              { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
 <RESCODE>\"-\"          { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
-<RESCODE>.              { yy_pop_state( yyscanner ); fprintf(stderr, "Unexpected char in RESCODE '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<RESCODE>.              { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
 <REFERER>\"             { yy_pop_state( yyscanner ); MAKE_STR(); return QUOTE; }
 <REFERER>\\\"           { MAKE_STR(); return QSTR; }

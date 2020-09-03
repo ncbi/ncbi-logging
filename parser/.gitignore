@@ -40,3 +40,6 @@ tw_v2_parser.cpp
 tw_v2_parser.hpp
 tw_v2_scanner.cpp
 tw_v2_scanner.hpp
+
+# fuzz-testing temporaries
+fuzz

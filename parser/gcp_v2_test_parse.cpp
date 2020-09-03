@@ -117,6 +117,12 @@ TEST_F( GCPTestFixture, unrecognized_char )
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"1 \\u0007\"}\n", res );
 }
 
+TEST_F( GCPTestFixture, lonely_eol )
+{
+    std::string res = try_to_parse_ugly( "\n" );
+    ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"\"}\n", res );
+}
+
 TEST_F( GCPTestFixture, parse_embedded_0 )
 {   //TODO: send the line to Review
     string s("\"1\",\x00\"18.207.254.142\"", 21);

@@ -9,7 +9,8 @@ CPP := g++ -c
 LD := g++
 CXXFLAGS += -I . -MMD
 GPROFFLAGS = -pg -O3
-FLEXFLAGS = -8 --fast
+#FLEXFLAGS = -8 --fast
+FLEXFLAGS = -8 --align
 
 PREFIX_OP := op_
 PREFIX_OP_V2 := op_v2_
@@ -61,6 +62,12 @@ $(OBJDIR)/%.rel.o: %.cpp
 
 $(OBJDIR)/%.prof.o: %.cpp
 	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
+
+# instrumented for fuzzing
+FUZZ_OPT = -fsanitize=fuzzer,address,signed-integer-overflow -fprofile-instr-generate -fcoverage-mapping
+#FUZZ_OPT = -fsanitize=fuzzer,signed-integer-overflow -fprofile-instr-generate -fcoverage-mapping
+$(OBJDIR)/%.fuzz.o: %.cpp
+	clang++ -c $< -o $@ -g $(CXXFLAGS) $(FUZZ_OPT)
 
 -include $(OBJDIR)/*.d
 
@@ -787,4 +794,102 @@ vg_aws : $(BINDIR)/aws2jsn-$(BUILD) $(BINDIR)/$(PREFIX_AWS_V2)test_flex-$(BUILD)
 
 vg_all : vg_op vg_gcp vg_aws
 
-.PHONY: vg_op vg_gcp vg_aws vg_all
+.PHONY: aws_op vg_gcp vg_aws vg_all
+
+#-------------------------------------------------------------------------------
+# fuzz testing
+clean_fuzz:
+	rm -rf fuzz/
+
+#-------------------------------------------------------------------------------
+# fuzz testing AWS
+#
+AWS_FUZZ_SRC = \
+	$(AWS2JSN_CMN_SRC) \
+	$(PREFIX_AWS_V2)fuzz.cpp
+
+AWS_FUZZ_OBJ = \
+	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(AWS_FUZZ_SRC)))
+
+$(BINDIR)/aws-fuzz: aws $(AWS_FUZZ_OBJ)
+	clang++ -g -o $@ $(AWS_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+
+#AWS_FUZZ_DICT ?= -dict=fuzz/aws-dict
+AWS_RUNS ?= 25000
+
+run_aws_fuzz: $(BINDIR)/aws-fuzz
+	 mkdir -p fuzz/aws-corpus fuzz/aws-seeds
+	 cp data/aws_testlines.log fuzz/aws-seeds/
+	 $^ $(AWS_FUZZ_DICT) -runs=$(AWS_RUNS) fuzz/aws-corpus fuzz/aws-seeds
+
+.phony: run_aws_fuzz
+
+#-------------------------------------------------------------------------------
+# fuzz testing GCP
+#
+GCP_FUZZ_SRC = \
+	$(GCP2JSN_CMN_SRC) \
+	$(PREFIX_GCP_V2)fuzz.cpp
+
+GCP_FUZZ_OBJ = \
+	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(GCP_FUZZ_SRC)))
+
+$(BINDIR)/gcp-fuzz: gcp $(GCP_FUZZ_OBJ)
+	clang++ -g -o $@ $(GCP_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+
+#GCP_FUZZ_DICT ?= -dict=fuzz/gcp-dict
+GCP_RUNS ?= 25000
+
+run_gcp_fuzz: $(BINDIR)/gcp-fuzz
+	 mkdir -p fuzz/gcp-corpus fuzz/gcp-seeds
+	 cp data/gcp_testlines.log fuzz/gcp-seeds/
+	 $^ $(GCP_FUZZ_DICT) -runs=$(GCP_RUNS) fuzz/gcp-corpus fuzz/gcp-seeds/
+
+.phony: run_gcp_fuzz
+
+#-------------------------------------------------------------------------------
+# fuzz testing OP
+#
+OP_FUZZ_SRC = \
+	$(OP2JSN_CMN_SRC) \
+	$(PREFIX_OP_V2)fuzz.cpp
+
+OP_FUZZ_OBJ = \
+	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(OP_FUZZ_SRC)))
+
+$(BINDIR)/op-fuzz: op $(OP_FUZZ_OBJ)
+	clang++ -g -o $@ $(OP_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+
+#OP_FUZZ_DICT ?= -dict=fuzz/op-dict
+OP_RUNS ?= 25000
+
+run_op_fuzz: $(BINDIR)/op-fuzz
+	 mkdir -p fuzz/op-corpus fuzz/op-seeds
+	 cp data/op_testlines.log fuzz/op-seeds/
+	 $^ $(OP_FUZZ_DICT) -runs=$(OP_RUNS) fuzz/op-corpus fuzz/op-seeds/
+
+.phony: run_op_fuzz
+
+#-------------------------------------------------------------------------------
+# fuzz testing TW
+#
+TW_FUZZ_SRC = \
+	$(TW2JSN_CMN_SRC) \
+	$(PREFIX_TW_V2)fuzz.cpp
+
+TW_FUZZ_OBJ = \
+	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(TW_FUZZ_SRC)))
+
+$(BINDIR)/tw-fuzz: tw $(TW_FUZZ_OBJ)
+	clang++ -g -o $@ $(TW_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+
+#TW_FUZZ_DICT ?= -dict=fuzz/op-dict
+TW_RUNS ?= 25000
+
+run_tw_fuzz: $(BINDIR)/tw-fuzz
+	 mkdir -p fuzz/tw-corpus fuzz/tw-seeds
+	 cp data/tw_testlines.log fuzz/tw-seeds/
+	 $^ $(TW_FUZZ_DICT) -runs=$(TW_RUNS) fuzz/tw-corpus fuzz/tw-seeds/
+
+.phony: run_tw_fuzz
+

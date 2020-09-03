@@ -105,7 +105,7 @@ PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
 <AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
 <AGENT>.                { MAKE_STR(); return AGENTSTR; };
 
-.                   { fprintf(stderr, "Unexpected character '%c' (%x)\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+.                   { MAKE_STR(); return UNRECOGNIZED; }
 
 %%
 

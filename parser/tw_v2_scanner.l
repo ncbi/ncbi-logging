@@ -74,32 +74,31 @@ MSG         .+
 {SEP}               { MAKE_STR(); return SEP; }
 
 {ID1}               { MAKE_STR(); return ID1; }
-.                   { return UNRECOGNIZED; }
+.                   { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_ID2>{ID2}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID2; }
-<TW_ID2>.           { return UNRECOGNIZED; }
+<TW_ID2>.           { MAKE_STR(); return UNRECOGNIZED; }
 
-  /*TODO: remove the fprintfs, update .y to report (a la ID2) */
 <TW_ID3>{ID3}       { MAKE_STR(); yy_pop_state( yyscanner ); return ID3; }
-<TW_ID3>.           { fprintf(stderr, "Unexpected character '%c' (%x) in ID3\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_ID3>.           { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_TIME>{TIME}     { MAKE_STR(); yy_pop_state( yyscanner ); return TIME; }
-<TW_TIME>.          { fprintf(stderr, "Unexpected character '%c' (%x) in TIME\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_TIME>.          { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_SERVER>{SERVER} { MAKE_STR(); yy_pop_state( yyscanner ); return SERVER; }
-<TW_SERVER>.        { fprintf(stderr, "Unexpected character '%c' (%x) in SERVER\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_SERVER>.        { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_IPADDR>{IPADDR} { MAKE_STR(); yy_pop_state( yyscanner ); return IPADDR; }
-<TW_IPADDR>.        { fprintf(stderr, "Unexpected character '%c' (%x) in IPADDR\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_IPADDR>.        { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_SID>{SID}       { MAKE_STR(); yy_pop_state( yyscanner ); return SID; }
-<TW_SID>.           { fprintf(stderr, "Unexpected character '%c' (%x) in SID\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_SID>.           { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_SERVICE>{SERVICE}   { MAKE_STR(); yy_pop_state( yyscanner ); return SERVICE; }
-<TW_SERVICE>.           { fprintf(stderr, "Unexpected character '%c' (%x) in SERVICE\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_SERVICE>.           { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_EVENT>{EVENT}   { MAKE_STR(); yy_pop_state( yyscanner ); return EVENT; }
-<TW_EVENT>.         { fprintf(stderr, "Unexpected character '%c' (%x) in EVENT\n", yytext[0], yytext[0]); return UNRECOGNIZED; }
+<TW_EVENT>.         { MAKE_STR(); return UNRECOGNIZED; }
 
 <TW_MSG>{MSG}       { MAKE_STR(); yy_pop_state( yyscanner ); return MSG; }
 
@@ -107,7 +106,7 @@ MSG         .+
 
 YY_BUFFER_STATE tw_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
 {
-    YY_BUFFER_STATE ret = tw__scan_bytes( input, size, yyscanner );    
+    YY_BUFFER_STATE ret = tw__scan_bytes( input, size, yyscanner );
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );
