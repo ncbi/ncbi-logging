@@ -128,11 +128,14 @@ TEST_F( TWTestFixture, ErrorRecovery )
                 s_outputs.get_good() );
 }
 
-TEST_F( TWTestFixture, nul_in_source )
-{   //TODO: now ::getline() truncates the input stream on embedded 0;
-    // implement our own if we want to fix that (LOGMON-86)
-    std::string res = try_to_parse_review( "line1 \000 blah\nline1 blah" );
-    ASSERT_EQ( "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 \"}\n", res );
+TEST_F( TWTestFixture, parse_embedded_0 )
+{
+    string s("line1 \000 blah\nline1 blah", 23);
+    std::string res = try_to_parse_review( s );
+    ASSERT_EQ(
+        "{\"_error\":\"invalid ID1\",\"_line_nr\":1,\"_unparsed\":\"line1 \\u0000 blah\"}\n{\"_error\":\"invalid ID1\",\"_line_nr\":2,\"_unparsed\":\"line1 blah\"}\n",
+        res
+        );
 }
 
 TEST_F( TWTestFixture, NoMessage )

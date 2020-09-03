@@ -114,6 +114,16 @@ TEST_F( OPTestFixture, unrecognized_char )
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 \\u0007\"}\n", res );
 }
 
+TEST_F( OPTestFixture, parse_embedded_0 )
+{   //TODO: send the line to Review
+    string s("18.207.254.142 - \x00 - ", 21);
+    std::string res = try_to_parse_ugly( s );
+    ASSERT_EQ(
+        "{\"_line_nr\":1,\"_unparsed\":\"18.207.254.142 - \\u0000 - \",\"ip\":\"18.207.254.142\"}\n",
+        res
+        );
+}
+
 TEST_F( OPTestFixture, parse_ip4 )
 {
     std::string res = try_to_parse_good( "18.207.254.142 - - [01/Jan/2020:02:50:24 -0500] \"sra-download.ncbi.nlm.nih.gov\" \"GET\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5\n" );

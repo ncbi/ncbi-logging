@@ -107,6 +107,16 @@ TEST_F( AWSTestFixture, parse_just_dashes )
         );
 }
 
+TEST_F( AWSTestFixture, parse_embedded_0 )
+{   //TODO: send the line to Review
+    string s("- - - \x00 - - - - - - - - - - - - - - - - - - - - -", 49);
+    std::string res = try_to_parse_ugly( s );
+    ASSERT_EQ(
+        "{\"_line_nr\":1,\"_unparsed\":\"- - - \\u0000 - - - - - - - - - - - - - - - - - - - - -\",\"bucket\":\"\",\"owner\":\"\",\"time\":\"\"}\n",
+        res
+        );
+}
+
 TEST_F( AWSTestFixture, parse_quoted_dashes )
 {
     std::string res = try_to_parse_good( "\"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\"" );

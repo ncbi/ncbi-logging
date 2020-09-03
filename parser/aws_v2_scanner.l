@@ -40,7 +40,8 @@ I64         [-+]?[0-9]+
 SPACE       " "
 
 CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\]^{}]
-QCHARS      ${SPACE}|[.?&=%/\\]|{CHARS}
+CTRLCHARS   [\x00-\x08\x0a-\x1f]
+QCHARS      [.?&=%/\\]|{CHARS}|{CTRLCHARS}
 KEYCHARS    [?&=%\\]|{CHARS}
 
 QSTR        {QCHARS}+

@@ -1425,7 +1425,7 @@ yyreduce:
 
   case 3:
 #line 78 "aws_v2_parser.y" /* yacc.c:1646  */
-    { YYACCEPT; }
+    { YYABORT; }
 #line 1430 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
@@ -1531,100 +1531,94 @@ yyreduce:
 #line 1532 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 150 "aws_v2_parser.y" /* yacc.c:1646  */
-    {  YYABORT; }
-#line 1538 "aws_v2_parser.cpp" /* yacc.c:1646  */
-    break;
-
   case 21:
 #line 153 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::owner, (yyvsp[0].s) ); }
-#line 1544 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1538 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 154 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::bucket, (yyvsp[0].s) ); }
-#line 1550 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1544 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
 #line 155 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::requester, (yyvsp[0].s) ); }
-#line 1556 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1550 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 156 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::request_id, (yyvsp[0].s) ); }
-#line 1562 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1556 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
 #line 157 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::operation, (yyvsp[0].s) ); }
-#line 1568 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1562 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 158 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::error, (yyvsp[0].s) ); }
-#line 1574 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1568 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
 #line 159 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::version_id, (yyvsp[0].s) ); }
-#line 1580 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1574 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
 #line 160 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::sig_ver, (yyvsp[0].s) ); }
-#line 1586 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1580 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
 #line 161 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::cipher_suite, (yyvsp[0].s) ); }
-#line 1592 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1586 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
 #line 162 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::auth_type, (yyvsp[0].s) ); }
-#line 1598 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1592 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
 #line 163 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::host_header, (yyvsp[0].s) ); }
-#line 1604 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1598 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
 #line 166 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
-#line 1610 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1604 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
 #line 167 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . accession = (yyvsp[0].s); }
-#line 1616 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1610 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
 #line 168 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . filename = (yyvsp[0].s); }
-#line 1622 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1616 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
 #line 169 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . extension = (yyvsp[0].s); }
-#line 1628 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1622 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
@@ -1636,12 +1630,12 @@ yyreduce:
                 (yyval.req) . filename  = (yyvsp[0].req) . accession;
             }
         }
-#line 1640 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1634 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
 #line 182 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
+    {
             (yyval.req) . path . n += (yyvsp[0].req) . path . n;
 
             // clear the filename and extension after every slash - to make sure we catch only the last
@@ -1667,86 +1661,86 @@ yyreduce:
                 (yyval.req) . extension = (yyvsp[0].req) . extension;
             }
         }
-#line 1671 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1665 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
 #line 211 "aws_v2_parser.y" /* yacc.c:1646  */
     { (yyval.req) = (yyvsp[0].req); }
-#line 1677 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1671 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
 #line 212 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); }
-#line 1683 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1677 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
 #line 216 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::res_len, (yyvsp[0].s) ); }
-#line 1689 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1683 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
 #line 217 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::res_len, (yyvsp[0].s) ); }
-#line 1695 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1689 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
 #line 221 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::obj_size, (yyvsp[0].s) ); }
-#line 1701 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1695 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
 #line 222 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::obj_size, (yyvsp[0].s) ); }
-#line 1707 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1701 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
 #line 226 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::total_time, (yyvsp[0].s) ); }
-#line 1713 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1707 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
 #line 227 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::total_time, (yyvsp[0].s) ); }
-#line 1719 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1713 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
 #line 231 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::turnaround_time, (yyvsp[0].s) ); }
-#line 1725 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1719 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
 #line 232 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::turnaround_time, (yyvsp[0].s) ); }
-#line 1731 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1725 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
 #line 236 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
+    {
             (yyval.s) = (yyvsp[-1].s);
             MERGE_TSTR( (yyval.s) , (yyvsp[0].s) );
         }
-#line 1740 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1734 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
 #line 244 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
+    {
             (yyval.s) = (yyvsp[-2].s); // keep the space between the 2 parts of the Id
             MERGE_TSTR( (yyval.s) , (yyvsp[-1].s) );
             SET_VALUE( AWSReceiver::host_id, (yyval.s) );
         }
-#line 1750 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1744 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
@@ -1757,7 +1751,7 @@ yyreduce:
             (yyval.s) . n --;
             SET_VALUE( AWSReceiver::host_id, (yyval.s) );
         }
-#line 1761 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1755 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
@@ -1765,7 +1759,7 @@ yyreduce:
     {
             SET_VALUE( AWSReceiver::host_id, (yyvsp[-1].s) );
         }
-#line 1769 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1763 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
@@ -1773,108 +1767,108 @@ yyreduce:
     {
             SET_VALUE( AWSReceiver::host_id, (yyvsp[-1].s) );
         }
-#line 1777 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1771 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
 #line 267 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::tls_version, (yyvsp[0].s) ); }
-#line 1783 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1777 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 54:
 #line 268 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::tls_version, (yyvsp[0].s) ); }
-#line 1789 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1783 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 55:
 #line 272 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::ip, (yyvsp[0].s) ); }
-#line 1795 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1789 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 56:
 #line 273 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::ip, (yyvsp[0].s) ); }
-#line 1801 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1795 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
 #line 274 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::ip, (yyvsp[0].s) ); }
-#line 1807 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1801 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 60:
 #line 298 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
-#line 1813 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1807 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 61:
 #line 299 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1819 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1813 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 62:
 #line 300 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1825 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1819 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 63:
 #line 301 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req).accession_mode = acc_after; }
-#line 1831 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1825 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 64:
 #line 302 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); }
-#line 1837 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1831 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 65:
 #line 304 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            InitRequest( (yyval.req) ); 
-            (yyval.req) . path = (yyvsp[0].s); 
-            (yyval.req) . accession = (yyvsp[0].s); 
-            (yyval.req) . accession_mode = acc_inside; 
+    {
+            InitRequest( (yyval.req) );
+            (yyval.req) . path = (yyvsp[0].s);
+            (yyval.req) . accession = (yyvsp[0].s);
+            (yyval.req) . accession_mode = acc_inside;
         }
-#line 1848 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1842 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 66:
 #line 310 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . filename = (yyvsp[0].s); }
-#line 1854 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1848 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
 #line 311 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) ); (yyval.req) . path = (yyvsp[0].s); (yyval.req) . extension = (yyvsp[0].s); }
-#line 1860 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1854 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 68:
 #line 318 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            (yyval.req) = (yyvsp[0].req); 
-            if ( (yyvsp[0].req) . accession_mode == acc_after )            
+    {
+            (yyval.req) = (yyvsp[0].req);
+            if ( (yyvsp[0].req) . accession_mode == acc_after )
             {   /* a delimiter seen before an accession */
                 (yyval.req) . accession_mode = acc_before;
             }
         }
-#line 1872 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1866 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 69:
 #line 326 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            (yyval.req) = (yyvsp[-1].req); 
+    {
+            (yyval.req) = (yyvsp[-1].req);
             MERGE_TSTR( (yyval.req) . path, (yyvsp[0].req) . path );
             switch ( (yyval.req).accession_mode )
             {
@@ -1901,19 +1895,19 @@ yyreduce:
                 break;
             }
         }
-#line 1905 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1899 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
 #line 357 "aws_v2_parser.y" /* yacc.c:1646  */
     { aws_start_URL( scanner ); }
-#line 1911 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1905 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
 #line 357 "aws_v2_parser.y" /* yacc.c:1646  */
     { (yyval.req) = (yyvsp[0].req); }
-#line 1917 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1911 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 72:
@@ -1923,7 +1917,7 @@ yyreduce:
         (yyval.req).method = (yyvsp[-4].s);
         (yyval.req).vers   = (yyvsp[-1].s);
     }
-#line 1927 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1921 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 73:
@@ -1932,7 +1926,7 @@ yyreduce:
         (yyval.req) = (yyvsp[-2].req);
         (yyval.req).method = (yyvsp[-3].s);
      }
-#line 1936 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1930 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 74:
@@ -1941,133 +1935,133 @@ yyreduce:
         InitRequest( (yyval.req) );
         (yyval.req).method = (yyvsp[-1].s);
     }
-#line 1945 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1939 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 75:
 #line 378 "aws_v2_parser.y" /* yacc.c:1646  */
     { /* SPACE does that in the above branches, here have to pop state explicitly */
-            aws_pop_state( scanner ); 
+            aws_pop_state( scanner );
         }
-#line 1953 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1947 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 76:
 #line 382 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
+    {
             (yyval.req) = (yyvsp[-2].req);
             (yyval.req).method = (yyvsp[-3].s);
         }
-#line 1962 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1956 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 77:
 #line 386 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitRequest( (yyval.req) );}
-#line 1968 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1962 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 78:
 #line 390 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::res_code, (yyvsp[0].s) ); }
-#line 1974 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1968 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 79:
 #line 391 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::res_code, (yyvsp[0].s) ); }
-#line 1980 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1974 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 80:
 #line 395 "aws_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1986 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1980 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 81:
 #line 396 "aws_v2_parser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[-1].s); MERGE_TSTR ( (yyval.s), (yyvsp[0].s) ); }
-#line 1992 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1986 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 82:
 #line 400 "aws_v2_parser.y" /* yacc.c:1646  */
     { aws_start_referer( scanner ); }
-#line 1998 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 1992 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 83:
 #line 402 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            SET_VALUE( AWSReceiver::referer, (yyvsp[-1].s) ); 
+    {
+            SET_VALUE( AWSReceiver::referer, (yyvsp[-1].s) );
             aws_pop_state( scanner ); // out of QUOTED into the global state
         }
-#line 2007 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2001 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 84:
 #line 407 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            SET_VALUE( AWSReceiver::referer, (yyvsp[0].s) ); 
+    {
+            SET_VALUE( AWSReceiver::referer, (yyvsp[0].s) );
         }
-#line 2015 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2009 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 85:
 #line 413 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 2021 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2015 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 86:
 #line 415 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            InitAgent( (yyval.agent) ); 
-            (yyval.agent).original = (yyvsp[0].s); 
+    {
+            InitAgent( (yyval.agent) );
+            (yyval.agent).original = (yyvsp[0].s);
             const char * dot = strchr( (yyvsp[0].s) . p, '.' );
             (yyval.agent) . vdb_tool . p = (yyvsp[0].s) . p;
             (yyval.agent) . vdb_tool . n = dot - (yyvsp[0].s) . p;
             /* skip the leading dot */
-            (yyval.agent) . vdb_release . p = dot + 1; 
-            (yyval.agent) . vdb_release . n = (yyvsp[0].s) . n - ( dot - (yyvsp[0].s) . p ) - 1; 
+            (yyval.agent) . vdb_release . p = dot + 1;
+            (yyval.agent) . vdb_release . n = (yyvsp[0].s) . n - ( dot - (yyvsp[0].s) . p ) - 1;
         }
-#line 2036 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2030 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 87:
 #line 425 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_libc = (yyvsp[0].s); }
-#line 2042 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2036 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 88:
 #line 426 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); (yyval.agent).vdb_phid_compute_env = (yyvsp[0].s); }
-#line 2048 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2042 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 89:
 #line 427 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 2054 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2048 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 90:
 #line 428 "aws_v2_parser.y" /* yacc.c:1646  */
     { InitAgent( (yyval.agent) ); (yyval.agent).original = (yyvsp[0].s); }
-#line 2060 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2054 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 91:
 #line 432 "aws_v2_parser.y" /* yacc.c:1646  */
     { (yyval.agent) = (yyvsp[0].agent); }
-#line 2066 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2060 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
 #line 434 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
+    {
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].agent) . original );
         if ( (yyvsp[0].agent) . vdb_phid_compute_env . n > 0 )
@@ -2097,7 +2091,7 @@ yyreduce:
             (yyval.agent) . vdb_release = (yyvsp[0].agent) . vdb_release;
         }
     }
-#line 2101 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2095 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
@@ -2106,14 +2100,14 @@ yyreduce:
         (yyval.agent) = (yyvsp[-1].agent);
         MERGE_TSTR( (yyval.agent) . original, (yyvsp[0].s) );
     }
-#line 2110 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2104 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 94:
 #line 473 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
+    {
             t_agent temp;
-            InitAgent( temp ); 
+            InitAgent( temp );
             temp . original = (yyvsp[-2].s);
             MERGE_TSTR( temp . original, (yyvsp[-1].agent) . original );
             (yyval.agent) = (yyvsp[-1].agent);
@@ -2121,50 +2115,50 @@ yyreduce:
             (yyval.agent) . vdb_os = (yyvsp[-2].s);
             lib -> setAgent( (yyval.agent) );
         }
-#line 2125 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2119 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 95:
 #line 484 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
+    {
             (yyval.agent) = (yyvsp[-1].agent);
             lib -> setAgent( (yyval.agent) );
         }
-#line 2134 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2128 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 96:
 #line 489 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            InitAgent( (yyval.agent) ); 
+    {
+            InitAgent( (yyval.agent) );
             lib -> setAgent( (yyval.agent) );
         }
-#line 2143 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2137 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 97:
 #line 494 "aws_v2_parser.y" /* yacc.c:1646  */
-    { 
-            InitAgent( (yyval.agent) ); 
+    {
+            InitAgent( (yyval.agent) );
             lib -> setAgent( (yyval.agent) );
         }
-#line 2152 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2146 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 98:
 #line 501 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::time, (yyvsp[0].s) ); }
-#line 2158 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2152 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 99:
 #line 502 "aws_v2_parser.y" /* yacc.c:1646  */
     { SET_VALUE( AWSReceiver::time, (yyvsp[0].s) ); }
-#line 2164 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2158 "aws_v2_parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2168 "aws_v2_parser.cpp" /* yacc.c:1646  */
+#line 2162 "aws_v2_parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

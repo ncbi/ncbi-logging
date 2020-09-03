@@ -56,7 +56,7 @@ using namespace NCBI::Logging;
 
 %token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
 %token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID TIME_FMT RESULTCODE
-%token COLON QUOTE OB CB 
+%token COLON QUOTE OB CB
 %token UNRECOGNIZED
 %token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
 
@@ -67,7 +67,7 @@ using namespace NCBI::Logging;
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
 %type<s> x_amz_id_2
 %type<req> request aws_key aws_quoted_key url_token url_list url key_token
-%type<agent> agent vdb_agent vdb_agent_token 
+%type<agent> agent vdb_agent vdb_agent_token
 
 %start line
 
@@ -75,7 +75,7 @@ using namespace NCBI::Logging;
 
 line
     : log_aws       { YYACCEPT; }
-    | log_aws_err   { YYACCEPT; }
+    | log_aws_err   { YYABORT; }
     ;
 
 log_aws
@@ -94,14 +94,14 @@ log_aws
       aws_obj_size SPACE
       aws_total_time SPACE
       aws_turnaround_time SPACE
-      referer 
-      { aws_start_UserAgent( scanner ); } 
-      SPACE agent 
+      referer
+      { aws_start_UserAgent( scanner ); }
+      SPACE agent
       { aws_pop_state( scanner ); }
       SPACE
       aws_version_id SPACE
-      { aws_start_host_id( scanner ); } 
-      aws_host_id 
+      { aws_start_host_id( scanner ); }
+      aws_host_id
       { aws_pop_state( scanner ); /* the following space is consumed by aws_host_id */ }
       aws_sig SPACE
       aws_cipher SPACE
@@ -147,7 +147,7 @@ string_or_dash
     ;
 
 log_aws_err
-    : aws_owner error       {  YYABORT; }
+    : aws_owner error
     ;
 
 aws_owner      : string_or_dash             { SET_VALUE( AWSReceiver::owner, $1 ); };
@@ -177,9 +177,9 @@ aws_key
             {
                 $$ . filename  = $1 . accession;
             }
-        }    
-    | aws_key key_token    
-        { 
+        }
+    | aws_key key_token
+        {
             $$ . path . n += $2 . path . n;
 
             // clear the filename and extension after every slash - to make sure we catch only the last
@@ -233,15 +233,15 @@ aws_turnaround_time
     ;
 
 x_amz_id_2: X_AMZ_ID_2 SPACE
-        { 
+        {
             $$ = $1;
             MERGE_TSTR( $$ , $2 );
         }
     ;
 
-aws_host_id 
+aws_host_id
     : x_amz_id_2 S3_EXT_REQ_ID SPACE
-        { 
+        {
             $$ = $1; // keep the space between the 2 parts of the Id
             MERGE_TSTR( $$ , $2 );
             SET_VALUE( AWSReceiver::host_id, $$ );
@@ -263,7 +263,7 @@ aws_host_id
         }
     ;
 
-aws_tls_vers 
+aws_tls_vers
     : TLS_VERSION           { SET_VALUE( AWSReceiver::tls_version, $1 ); }
     | dash                  { SET_VALUE( AWSReceiver::tls_version, $1 ); }
     ;
@@ -275,14 +275,14 @@ ip
     ;
 
 method
-    : METHOD  
+    : METHOD
     | dash
     ;
 
- /* 
+ /*
     typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode; (defined in log_lines.hpp)
 
-        for a url_token node, set to 
+        for a url_token node, set to
             'acc_inside' if it is an ACCESSION
             'acc_after'  if it is a delimiter
 
@@ -290,7 +290,7 @@ method
             'acc_before' - no accession has been seen yet
             'acc_inside' - we are between the first accession and the following delimiter,
                             capture the filename and extension tokens
-            'acc_after'  - we are past delimiter following an accession, 
+            'acc_after'  - we are past delimiter following an accession,
                             no further action necessary
  */
 
@@ -300,31 +300,31 @@ url_token
     | AMPERSAND     { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
     | QMARK         { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
     | PERCENT       { InitRequest( $$ ); $$ . path = $1; }
-    | ACCESSION     
-        { 
-            InitRequest( $$ ); 
-            $$ . path = $1; 
-            $$ . accession = $1; 
-            $$ . accession_mode = acc_inside; 
+    | ACCESSION
+        {
+            InitRequest( $$ );
+            $$ . path = $1;
+            $$ . accession = $1;
+            $$ . accession_mode = acc_inside;
         }
     | PATHSTR       { InitRequest( $$ ); $$ . path = $1; $$ . filename = $1; }
     | PATHEXT       { InitRequest( $$ ); $$ . path = $1; $$ . extension = $1; }
     ;
 
- /* This is a collection of url tokens and accessions. 
+ /* This is a collection of url tokens and accessions.
     We are looking for the first accession and filename/extension that follow it.*/
 url_list
-    :  url_token               
-        { 
-            $$ = $1; 
-            if ( $1 . accession_mode == acc_after )            
+    :  url_token
+        {
+            $$ = $1;
+            if ( $1 . accession_mode == acc_after )
             {   /* a delimiter seen before an accession */
                 $$ . accession_mode = acc_before;
             }
         }
     |  url_list url_token
-        { 
-            $$ = $1; 
+        {
+            $$ = $1;
             MERGE_TSTR( $$ . path, $2 . path );
             switch ( $$.accession_mode )
             {
@@ -369,17 +369,17 @@ request
         $$ = $3;
         $$.method = $2;
      }
-    | QUOTE method QUOTE 
+    | QUOTE method QUOTE
     {
         InitRequest( $$ );
         $$.method = $2;
     }
-    | QUOTE method url 
+    | QUOTE method url
         { /* SPACE does that in the above branches, here have to pop state explicitly */
-            aws_pop_state( scanner ); 
-        } 
+            aws_pop_state( scanner );
+        }
       QUOTE
-        { 
+        {
             $$ = $3;
             $$.method = $2;
         }
@@ -397,41 +397,41 @@ qstr_list
     ;
 
 referer
-    : QUOTE { aws_start_referer( scanner ); } 
-        qstr_list QUOTE                 
-        { 
-            SET_VALUE( AWSReceiver::referer, $3 ); 
+    : QUOTE { aws_start_referer( scanner ); }
+        qstr_list QUOTE
+        {
+            SET_VALUE( AWSReceiver::referer, $3 );
             aws_pop_state( scanner ); // out of QUOTED into the global state
         }
-    | string_or_dash                        
-        { 
-            SET_VALUE( AWSReceiver::referer, $1 ); 
+    | string_or_dash
+        {
+            SET_VALUE( AWSReceiver::referer, $1 );
         }
     ;
 
 vdb_agent_token
-    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; } 
+    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; }
     | SRATOOLVERS
-        { 
-            InitAgent( $$ ); 
-            $$.original = $1; 
+        {
+            InitAgent( $$ );
+            $$.original = $1;
             const char * dot = strchr( $1 . p, '.' );
             $$ . vdb_tool . p = $1 . p;
             $$ . vdb_tool . n = dot - $1 . p;
             /* skip the leading dot */
-            $$ . vdb_release . p = dot + 1; 
-            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1; 
-        } 
+            $$ . vdb_release . p = dot + 1;
+            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1;
+        }
     | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; }
     | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
-    | SPACE         { InitAgent( $$ ); $$.original = $1; } 
+    | SPACE         { InitAgent( $$ ); $$.original = $1; }
     | AGENTSTR      { InitAgent( $$ ); $$.original = $1; }
     ;
 
 vdb_agent
     : vdb_agent_token           { $$ = $1; }
-    | vdb_agent vdb_agent_token 
-    { 
+    | vdb_agent vdb_agent_token
+    {
         $$ = $1;
         MERGE_TSTR( $$ . original, $2 . original );
         if ( $2 . vdb_phid_compute_env . n > 0 )
@@ -465,14 +465,14 @@ vdb_agent
     {
         $$ = $1;
         MERGE_TSTR( $$ . original, $2 );
-    } 
+    }
     ;
 
 agent
-    : QUOTE OS vdb_agent QUOTE       
-        { 
+    : QUOTE OS vdb_agent QUOTE
+        {
             t_agent temp;
-            InitAgent( temp ); 
+            InitAgent( temp );
             temp . original = $2;
             MERGE_TSTR( temp . original, $3 . original );
             $$ = $3;
@@ -481,18 +481,18 @@ agent
             lib -> setAgent( $$ );
         }
     | QUOTE vdb_agent QUOTE
-        { 
+        {
             $$ = $2;
             lib -> setAgent( $$ );
         }
-    | QUOTE QUOTE                                           
-        { 
-            InitAgent( $$ ); 
+    | QUOTE QUOTE
+        {
+            InitAgent( $$ );
             lib -> setAgent( $$ );
         }
-    | dash 
-        { 
-            InitAgent( $$ ); 
+    | dash
+        {
+            InitAgent( $$ );
             lib -> setAgent( $$ );
         }
     ;
