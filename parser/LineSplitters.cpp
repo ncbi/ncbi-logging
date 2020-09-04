@@ -52,6 +52,8 @@ CLineSplitter::~CLineSplitter()
 
 bool CLineSplitter::getLine( void )
 {
+    if ( nullptr == m_f )
+        return false;
     ssize_t read = getline( & m_line, & m_allocated, m_f );
     if ( read == -1 )
     {   // error or EOF
@@ -77,4 +79,15 @@ const char * CLineSplitter::data( void ) const
 size_t CLineSplitter::size( void ) const
 {
     return m_size;
+}
+
+BufLineSplitter::BufLineSplitter( const char * buf, size_t size  )
+:   m_f( fmemopen( ( void * )buf, size, "r" ) ), m_splitter( m_f )
+{
+}
+
+BufLineSplitter::~BufLineSplitter()
+{
+    if ( nullptr != m_f )
+        fclose( m_f );
 }

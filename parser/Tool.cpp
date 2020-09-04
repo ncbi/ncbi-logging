@@ -3,6 +3,7 @@
 #include <cmdline.hpp>
 
 #include "CatWriters.hpp"
+#include "LineSplitters.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
@@ -45,21 +46,20 @@ Tool::run ( int argc, char * argv [] )
         
         if ( !help && !vers )
         {
-            FileCatWriter outputs( outputBaseName . toSTLString () ); 
+            FileCatWriter outputs( outputBaseName . toSTLString () );
+            CLineSplitter input( stdin );
             m_pbFact.setFast( fast );
+            std::unique_ptr< ParserInterface > p;
+
             if ( numThreads <= 1 )
             {
-                SingleThreadedParser p( cin, outputs, m_pbFact );
-                p . parse(); 
+                p = std::make_unique< SingleThreadedParser >( input, outputs, m_pbFact );
             }
             else
             {
-                //TODO: make queueSize a multiple of numThreads
-                MultiThreadedParser p( stdin, outputs, 100000, numThreads, m_pbFact );
-                p . parse();
-                // std::cout << "num-feed-sleeps = " << p . num_feed_sleeps << endl;
-                // std::cout << "thread-sleeps = " << MultiThreadedParser :: thread_sleeps . load() << endl;        
+                p = std::make_unique< MultiThreadedParser >( input, outputs, 100000, numThreads, m_pbFact );
             }
+            p -> parse_all_lines();
 
             std::ofstream report( outputBaseName . toSTLString () + ".stats" + FileCatWriter::extension );
             JsonLibFormatter f;

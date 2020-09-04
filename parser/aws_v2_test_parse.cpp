@@ -569,10 +569,11 @@ TEST_F( AWSTestFixture, MultiThreading )
     );
 
     FILE * ss = fmemopen( (void*) input.c_str(), input.size(), "r");
+    CLineSplitter splitter( ss );
     AWSParseBlockFactory pbFact;
     //pbFact.setFast(false);
-    MultiThreadedParser p( ss, s_outputs, 100, 2, pbFact );
-    p . parse();
+    MultiThreadedParser p( splitter, s_outputs, 100, 2, pbFact );
+    p . parse_all_lines();
 
     ASSERT_LT( 0, s_outputs.get_good().size() );
     ASSERT_EQ( 0, s_outputs.get_bad().size() );

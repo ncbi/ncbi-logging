@@ -11,6 +11,16 @@
 using namespace NCBI::Logging;
 using namespace std;
 
+ParserInterface::~ParserInterface()
+{
+}
+
+ParserInterface::ParserInterface( LineSplitterInterface & input,
+        CatWriterInterface & outputs,
+        ParseBlockFactoryInterface & pbFact )
+        : m_input( input ), m_outputs( outputs ), m_pbFact( pbFact )
+        {}
+
 ReceiverInterface::ReceiverInterface( unique_ptr<FormatterInterface> & p_fmt )
 : m_fmt ( p_fmt.release() ), m_cat ( cat_unknown )
 {
@@ -143,39 +153,31 @@ ParseBlockFactoryInterface :: ~ParseBlockFactoryInterface()
 {
 }
 
-SingleThreadedParser::SingleThreadedParser( std::istream & input,
+SingleThreadedParser::SingleThreadedParser( LineSplitterInterface & input,
         CatWriterInterface & outputs,
         ParseBlockFactoryInterface & pbFact )
-:   m_input ( input ),
-    m_outputs ( outputs ),
-    m_pb ( pbFact.MakeParseBlock() ),
-    m_debug ( false )
-{
-}
-
-SingleThreadedParser::~SingleThreadedParser()
+: ParserInterface( input, outputs, pbFact ), m_debug ( false )
 {
 }
 
 void
-SingleThreadedParser::parse()
+SingleThreadedParser::parse_all_lines()
 {
-    auto & receiver = m_pb -> GetReceiver();
+    auto pb = m_pbFact . MakeParseBlock();
+    auto & receiver = pb -> GetReceiver();
     FormatterInterface & fmt = receiver . GetFormatter();
 
-    m_pb -> SetDebug( m_debug );
+    pb -> SetDebug( m_debug );
 
     unsigned long int line_nr = 0;
 
-    StdLineSplitter splitter( m_input );
-    while( splitter.getLine() )
+    while( m_input.getLine() )
     {   // TODO: the body of the loop is almost identical to a block in AWSMultiThreadedParser::parser()
-
         line_nr++;
 
         receiver . SetCategory( ReceiverInterface::cat_unknown );
 
-        if ( ! m_pb -> Parse( splitter.data(), splitter.size() ) )
+        if ( ! pb -> parse_one_line( m_input.data(), m_input.size() ) )
         {
             receiver . SetCategory( ReceiverInterface::cat_ugly );
         }
@@ -183,30 +185,24 @@ SingleThreadedParser::parse()
         if ( receiver . GetCategory() != ReceiverInterface::cat_good )
         {
             fmt.addNameValue("_line_nr", line_nr);
-            receiver.setMember( "_unparsed", { splitter.data(), splitter.size(), false } );
+            receiver.setMember( "_unparsed", { m_input.data(), m_input.size(), false } );
         }
 
         m_outputs. write ( receiver . GetCategory(), fmt . format () );
     }
 }
 
-std::atomic< size_t > MultiThreadedParser :: thread_sleeps;
-
 MultiThreadedParser :: MultiThreadedParser(
-    FILE * input,
+    LineSplitterInterface & input,
     CatWriterInterface & outputs,
     size_t queueLimit,
     size_t threadNum,
     ParseBlockFactoryInterface & pbFact )
-:   m_input ( input ),
-    m_outputs ( outputs ),
-    m_queueLimit ( queueLimit ),
-    m_threadNum ( threadNum ),
-    m_pbFact ( pbFact )
+: ParserInterface( input, outputs, pbFact ), m_queueLimit ( queueLimit ), m_threadNum ( threadNum )
 {
-    thread_sleeps . store( 0 );
 }
 
+// worker-function running multiple times in parallel in the threads...
 void parser( ParseBlockFactoryInterface * factory,
              OneWriterManyReadersQueue * in_q,
              OutputQueue * out_q )
@@ -227,14 +223,13 @@ void parser( ParseBlockFactoryInterface * factory,
             {
                 const chrono::microseconds WorkerReadWait ( 500 );
                 std::this_thread::sleep_for( WorkerReadWait );
-                MultiThreadedParser :: thread_sleeps++;
             }
         }
         else
         {   // TODO: this block replicates much of AWSParser::parse()
             receiver . SetCategory( ReceiverInterface::cat_unknown );
 
-            if ( ! pb -> Parse( line -> c_str(), line -> size() ) )
+            if ( ! pb -> parse_one_line( line -> c_str(), line -> size() ) )
             {
                 receiver . SetCategory( ReceiverInterface::cat_ugly );
             }
@@ -283,7 +278,7 @@ void writer( OutputQueue * q,
     }
 }
 
-void MultiThreadedParser::parse( )
+void MultiThreadedParser::parse_all_lines( )
 {
     OneWriterManyReadersQueue Q ( m_queueLimit );
     OutputQueue Q_out ( m_queueLimit );
@@ -298,14 +293,12 @@ void MultiThreadedParser::parse( )
 
     try
     {
-        CLineSplitter splitter( m_input );
-        while( splitter.getLine() )
+        while( m_input.getLine() )
         {
-            OneWriterManyReadersQueue::value_type s = make_shared< string >( splitter.data(), splitter.size() );
+            OneWriterManyReadersQueue::value_type s = make_shared< string >( m_input.data(), m_input.size() );
             while ( ! Q.enqueue( s ) )
             {
                 this_thread::sleep_for( chrono::microseconds( 100 ) );
-                num_feed_sleeps++;
             }
 
         }

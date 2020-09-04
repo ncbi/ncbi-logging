@@ -5,6 +5,7 @@
 #include <sstream>
 #include "CatWriters.hpp"
 #include "ReceiverInterface.hpp"
+#include "LineSplitters.hpp"
 
 namespace NCBI
 {
@@ -41,10 +42,11 @@ namespace NCBI
                     std::stringstream ss;
                     ss << line;
                     ParseBlockFactory pbFact;
+                    StdLineSplitter input( ss );
                     //pbFact.setFast(false);
-                    SingleThreadedParser p( ss, s_outputs, pbFact );
+                    SingleThreadedParser p( input, s_outputs, pbFact );
                     p . setDebug( debug );
-                    p . parse(); // does the parsing and generates the report
+                    p . parse_all_lines(); // does the parsing and generates the report
                 }
 
                 std::string try_to_parse_good( const std::string &line, bool debug = false )

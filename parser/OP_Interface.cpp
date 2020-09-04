@@ -45,7 +45,7 @@ namespace NCBI
             OPParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~OPParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
-            virtual bool Parse( const char * line, size_t line_size );
+            virtual bool parse_one_line( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
@@ -86,7 +86,7 @@ OPParseBlock::SetDebug( bool onOff )
 }
 
 bool
-OPParseBlock::Parse( const char * line, size_t line_size )
+OPParseBlock::parse_one_line( const char * line, size_t line_size )
 {
     YY_BUFFER_STATE bs = op_scan_bytes( line, line_size, m_sc );
     int ret = op_parse( m_sc, & m_receiver );

@@ -3,7 +3,6 @@
 #include <string>
 #include <cstring>
 #include <memory>
-#include <atomic>
 
 #include "types.h"
 #include "Formatters.hpp"
@@ -14,6 +13,7 @@ namespace NCBI
     {
         class ReceiverInterface;
         class CatWriterInterface;
+        class LineSplitterInterface;
 
         typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
 
@@ -93,7 +93,7 @@ namespace NCBI
         public:
             virtual ~ParseBlockInterface() = 0;
             virtual ReceiverInterface & GetReceiver() = 0;
-            virtual bool Parse( const char * line, size_t line_size ) = 0;
+            virtual bool parse_one_line( const char * line, size_t line_size ) = 0;
             virtual void SetDebug( bool onOff ) = 0;
         };
 
@@ -110,46 +110,52 @@ namespace NCBI
             bool m_fast;
         };
 
-        class SingleThreadedParser
+        class ParserInterface
+        {
+        public :
+            virtual ~ParserInterface();
+            virtual void parse_all_lines() = 0;
+
+        protected :
+            ParserInterface( LineSplitterInterface & input,
+                    CatWriterInterface & outputs,
+                    ParseBlockFactoryInterface & pbFact );
+ 
+            LineSplitterInterface & m_input;
+            CatWriterInterface & m_outputs;
+            ParseBlockFactoryInterface & m_pbFact;
+        };
+
+        class SingleThreadedParser : public ParserInterface
         {
         public:
-            SingleThreadedParser( std::istream & input,
+            SingleThreadedParser( LineSplitterInterface & input,
                     CatWriterInterface & outputs,
                     ParseBlockFactoryInterface & pbFact );
 
-            ~SingleThreadedParser();
-
-            void parse();
+            virtual void parse_all_lines();
             void setDebug ( bool onOff ) { m_debug = onOff; }
 
         protected:
-            std::istream & m_input;
-            CatWriterInterface & m_outputs;
-            std::unique_ptr<ParseBlockInterface> m_pb;
             bool m_debug;
         };
 
-        class MultiThreadedParser
+        class MultiThreadedParser : public ParserInterface
         {
         public:
             MultiThreadedParser(
-                FILE * input,  // need for speed
+                LineSplitterInterface & input,
                 CatWriterInterface & outputs,
                 size_t queueLimit,
                 size_t threadNum,
                 ParseBlockFactoryInterface & pbFact
             );
 
-            void parse();
-            size_t num_feed_sleeps = 0;
-            static std::atomic< size_t > thread_sleeps;
+            virtual void parse_all_lines();
 
         private:
-            FILE * m_input;
-            CatWriterInterface & m_outputs;
             size_t m_queueLimit;
             size_t m_threadNum;
-            ParseBlockFactoryInterface & m_pbFact;
         };
 
     }

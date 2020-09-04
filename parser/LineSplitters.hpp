@@ -49,6 +49,21 @@ namespace NCBI
                 size_t m_allocated;
         };
 
+        class BufLineSplitter : public LineSplitterInterface
+        {
+            public :
+                BufLineSplitter( const char * buf, size_t size );
+                virtual ~BufLineSplitter();
+
+                virtual bool getLine( void ) { return m_splitter . getLine(); }
+                virtual const char * data( void ) const { return m_splitter . data(); }
+                virtual size_t size( void ) const { return m_splitter . size(); }
+
+            private :
+                FILE * m_f;
+                CLineSplitter m_splitter;
+        };
+
     }
 }
 
