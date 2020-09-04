@@ -44,7 +44,7 @@ namespace NCBI
                     ParseBlockFactory pbFact;
                     StdLineSplitter input( ss );
                     //pbFact.setFast(false);
-                    SingleThreadedParser p( input, s_outputs, pbFact );
+                    SingleThreadedDriver p( input, s_outputs, pbFact );
                     p . setDebug( debug );
                     p . parse_all_lines(); // does the parsing and generates the report
                 }

@@ -14,6 +14,7 @@ namespace NCBI
         class ReceiverInterface;
         class CatWriterInterface;
         class LineSplitterInterface;
+        class ParserDriverInterface;
 
         typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
 
@@ -93,43 +94,49 @@ namespace NCBI
         public:
             virtual ~ParseBlockInterface() = 0;
             virtual ReceiverInterface & GetReceiver() = 0;
-            virtual bool parse_one_line( const char * line, size_t line_size ) = 0;
+            virtual bool format_specific_parse( const char * line, size_t line_size ) = 0;
             virtual void SetDebug( bool onOff ) = 0;
+
+            void receive_one_line( const char * line, size_t line_size, size_t line_nr );
         };
 
         class ParseBlockFactoryInterface
         {
         public:
-            ParseBlockFactoryInterface() : m_fast( true ) {}
+            ParseBlockFactoryInterface();
             virtual ~ParseBlockFactoryInterface() = 0;
 
             void setFast( bool onOff ) { m_fast = onOff; }
+            void setNumThreads( size_t num_threads ) { m_nthreads = num_threads; }
 
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const = 0;
+            std::unique_ptr<ParserDriverInterface> MakeParserDriver(
+                LineSplitterInterface & input, CatWriterInterface & output );
 
             bool m_fast;
+            size_t m_nthreads;
         };
 
-        class ParserInterface
+        class ParserDriverInterface
         {
         public :
-            virtual ~ParserInterface();
+            virtual ~ParserDriverInterface();
             virtual void parse_all_lines() = 0;
 
         protected :
-            ParserInterface( LineSplitterInterface & input,
+            ParserDriverInterface( LineSplitterInterface & input,
                     CatWriterInterface & outputs,
                     ParseBlockFactoryInterface & pbFact );
- 
+
             LineSplitterInterface & m_input;
             CatWriterInterface & m_outputs;
             ParseBlockFactoryInterface & m_pbFact;
         };
 
-        class SingleThreadedParser : public ParserInterface
+        class SingleThreadedDriver : public ParserDriverInterface
         {
         public:
-            SingleThreadedParser( LineSplitterInterface & input,
+            SingleThreadedDriver( LineSplitterInterface & input,
                     CatWriterInterface & outputs,
                     ParseBlockFactoryInterface & pbFact );
 
@@ -140,10 +147,10 @@ namespace NCBI
             bool m_debug;
         };
 
-        class MultiThreadedParser : public ParserInterface
+        class MultiThreadedDriver : public ParserDriverInterface
         {
         public:
-            MultiThreadedParser(
+            MultiThreadedDriver(
                 LineSplitterInterface & input,
                 CatWriterInterface & outputs,
                 size_t queueLimit,

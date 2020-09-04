@@ -45,7 +45,7 @@ namespace NCBI
             TWParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~TWParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
-            virtual bool parse_one_line( const char * line, size_t line_size );
+            virtual bool format_specific_parse( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
@@ -86,7 +86,7 @@ TWParseBlock::SetDebug( bool onOff )
 }
 
 bool
-TWParseBlock::parse_one_line( const char * line, size_t line_size )
+TWParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
     YY_BUFFER_STATE bs = tw_scan_bytes( line, line_size, m_sc );
     int ret = tw_parse( m_sc, & m_receiver );

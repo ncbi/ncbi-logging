@@ -11,11 +11,11 @@
 using namespace NCBI::Logging;
 using namespace std;
 
-ParserInterface::~ParserInterface()
+ParserDriverInterface::~ParserDriverInterface()
 {
 }
 
-ParserInterface::ParserInterface( LineSplitterInterface & input,
+ParserDriverInterface::ParserDriverInterface( LineSplitterInterface & input,
         CatWriterInterface & outputs,
         ParseBlockFactoryInterface & pbFact )
         : m_input( input ), m_outputs( outputs ), m_pbFact( pbFact )
@@ -149,56 +149,77 @@ ParseBlockInterface :: ~ ParseBlockInterface ()
 {
 }
 
+void
+ParseBlockInterface :: receive_one_line( const char * line, size_t line_size, size_t line_nr )
+{
+    auto & receiver = GetReceiver();
+    receiver . SetCategory( ReceiverInterface::cat_unknown );
+
+    if ( ! format_specific_parse( line, line_size ) )
+    {
+        receiver . SetCategory( ReceiverInterface::cat_ugly );
+    }
+
+    if ( receiver . GetCategory() != ReceiverInterface::cat_good )
+    {
+        receiver.GetFormatter().addNameValue("_line_nr", line_nr);
+        receiver.setMember( "_unparsed", { line, line_size, false } );
+    }
+}
+
+ParseBlockFactoryInterface :: ParseBlockFactoryInterface()
+: m_fast( true ), m_nthreads( 1 )
+{
+}
+
 ParseBlockFactoryInterface :: ~ParseBlockFactoryInterface()
 {
 }
 
-SingleThreadedParser::SingleThreadedParser( LineSplitterInterface & input,
+std::unique_ptr<ParserDriverInterface>
+ParseBlockFactoryInterface :: MakeParserDriver(LineSplitterInterface & input, CatWriterInterface & output)
+{
+    if ( m_nthreads <= 1 )
+    {
+        return make_unique< SingleThreadedDriver >( input, output, *this );
+    }
+    else
+    {
+        return make_unique< MultiThreadedDriver >( input, output, 100000, m_nthreads, *this );
+    }
+}
+
+SingleThreadedDriver::SingleThreadedDriver( LineSplitterInterface & input,
         CatWriterInterface & outputs,
         ParseBlockFactoryInterface & pbFact )
-: ParserInterface( input, outputs, pbFact ), m_debug ( false )
+: ParserDriverInterface( input, outputs, pbFact ), m_debug ( false )
 {
 }
 
 void
-SingleThreadedParser::parse_all_lines()
+SingleThreadedDriver::parse_all_lines()
 {
     auto pb = m_pbFact . MakeParseBlock();
-    auto & receiver = pb -> GetReceiver();
-    FormatterInterface & fmt = receiver . GetFormatter();
-
     pb -> SetDebug( m_debug );
 
+    auto & receiver = pb -> GetReceiver();
+    FormatterInterface & fmt = receiver . GetFormatter();
     unsigned long int line_nr = 0;
-
     while( m_input.getLine() )
-    {   // TODO: the body of the loop is almost identical to a block in AWSMultiThreadedParser::parser()
+    {
         line_nr++;
-
-        receiver . SetCategory( ReceiverInterface::cat_unknown );
-
-        if ( ! pb -> parse_one_line( m_input.data(), m_input.size() ) )
-        {
-            receiver . SetCategory( ReceiverInterface::cat_ugly );
-        }
-
-        if ( receiver . GetCategory() != ReceiverInterface::cat_good )
-        {
-            fmt.addNameValue("_line_nr", line_nr);
-            receiver.setMember( "_unparsed", { m_input.data(), m_input.size(), false } );
-        }
-
+        pb -> receive_one_line ( m_input.data(), m_input.size(), line_nr );
         m_outputs. write ( receiver . GetCategory(), fmt . format () );
     }
 }
 
-MultiThreadedParser :: MultiThreadedParser(
+MultiThreadedDriver :: MultiThreadedDriver(
     LineSplitterInterface & input,
     CatWriterInterface & outputs,
     size_t queueLimit,
     size_t threadNum,
     ParseBlockFactoryInterface & pbFact )
-: ParserInterface( input, outputs, pbFact ), m_queueLimit ( queueLimit ), m_threadNum ( threadNum )
+: ParserDriverInterface( input, outputs, pbFact ), m_queueLimit ( queueLimit ), m_threadNum ( threadNum )
 {
 }
 
@@ -226,19 +247,8 @@ void parser( ParseBlockFactoryInterface * factory,
             }
         }
         else
-        {   // TODO: this block replicates much of AWSParser::parse()
-            receiver . SetCategory( ReceiverInterface::cat_unknown );
-
-            if ( ! pb -> parse_one_line( line -> c_str(), line -> size() ) )
-            {
-                receiver . SetCategory( ReceiverInterface::cat_ugly );
-            }
-
-            if ( receiver . GetCategory() != ReceiverInterface::cat_good )
-            {
-                fmt . addNameValue( "_line_nr", line_nr );
-                receiver . setMember( "_unparsed", { line -> c_str(), line -> size(), false } );
-            }
+        {
+            pb -> receive_one_line ( line -> c_str(), line -> size(), line_nr );
 
             ReceiverInterface::Category cat = receiver . GetCategory();
             //TODO: experiment with unique_ptr and/or naked pointers (also see Queues.hpp)
@@ -278,7 +288,7 @@ void writer( OutputQueue * q,
     }
 }
 
-void MultiThreadedParser::parse_all_lines( )
+void MultiThreadedDriver::parse_all_lines( )
 {
     OneWriterManyReadersQueue Q ( m_queueLimit );
     OutputQueue Q_out ( m_queueLimit );

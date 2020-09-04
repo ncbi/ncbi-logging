@@ -15,7 +15,7 @@ Tool::Tool( const string & version, ParseBlockFactoryInterface & pbFact )
 {
 }
 
-int 
+int
 Tool::run ( int argc, char * argv [] )
 {
     bool help = false;
@@ -43,27 +43,18 @@ Tool::run ( int argc, char * argv [] )
 
         if ( vers )
             cout << "version: " << m_version << endl;
-        
+
         if ( !help && !vers )
         {
-            FileCatWriter outputs( outputBaseName . toSTLString () );
             CLineSplitter input( stdin );
+            FileCatWriter outputs( outputBaseName . toSTLString () );
             m_pbFact.setFast( fast );
-            std::unique_ptr< ParserInterface > p;
-
-            if ( numThreads <= 1 )
-            {
-                p = std::make_unique< SingleThreadedParser >( input, outputs, m_pbFact );
-            }
-            else
-            {
-                p = std::make_unique< MultiThreadedParser >( input, outputs, 100000, numThreads, m_pbFact );
-            }
-            p -> parse_all_lines();
+            m_pbFact.setNumThreads( numThreads );
+            m_pbFact.MakeParserDriver( input, outputs ) -> parse_all_lines();
 
             std::ofstream report( outputBaseName . toSTLString () + ".stats" + FileCatWriter::extension );
             JsonLibFormatter f;
-            report << outputs.getCounter().report( f ) << endl; 
+            report << outputs.getCounter().report( f ) << endl;
         }
 
         return 0;

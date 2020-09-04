@@ -55,7 +55,7 @@ namespace NCBI
             AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~AWSParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
-            virtual bool parse_one_line( const char * line, size_t line_size );
+            virtual bool format_specific_parse( const char * line, size_t line_size );
             virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
@@ -96,7 +96,7 @@ AWSParseBlock::SetDebug( bool onOff )
 }
 
 bool
-AWSParseBlock::parse_one_line( const char * line, size_t line_size )
+AWSParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
     YY_BUFFER_STATE bs = aws_scan_bytes( line, line_size, m_sc );
     int ret = aws_parse( m_sc, & m_receiver );

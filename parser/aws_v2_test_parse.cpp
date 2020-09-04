@@ -572,7 +572,7 @@ TEST_F( AWSTestFixture, MultiThreading )
     CLineSplitter splitter( ss );
     AWSParseBlockFactory pbFact;
     //pbFact.setFast(false);
-    MultiThreadedParser p( splitter, s_outputs, 100, 2, pbFact );
+    MultiThreadedDriver p( splitter, s_outputs, 100, 2, pbFact );
     p . parse_all_lines();
 
     ASSERT_LT( 0, s_outputs.get_good().size() );
