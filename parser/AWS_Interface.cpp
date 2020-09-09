@@ -38,6 +38,7 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
     CASE( auth_type )
     CASE( host_header )
     CASE( tls_version )
+    CASE( _extra )
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE

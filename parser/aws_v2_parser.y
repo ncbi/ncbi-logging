@@ -41,6 +41,7 @@ extern void aws_start_time( void * yyscanner );
 extern void aws_start_ipaddr( void * yyscanner );
 extern void aws_start_rescode( void * yyscanner );
 extern void aws_start_referer( void * yyscanner );
+extern void aws_start_rest_of( void * yyscanner );
 
 extern void aws_pop_state( void * yyscanner );
 
@@ -108,6 +109,7 @@ log_aws
       aws_auth SPACE
       aws_host_hdr SPACE
       { aws_start_TLS_vers( scanner ); } aws_tls_vers { aws_pop_state( scanner ); }
+      rest_of_line
     {
         // numbers may be shifted!!!!
 
@@ -500,6 +502,11 @@ agent
 time
     : TIME_FMT              { SET_VALUE( AWSReceiver::time, $1 ); }
     | dash                  { SET_VALUE( AWSReceiver::time, $1 ); }
+    ;
+
+rest_of_line
+    : SPACE { aws_start_rest_of( scanner ); } STR { SET_VALUE( AWSReceiver::_extra, $3 ); }
+    | %empty
     ;
 
 %%

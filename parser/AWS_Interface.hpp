@@ -11,10 +11,10 @@ namespace NCBI
         struct AWSReceiver : public ReceiverInterface
         {
             using ReceiverInterface::set;
-            
+
             AWSReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
-            typedef enum { 
+            typedef enum {
                 owner = LastMemberId+1,
                 bucket,
                 time,
@@ -35,7 +35,8 @@ namespace NCBI
                 auth_type,
                 host_header,
                 tls_version,
-                AWS_LastMemberId = tls_version
+                _extra,
+                AWS_LastMemberId = _extra
             } AWS_Members; // all are t_str values
             virtual void set( AWS_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
 

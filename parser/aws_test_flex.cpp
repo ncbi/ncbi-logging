@@ -99,7 +99,7 @@ TEST_F ( AWS_TestFlexFixture, QuotedString )
     #undef str
 }
 TEST_F ( AWS_TestFlexFixture, QuotedNonAscii )
-{   // TODO properly address UTF-8 codepoints, 
+{   // TODO properly address UTF-8 codepoints,
     #define str "и"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( UNRECOGNIZED, NextTokenType() );
@@ -110,7 +110,7 @@ TEST_F ( AWS_TestFlexFixture, QuotedNonAscii )
 TEST_F ( AWS_TestFlexFixture, QuotedEscapedQuote )
 {   // skip non-ascii characters
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
-    ASSERT_EQ( QSTR, NextTokenType() ); 
+    ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_TRUE ( token . s . escaped );
     ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
@@ -142,14 +142,14 @@ TEST_F ( AWS_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1
 
 TEST_F ( AWS_TestFlexFixture, Path_State )
 {
-    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) ); 
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) );
     ASSERT_EQ( "a", TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, Path_StateReturn )
 {
-    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a b" ) ); 
-    ASSERT_EQ( "a", TokenValue() ); 
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a b" ) );
+    ASSERT_EQ( "a", TokenValue() );
     // " " sends us back to the default state
     ASSERT_EQ( SPACE, NextTokenType() );
     // now should be back in the default state
@@ -159,9 +159,9 @@ TEST_F ( AWS_TestFlexFixture, Path_StateReturn )
 TEST_F ( AWS_TestFlexFixture, Path_Accesssion )
 {
     const char * input = "/SRR9154112%2F%2A.fastq";
-    ASSERT_EQ( SLASH, StartScanInURL_State( input ) ); 
+    ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
     ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType( ) ); 
+    ASSERT_EQ( SLASH, NextTokenType( ) );
     ASSERT_EQ( PERCENT, NextTokenType() ); ASSERT_EQ( "%", TokenValue() );
     ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "2A", TokenValue() );
     ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq", TokenValue() );
@@ -174,7 +174,7 @@ TEST_F ( AWS_TestFlexFixture, Agent )
     aws__scan_string( input, sc );
     //aws_set_debug ( 1, sc );
     aws_start_UserAgent( sc );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
     ASSERT_EQ( OS, NextTokenType() ); ASSERT_EQ( "linux64", TokenValue() );
     ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
     ASSERT_EQ( SRA_TOOLKIT, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
@@ -188,7 +188,7 @@ TEST_F ( AWS_TestFlexFixture, Agent )
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ",", TokenValue() );
     ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "libc=2.17", TokenValue() );
     ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ")", TokenValue() );
-    ASSERT_EQ( QUOTE, NextTokenType() ); 
+    ASSERT_EQ( QUOTE, NextTokenType() );
 }
 
 TEST_F ( AWS_TestFlexFixture, TLS_Version )
@@ -198,13 +198,13 @@ TEST_F ( AWS_TestFlexFixture, TLS_Version )
     aws__scan_string( input, sc );
     //aws_set_debug ( 1, sc );
     aws_start_TLS_vers( sc );
-    ASSERT_EQ( TLS_VERSION, NextTokenType() ); 
+    ASSERT_EQ( TLS_VERSION, NextTokenType() );
     ASSERT_EQ( input, TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, Host_ID )
 {
-    const char * input = 
+    const char * input =
 "AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=";
 
     aws__scan_string( input, sc );

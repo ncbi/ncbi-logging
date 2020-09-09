@@ -278,6 +278,18 @@ TEST_F ( AWS_TestFlexFixture, KEYSTR_KEYEXT )
     ASSERT_EQ( ".A&B\\C%D=F?X", TokenValue() );
 }
 
+TEST_F ( AWS_TestFlexFixture, RestOfLine )
+{
+    const char * input = "- and now the extra tokens";
+
+    aws__scan_bytes( input, strlen( input ), sc );
+    //aws_set_debug ( 1, sc );
+    ASSERT_EQ( DASH, NextTokenType() );
+    aws_start_rest_of( sc );
+    ASSERT_EQ( STR, NextTokenType() );
+    ASSERT_EQ( " and now the extra tokens", TokenValue() );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

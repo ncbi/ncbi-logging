@@ -530,6 +530,16 @@ TEST_F( AWSTestFixture, percent_in_key )
     ASSERT_EQ( "SRR12318371/run2249_lane2_read2_indexN703%253DDropSeq_Potter_BrainWT_8_17_17_N703.fastq.gz.1", extract_value( res, "key" ) );
 }
 
+TEST_F( AWSTestFixture, extra_data )
+{
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - - - - - - - - - more tokens follow" );
+    ASSERT_EQ(
+        "{\"_extra\":\"more tokens follow\",\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
+        res
+        );
+}
+
+
 //TODO: reportField
 
 #if 0

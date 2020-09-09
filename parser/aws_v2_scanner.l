@@ -90,7 +90,7 @@ S3_EXT_REQ_ID    {BASE64}
 
 RESULTCODE      ([0-9]{3})|"-"
 
-%x QUOTED TIMEFMT KEY PATH AGENT TLSVERSION HOSTID IPADDR RESCODE REFERER
+%x QUOTED TIMEFMT KEY PATH AGENT TLSVERSION HOSTID IPADDR RESCODE REFERER REST_OF_LINE
 
 %%
 
@@ -181,6 +181,8 @@ RESULTCODE      ([0-9]{3})|"-"
 <REFERER>{QSTR_ESC}     { MAKE_STR_ESCAPED(); return QSTR; }
 <REFERER>.              { MAKE_STR(); return QSTR; }
 
+<REST_OF_LINE>.*        { MAKE_STR(); return STR; }
+
 %%
 
 YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
@@ -235,6 +237,11 @@ void aws_start_rescode( yyscan_t yyscanner )
 void aws_start_referer( yyscan_t yyscanner )
 {
     yy_push_state( REFERER, yyscanner );
+}
+
+void aws_start_rest_of( yyscan_t yyscanner )
+{
+    yy_push_state( REST_OF_LINE, yyscanner );
 }
 
 void aws_pop_state( yyscan_t yyscanner )
