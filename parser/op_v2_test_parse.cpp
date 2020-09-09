@@ -88,6 +88,19 @@ TEST_F( OPTestFixture, Setters_BadUTF8 )
     ASSERT_EQ( "7dd\\uffffffffga", extract_value( text, "owner" ) );
 }
 
+TEST_F( OPTestFixture, Setters_GoodUTF8_lib )
+{
+    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
+    OPReceiver e ( f );
+
+    t_str v;
+    auto s = u8"попробуем 产品公司求购 ";
+    INIT_TSTR( v, s );
+    e.set( OPReceiver::owner, v );
+    //string text = e . GetFormatter() . format();
+    //ASSERT_EQ( s, extract_value( text, "owner" ) );
+}
+
 TEST_F( OPTestFixture, LineRejecting )
 {
     std::string res = try_to_parse_ugly( "line1 blah\nline2\nline3\n" );

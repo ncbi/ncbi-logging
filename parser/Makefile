@@ -777,7 +777,7 @@ VG_OPTIONS := --leak-check=full --error-exitcode=1
 BUILD = dbg
 #BUILD = rel
 
-vg_op : $(BINDIR)/op2jsn-$(BUILD) $(BINDIR)/$(PREFIX_OP_V2)test_flex-$(BUILD) $(BINDIR)/op_test_parse-$(BUILD)
+vg_op : $(BINDIR)/op2jsn-$(BUILD) $(BINDIR)/$(PREFIX_OP_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_OP_V2)test_parse-$(BUILD)
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP_V2)test_flex-$(BUILD)
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP_V2)test_parse-$(BUILD)
 	cat data/$(PREFIX_OP)testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/op2jsn-$(BUILD) actual/op
@@ -792,9 +792,14 @@ vg_aws : $(BINDIR)/aws2jsn-$(BUILD) $(BINDIR)/$(PREFIX_AWS_V2)test_flex-$(BUILD)
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS_V2)test_parse-$(BUILD)
 	cat data/$(PREFIX_AWS)testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/aws2jsn-$(BUILD) actual/aws
 
-vg_all : vg_op vg_gcp vg_aws
+vg_tw : $(BINDIR)/tw2jsn-$(BUILD) $(BINDIR)/$(PREFIX_TW_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_TW_V2)test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_TW_V2)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_TW_V2)test_parse-$(BUILD)
+	cat data/$(PREFIX_TW)testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/tw2jsn-$(BUILD) actual/tw
 
-.PHONY: aws_op vg_gcp vg_aws vg_all
+vg_all : vg_op vg_gcp vg_aws vg_tw
+
+.PHONY: aws_op vg_gcp vg_aws vg_tw vg_all
 
 #-------------------------------------------------------------------------------
 # fuzz testing

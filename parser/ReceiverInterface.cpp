@@ -16,10 +16,10 @@ ParserDriverInterface::~ParserDriverInterface()
 }
 
 ParserDriverInterface::ParserDriverInterface( LineSplitterInterface & input,
-        CatWriterInterface & outputs,
-        ParseBlockFactoryInterface & pbFact )
-        : m_input( input ), m_outputs( outputs ), m_pbFact( pbFact )
-        {}
+CatWriterInterface & outputs )
+: m_input( input ), m_outputs( outputs )
+{
+}
 
 ReceiverInterface::ReceiverInterface( unique_ptr<FormatterInterface> & p_fmt )
 : m_fmt ( p_fmt.release() ), m_cat ( cat_unknown )
@@ -181,7 +181,7 @@ ParseBlockFactoryInterface :: MakeParserDriver(LineSplitterInterface & input, Ca
 {
     if ( m_nthreads <= 1 )
     {
-        return make_unique< SingleThreadedDriver >( input, output, *this );
+        return make_unique< SingleThreadedDriver >( input, output, MakeParseBlock() );
     }
     else
     {
@@ -191,24 +191,25 @@ ParseBlockFactoryInterface :: MakeParserDriver(LineSplitterInterface & input, Ca
 
 SingleThreadedDriver::SingleThreadedDriver( LineSplitterInterface & input,
         CatWriterInterface & outputs,
-        ParseBlockFactoryInterface & pbFact )
-: ParserDriverInterface( input, outputs, pbFact ), m_debug ( false )
+        unique_ptr<ParseBlockInterface> pb )
+:   ParserDriverInterface( input, outputs ),
+    m_debug ( false ),
+    m_pb ( pb.release() )
 {
 }
 
 void
 SingleThreadedDriver::parse_all_lines()
 {
-    auto pb = m_pbFact . MakeParseBlock();
-    pb -> SetDebug( m_debug );
+    m_pb -> SetDebug( m_debug );
 
-    auto & receiver = pb -> GetReceiver();
+    auto & receiver = m_pb -> GetReceiver();
     FormatterInterface & fmt = receiver . GetFormatter();
     unsigned long int line_nr = 0;
     while( m_input.getLine() )
     {
         line_nr++;
-        pb -> receive_one_line ( m_input.data(), m_input.size(), line_nr );
+        m_pb -> receive_one_line ( m_input.data(), m_input.size(), line_nr );
         m_outputs. write ( receiver . GetCategory(), fmt . format () );
     }
 }
@@ -219,16 +220,18 @@ MultiThreadedDriver :: MultiThreadedDriver(
     size_t queueLimit,
     size_t threadNum,
     ParseBlockFactoryInterface & pbFact )
-: ParserDriverInterface( input, outputs, pbFact ), m_queueLimit ( queueLimit ), m_threadNum ( threadNum )
+:   ParserDriverInterface( input, outputs ),
+    m_queueLimit ( queueLimit ),
+    m_threadNum ( threadNum ),
+    m_pbFact ( pbFact )
 {
 }
 
 // worker-function running multiple times in parallel in the threads...
-void parser( ParseBlockFactoryInterface * factory,
+void parser( unique_ptr<ParseBlockInterface> pb,
              OneWriterManyReadersQueue * in_q,
              OutputQueue * out_q )
 {
-    auto pb = factory -> MakeParseBlock();
     auto & receiver = pb -> GetReceiver();
     FormatterInterface & fmt = receiver . GetFormatter();
 
@@ -298,7 +301,7 @@ void MultiThreadedDriver::parse_all_lines( )
     vector<thread> workers;
     for ( auto i = 0; i < m_threadNum; ++i )
     {
-        workers.push_back( thread( parser, &m_pbFact, &Q, &Q_out ) );
+        workers.push_back( thread( parser, m_pbFact . MakeParseBlock(), &Q, &Q_out ) );
     }
 
     try

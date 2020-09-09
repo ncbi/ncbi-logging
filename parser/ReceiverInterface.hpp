@@ -110,6 +110,7 @@ namespace NCBI
             void setNumThreads( size_t num_threads ) { m_nthreads = num_threads; }
 
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const = 0;
+
             std::unique_ptr<ParserDriverInterface> MakeParserDriver(
                 LineSplitterInterface & input, CatWriterInterface & output );
 
@@ -125,12 +126,10 @@ namespace NCBI
 
         protected :
             ParserDriverInterface( LineSplitterInterface & input,
-                    CatWriterInterface & outputs,
-                    ParseBlockFactoryInterface & pbFact );
+                    CatWriterInterface & outputs );
 
             LineSplitterInterface & m_input;
             CatWriterInterface & m_outputs;
-            ParseBlockFactoryInterface & m_pbFact;
         };
 
         class SingleThreadedDriver : public ParserDriverInterface
@@ -138,13 +137,14 @@ namespace NCBI
         public:
             SingleThreadedDriver( LineSplitterInterface & input,
                     CatWriterInterface & outputs,
-                    ParseBlockFactoryInterface & pbFact );
+                    std::unique_ptr<ParseBlockInterface> pb );
 
             virtual void parse_all_lines();
             void setDebug ( bool onOff ) { m_debug = onOff; }
 
         protected:
             bool m_debug;
+            std::unique_ptr<ParseBlockInterface> m_pb;
         };
 
         class MultiThreadedDriver : public ParserDriverInterface
@@ -163,6 +163,7 @@ namespace NCBI
         private:
             size_t m_queueLimit;
             size_t m_threadNum;
+            ParseBlockFactoryInterface & m_pbFact;
         };
 
     }
