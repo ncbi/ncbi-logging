@@ -14,7 +14,6 @@
 
 #include "aws_v2_parser.hpp"
 #include "aws_v2_scanner.hpp"
-#include "helper.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
@@ -505,7 +504,8 @@ time
     ;
 
 rest_of_line
-    : SPACE { aws_start_rest_of( scanner ); } STR { SET_VALUE( AWSReceiver::_extra, $3 ); }
+    : SPACE { aws_start_rest_of( scanner ); } STR
+        { SET_VALUE( AWSReceiver::_extra, $3 ); lib->reportField("Extra fields discovered"); }
     | %empty
     ;
 

@@ -20,6 +20,9 @@ PREFIX_TW_V2 := tw_v2_
 all: v2
 	@echo "done"
 
+test runtests: test_v2
+	@echo "done"
+
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
 	rm -rf $(LIBDIR) $(BINDIR) $(OBJDIR)
@@ -48,13 +51,9 @@ $(OBJDIR)/%.rel.o: %.cpp
 $(OBJDIR)/%.prof.o: %.cpp
 	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
 
-# instrumented for fuzzing
-FUZZ_OPT = -fsanitize=fuzzer,address,signed-integer-overflow -fprofile-instr-generate -fcoverage-mapping
-#FUZZ_OPT = -fsanitize=fuzzer,signed-integer-overflow -fprofile-instr-generate -fcoverage-mapping
-$(OBJDIR)/%.fuzz.o: %.cpp
-	clang++ -c $< -o $@ -g $(CXXFLAGS) $(FUZZ_OPT)
-
 -include $(OBJDIR)/*.d
+
+.phony: all test runtests clean mkdir
 
 #################################################
 # Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
@@ -77,13 +76,23 @@ $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
 #################################################
-# unit tests for formatter/catwriter
+# utility modules
 
-TEST_SUPPORT_SRC = \
-	Formatters.cpp test_formatter.cpp \
-	CatWriters.cpp test_catwriter.cpp \
-	Queues.cpp test_queues.cpp \
-	LineSplitters.cpp test_linesplitter.cpp \
+COMMON_V2_SRC = \
+	CatWriters.cpp \
+	Formatters.cpp \
+	ReceiverInterface.cpp \
+	Queues.cpp \
+	LineSplitters.cpp
+
+#################################################
+# unit tests for formatter/catwriter/etc
+
+TEST_SUPPORT_SRC = $(COMMON_V2_SRC) \
+	test_formatter.cpp \
+	test_catwriter.cpp \
+	test_queues.cpp \
+	test_linesplitter.cpp \
 	test_support_main.cpp
 
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
@@ -104,18 +113,13 @@ run_test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
 .PHONY: test_support run_test_support
 
 #################################################
-# V2 parsers
-
-COMMON_V2_SRC = \
-	CatWriters.cpp \
-	Formatters.cpp \
-	ReceiverInterface.cpp \
-	Queues.cpp \
-	LineSplitters.cpp
+# generic app head
 
 DBG_TOOL_OBJ = $(OBJDIR)/Tool.dbg.o $(DBG_CMD_OBJ)
 REL_TOOL_OBJ = $(OBJDIR)/Tool.rel.o $(REL_CMD_OBJ)
 PROF_TOOL_OBJ = $(OBJDIR)/Tool.prof.o $(PROF_CMD_OBJ)
+
+LDFLAGS = -lutf8proc -lmbedcrypto -lpthread
 
 #################################################
 # stand alone AWS parser
@@ -143,13 +147,13 @@ $(PREFIX_AWS_V2)parser.cpp: $(PREFIX_AWS_V2)parser.y
 	bison --report all -d $(PREFIX_AWS_V2)parser.y --output-file $(PREFIX_AWS_V2)parser.cpp
 
 $(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 $(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel $(LDFLAGS)
 
 $(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(PROF_TOOL_OBJ)
-	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel $(LDFLAGS)
 
 aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 
@@ -212,13 +216,13 @@ $(PREFIX_OP_V2)parser.cpp: $(PREFIX_OP_V2)parser.y
 	bison --report all -d $(PREFIX_OP_V2)parser.y --output-file $(PREFIX_OP_V2)parser.cpp
 
 $(BINDIR)/op2jsn-dbg: $(OP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 $(BINDIR)/op2jsn-rel: $(OP2JSN_REL_OBJ) $(REL_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel $(LDFLAGS)
 
 $(BINDIR)/op2jsn-prof: $(OP2JSN_PROF_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel $(LDFLAGS)
 
 op: mkdir $(BINDIR)/op2jsn-dbg $(BINDIR)/op2jsn-rel
 
@@ -281,13 +285,13 @@ $(PREFIX_GCP_V2)parser.cpp: $(PREFIX_GCP_V2)parser.y
 	bison --report all -d $(PREFIX_GCP_V2)parser.y --output-file $(PREFIX_GCP_V2)parser.cpp
 
 $(BINDIR)/gcp2jsn-dbg: $(GCP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 $(BINDIR)/gcp2jsn-rel: $(GCP2JSN_REL_OBJ) $(REL_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel $(LDFLAGS)
 
 $(BINDIR)/gcp2jsn-prof: $(GCP2JSN_PROF_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel $(LDFLAGS)
 
 gcp: mkdir $(BINDIR)/gcp2jsn-dbg $(BINDIR)/gcp2jsn-rel
 
@@ -350,13 +354,13 @@ $(PREFIX_TW_V2)parser.cpp: $(PREFIX_TW_V2)parser.y
 	bison --report all -d $(PREFIX_TW_V2)parser.y --output-file $(PREFIX_TW_V2)parser.cpp
 
 $(BINDIR)/tw2jsn-dbg: $(TW2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 $(BINDIR)/tw2jsn-rel: $(TW2JSN_REL_OBJ) $(REL_TOOL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel-no-busy -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel-no-busy $(LDFLAGS)
 
 $(BINDIR)/tw2jsn-prof: $(TW2JSN_PROF_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel-no-busy -lutf8proc -lmbedcrypto -lpthread
+	$(LD) -o $@ $^ $(GPROFFLAGS) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel-no-busy $(LDFLAGS)
 
 tw: mkdir $(BINDIR)/tw2jsn-dbg $(BINDIR)/tw2jsn-rel
 
@@ -394,8 +398,7 @@ run_$(PREFIX_TW_V2)flex_test: $(BINDIR)/$(PREFIX_TW_V2)test_flex-dbg $(BINDIR)/$
 .PHONY: tw tw_prof run_$(PREFIX_TW_V2)test_parse run_$(PREFIX_TW_V2)test_flex
 
 #################################################
-#################################################
-# V2 acceptance ( TODO TW* )
+# acceptance
 
 AWS2JSON = $(BINDIR)/aws2jsn-dbg
 OP2JSON = $(BINDIR)/op2jsn-dbg
@@ -435,7 +438,7 @@ test_v2: jq v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run
 .PHONY: v2 test_v2 jq
 
 #################################################
-# some valgrind checks...
+# valgrind
 
 VG_OPTIONS := --leak-check=full --error-exitcode=1
 
@@ -465,12 +468,25 @@ vg_tw : $(BINDIR)/tw2jsn-$(BUILD) $(BINDIR)/$(PREFIX_TW_V2)test_flex-$(BUILD) $(
 
 vg_all : vg_op vg_gcp vg_aws vg_tw
 
-.PHONY: aws_op vg_gcp vg_aws vg_tw vg_all
+.PHONY: vg_op vg_gcp vg_aws vg_tw vg_all
 
 #-------------------------------------------------------------------------------
 # fuzz testing
+
+FUZZ_THREADS = 2
+FUZZ_RUNS ?= 5000
+
+FUZZ_OPT = -DTHREAD_NUM=$(FUZZ_THREADS) -fsanitize=fuzzer,address,signed-integer-overflow -fprofile-instr-generate -fcoverage-mapping
+
+$(OBJDIR)/%.fuzz.o: %.cpp
+	clang++ -c $< -o $@ -g $(CXXFLAGS) $(FUZZ_OPT)
+
 clean_fuzz:
 	rm -rf fuzz/
+
+run_fuzz: run_aws_fuzz run_gcp_fuzz run_op_fuzz run_tw_fuzz
+
+.phony: clean_fuzz run_fuzz
 
 #-------------------------------------------------------------------------------
 # fuzz testing AWS
@@ -483,21 +499,25 @@ AWS_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(AWS_FUZZ_SRC)))
 
 $(BINDIR)/aws-fuzz: aws $(AWS_FUZZ_OBJ)
-	clang++ -g -o $@ $(AWS_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	clang++ -g -o $@ $(AWS_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 #AWS_FUZZ_DICT ?= -dict=fuzz/aws-dict
-AWS_RUNS ?= 25000
 
 run_aws_fuzz: $(BINDIR)/aws-fuzz
 	 mkdir -p fuzz/aws-corpus fuzz/aws-seeds
 	 cp data/aws_testlines.log fuzz/aws-seeds/
-	 $^ $(AWS_FUZZ_DICT) -runs=$(AWS_RUNS) fuzz/aws-corpus fuzz/aws-seeds
+	 $^ $(AWS_FUZZ_DICT) -runs=$(FUZZ_RUNS) fuzz/aws-corpus fuzz/aws-seeds
 
 .phony: run_aws_fuzz
 
 #-------------------------------------------------------------------------------
 # fuzz testing GCP
 #
+
+fuzz: run_aws_fuzz run_gcp_fuzz run_op_fuzz run_tw_fuzz
+
+.phony: fuzz
+
 GCP_FUZZ_SRC = \
 	$(GCP2JSN_CMN_SRC) \
 	$(PREFIX_GCP_V2)fuzz.cpp
@@ -506,15 +526,14 @@ GCP_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(GCP_FUZZ_SRC)))
 
 $(BINDIR)/gcp-fuzz: gcp $(GCP_FUZZ_OBJ)
-	clang++ -g -o $@ $(GCP_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	clang++ -g -o $@ $(GCP_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 #GCP_FUZZ_DICT ?= -dict=fuzz/gcp-dict
-GCP_RUNS ?= 25000
 
 run_gcp_fuzz: $(BINDIR)/gcp-fuzz
 	 mkdir -p fuzz/gcp-corpus fuzz/gcp-seeds
 	 cp data/gcp_testlines.log fuzz/gcp-seeds/
-	 $^ $(GCP_FUZZ_DICT) -runs=$(GCP_RUNS) fuzz/gcp-corpus fuzz/gcp-seeds/
+	 $^ $(GCP_FUZZ_DICT) -runs=$(FUZZ_RUNS) fuzz/gcp-corpus fuzz/gcp-seeds/
 
 .phony: run_gcp_fuzz
 
@@ -529,15 +548,14 @@ OP_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(OP_FUZZ_SRC)))
 
 $(BINDIR)/op-fuzz: op $(OP_FUZZ_OBJ)
-	clang++ -g -o $@ $(OP_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	clang++ -g -o $@ $(OP_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 #OP_FUZZ_DICT ?= -dict=fuzz/op-dict
-OP_RUNS ?= 25000
 
 run_op_fuzz: $(BINDIR)/op-fuzz
 	 mkdir -p fuzz/op-corpus fuzz/op-seeds
 	 cp data/op_testlines.log fuzz/op-seeds/
-	 $^ $(OP_FUZZ_DICT) -runs=$(OP_RUNS) fuzz/op-corpus fuzz/op-seeds/
+	 $^ $(OP_FUZZ_DICT) -runs=$(FUZZ_RUNS) fuzz/op-corpus fuzz/op-seeds/
 
 .phony: run_op_fuzz
 
@@ -552,15 +570,13 @@ TW_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(TW_FUZZ_SRC)))
 
 $(BINDIR)/tw-fuzz: tw $(TW_FUZZ_OBJ)
-	clang++ -g -o $@ $(TW_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+	clang++ -g -o $@ $(TW_FUZZ_OBJ) $(FUZZ_OPT) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
 #TW_FUZZ_DICT ?= -dict=fuzz/op-dict
-TW_RUNS ?= 25000
 
 run_tw_fuzz: $(BINDIR)/tw-fuzz
 	 mkdir -p fuzz/tw-corpus fuzz/tw-seeds
 	 cp data/tw_testlines.log fuzz/tw-seeds/
-	 $^ $(TW_FUZZ_DICT) -runs=$(TW_RUNS) fuzz/tw-corpus fuzz/tw-seeds/
+	 $^ $(TW_FUZZ_DICT) -runs=$(FUZZ_RUNS) fuzz/tw-corpus fuzz/tw-seeds/
 
 .phony: run_tw_fuzz
-

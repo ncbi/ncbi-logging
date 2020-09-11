@@ -228,7 +228,7 @@ MultiThreadedDriver :: MultiThreadedDriver(
 }
 
 // worker-function running multiple times in parallel in the threads...
-void parser( unique_ptr<ParseBlockInterface> pb,
+void parse_thread_worker( unique_ptr<ParseBlockInterface> pb,
              OneWriterManyReadersQueue * in_q,
              OutputQueue * out_q )
 {
@@ -301,7 +301,7 @@ void MultiThreadedDriver::parse_all_lines( )
     vector<thread> workers;
     for ( auto i = 0; i < m_threadNum; ++i )
     {
-        workers.push_back( thread( parser, m_pbFact . MakeParseBlock(), &Q, &Q_out ) );
+        workers.push_back( thread( parse_thread_worker, m_pbFact . MakeParseBlock(), &Q, &Q_out ) );
     }
 
     try

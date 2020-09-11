@@ -24,26 +24,12 @@
 *
 */
 
-#include <sstream>
-
 #include "GCP_Interface.hpp"
-#include "CatWriters.hpp"
-
-using namespace std;
-using namespace NCBI::Logging;
+#include "fuzz_head.hpp"
 
 extern "C" int
 LLVMFuzzerTestOneInput ( const uint8_t * const Data, size_t const Size )
 {
-    stringstream in;
-    in << string( (const char *)Data, Size );
-
-    GCPParseBlockFactory fact;
-    StringCatWriter outputs;
-
-    SingleThreadedParser p( in, outputs, fact );
-    p . parse();
-
-    return 0;  // Non-zero return values are reserved for future use.
+    return FuzzHead<NCBI::Logging::GCPParseBlockFactory>( Data, Size );
 }
 

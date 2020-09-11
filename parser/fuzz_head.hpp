@@ -23,13 +23,39 @@
 * ===========================================================================
 *
 */
+#pragma once
 
-#include "AWS_Interface.hpp"
-#include "fuzz_head.hpp"
+#include <sstream>
 
-extern "C" int
-LLVMFuzzerTestOneInput ( const uint8_t * const Data, size_t const Size )
+#include "ReceiverInterface.hpp"
+#include "CatWriters.hpp"
+#include "LineSplitters.hpp"
+
+#ifndef THREAD_NUM
+    #define THREAD_NUM 1
+#endif
+
+template <class ParseBlockFactory>
+int
+FuzzHead ( const uint8_t * const Data,
+           size_t const Size )
 {
-    return FuzzHead<NCBI::Logging::AWSParseBlockFactory>( Data, Size );
+    ParseBlockFactory fact;
+    NCBI::Logging::StringCatWriter outputs;
+    NCBI::Logging::BufLineSplitter input( (const char *)Data, Size );
+
+    if ( THREAD_NUM <= 1 )
+    {
+        NCBI::Logging::SingleThreadedDriver p( input, outputs, fact.MakeParseBlock() );
+        p . parse_all_lines();
+    }
+    else
+    {
+        size_t queueLimit = 1000;
+        NCBI::Logging::MultiThreadedDriver p( input, outputs, queueLimit, THREAD_NUM, fact );
+        p . parse_all_lines();
+    }
+
+    return 0;  // Non-zero return values are reserved for future use.
 }
 

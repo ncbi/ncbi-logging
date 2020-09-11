@@ -43,24 +43,23 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
-    t_timepoint tp;
     t_request req;
     t_agent agent;
 }
 
 %token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC SPACE SLASH QMARK
 %token<s> I64
-%token DOT DASH COLON QUOTE OB CB PORT RL CR LF    
-%token UNRECOGNIZED 
-%token<s> PATHSTR PATHEXT ACCESSION 
+%token DOT DASH COLON QUOTE OB CB PORT RL CR LF
+%token UNRECOGNIZED
+%token<s> PATHSTR PATHEXT ACCESSION
 %token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS
 %token<s> PAREN_OPEN PAREN_CLOSE COMMA PHIDVALUE TIME_FMT
 
 %type<s> time
-%type<req> server_and_request request url url_token url_entry 
+%type<req> server_and_request request url url_token url_entry
 %type<req> request_tail_elem request_tail url_with_optional_params
 %type<s> ip user req_time referer forwarded method server
-%type<s> quoted_list quoted_list_body quoted_list_elem url_params 
+%type<s> quoted_list quoted_list_body quoted_list_elem url_params
 %type<agent> agent vdb_agent_token vdb_agent
 %type<s> result_code result_len port req_len referer_token referer_list
 
@@ -82,7 +81,7 @@ log_onprem
       result_code  SPACE
       result_len  SPACE
       req_time  SPACE
-      referer { op_start_UserAgent( scanner ); } SPACE 
+      referer { op_start_UserAgent( scanner ); } SPACE
       agent { op_pop_state( scanner ); }  SPACE
       forwarded  SPACE
       port  SPACE
@@ -113,45 +112,45 @@ method
     : METHOD        { $$ = $1; }
     ;
 
-server 
+server
     : QUOTE QSTR QUOTE  { SET_VALUE( OPReceiver::server, $2 ); }
     | STR               { SET_VALUE( OPReceiver::server, $1 ); }
     ;
 
 url_token
-    : SLASH     
-        { 
+    : SLASH
+        {
             InitRequest( $$ );
-            $$ . path = $1; 
+            $$ . path = $1;
         }
-    | ACCESSION  
-        { 
+    | ACCESSION
+        {
             InitRequest( $$ );
-            $$ . path = $1; 
-            $$ . accession = $1; 
+            $$ . path = $1;
+            $$ . accession = $1;
         }
-    | PATHSTR   
-        { 
+    | PATHSTR
+        {
             InitRequest( $$ );
-            $$ . path = $1; 
-            $$ . filename = $1; 
+            $$ . path = $1;
+            $$ . filename = $1;
         }
     | PATHEXT
-        { 
+        {
             InitRequest( $$ );
-            $$ . path = $1; 
-            $$ . extension = $1; 
+            $$ . path = $1;
+            $$ . extension = $1;
         }
     ;
 
-url_params 
+url_params
     : QMARK                 { $$ = $1; }
     | url_params SLASH      { $$ = $1; $$ . n += $2 . n; }
     | url_params ACCESSION  { $$ = $1; $$ . n += $2 . n; }
     | url_params PATHSTR    { $$ = $1; $$ . n += $2 . n; }
     | url_params PATHEXT    { $$ = $1; $$ . n += $2 . n; }
-    | url_params QMARK      { $$ = $1; $$ . n += $2 . n; }    
-    ; 
+    | url_params QMARK      { $$ = $1; $$ . n += $2 . n; }
+    ;
 
 url
     : url_token
@@ -161,9 +160,9 @@ url
             {
                 $$ . filename  = $1 . accession;
             }
-        }    
-    | url url_token    
-        { 
+        }
+    | url url_token
+        {
             $$ = $1;
             $$ . path . n += $2 . path . n;
 
@@ -193,27 +192,27 @@ url
     ;
 
 url_with_optional_params
-    : url 
-        { 
-            $$ = $1; 
+    : url
+        {
+            $$ = $1;
         }
-    | url url_params 
-        { 
+    | url url_params
+        {
             $$ = $1;
             $$ . path . n += $2 . n;
         }
     ;
 
 url_entry
-    : SPACE { op_start_URL ( scanner ); } url_with_optional_params 
-        { 
-            $$ = $3; 
+    : SPACE { op_start_URL ( scanner ); } url_with_optional_params
+        {
+            $$ = $3;
             op_pop_state ( scanner );
         }
     ;
 
 request_tail_elem
-    : VERS      
+    : VERS
         {
             InitRequest( $$ );
             $$ . path = $1;
@@ -229,12 +228,12 @@ request_tail_elem
             InitRequest( $$ );
             $$ . path = $1;
         }
-    | METHOD  
+    | METHOD
         {
             InitRequest( $$ );
             $$ . path = $1;
         }
-    | SPACE   
+    | SPACE
         {
             InitRequest( $$ );
             $$ . path = $1;
@@ -242,13 +241,13 @@ request_tail_elem
     ;
 
 request_tail
-    : request_tail_elem  
+    : request_tail_elem
         { $$ = $1; }
-    | request_tail request_tail_elem   
-        { 
-            $$ = $1; 
-            $$ . path . n += $2 . path .n; 
-            $$ . path . escaped = $1 . path . escaped || $2 . path . escaped; 
+    | request_tail request_tail_elem
+        {
+            $$ = $1;
+            $$ . path . n += $2 . path .n;
+            $$ . path . escaped = $1 . path . escaped || $2 . path . escaped;
         }
     ;
 
@@ -269,7 +268,7 @@ request
         $$ = $3;
         $$.method = $2;
 
-        // the scanner was in the PATH state, consumed the closing QUOTE and popped the state, 
+        // the scanner was in the PATH state, consumed the closing QUOTE and popped the state,
         // returning to the QUOTED state which we should get out of as well
         op_pop_state ( scanner );
     }
@@ -280,15 +279,15 @@ request
     }
     ;
 
-server_and_request 
+server_and_request
     : server SPACE request
     {
         lib->setRequest( $3 );
     }
     | server SPACE quoted_list
-    { 
+    {
         //TODO: reportField(request, $3)
-    }    
+    }
     | request
     {
         SET_VALUE( OPReceiver::server, EmptyTSTR );
@@ -343,32 +342,32 @@ referer_list
 
 referer
     : QUOTE referer_list QUOTE  { SET_VALUE( OPReceiver::referer, $2 ); }
-    | QUOTE QUOTE               { SET_VALUE( OPReceiver::referer, EmptyTSTR ); } 
+    | QUOTE QUOTE               { SET_VALUE( OPReceiver::referer, EmptyTSTR ); }
     ;
 
 vdb_agent_token
-    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; } 
+    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; }
     | SRATOOLVERS
-        { 
-            InitAgent( $$ ); 
-            $$.original = $1; 
+        {
+            InitAgent( $$ );
+            $$.original = $1;
             const char * dot = strchr( $1 . p, '.' );
             $$ . vdb_tool . p = $1 . p;
             $$ . vdb_tool . n = dot - $1 . p;
             /* skip the leading dot */
-            $$ . vdb_release . p = dot + 1; 
-            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1; 
-        } 
+            $$ . vdb_release . p = dot + 1;
+            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1;
+        }
     | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; }
     | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
-    | SPACE         { InitAgent( $$ ); $$.original = $1; } 
-    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; } 
+    | SPACE         { InitAgent( $$ ); $$.original = $1; }
+    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; }
     ;
 
 vdb_agent
     : vdb_agent_token           { $$ = $1; }
-    | vdb_agent vdb_agent_token 
-    { 
+    | vdb_agent vdb_agent_token
+    {
         $$ = $1;
         MERGE_TSTR( $$ . original, $2 . original );
         if ( $2 . vdb_phid_compute_env . n > 0 )
@@ -402,24 +401,24 @@ vdb_agent
     {
         $$ = $1;
         MERGE_TSTR( $$ . original, $2 );
-    } 
+    }
     ;
 
 agent
-    : QUOTE OS vdb_agent QUOTE       
-        { 
+    : QUOTE OS vdb_agent QUOTE
+        {
             $3 . vdb_os = $2;
             MERGE_TSTR( $2, $3 . original );
             $3 . original = $2;
             lib->setAgent( $3 );
         }
     | QUOTE vdb_agent QUOTE
-        { 
+        {
             lib->setAgent( $2 );
         }
-    | QUOTE QUOTE                                           
-        { 
-            InitAgent( $$ ); 
+    | QUOTE QUOTE
+        {
+            InitAgent( $$ );
             lib->setAgent( $$ );
         }
     ;

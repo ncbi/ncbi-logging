@@ -24,46 +24,12 @@
 *
 */
 
-#include <sstream>
-#include <cstdio>
-
 #include "TW_Interface.hpp"
-#include "CatWriters.hpp"
-#include "LineSplitters.hpp"
-
-using namespace std;
-using namespace NCBI::Logging;
-
-static int tw_fuzz_single_threaded( const uint8_t * const Data, size_t const Size )
-{
-    BufLineSplitter input( (const char *)Data, Size );
-    TWParseBlockFactory fact;
-    StringCatWriter outputs;
-
-    SingleThreadedParser p( input, outputs, fact );
-    p . parse_all_lines();
-
-    return 0;  // Non-zero return values are reserved for future use.
-}
-
-static int tw_fuzz_multi_threaded( const uint8_t * const Data, size_t const Size )
-{
-    BufLineSplitter input( (const char *)Data, Size );
-    TWParseBlockFactory fact;
-    StringCatWriter outputs;
-    size_t queueLimit = 1000;
-    size_t thread_num = 2;
-
-    MultiThreadedParser p( input, outputs, queueLimit, thread_num, fact );
-    p . parse_all_lines();
-
-    return 0;  // Non-zero return values are reserved for future use.
-}
+#include "fuzz_head.hpp"
 
 extern "C" int
 LLVMFuzzerTestOneInput ( const uint8_t * const Data, size_t const Size )
 {
-    //return tw_fuzz_single_threaded( Data, Size );
-    return tw_fuzz_multi_threaded( Data, Size );
+    return FuzzHead<NCBI::Logging::TWParseBlockFactory>( Data, Size );
 }
 
