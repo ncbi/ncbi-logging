@@ -9,7 +9,6 @@ gmon.out
 rejected.txt
 
 #do not exclude op_scanner.* etc. that would exclude [op|aws]_scanner.[y|l] too!
-#this is for v1
 op_scanner.cpp
 op_scanner.hpp
 op_parser.cpp
@@ -22,24 +21,10 @@ gcp_scanner.cpp
 gcp_scanner.hpp
 gcp_parser.cpp
 gcp_parser.hpp
-
-#this is for v2
-aws_v2_parser.cpp
-aws_v2_parser.hpp
-aws_v2_scanner.cpp
-aws_v2_scanner.hpp
-gcp_v2_parser.cpp
-gcp_v2_parser.hpp
-gcp_v2_scanner.cpp
-gcp_v2_scanner.hpp
-op_v2_parser.cpp
-op_v2_parser.hpp
-op_v2_scanner.cpp
-op_v2_scanner.hpp
-tw_v2_parser.cpp
-tw_v2_parser.hpp
-tw_v2_scanner.cpp
-tw_v2_scanner.hpp
+tw_parser.cpp
+tw_parser.hpp
+tw_scanner.cpp
+tw_scanner.hpp
 
 # fuzz-testing temporaries
 fuzz

@@ -1,5 +1,3 @@
-.PHONY: clean all run prof
-
 BINDIR = bin
 LIBDIR = lib
 OBJDIR = obj
@@ -9,35 +7,31 @@ CPP := g++ -c
 LD := g++
 CXXFLAGS += -I . -MMD
 GPROFFLAGS = -pg -O3
-#FLEXFLAGS = -8 --fast
 FLEXFLAGS = -8 --align
 
-PREFIX_OP_V2 := op_v2_
-PREFIX_AWS_V2 := aws_v2_
-PREFIX_GCP_V2 := gcp_v2_
-PREFIX_TW_V2 := tw_v2_
+PREFIX_OP := op_
+PREFIX_AWS := aws_
+PREFIX_GCP := gcp_
+PREFIX_TW := tw_
 
-all: v2
-	@echo "done"
-
-test runtests: test_v2
+all: aws op gcp tw
 	@echo "done"
 
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
 clean:
 	rm -rf $(LIBDIR) $(BINDIR) $(OBJDIR)
-	rm -f $(PREFIX_OP_V2)parser.hpp $(PREFIX_OP_V2)parser.cpp
-	rm -f $(PREFIX_OP_V2)scanner.hpp $(PREFIX_OP_V2)scanner.cpp
-	rm -f $(PREFIX_OP_V2)parser.output
-	rm -f $(PREFIX_AWS_V2)parser.hpp $(PREFIX_AWS_V2)parser.cpp
-	rm -f $(PREFIX_AWS_V2)scanner.hpp $(PREFIX_AWS_V2)scanner.cpp
-	rm -f $(PREFIX_AWS_V2)parser.output
-	rm -f $(PREFIX_GCP_V2)parser.hpp $(PREFIX_GCP_V2)parser.cpp
-	rm -f $(PREFIX_GCP_V2)scanner.hpp $(PREFIX_GCP_V2)scanner.cpp
-	rm -f $(PREFIX_GCP_V2)parser.output
-	rm -f $(PREFIX_TW_V2)parser.hpp $(PREFIX_TW_V2)parser.cpp
-	rm -f $(PREFIX_TW_V2)scanner.hpp $(PREFIX_TW_V2)scanner.cpp
-	rm -f $(PREFIX_TW_V2)parser.output
+	rm -f $(PREFIX_OP)parser.hpp $(PREFIX_OP)parser.cpp
+	rm -f $(PREFIX_OP)scanner.hpp $(PREFIX_OP)scanner.cpp
+	rm -f $(PREFIX_OP)parser.output
+	rm -f $(PREFIX_AWS)parser.hpp $(PREFIX_AWS)parser.cpp
+	rm -f $(PREFIX_AWS)scanner.hpp $(PREFIX_AWS)scanner.cpp
+	rm -f $(PREFIX_AWS)parser.output
+	rm -f $(PREFIX_GCP)parser.hpp $(PREFIX_GCP)parser.cpp
+	rm -f $(PREFIX_GCP)scanner.hpp $(PREFIX_GCP)scanner.cpp
+	rm -f $(PREFIX_GCP)parser.output
+	rm -f $(PREFIX_TW)parser.hpp $(PREFIX_TW)parser.cpp
+	rm -f $(PREFIX_TW)scanner.hpp $(PREFIX_TW)scanner.cpp
+	rm -f $(PREFIX_TW)parser.output
 
 mkdir:
 	@ mkdir -p $(LIBDIR) $(BINDIR) $(OBJDIR)
@@ -53,7 +47,7 @@ $(OBJDIR)/%.prof.o: %.cpp
 
 -include $(OBJDIR)/*.d
 
-.phony: all test runtests clean mkdir
+.phony: all all_test clean mkdir
 
 #################################################
 # Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
@@ -78,7 +72,7 @@ $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 #################################################
 # utility modules
 
-COMMON_V2_SRC = \
+COMMON_SRC = \
 	CatWriters.cpp \
 	Formatters.cpp \
 	ReceiverInterface.cpp \
@@ -88,7 +82,7 @@ COMMON_V2_SRC = \
 #################################################
 # unit tests for formatter/catwriter/etc
 
-TEST_SUPPORT_SRC = $(COMMON_V2_SRC) \
+TEST_SUPPORT_SRC = $(COMMON_SRC) \
 	test_formatter.cpp \
 	test_catwriter.cpp \
 	test_queues.cpp \
@@ -104,13 +98,11 @@ $(BINDIR)/test_support-dbg: $(TEST_SUPPORT_DBG_OBJ)
 $(BINDIR)/test_support-rel: $(TEST_SUPPORT_REL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
 
-test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
-
 run_test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
 	$(BINDIR)/test_support-dbg
 	$(BINDIR)/test_support-rel
 
-.PHONY: test_support run_test_support
+.PHONY: run_test_support
 
 #################################################
 # generic app head
@@ -125,9 +117,9 @@ LDFLAGS = -lutf8proc -lmbedcrypto -lpthread
 # stand alone AWS parser
 
 AWS2JSN_CMN_SRC = \
-	$(COMMON_V2_SRC) \
-	$(PREFIX_AWS_V2)parser.cpp \
-	$(PREFIX_AWS_V2)scanner.cpp \
+	$(COMMON_SRC) \
+	$(PREFIX_AWS)parser.cpp \
+	$(PREFIX_AWS)scanner.cpp \
 	AWS_Interface.cpp
 
 AWS2JSN_SRC = $(AWS2JSN_CMN_SRC) aws2jsn.cpp
@@ -136,15 +128,15 @@ AWS2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS2JSN_SRC)))
 AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
 AWS2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(AWS2JSN_SRC)))
 
-$(OBJDIR)/$(PREFIX_AWS_V2)parser.dbg.o:  	$(OBJDIR)/$(PREFIX_AWS_V2)scanner.dbg.o
-$(OBJDIR)/$(PREFIX_AWS_V2)parser.rel.o:  	$(OBJDIR)/$(PREFIX_AWS_V2)scanner.rel.o
-$(OBJDIR)/$(PREFIX_AWS_V2)parser.prof.o:  	$(OBJDIR)/$(PREFIX_AWS_V2)scanner.prof.o
+$(OBJDIR)/$(PREFIX_AWS)parser.dbg.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
+$(OBJDIR)/$(PREFIX_AWS)parser.prof.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.prof.o
 
-$(PREFIX_AWS_V2)scanner.cpp: $(PREFIX_AWS_V2)scanner.l $(PREFIX_AWS_V2)parser.hpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_AWS_V2)scanner.hpp --outfile=$(PREFIX_AWS_V2)scanner.cpp $(PREFIX_AWS_V2)scanner.l
+$(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l $(PREFIX_AWS)parser.hpp
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_AWS)scanner.hpp --outfile=$(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.l
 
-$(PREFIX_AWS_V2)parser.cpp: $(PREFIX_AWS_V2)parser.y
-	bison --report all -d $(PREFIX_AWS_V2)parser.y --output-file $(PREFIX_AWS_V2)parser.cpp
+$(PREFIX_AWS)parser.cpp: $(PREFIX_AWS)parser.y
+	bison --report all -d $(PREFIX_AWS)parser.y --output-file $(PREFIX_AWS)parser.cpp
 
 $(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
@@ -159,44 +151,44 @@ aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
 
 aws_prof: mkdir $(BINDIR)/aws2jsn-prof
 
-$(PREFIX_AWS_V2)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS_V2)test_parse.cpp
-$(PREFIX_AWS_V2)_TEST_FLEX_SRC = $(PREFIX_AWS_V2)test_flex.cpp $(PREFIX_AWS_V2)scanner.cpp
+$(PREFIX_AWS)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS)test_parse.cpp
+$(PREFIX_AWS)_TEST_FLEX_SRC = $(PREFIX_AWS)test_flex.cpp $(PREFIX_AWS)scanner.cpp
 
-$(PREFIX_AWS_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS_V2)_TEST_PARSE_SRC)))
-$(PREFIX_AWS_V2)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS_V2)_TEST_PARSE_SRC)))
+$(PREFIX_AWS)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS)_TEST_PARSE_SRC)))
+$(PREFIX_AWS)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS)_TEST_PARSE_SRC)))
 
-$(PREFIX_AWS_V2)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS_V2)_TEST_FLEX_SRC)))
-$(PREFIX_AWS_V2)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS_V2)_TEST_FLEX_SRC)))
+$(PREFIX_AWS)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS)_TEST_FLEX_SRC)))
+$(PREFIX_AWS)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS)_TEST_FLEX_SRC)))
 
-$(BINDIR)/$(PREFIX_AWS_V2)test_parse-dbg: $($(PREFIX_AWS_V2)_TEST_PARSE_DBG_OBJ)
+$(BINDIR)/$(PREFIX_AWS)test_parse-dbg: $($(PREFIX_AWS)_TEST_PARSE_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_AWS_V2)test_parse-rel: $($(PREFIX_AWS_V2)_TEST_PARSE_REL_OBJ)
+$(BINDIR)/$(PREFIX_AWS)test_parse-rel: $($(PREFIX_AWS)_TEST_PARSE_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg: $($(PREFIX_AWS_V2)_TEST_FLEX_DBG_OBJ)
+$(BINDIR)/$(PREFIX_AWS)test_flex-dbg: $($(PREFIX_AWS)_TEST_FLEX_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-$(BINDIR)/$(PREFIX_AWS_V2)test_flex-rel: $($(PREFIX_AWS_V2)_TEST_FLEX_REL_OBJ)
+$(BINDIR)/$(PREFIX_AWS)test_flex-rel: $($(PREFIX_AWS)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-run_$(PREFIX_AWS_V2)parse_test: run_test_support run_$(PREFIX_AWS_V2)flex_test $(BINDIR)/$(PREFIX_AWS_V2)test_parse-dbg $(BINDIR)/$(PREFIX_AWS_V2)test_parse-rel
-	$(BINDIR)/$(PREFIX_AWS_V2)test_parse-dbg
-	$(BINDIR)/$(PREFIX_AWS_V2)test_parse-rel
+run_$(PREFIX_AWS)parse_test: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
+	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
 
-run_$(PREFIX_AWS_V2)flex_test: $(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg $(BINDIR)/$(PREFIX_AWS_V2)test_flex-rel
-	$(BINDIR)/$(PREFIX_AWS_V2)test_flex-dbg
-	$(BINDIR)/$(PREFIX_AWS_V2)test_flex-rel
+run_$(PREFIX_AWS)flex_test: aws $(BINDIR)/$(PREFIX_AWS)test_flex-dbg $(BINDIR)/$(PREFIX_AWS)test_flex-rel
+	$(BINDIR)/$(PREFIX_AWS)test_flex-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_flex-rel
 
-.PHONY: aws aws_prof run_$(PREFIX_AWS_V2)test_parse run_$(PREFIX_AWS_V2)test_flex
+.PHONY: aws aws_prof run_$(PREFIX_AWS)parse_test run_$(PREFIX_AWS)flex_test
 
 #################################################
 # stand alone OP parser
 
 OP2JSN_CMN_SRC = \
-	$(COMMON_V2_SRC) \
-	$(PREFIX_OP_V2)parser.cpp \
-	$(PREFIX_OP_V2)scanner.cpp \
+	$(COMMON_SRC) \
+	$(PREFIX_OP)parser.cpp \
+	$(PREFIX_OP)scanner.cpp \
 	OP_Interface.cpp
 
 OP2JSN_SRC = $(OP2JSN_CMN_SRC) op2jsn.cpp
@@ -205,15 +197,15 @@ OP2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(OP2JSN_SRC)))
 OP2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(OP2JSN_SRC)))
 OP2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(OP2JSN_SRC)))
 
-$(OBJDIR)/$(PREFIX_OP_V2)parser.dbg.o:  $(OBJDIR)/$(PREFIX_OP_V2)scanner.dbg.o
-$(OBJDIR)/$(PREFIX_OP_V2)parser.rel.o:  $(OBJDIR)/$(PREFIX_OP_V2)scanner.rel.o
-$(OBJDIR)/$(PREFIX_OP_V2)parser.prof.o:  $(OBJDIR)/$(PREFIX_OP_V2)scanner.prof.o
+$(OBJDIR)/$(PREFIX_OP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_OP)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_OP)parser.rel.o:  $(OBJDIR)/$(PREFIX_OP)scanner.rel.o
+$(OBJDIR)/$(PREFIX_OP)parser.prof.o:  $(OBJDIR)/$(PREFIX_OP)scanner.prof.o
 
-$(PREFIX_OP_V2)scanner.cpp: $(PREFIX_OP_V2)scanner.l $(PREFIX_OP_V2)parser.hpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_OP_V2)scanner.hpp --outfile=$(PREFIX_OP_V2)scanner.cpp $(PREFIX_OP_V2)scanner.l
+$(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l $(PREFIX_OP)parser.hpp
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
 
-$(PREFIX_OP_V2)parser.cpp: $(PREFIX_OP_V2)parser.y
-	bison --report all -d $(PREFIX_OP_V2)parser.y --output-file $(PREFIX_OP_V2)parser.cpp
+$(PREFIX_OP)parser.cpp: $(PREFIX_OP)parser.y
+	bison --report all -d $(PREFIX_OP)parser.y --output-file $(PREFIX_OP)parser.cpp
 
 $(BINDIR)/op2jsn-dbg: $(OP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
@@ -228,44 +220,44 @@ op: mkdir $(BINDIR)/op2jsn-dbg $(BINDIR)/op2jsn-rel
 
 op_prof: mkdir $(BINDIR)/op2jsn-prof
 
-$(PREFIX_OP_V2)_TEST_PARSE_SRC = $(OP2JSN_CMN_SRC) $(PREFIX_OP_V2)test_parse.cpp
-$(PREFIX_OP_V2)_TEST_FLEX_SRC = $(PREFIX_OP_V2)test_flex.cpp $(PREFIX_OP_V2)scanner.cpp
+$(PREFIX_OP)_TEST_PARSE_SRC = $(OP2JSN_CMN_SRC) $(PREFIX_OP)test_parse.cpp
+$(PREFIX_OP)_TEST_FLEX_SRC = $(PREFIX_OP)test_flex.cpp $(PREFIX_OP)scanner.cpp
 
-$(PREFIX_OP_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_OP_V2)_TEST_PARSE_SRC)))
-$(PREFIX_OP_V2)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_OP_V2)_TEST_PARSE_SRC)))
+$(PREFIX_OP)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_OP)_TEST_PARSE_SRC)))
+$(PREFIX_OP)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_OP)_TEST_PARSE_SRC)))
 
-$(PREFIX_OP_V2)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_OP_V2)_TEST_FLEX_SRC)))
-$(PREFIX_OP_V2)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_OP_V2)_TEST_FLEX_SRC)))
+$(PREFIX_OP)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_OP)_TEST_FLEX_SRC)))
+$(PREFIX_OP)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_OP)_TEST_FLEX_SRC)))
 
-$(BINDIR)/$(PREFIX_OP_V2)test_parse-dbg: $($(PREFIX_OP_V2)_TEST_PARSE_DBG_OBJ)
+$(BINDIR)/$(PREFIX_OP)test_parse-dbg: $($(PREFIX_OP)_TEST_PARSE_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_OP_V2)test_parse-rel: $($(PREFIX_OP_V2)_TEST_PARSE_REL_OBJ)
+$(BINDIR)/$(PREFIX_OP)test_parse-rel: $($(PREFIX_OP)_TEST_PARSE_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_OP_V2)test_flex-dbg: $($(PREFIX_OP_V2)_TEST_FLEX_DBG_OBJ)
+$(BINDIR)/$(PREFIX_OP)test_flex-dbg: $($(PREFIX_OP)_TEST_FLEX_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-$(BINDIR)/$(PREFIX_OP_V2)test_flex-rel: $($(PREFIX_OP_V2)_TEST_FLEX_REL_OBJ)
+$(BINDIR)/$(PREFIX_OP)test_flex-rel: $($(PREFIX_OP)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-run_$(PREFIX_OP_V2)parse_test: run_test_support run_$(PREFIX_OP_V2)flex_test $(BINDIR)/$(PREFIX_OP_V2)test_parse-dbg $(BINDIR)/$(PREFIX_OP_V2)test_parse-rel
-	$(BINDIR)/$(PREFIX_OP_V2)test_parse-dbg
-	$(BINDIR)/$(PREFIX_OP_V2)test_parse-rel
+run_$(PREFIX_OP)parse_test: op run_test_support run_$(PREFIX_OP)flex_test $(BINDIR)/$(PREFIX_OP)test_parse-dbg $(BINDIR)/$(PREFIX_OP)test_parse-rel
+	$(BINDIR)/$(PREFIX_OP)test_parse-dbg
+	$(BINDIR)/$(PREFIX_OP)test_parse-rel
 
-run_$(PREFIX_OP_V2)flex_test: $(BINDIR)/$(PREFIX_OP_V2)test_flex-dbg $(BINDIR)/$(PREFIX_OP_V2)test_flex-rel
-	$(BINDIR)/$(PREFIX_OP_V2)test_flex-dbg
-	$(BINDIR)/$(PREFIX_OP_V2)test_flex-rel
+run_$(PREFIX_OP)flex_test: op $(BINDIR)/$(PREFIX_OP)test_flex-dbg $(BINDIR)/$(PREFIX_OP)test_flex-rel
+	$(BINDIR)/$(PREFIX_OP)test_flex-dbg
+	$(BINDIR)/$(PREFIX_OP)test_flex-rel
 
-.PHONY: op op_prof run_$(PREFIX_OP_V2)test_parse run_$(PREFIX_OP_V2)test_flex
+.PHONY: op op_prof run_$(PREFIX_OP)parse_test run_$(PREFIX_OP)flex_test
 
 #################################################
 # stand alone GCP parser
 
 GCP2JSN_CMN_SRC = \
-	$(COMMON_V2_SRC) \
-	$(PREFIX_GCP_V2)parser.cpp \
-	$(PREFIX_GCP_V2)scanner.cpp \
+	$(COMMON_SRC) \
+	$(PREFIX_GCP)parser.cpp \
+	$(PREFIX_GCP)scanner.cpp \
 	GCP_Interface.cpp
 
 GCP2JSN_SRC = $(GCP2JSN_CMN_SRC) gcp2jsn.cpp
@@ -274,15 +266,15 @@ GCP2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(GCP2JSN_SRC)))
 GCP2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(GCP2JSN_SRC)))
 GCP2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(GCP2JSN_SRC)))
 
-$(OBJDIR)/$(PREFIX_GCP_V2)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP_V2)scanner.dbg.o
-$(OBJDIR)/$(PREFIX_GCP_V2)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP_V2)scanner.rel.o
-$(OBJDIR)/$(PREFIX_GCP_V2)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP_V2)scanner.prof.o
+$(OBJDIR)/$(PREFIX_GCP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_GCP)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.rel.o
+$(OBJDIR)/$(PREFIX_GCP)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.prof.o
 
-$(PREFIX_GCP_V2)scanner.cpp: $(PREFIX_GCP_V2)scanner.l $(PREFIX_GCP_V2)parser.hpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_GCP_V2)scanner.hpp --outfile=$(PREFIX_GCP_V2)scanner.cpp $(PREFIX_GCP_V2)scanner.l
+$(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l $(PREFIX_GCP)parser.hpp
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_GCP)scanner.hpp --outfile=$(PREFIX_GCP)scanner.cpp $(PREFIX_GCP)scanner.l
 
-$(PREFIX_GCP_V2)parser.cpp: $(PREFIX_GCP_V2)parser.y
-	bison --report all -d $(PREFIX_GCP_V2)parser.y --output-file $(PREFIX_GCP_V2)parser.cpp
+$(PREFIX_GCP)parser.cpp: $(PREFIX_GCP)parser.y
+	bison --report all -d $(PREFIX_GCP)parser.y --output-file $(PREFIX_GCP)parser.cpp
 
 $(BINDIR)/gcp2jsn-dbg: $(GCP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
@@ -297,44 +289,44 @@ gcp: mkdir $(BINDIR)/gcp2jsn-dbg $(BINDIR)/gcp2jsn-rel
 
 gcp_prof: mkdir $(BINDIR)/gcp2jsn-prof
 
-$(PREFIX_GCP_V2)_TEST_PARSE_SRC = $(GCP2JSN_CMN_SRC) $(PREFIX_GCP_V2)test_parse.cpp
-$(PREFIX_GCP_V2)_TEST_FLEX_SRC = $(PREFIX_GCP_V2)test_flex.cpp $(PREFIX_GCP_V2)scanner.cpp
+$(PREFIX_GCP)_TEST_PARSE_SRC = $(GCP2JSN_CMN_SRC) $(PREFIX_GCP)test_parse.cpp
+$(PREFIX_GCP)_TEST_FLEX_SRC = $(PREFIX_GCP)test_flex.cpp $(PREFIX_GCP)scanner.cpp
 
-$(PREFIX_GCP_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_GCP_V2)_TEST_PARSE_SRC)))
-$(PREFIX_GCP_V2)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_GCP_V2)_TEST_PARSE_SRC)))
+$(PREFIX_GCP)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_GCP)_TEST_PARSE_SRC)))
+$(PREFIX_GCP)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_GCP)_TEST_PARSE_SRC)))
 
-$(PREFIX_GCP_V2)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_GCP_V2)_TEST_FLEX_SRC)))
-$(PREFIX_GCP_V2)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_GCP_V2)_TEST_FLEX_SRC)))
+$(PREFIX_GCP)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_GCP)_TEST_FLEX_SRC)))
+$(PREFIX_GCP)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_GCP)_TEST_FLEX_SRC)))
 
-$(BINDIR)/$(PREFIX_GCP_V2)test_parse-dbg: $($(PREFIX_GCP_V2)_TEST_PARSE_DBG_OBJ)
+$(BINDIR)/$(PREFIX_GCP)test_parse-dbg: $($(PREFIX_GCP)_TEST_PARSE_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_GCP_V2)test_parse-rel: $($(PREFIX_GCP_V2)_TEST_PARSE_REL_OBJ)
+$(BINDIR)/$(PREFIX_GCP)test_parse-rel: $($(PREFIX_GCP)_TEST_PARSE_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg: $($(PREFIX_GCP_V2)_TEST_FLEX_DBG_OBJ)
+$(BINDIR)/$(PREFIX_GCP)test_flex-dbg: $($(PREFIX_GCP)_TEST_FLEX_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-$(BINDIR)/$(PREFIX_GCP_V2)test_flex-rel: $($(PREFIX_GCP_V2)_TEST_FLEX_REL_OBJ)
+$(BINDIR)/$(PREFIX_GCP)test_flex-rel: $($(PREFIX_GCP)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-run_$(PREFIX_GCP_V2)parse_test: run_test_support run_$(PREFIX_GCP_V2)flex_test $(BINDIR)/$(PREFIX_GCP_V2)test_parse-dbg $(BINDIR)/$(PREFIX_GCP_V2)test_parse-rel
-	$(BINDIR)/$(PREFIX_GCP_V2)test_parse-dbg
-	$(BINDIR)/$(PREFIX_GCP_V2)test_parse-rel
+run_$(PREFIX_GCP)parse_test: gcp run_test_support run_$(PREFIX_GCP)flex_test $(BINDIR)/$(PREFIX_GCP)test_parse-dbg $(BINDIR)/$(PREFIX_GCP)test_parse-rel
+	$(BINDIR)/$(PREFIX_GCP)test_parse-dbg
+	$(BINDIR)/$(PREFIX_GCP)test_parse-rel
 
-run_$(PREFIX_GCP_V2)flex_test: $(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg $(BINDIR)/$(PREFIX_GCP_V2)test_flex-rel
-	$(BINDIR)/$(PREFIX_GCP_V2)test_flex-dbg
-	$(BINDIR)/$(PREFIX_GCP_V2)test_flex-rel
+run_$(PREFIX_GCP)flex_test: gcp $(BINDIR)/$(PREFIX_GCP)test_flex-dbg $(BINDIR)/$(PREFIX_GCP)test_flex-rel
+	$(BINDIR)/$(PREFIX_GCP)test_flex-dbg
+	$(BINDIR)/$(PREFIX_GCP)test_flex-rel
 
-.PHONY: gcp gcp_prof run_$(PREFIX_GCP_V2)test_parse run_$(PREFIX_GCP_V2)test_flex
+.PHONY: gcp gcp_prof run_$(PREFIX_GCP)parse_test run_$(PREFIX_GCP)flex_test
 
 #################################################
 # stand alone TW parser
 
 TW2JSN_CMN_SRC = \
-	$(COMMON_V2_SRC) \
-	$(PREFIX_TW_V2)parser.cpp \
-	$(PREFIX_TW_V2)scanner.cpp \
+	$(COMMON_SRC) \
+	$(PREFIX_TW)parser.cpp \
+	$(PREFIX_TW)scanner.cpp \
 	TW_Interface.cpp
 
 TW2JSN_SRC = $(TW2JSN_CMN_SRC) tw2jsn.cpp
@@ -343,15 +335,15 @@ TW2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TW2JSN_SRC)))
 TW2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(TW2JSN_SRC)))
 TW2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(TW2JSN_SRC)))
 
-$(OBJDIR)/$(PREFIX_TW_V2)parser.dbg.o:  $(OBJDIR)/$(PREFIX_TW_V2)scanner.dbg.o
-$(OBJDIR)/$(PREFIX_TW_V2)parser.rel.o:  $(OBJDIR)/$(PREFIX_TW_V2)scanner.rel.o
-$(OBJDIR)/$(PREFIX_TW_V2)parser.prof.o:  $(OBJDIR)/$(PREFIX_TW_V2)scanner.prof.o
+$(OBJDIR)/$(PREFIX_TW)parser.dbg.o:  $(OBJDIR)/$(PREFIX_TW)scanner.dbg.o
+$(OBJDIR)/$(PREFIX_TW)parser.rel.o:  $(OBJDIR)/$(PREFIX_TW)scanner.rel.o
+$(OBJDIR)/$(PREFIX_TW)parser.prof.o:  $(OBJDIR)/$(PREFIX_TW)scanner.prof.o
 
-$(PREFIX_TW_V2)scanner.cpp: $(PREFIX_TW_V2)scanner.l $(PREFIX_TW_V2)parser.hpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_TW_V2)scanner.hpp --outfile=$(PREFIX_TW_V2)scanner.cpp $(PREFIX_TW_V2)scanner.l
+$(PREFIX_TW)scanner.cpp: $(PREFIX_TW)scanner.l $(PREFIX_TW)parser.hpp
+	flex $(FLEXFLAGS) --header-file=$(PREFIX_TW)scanner.hpp --outfile=$(PREFIX_TW)scanner.cpp $(PREFIX_TW)scanner.l
 
-$(PREFIX_TW_V2)parser.cpp: $(PREFIX_TW_V2)parser.y
-	bison --report all -d $(PREFIX_TW_V2)parser.y --output-file $(PREFIX_TW_V2)parser.cpp
+$(PREFIX_TW)parser.cpp: $(PREFIX_TW)parser.y
+	bison --report all -d $(PREFIX_TW)parser.y --output-file $(PREFIX_TW)parser.cpp
 
 $(BINDIR)/tw2jsn-dbg: $(TW2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
@@ -366,36 +358,36 @@ tw: mkdir $(BINDIR)/tw2jsn-dbg $(BINDIR)/tw2jsn-rel
 
 tw_prof: mkdir $(BINDIR)/tw2jsn-prof
 
-$(PREFIX_TW_V2)_TEST_PARSE_SRC = $(TW2JSN_CMN_SRC) $(PREFIX_TW_V2)test_parse.cpp
-$(PREFIX_TW_V2)_TEST_FLEX_SRC = $(PREFIX_TW_V2)test_flex.cpp $(PREFIX_TW_V2)scanner.cpp
+$(PREFIX_TW)_TEST_PARSE_SRC = $(TW2JSN_CMN_SRC) $(PREFIX_TW)test_parse.cpp
+$(PREFIX_TW)_TEST_FLEX_SRC = $(PREFIX_TW)test_flex.cpp $(PREFIX_TW)scanner.cpp
 
-$(PREFIX_TW_V2)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_TW_V2)_TEST_PARSE_SRC)))
-$(PREFIX_TW_V2)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_TW_V2)_TEST_PARSE_SRC)))
+$(PREFIX_TW)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_TW)_TEST_PARSE_SRC)))
+$(PREFIX_TW)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_TW)_TEST_PARSE_SRC)))
 
-$(PREFIX_TW_V2)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_TW_V2)_TEST_FLEX_SRC)))
-$(PREFIX_TW_V2)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_TW_V2)_TEST_FLEX_SRC)))
+$(PREFIX_TW)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_TW)_TEST_FLEX_SRC)))
+$(PREFIX_TW)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_TW)_TEST_FLEX_SRC)))
 
-$(BINDIR)/$(PREFIX_TW_V2)test_parse-dbg: $($(PREFIX_TW_V2)_TEST_PARSE_DBG_OBJ)
+$(BINDIR)/$(PREFIX_TW)test_parse-dbg: $($(PREFIX_TW)_TEST_PARSE_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_TW_V2)test_parse-rel: $($(PREFIX_TW_V2)_TEST_PARSE_REL_OBJ)
+$(BINDIR)/$(PREFIX_TW)test_parse-rel: $($(PREFIX_TW)_TEST_PARSE_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto
 
-$(BINDIR)/$(PREFIX_TW_V2)test_flex-dbg: $($(PREFIX_TW_V2)_TEST_FLEX_DBG_OBJ)
+$(BINDIR)/$(PREFIX_TW)test_flex-dbg: $($(PREFIX_TW)_TEST_FLEX_DBG_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-$(BINDIR)/$(PREFIX_TW_V2)test_flex-rel: $($(PREFIX_TW_V2)_TEST_FLEX_REL_OBJ)
+$(BINDIR)/$(PREFIX_TW)test_flex-rel: $($(PREFIX_TW)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-run_$(PREFIX_TW_V2)parse_test: run_test_support run_$(PREFIX_TW_V2)flex_test $(BINDIR)/$(PREFIX_TW_V2)test_parse-dbg $(BINDIR)/$(PREFIX_TW_V2)test_parse-rel
-	$(BINDIR)/$(PREFIX_TW_V2)test_parse-dbg
-	$(BINDIR)/$(PREFIX_TW_V2)test_parse-rel
+run_$(PREFIX_TW)parse_test: tw run_test_support run_$(PREFIX_TW)flex_test $(BINDIR)/$(PREFIX_TW)test_parse-dbg $(BINDIR)/$(PREFIX_TW)test_parse-rel
+	$(BINDIR)/$(PREFIX_TW)test_parse-dbg
+	$(BINDIR)/$(PREFIX_TW)test_parse-rel
 
-run_$(PREFIX_TW_V2)flex_test: $(BINDIR)/$(PREFIX_TW_V2)test_flex-dbg $(BINDIR)/$(PREFIX_TW_V2)test_flex-rel
-	$(BINDIR)/$(PREFIX_TW_V2)test_flex-dbg
-	$(BINDIR)/$(PREFIX_TW_V2)test_flex-rel
+run_$(PREFIX_TW)flex_test: tw $(BINDIR)/$(PREFIX_TW)test_flex-dbg $(BINDIR)/$(PREFIX_TW)test_flex-rel
+	$(BINDIR)/$(PREFIX_TW)test_flex-dbg
+	$(BINDIR)/$(PREFIX_TW)test_flex-rel
 
-.PHONY: tw tw_prof run_$(PREFIX_TW_V2)test_parse run_$(PREFIX_TW_V2)test_flex
+.PHONY: tw tw_prof run_$(PREFIX_TW)parse_test run_$(PREFIX_TW)flex_test
 
 #################################################
 # acceptance
@@ -405,37 +397,36 @@ OP2JSON = $(BINDIR)/op2jsn-dbg
 GCP2JSON = $(BINDIR)/gcp2jsn-dbg
 TW2JSON = $(BINDIR)/tw2jsn-dbg
 
-v2: aws op gcp tw
-
 jq:
 	jq -e . ./expected/*/*.jsonl > /dev/null
 
-test_v2: jq v2 run_$(PREFIX_AWS_V2)parse_test run_$(PREFIX_GCP_V2)parse_test run_$(PREFIX_OP_V2)parse_test run_$(PREFIX_TW_V2)parse_test
-	mkdir -p  actual/$(PREFIX_AWS_V2)testlines
-	cat data/aws_testlines.log | $(AWS2JSON) actual/$(PREFIX_AWS_V2)testlines/aws >./actual/$(PREFIX_AWS_V2)testlines/stdout 2>./actual/$(PREFIX_AWS_V2)testlines/stderr \
-						&& diff ./expected/$(PREFIX_AWS_V2)testlines ./actual/$(PREFIX_AWS_V2)testlines
-	@ echo "test_aws v2 passed"
-	@ rm -rf actual/$(PREFIX_AWS_V2)*
+test: jq all run_$(PREFIX_AWS)parse_test run_$(PREFIX_GCP)parse_test run_$(PREFIX_OP)parse_test run_$(PREFIX_TW)parse_test
+	mkdir -p  actual/$(PREFIX_AWS)testlines
+	cat data/aws_testlines.log | $(AWS2JSON) actual/$(PREFIX_AWS)testlines/aws >./actual/$(PREFIX_AWS)testlines/stdout 2>./actual/$(PREFIX_AWS)testlines/stderr \
+						&& diff ./expected/$(PREFIX_AWS)testlines ./actual/$(PREFIX_AWS)testlines
+	@ echo "test_aws passed"
+	@ rm -rf actual/$(PREFIX_AWS)*
 	#
-	mkdir -p  actual/$(PREFIX_OP_V2)testlines
-	cat data/op_testlines.log | $(OP2JSON) actual/$(PREFIX_OP_V2)testlines/op >./actual/$(PREFIX_OP_V2)testlines/stdout 2>./actual/$(PREFIX_OP_V2)testlines/stderr \
-						&& diff ./expected/$(PREFIX_OP_V2)testlines ./actual/$(PREFIX_OP_V2)testlines
-	@ echo "test_op v2 passed"
-	@ rm -rf actual/$(PREFIX_OP_V2)*
+	mkdir -p  actual/$(PREFIX_OP)testlines
+	cat data/op_testlines.log | $(OP2JSON) actual/$(PREFIX_OP)testlines/op >./actual/$(PREFIX_OP)testlines/stdout 2>./actual/$(PREFIX_OP)testlines/stderr \
+						&& diff ./expected/$(PREFIX_OP)testlines ./actual/$(PREFIX_OP)testlines
+	@ echo "test_op passed"
+	@ rm -rf actual/$(PREFIX_OP)*
 	#
-	mkdir -p  actual/$(PREFIX_GCP_V2)testlines
-	cat data/gcp_testlines.log | $(GCP2JSON) actual/$(PREFIX_GCP_V2)testlines/gcp >./actual/$(PREFIX_GCP_V2)testlines/stdout 2>./actual/$(PREFIX_GCP_V2)testlines/stderr \
-						&& diff ./expected/$(PREFIX_GCP_V2)testlines ./actual/$(PREFIX_GCP_V2)testlines
-	@ echo "test_gcp v2 passed"
-	@ rm -rf actual/$(PREFIX_GCP_V2)*
+	mkdir -p  actual/$(PREFIX_GCP)testlines
+	cat data/gcp_testlines.log | $(GCP2JSON) actual/$(PREFIX_GCP)testlines/gcp >./actual/$(PREFIX_GCP)testlines/stdout 2>./actual/$(PREFIX_GCP)testlines/stderr \
+						&& diff ./expected/$(PREFIX_GCP)testlines ./actual/$(PREFIX_GCP)testlines
+	@ echo "test_gcp passed"
+	@ rm -rf actual/$(PREFIX_GCP)*
 	#
-	mkdir -p  actual/$(PREFIX_TW_V2)testlines
-	cat data/tw_testlines.log | $(TW2JSON) actual/$(PREFIX_TW_V2)testlines/tw >./actual/$(PREFIX_TW_V2)testlines/stdout 2>./actual/$(PREFIX_TW_V2)testlines/stderr \
-						&& diff ./expected/$(PREFIX_TW_V2)testlines ./actual/$(PREFIX_TW_V2)testlines
-	@ echo "test_tw v2 passed"
-	@ rm -rf actual/$(PREFIX_TW_V2)*
+	mkdir -p  actual/$(PREFIX_TW)testlines
+	cat data/tw_testlines.log | $(TW2JSON) actual/$(PREFIX_TW)testlines/tw >./actual/$(PREFIX_TW)testlines/stdout 2>./actual/$(PREFIX_TW)testlines/stderr \
+						&& diff ./expected/$(PREFIX_TW)testlines ./actual/$(PREFIX_TW)testlines
+	@ echo "test_tw passed"
+	@ rm -rf actual/$(PREFIX_TW)*
+	@echo "done"
 
-.PHONY: v2 test_v2 jq
+.PHONY: test jq
 
 #################################################
 # valgrind
@@ -446,24 +437,24 @@ VG_OPTIONS := --leak-check=full --error-exitcode=1
 BUILD = dbg
 #BUILD = rel
 
-vg_op : $(BINDIR)/op2jsn-$(BUILD) $(BINDIR)/$(PREFIX_OP_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_OP_V2)test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP_V2)test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP_V2)test_parse-$(BUILD)
+vg_op : $(BINDIR)/op2jsn-$(BUILD) $(BINDIR)/$(PREFIX_OP)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_OP)test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_OP)test_parse-$(BUILD)
 	cat data/op_testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/op2jsn-$(BUILD) actual/op
 
-vg_gcp : $(BINDIR)/gcp2jsn-$(BUILD) $(BINDIR)/$(PREFIX_GCP_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_GCP_V2)test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_GCP_V2)test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_GCP_V2)test_parse-$(BUILD)
+vg_gcp : $(BINDIR)/gcp2jsn-$(BUILD) $(BINDIR)/$(PREFIX_GCP)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_GCP)test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_GCP)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_GCP)test_parse-$(BUILD)
 	cat data/gcp_testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/gcp2jsn-$(BUILD) actual/gcp
 
-vg_aws : $(BINDIR)/aws2jsn-$(BUILD) $(BINDIR)/$(PREFIX_AWS_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_AWS_V2)test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS_V2)test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS_V2)test_parse-$(BUILD)
+vg_aws : $(BINDIR)/aws2jsn-$(BUILD) $(BINDIR)/$(PREFIX_AWS)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_AWS)test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS)test_parse-$(BUILD)
 	cat data/aws_testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/aws2jsn-$(BUILD) actual/aws
 
-vg_tw : $(BINDIR)/tw2jsn-$(BUILD) $(BINDIR)/$(PREFIX_TW_V2)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_TW_V2)test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_TW_V2)test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_TW_V2)test_parse-$(BUILD)
+vg_tw : $(BINDIR)/tw2jsn-$(BUILD) $(BINDIR)/$(PREFIX_TW)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_TW)test_parse-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_TW)test_flex-$(BUILD)
+	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_TW)test_parse-$(BUILD)
 	cat data/tw_testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/tw2jsn-$(BUILD) actual/tw
 
 vg_all : vg_op vg_gcp vg_aws vg_tw
@@ -493,7 +484,7 @@ run_fuzz: run_aws_fuzz run_gcp_fuzz run_op_fuzz run_tw_fuzz
 #
 AWS_FUZZ_SRC = \
 	$(AWS2JSN_CMN_SRC) \
-	$(PREFIX_AWS_V2)fuzz.cpp
+	$(PREFIX_AWS)fuzz.cpp
 
 AWS_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(AWS_FUZZ_SRC)))
@@ -520,7 +511,7 @@ fuzz: run_aws_fuzz run_gcp_fuzz run_op_fuzz run_tw_fuzz
 
 GCP_FUZZ_SRC = \
 	$(GCP2JSN_CMN_SRC) \
-	$(PREFIX_GCP_V2)fuzz.cpp
+	$(PREFIX_GCP)fuzz.cpp
 
 GCP_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(GCP_FUZZ_SRC)))
@@ -542,7 +533,7 @@ run_gcp_fuzz: $(BINDIR)/gcp-fuzz
 #
 OP_FUZZ_SRC = \
 	$(OP2JSN_CMN_SRC) \
-	$(PREFIX_OP_V2)fuzz.cpp
+	$(PREFIX_OP)fuzz.cpp
 
 OP_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(OP_FUZZ_SRC)))
@@ -564,7 +555,7 @@ run_op_fuzz: $(BINDIR)/op-fuzz
 #
 TW_FUZZ_SRC = \
 	$(TW2JSN_CMN_SRC) \
-	$(PREFIX_TW_V2)fuzz.cpp
+	$(PREFIX_TW)fuzz.cpp
 
 TW_FUZZ_OBJ = \
 	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(TW_FUZZ_SRC)))

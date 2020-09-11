@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "gcp_v2_parser.hpp"
-#include "gcp_v2_scanner.hpp"
+#include "gcp_parser.hpp"
+#include "gcp_scanner.hpp"
 
 using namespace std;
 

@@ -11,8 +11,8 @@
 #define YYDEBUG 1
 
 #include <stdint.h>
-#include "gcp_v2_parser.hpp"
-#include "gcp_v2_scanner.hpp"
+#include "gcp_parser.hpp"
+#include "gcp_scanner.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;

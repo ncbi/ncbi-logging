@@ -12,8 +12,8 @@
 
 #include <stdint.h>
 
-#include "aws_v2_parser.hpp"
-#include "aws_v2_scanner.hpp"
+#include "aws_parser.hpp"
+#include "aws_scanner.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;

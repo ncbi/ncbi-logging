@@ -1,7 +1,7 @@
 #include "AWS_Interface.hpp"
 
-#include "aws_v2_parser.hpp"
-#include "aws_v2_scanner.hpp"
+#include "aws_parser.hpp"
+#include "aws_scanner.hpp"
 
 extern YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 

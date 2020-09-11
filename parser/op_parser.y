@@ -11,8 +11,8 @@
 #define YYDEBUG 1
 
 #include <stdint.h>
-#include "op_v2_parser.hpp"
-#include "op_v2_scanner.hpp"
+#include "op_parser.hpp"
+#include "op_scanner.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;

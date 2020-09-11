@@ -11,8 +11,8 @@
 #define YYDEBUG 1
 
 #include <stdint.h>
-#include "tw_v2_parser.hpp"
-#include "tw_v2_scanner.hpp"
+#include "tw_parser.hpp"
+#include "tw_scanner.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;

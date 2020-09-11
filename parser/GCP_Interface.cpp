@@ -1,7 +1,7 @@
 #include "GCP_Interface.hpp"
 
-#include "gcp_v2_parser.hpp"
-#include "gcp_v2_scanner.hpp"
+#include "gcp_parser.hpp"
+#include "gcp_scanner.hpp"
 
 extern YY_BUFFER_STATE gcp_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 

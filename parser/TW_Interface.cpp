@@ -1,7 +1,7 @@
 #include "TW_Interface.hpp"
 
-#include "tw_v2_parser.hpp"
-#include "tw_v2_scanner.hpp"
+#include "tw_parser.hpp"
+#include "tw_scanner.hpp"
 
 extern YY_BUFFER_STATE tw_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 

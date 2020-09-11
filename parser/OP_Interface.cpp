@@ -1,7 +1,7 @@
 #include "OP_Interface.hpp"
 
-#include "op_v2_parser.hpp"
-#include "op_v2_scanner.hpp"
+#include "op_parser.hpp"
+#include "op_scanner.hpp"
 
 extern YY_BUFFER_STATE op_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 

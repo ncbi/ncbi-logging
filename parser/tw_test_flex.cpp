@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "tw_v2_parser.hpp"
-#include "tw_v2_scanner.hpp"
+#include "tw_parser.hpp"
+#include "tw_scanner.hpp"
 
 using namespace std;
 
