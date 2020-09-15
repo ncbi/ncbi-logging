@@ -9,7 +9,6 @@ GPROFFLAGS = -pg -O3
 FLEXFLAGS = -8 --align
 
 PREFIX_OP := op_
-PREFIX_AWS := aws_
 PREFIX_GCP := gcp_
 PREFIX_TW := tw_
 
@@ -25,7 +24,7 @@ test_cmn:
 	$(MAKE) -C common test
 
 #do not rm XXX_parser.*/XXX_scanner.*! this would deleted *.l and *.y too!
-clean: clean_aws clean_op clean_gcp clean_tw
+clean: aws_clean op_clean gcp_clean tw_clean
 	rm -rf *.output
 
 mkdir:
@@ -81,71 +80,19 @@ COMMON_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(COMMON_SRC)))
 #################################################
 # stand alone AWS parser
 
-AWS2JSN_CMN_SRC = \
-	$(PREFIX_AWS)parser.cpp \
-	$(PREFIX_AWS)scanner.cpp \
-	AWS_Interface.cpp
+aws: mkdir
+	$(MAKE) -C aws
 
-AWS2JSN_SRC = $(AWS2JSN_CMN_SRC) aws2jsn.cpp
+aws_prof:
+	$(MAKE) -C aws prof
 
-AWS2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS2JSN_SRC)))
-AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
-AWS2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(AWS2JSN_SRC)))
+aws_test:
+	$(MAKE) -C aws test
 
-$(OBJDIR)/$(PREFIX_AWS)parser.dbg.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.dbg.o
-$(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
-$(OBJDIR)/$(PREFIX_AWS)parser.prof.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.prof.o
+aws_clean:
+	$(MAKE) -C aws clean
 
-$(OBJDIR)/AWS_Interface.dbg.o $(OBJDIR)/AWS_Interface.rel.o $(OBJDIR)/AWS_Interface.prof.o : $(PREFIX_AWS)parser.hpp
-$(PREFIX_AWS)parser.hpp : $(PREFIX_AWS)parser.cpp
-
-$(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) $(LDFLAGS)
-
-$(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_TOOL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_REL_OBJ) $(LDFLAGS)
-
-$(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(PROF_TOOL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_PROF_OBJ) $(GPROFFLAGS) $(LDFLAGS)
-
-aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
-
-aws_prof: mkdir $(BINDIR)/aws2jsn-prof
-	#TODO: revive
-
-$(PREFIX_AWS)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS)test_parse.cpp
-$(PREFIX_AWS)_TEST_FLEX_SRC = $(PREFIX_AWS)test_flex.cpp $(PREFIX_AWS)scanner.cpp
-
-$(PREFIX_AWS)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS)_TEST_PARSE_SRC)))
-$(PREFIX_AWS)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS)_TEST_PARSE_SRC)))
-
-$(PREFIX_AWS)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS)_TEST_FLEX_SRC)))
-$(PREFIX_AWS)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS)_TEST_FLEX_SRC)))
-
-$(BINDIR)/$(PREFIX_AWS)test_parse-dbg: $($(PREFIX_AWS)_TEST_PARSE_DBG_OBJ)
-	$(LD) -o $@ $^  $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS)
-
-$(BINDIR)/$(PREFIX_AWS)test_parse-rel: $($(PREFIX_AWS)_TEST_PARSE_REL_OBJ)
-	$(LD) -o $@ $^  $(COMMON_REL_OBJ) -lgtest $(LDFLAGS)
-
-$(BINDIR)/$(PREFIX_AWS)test_flex-dbg: $($(PREFIX_AWS)_TEST_FLEX_DBG_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread
-
-$(BINDIR)/$(PREFIX_AWS)test_flex-rel: $($(PREFIX_AWS)_TEST_FLEX_REL_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread
-
-run_$(PREFIX_AWS)parse_test: aws run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
-	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
-	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
-
-run_$(PREFIX_AWS)flex_test: aws $(BINDIR)/$(PREFIX_AWS)test_flex-dbg $(BINDIR)/$(PREFIX_AWS)test_flex-rel
-	$(BINDIR)/$(PREFIX_AWS)test_flex-dbg
-	$(BINDIR)/$(PREFIX_AWS)test_flex-rel
-
-clean_aws:
-	rm -rf $(OBJDIR)/aws* $(OBJDIR)/AWS_* $(BINDIR)/aws* ./$(PREFIX_AWS)parser.?pp ./$(PREFIX_AWS)scanner.?pp
-
-.PHONY: aws aws_prof clean_aws run_$(PREFIX_AWS)parse_test run_$(PREFIX_AWS)flex_test
+.PHONY: aws aws_prof aws_clean aws_test
 
 #################################################
 # stand alone OP parser
@@ -211,10 +158,10 @@ run_$(PREFIX_OP)flex_test: op $(BINDIR)/$(PREFIX_OP)test_flex-dbg $(BINDIR)/$(PR
 	$(BINDIR)/$(PREFIX_OP)test_flex-dbg
 	$(BINDIR)/$(PREFIX_OP)test_flex-rel
 
-clean_op:
+op_clean:
 	rm -rf $(OBJDIR)/op* $(OBJDIR)/OP_* $(BINDIR)/op* ./$(PREFIX_OP)parser.?pp ./$(PREFIX_OP)scanner.?pp
 
-.PHONY: op op_prof clean_op run_$(PREFIX_OP)parse_test run_$(PREFIX_OP)flex_test
+.PHONY: op op_prof op_clean run_$(PREFIX_OP)parse_test run_$(PREFIX_OP)flex_test
 
 #################################################
 # stand alone GCP parser
@@ -280,10 +227,10 @@ run_$(PREFIX_GCP)flex_test: gcp $(BINDIR)/$(PREFIX_GCP)test_flex-dbg $(BINDIR)/$
 	$(BINDIR)/$(PREFIX_GCP)test_flex-dbg
 	$(BINDIR)/$(PREFIX_GCP)test_flex-rel
 
-clean_gcp:
+gcp_clean:
 	rm -rf $(OBJDIR)/gcp* $(OBJDIR)/GCP_* $(BINDIR)/gcp* ./$(PREFIX_GCP)parser.?pp ./$(PREFIX_GCP)scanner.?pp
 
-.PHONY: gcp gcp_prof clean_gcp run_$(PREFIX_GCP)parse_test run_$(PREFIX_GCP)flex_test
+.PHONY: gcp gcp_prof gcp_clean run_$(PREFIX_GCP)parse_test run_$(PREFIX_GCP)flex_test
 
 #################################################
 # stand alone TW parser
@@ -349,15 +296,14 @@ run_$(PREFIX_TW)flex_test: tw $(BINDIR)/$(PREFIX_TW)test_flex-dbg $(BINDIR)/$(PR
 	$(BINDIR)/$(PREFIX_TW)test_flex-dbg
 	$(BINDIR)/$(PREFIX_TW)test_flex-rel
 
-clean_tw:
+tw_clean:
 	rm -rf $(OBJDIR)/tw* $(OBJDIR)/TW_* $(BINDIR)/tw* ./$(PREFIX_TW)parser.?pp ./$(PREFIX_TW)scanner.?pp
 
-.PHONY: tw tw_prof clean_tw run_$(PREFIX_TW)parse_test run_$(PREFIX_TW)flex_test
+.PHONY: tw tw_prof tw_clean run_$(PREFIX_TW)parse_test run_$(PREFIX_TW)flex_test
 
 #################################################
 # acceptance
 
-AWS2JSON = $(BINDIR)/aws2jsn-dbg
 OP2JSON = $(BINDIR)/op2jsn-dbg
 GCP2JSON = $(BINDIR)/gcp2jsn-dbg
 TW2JSON = $(BINDIR)/tw2jsn-dbg
@@ -365,12 +311,8 @@ TW2JSON = $(BINDIR)/tw2jsn-dbg
 jq:
 	jq -e . ./expected/*/*.jsonl > /dev/null
 
-acc_test: jq all run_$(PREFIX_AWS)parse_test run_$(PREFIX_GCP)parse_test run_$(PREFIX_OP)parse_test run_$(PREFIX_TW)parse_test
-	mkdir -p  actual/$(PREFIX_AWS)testlines
-	cat data/aws_testlines.log | $(AWS2JSON) actual/$(PREFIX_AWS)testlines/aws >./actual/$(PREFIX_AWS)testlines/stdout 2>./actual/$(PREFIX_AWS)testlines/stderr \
-						&& diff ./expected/$(PREFIX_AWS)testlines ./actual/$(PREFIX_AWS)testlines
-	@ echo "test_aws passed"
-	@ rm -rf actual/$(PREFIX_AWS)*
+acc_test: jq run_$(PREFIX_GCP)parse_test run_$(PREFIX_OP)parse_test run_$(PREFIX_TW)parse_test
+	$(MAKE) -C aws acc_test
 	#
 	mkdir -p  actual/$(PREFIX_OP)testlines
 	cat data/op_testlines.log | $(OP2JSON) actual/$(PREFIX_OP)testlines/op >./actual/$(PREFIX_OP)testlines/stdout 2>./actual/$(PREFIX_OP)testlines/stderr \
@@ -412,10 +354,8 @@ vg_gcp : $(BINDIR)/gcp2jsn-$(BUILD) $(BINDIR)/$(PREFIX_GCP)test_flex-$(BUILD) $(
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_GCP)test_parse-$(BUILD)
 	cat data/gcp_testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/gcp2jsn-$(BUILD) actual/gcp
 
-vg_aws : $(BINDIR)/aws2jsn-$(BUILD) $(BINDIR)/$(PREFIX_AWS)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_AWS)test_parse-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS)test_flex-$(BUILD)
-	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_AWS)test_parse-$(BUILD)
-	cat data/aws_testlines.log | valgrind $(VG_OPTIONS) $(BINDIR)/aws2jsn-$(BUILD) actual/aws
+vg_aws :
+	$(MAKE) -C aws vg
 
 vg_tw : $(BINDIR)/tw2jsn-$(BUILD) $(BINDIR)/$(PREFIX_TW)test_flex-$(BUILD) $(BINDIR)/$(PREFIX_TW)test_parse-$(BUILD)
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX_TW)test_flex-$(BUILD)
@@ -438,31 +378,14 @@ $(OBJDIR)/%.fuzz.o: %.cpp
 	clang++ -c $< -o $@ -g $(CXXFLAGS) $(FUZZ_OPT)
 
 clean_fuzz:
-	rm -rf fuzz/
+	$(MAKE) -C aws clean_fuzz
 
 run_fuzz: run_aws_fuzz run_gcp_fuzz run_op_fuzz run_tw_fuzz
 
 .phony: clean_fuzz run_fuzz
 
-#-------------------------------------------------------------------------------
-# fuzz testing AWS
-#
-AWS_FUZZ_SRC = \
-	$(AWS2JSN_CMN_SRC) \
-	$(PREFIX_AWS)fuzz.cpp
-
-AWS_FUZZ_OBJ = \
-	$(addprefix $(OBJDIR)/,$(subst .cpp,.fuzz.o,$(AWS_FUZZ_SRC)))
-
-$(BINDIR)/aws-fuzz: aws $(AWS_FUZZ_OBJ)
-	clang++ -g -o $@ $(AWS_FUZZ_OBJ) $(FUZZ_OPT) $(COMMON_DBG_OBJ) $(LDFLAGS)
-
-#AWS_FUZZ_DICT ?= -dict=fuzz/aws-dict
-
-run_aws_fuzz: $(BINDIR)/aws-fuzz
-	 mkdir -p fuzz/aws-corpus fuzz/aws-seeds
-	 cp data/aws_testlines.log fuzz/aws-seeds/
-	 $^ $(AWS_FUZZ_DICT) -runs=$(FUZZ_RUNS) fuzz/aws-corpus fuzz/aws-seeds
+run_aws_fuzz:
+	$(MAKE) -C aws run_fuzz
 
 .phony: run_aws_fuzz
 
