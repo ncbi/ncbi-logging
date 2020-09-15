@@ -179,17 +179,7 @@ $(BINDIR)/$(PREFIX_AWS)test_flex-dbg: $($(PREFIX_AWS)_TEST_FLEX_DBG_OBJ)
 $(BINDIR)/$(PREFIX_AWS)test_flex-rel: $($(PREFIX_AWS)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-#run_$(PREFIX_AWS)parse_test: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
-#	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
-#	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
-
-run_$(PREFIX_AWS)parse_test-dbg: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg
-	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
-
-run_$(PREFIX_AWS)parse_test_rel: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-rel
-	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
-
-run_$(PREFIX_AWS)parse_test:
+run_$(PREFIX_AWS)parse_test: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
 	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
 	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
 
