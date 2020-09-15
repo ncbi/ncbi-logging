@@ -1,0 +1,26 @@
+description of incremental updates to already loaded data
+---------------------------------------------------------
+
+step 1)
+generate a patch-id
+select a subset (or full set) of the rows in the database, and apply the patch-id to the subset
+extract the subset in JSON-format
+
+step 2)
+transform the JSON-format from step 1 into the original input-format
+
+step 3)
+feed the original input-format into the format-specific parser
+
+step 4)
+load the resulting JSON back into the database, that includes adjusted/fixed values
+the newly loaded data will have patch-id zero now
+
+step 5)
+delete the subset from step 1 from the database, be deleting rows with the generated patch-id
+
+---------------------------------------------------------
+we need to develop format-specific tools for step 2.
+
+the format-specific parser for step 3 is the regular one for importing.
+
