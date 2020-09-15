@@ -36,6 +36,8 @@ clean:
 mkdir:
 	@ mkdir -p $(LIBDIR) $(BINDIR) $(OBJDIR)
 
+#################################################
+# generic rules for compiling
 $(OBJDIR)/%.dbg.o: %.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
 
@@ -44,6 +46,14 @@ $(OBJDIR)/%.rel.o: %.cpp
 
 $(OBJDIR)/%.prof.o: %.cpp
 	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
+
+#################################################
+# generic rules for flex and bison
+%scanner.cpp: %scanner.l %parser.hpp %parser.cpp
+	flex $(FLEXFLAGS) --header-file=$(subst .cpp,.hpp,$@) --outfile=$@ $<
+
+%parser.cpp : %parser.y
+	bison --report all -d $< --output-file $@
 
 -include $(OBJDIR)/*.d
 
@@ -135,12 +145,6 @@ $(OBJDIR)/$(PREFIX_AWS)parser.prof.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.prof.o
 $(OBJDIR)/AWS_Interface.dbg.o $(OBJDIR)/AWS_Interface.rel.o $(OBJDIR)/AWS_Interface.prof.o : $(PREFIX_AWS)parser.hpp
 $(PREFIX_AWS)parser.hpp : $(PREFIX_AWS)parser.cpp
 
-$(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l $(PREFIX_AWS)parser.hpp $(PREFIX_AWS)parser.cpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_AWS)scanner.hpp --outfile=$(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.l
-
-$(PREFIX_AWS)parser.cpp : $(PREFIX_AWS)parser.y
-	bison --report all -d $(PREFIX_AWS)parser.y --output-file $(PREFIX_AWS)parser.cpp
-
 $(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
@@ -175,7 +179,17 @@ $(BINDIR)/$(PREFIX_AWS)test_flex-dbg: $($(PREFIX_AWS)_TEST_FLEX_DBG_OBJ)
 $(BINDIR)/$(PREFIX_AWS)test_flex-rel: $($(PREFIX_AWS)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
-run_$(PREFIX_AWS)parse_test: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
+#run_$(PREFIX_AWS)parse_test: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
+#	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
+#	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
+
+run_$(PREFIX_AWS)parse_test-dbg: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
+
+run_$(PREFIX_AWS)parse_test_rel: aws run_test_support run_$(PREFIX_AWS)flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-rel
+	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
+
+run_$(PREFIX_AWS)parse_test:
 	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
 	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
 
@@ -206,12 +220,6 @@ $(OBJDIR)/$(PREFIX_OP)parser.prof.o:  $(OBJDIR)/$(PREFIX_OP)scanner.prof.o
 
 $(OBJDIR)/OP_Interface.dbg.o $(OBJDIR)/OP_Interface.rel.o $(OBJDIR)/OP_Interface.prof.o : $(PREFIX_OP)parser.hpp
 $(PREFIX_OP)parser.hpp : $(PREFIX_OP)parser.cpp
-
-$(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l $(PREFIX_OP)parser.hpp $(PREFIX_OP)parser.cpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
-
-$(PREFIX_OP)parser.cpp: $(PREFIX_OP)parser.y
-	bison --report all -d $(PREFIX_OP)parser.y --output-file $(PREFIX_OP)parser.cpp
 
 $(BINDIR)/op2jsn-dbg: $(OP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
@@ -279,12 +287,6 @@ $(OBJDIR)/$(PREFIX_GCP)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.prof.o
 $(OBJDIR)/GCP_Interface.dbg.o $(OBJDIR)/GCP_Interface.rel.o $(OBJDIR)/GCP_Interface.prof.o : $(PREFIX_GCP)parser.hpp
 $(PREFIX_GCP)parser.hpp : $(PREFIX_GCP)parser.cpp
 
-$(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l $(PREFIX_GCP)parser.hpp $(PREFIX_GCP)parser.cpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_GCP)scanner.hpp --outfile=$(PREFIX_GCP)scanner.cpp $(PREFIX_GCP)scanner.l
-
-$(PREFIX_GCP)parser.cpp: $(PREFIX_GCP)parser.y
-	bison --report all -d $(PREFIX_GCP)parser.y --output-file $(PREFIX_GCP)parser.cpp
-
 $(BINDIR)/gcp2jsn-dbg: $(GCP2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
 
@@ -350,12 +352,6 @@ $(OBJDIR)/$(PREFIX_TW)parser.prof.o:  $(OBJDIR)/$(PREFIX_TW)scanner.prof.o
 
 $(OBJDIR)/TW_Interface.dbg.o $(OBJDIR)/TW_Interface.rel.o $(OBJDIR)/TW_Interface.prof.o : $(PREFIX_TW)parser.hpp
 $(PREFIX_TW)parser.hpp : $(PREFIX_TW)parser.cpp
-
-$(PREFIX_TW)scanner.cpp: $(PREFIX_TW)scanner.l $(PREFIX_TW)parser.hpp $(PREFIX_TW)parser.cpp
-	flex $(FLEXFLAGS) --header-file=$(PREFIX_TW)scanner.hpp --outfile=$(PREFIX_TW)scanner.cpp $(PREFIX_TW)scanner.l
-
-$(PREFIX_TW)parser.cpp: $(PREFIX_TW)parser.y
-	bison --report all -d $(PREFIX_TW)parser.y --output-file $(PREFIX_TW)parser.cpp
 
 $(BINDIR)/tw2jsn-dbg: $(TW2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg $(LDFLAGS)
