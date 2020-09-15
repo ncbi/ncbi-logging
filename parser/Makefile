@@ -132,10 +132,13 @@ $(OBJDIR)/$(PREFIX_AWS)parser.dbg.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
 $(OBJDIR)/$(PREFIX_AWS)parser.prof.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.prof.o
 
-$(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l $(PREFIX_AWS)parser.hpp
+$(OBJDIR)/AWS_Interface.dbg.o $(OBJDIR)/AWS_Interface.rel.o $(OBJDIR)/AWS_Interface.prof.o : $(PREFIX_AWS)parser.hpp
+$(PREFIX_AWS)parser.hpp : $(PREFIX_AWS)parser.cpp
+
+$(PREFIX_AWS)scanner.cpp: $(PREFIX_AWS)scanner.l $(PREFIX_AWS)parser.hpp $(PREFIX_AWS)parser.cpp
 	flex $(FLEXFLAGS) --header-file=$(PREFIX_AWS)scanner.hpp --outfile=$(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.l
 
-$(PREFIX_AWS)parser.cpp: $(PREFIX_AWS)parser.y
+$(PREFIX_AWS)parser.cpp : $(PREFIX_AWS)parser.y
 	bison --report all -d $(PREFIX_AWS)parser.y --output-file $(PREFIX_AWS)parser.cpp
 
 $(BINDIR)/aws2jsn-dbg: $(AWS2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
@@ -201,7 +204,10 @@ $(OBJDIR)/$(PREFIX_OP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_OP)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_OP)parser.rel.o:  $(OBJDIR)/$(PREFIX_OP)scanner.rel.o
 $(OBJDIR)/$(PREFIX_OP)parser.prof.o:  $(OBJDIR)/$(PREFIX_OP)scanner.prof.o
 
-$(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l $(PREFIX_OP)parser.hpp
+$(OBJDIR)/OP_Interface.dbg.o $(OBJDIR)/OP_Interface.rel.o $(OBJDIR)/OP_Interface.prof.o : $(PREFIX_OP)parser.hpp
+$(PREFIX_OP)parser.hpp : $(PREFIX_OP)parser.cpp
+
+$(PREFIX_OP)scanner.cpp: $(PREFIX_OP)scanner.l $(PREFIX_OP)parser.hpp $(PREFIX_OP)parser.cpp
 	flex $(FLEXFLAGS) --header-file=$(PREFIX_OP)scanner.hpp --outfile=$(PREFIX_OP)scanner.cpp $(PREFIX_OP)scanner.l
 
 $(PREFIX_OP)parser.cpp: $(PREFIX_OP)parser.y
@@ -270,7 +276,10 @@ $(OBJDIR)/$(PREFIX_GCP)parser.dbg.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_GCP)parser.rel.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.rel.o
 $(OBJDIR)/$(PREFIX_GCP)parser.prof.o:  $(OBJDIR)/$(PREFIX_GCP)scanner.prof.o
 
-$(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l $(PREFIX_GCP)parser.hpp
+$(OBJDIR)/GCP_Interface.dbg.o $(OBJDIR)/GCP_Interface.rel.o $(OBJDIR)/GCP_Interface.prof.o : $(PREFIX_GCP)parser.hpp
+$(PREFIX_GCP)parser.hpp : $(PREFIX_GCP)parser.cpp
+
+$(PREFIX_GCP)scanner.cpp: $(PREFIX_GCP)scanner.l $(PREFIX_GCP)parser.hpp $(PREFIX_GCP)parser.cpp
 	flex $(FLEXFLAGS) --header-file=$(PREFIX_GCP)scanner.hpp --outfile=$(PREFIX_GCP)scanner.cpp $(PREFIX_GCP)scanner.l
 
 $(PREFIX_GCP)parser.cpp: $(PREFIX_GCP)parser.y
@@ -339,7 +348,10 @@ $(OBJDIR)/$(PREFIX_TW)parser.dbg.o:  $(OBJDIR)/$(PREFIX_TW)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_TW)parser.rel.o:  $(OBJDIR)/$(PREFIX_TW)scanner.rel.o
 $(OBJDIR)/$(PREFIX_TW)parser.prof.o:  $(OBJDIR)/$(PREFIX_TW)scanner.prof.o
 
-$(PREFIX_TW)scanner.cpp: $(PREFIX_TW)scanner.l $(PREFIX_TW)parser.hpp
+$(OBJDIR)/TW_Interface.dbg.o $(OBJDIR)/TW_Interface.rel.o $(OBJDIR)/TW_Interface.prof.o : $(PREFIX_TW)parser.hpp
+$(PREFIX_TW)parser.hpp : $(PREFIX_TW)parser.cpp
+
+$(PREFIX_TW)scanner.cpp: $(PREFIX_TW)scanner.l $(PREFIX_TW)parser.hpp $(PREFIX_TW)parser.cpp
 	flex $(FLEXFLAGS) --header-file=$(PREFIX_TW)scanner.hpp --outfile=$(PREFIX_TW)scanner.cpp $(PREFIX_TW)scanner.l
 
 $(PREFIX_TW)parser.cpp: $(PREFIX_TW)parser.y
