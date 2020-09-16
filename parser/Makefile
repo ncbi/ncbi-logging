@@ -10,7 +10,10 @@ test: test_cmn acc_test
 test_cmn:
 	$(MAKE) -C common test
 
-clean: aws_clean op_clean gcp_clean tw_clean
+cmn_clean:
+	$(MAKE) -C common clean
+
+clean: aws_clean op_clean gcp_clean tw_clean cmn_clean
 	rm -rf *.output
 
 #################################################

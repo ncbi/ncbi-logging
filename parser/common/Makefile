@@ -8,6 +8,7 @@ clean: cmn_clean
 
 mkdir:
 	@ mkdir -p $(BINDIR) $(OBJDIR)
+	@ echo "mkdir run"
 
 .phony: all test clean mkdir
 
@@ -25,7 +26,7 @@ $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
-cmd: $(CMD_DBG_OBJ) $(CMD_REL_OBJ)
+cmd: mkdir $(CMD_DBG_OBJ) $(CMD_REL_OBJ)
 
 .phony: cmd
 
@@ -57,7 +58,7 @@ ALL_OBJ = $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(TEST_SUPPORT_DBG_OBJ) $(TEST_SUPPORT_R
 ALL_D = $(subst .o,.d,$(ALL_OBJ))
 -include $(ALL_D)
 
-common: $(COMMON_DBG_OBJ) $(COMMON_REL_OBJ)
+common: mkdir $(COMMON_DBG_OBJ) $(COMMON_REL_OBJ)
 
 cmn_clean:
 	@ rm -rf $(ALL_OBJ) $(ALL_D)
@@ -67,11 +68,11 @@ cmn_test: mkdir $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
 	$(BINDIR)/test_common-dbg
 	$(BINDIR)/test_common-rel
 
-$(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ)
-	$(LD) -o $@ $^ $(CMD_DBG_OBJ) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
+$(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ) $(CMD_DBG_OBJ)
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
 
-$(BINDIR)/test_common-rel: $(TEST_SUPPORT_REL_OBJ)
-	$(LD) -o $@ $^ $(CMD_REL_OBJ) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
+$(BINDIR)/test_common-rel: $(TEST_SUPPORT_REL_OBJ) $(CMD_REL_OBJ)
+	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
 
 .PHONY: common cmn_clean cmn_test
 
