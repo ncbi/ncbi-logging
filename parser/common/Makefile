@@ -1,49 +1,23 @@
-BINDIR = ../bin
-OBJDIR = ../obj
+include ../Makefile.set
 
-CC := gcc -c
-CPP := g++ -c
-LD := g++
-CXXFLAGS += -I . -MMD
-GPROFFLAGS = -pg -O3
+all: cmd common
 
-all: cmd support
+test: cmn_test
 
-test: run_test_support
-
-clean: clean_support
+clean: cmn_clean
 
 mkdir:
 	@ mkdir -p $(BINDIR) $(OBJDIR)
 
-#################################################
-# generic rules for compiling
-$(OBJDIR)/%.dbg.o: %.cpp
-	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
-
-$(OBJDIR)/%.rel.o: %.cpp
-	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
-
-$(OBJDIR)/%.prof.o: %.cpp
-	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
-
--include $(OBJDIR)/*.d
-
 .phony: all test clean mkdir
-
-#################################################
-# Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
-JWT_TOOL ?= ../../../ncbi-vdb3/jwt-tool
-
-CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/utf8proc -I$(JWT_TOOL)/tool
 
 #################################################
 # VDB3 Command line parsing
 CMD_SRC_LOCATION = $(JWT_TOOL)/tool
 CMD_SRC = $(CMD_SRC_LOCATION)/cmdline.cpp
 
-DBG_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
-REL_CMD_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
+CMD_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
+CMD_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
 
 $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
@@ -51,7 +25,7 @@ $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
-cmd: $(DBG_CMD_OBJ) $(REL_CMD_OBJ)
+cmd: $(CMD_DBG_OBJ) $(CMD_REL_OBJ)
 
 .phony: cmd
 
@@ -79,22 +53,30 @@ TEST_SUPPORT_SRC = $(COMMON_SRC) \
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
 TEST_SUPPORT_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(TEST_SUPPORT_SRC)))
 
-support: $(TEST_SUPPORT_DBG_OBJ) $(TEST_SUPPORT_REL_OBJ)
+ALL_OBJ = $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(TEST_SUPPORT_DBG_OBJ) $(TEST_SUPPORT_REL_OBJ)
+ALL_D = $(subst .o,.d,$(ALL_OBJ))
+-include $(ALL_D)
 
-$(BINDIR)/test_support-dbg: $(TEST_SUPPORT_DBG_OBJ)
-	$(LD) -o $@ $^ $(DBG_CMD_OBJ) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
+common: $(COMMON_DBG_OBJ) $(COMMON_REL_OBJ)
 
-$(BINDIR)/test_support-rel: $(TEST_SUPPORT_REL_OBJ)
-	$(LD) -o $@ $^ $(REL_CMD_OBJ) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
+cmn_clean:
+	@ rm -rf $(ALL_OBJ) $(ALL_D)
+	@ rm -rf $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
 
-clean_support:
-	rm -rf $(TEST_SUPPORT_DBG_OBJ) $(TEST_SUPPORT_REL_OBJ) $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
+cmn_test: mkdir $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
+	$(BINDIR)/test_common-dbg
+	$(BINDIR)/test_common-rel
 
-run_test_support: mkdir $(BINDIR)/test_support-dbg $(BINDIR)/test_support-rel
-	$(BINDIR)/test_support-dbg
-	$(BINDIR)/test_support-rel
+$(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ)
+	$(LD) -o $@ $^ $(CMD_DBG_OBJ) -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
 
-.PHONY: support clean_support run_test_support
+$(BINDIR)/test_common-rel: $(TEST_SUPPORT_REL_OBJ)
+	$(LD) -o $@ $^ $(CMD_REL_OBJ) -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
+
+.PHONY: common cmn_clean cmn_test
+
+#-------------------------------------------------------------------------------
+# vg: TBD
 
 #-------------------------------------------------------------------------------
 # fuzz testing: TBD

@@ -1,0 +1,78 @@
+.default: all
+
+BINDIR = ../bin
+OBJDIR = ../obj
+
+CC := gcc -c
+CPP := g++ -c
+LD := g++
+CXXFLAGS += -I . -I ../common/ -MMD
+GPROFFLAGS = -pg -O3
+FLEXFLAGS = -8 --align
+
+#################################################
+# generic rules for compiling
+$(OBJDIR)/%.dbg.o: %.cpp
+	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
+
+$(OBJDIR)/%.rel.o: %.cpp
+	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
+
+$(OBJDIR)/%.prof.o: %.cpp
+	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
+
+#################################################
+# generic rules for flex and bison
+
+%scanner.cpp: %scanner.l %parser.hpp %parser.cpp
+	flex $(FLEXFLAGS) --header-file=$(subst .cpp,.hpp,$@) --outfile=$@ $<
+
+%parser.cpp : %parser.y
+	bison --report all -d $< --output-file $@
+
+.phony: all test clean mkdir
+
+#################################################
+# Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
+JWT_TOOL ?= ../../../ncbi-vdb3/jwt-tool
+
+CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/utf8proc -I$(JWT_TOOL)/tool
+
+LDFLAGS = -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+
+#################################################
+
+# NOTE: keep matching the set of source files in common/
+COMMON_SRC = \
+	CatWriters.cpp \
+	Formatters.cpp \
+	ReceiverInterface.cpp \
+	Queues.cpp \
+	LineSplitters.cpp \
+	Tool.cpp \
+	cmdline.cpp
+
+COMMON_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(COMMON_SRC)))
+COMMON_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(COMMON_SRC)))
+COMMON_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(COMMON_SRC)))
+
+#################################################
+# valgrind
+
+VG_OPTIONS := --leak-check=full --error-exitcode=1
+
+# which version to run under valginrd (uncomment one)
+BUILD = dbg
+#BUILD = rel
+
+#-------------------------------------------------------------------------------
+# fuzz testing
+
+FUZZ_THREADS = 2
+FUZZ_RUNS ?= 5000
+
+FUZZ_OPT = -DTHREAD_NUM=$(FUZZ_THREADS) -fsanitize=fuzzer,address,signed-integer-overflow -fprofile-instr-generate -fcoverage-mapping
+
+$(OBJDIR)/%.fuzz.o: %.cpp
+	clang++ -c $< -o $@ -g $(CXXFLAGS) $(FUZZ_OPT)
+
