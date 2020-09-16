@@ -8,6 +8,7 @@ namespace NCBI
 {
     namespace Logging
     {
+        /* we are using the receiver for parsing original lines as well as for reconstructing original lines! */
         struct AWSReceiver : public ReceiverInterface
         {
             using ReceiverInterface::set;
@@ -39,14 +40,19 @@ namespace NCBI
                 AWS_LastMemberId = _extra
             } AWS_Members; // all are t_str values
             virtual void set( AWS_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
-
-        private:
         };
 
         class AWSParseBlockFactory : public ParseBlockFactoryInterface
         {
         public:
             virtual ~AWSParseBlockFactory();
+            virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
+        };
+
+        class AWSReverseBlockFactory : public ParseBlockFactoryInterface
+        {
+        public:
+            virtual ~AWSReverseBlockFactory();
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
         };
 

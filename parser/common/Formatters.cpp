@@ -131,28 +131,6 @@ std::ostream& operator<< (std::ostream& os, const t_str & s)
         str += len;
         remain -= len;
     }
-
-    // ncbi::String k( s.p, s.n ); // throws if invalid UTF8; escapes control characters
-    // ncbi::StringBuffer out;
-
-    // ncbi::String::Iterator iter( k.makeIterator() );
-    // while( iter.isValid() )
-    // {
-    //     auto ch = iter.get();
-    //     switch ( ch )
-    //     {
-    //     case '\\':
-    //     case '\"':
-    //         out . append( '\\' );
-    //         break;
-    //     default:
-    //         break;
-    //     }
-    //     out . append( ch );
-    //     ++iter;
-    // }
-    // os . write( out.data(), out.size() );
-
     os . put ( '"' );
     return os;
 }
@@ -209,4 +187,3 @@ void JsonFastFormatter::addNameValue( const std::string & name, const std::strin
     t_str tmp { value.c_str(), value.size(), false };
     addNameValue( name, tmp );
 }
-

@@ -62,9 +62,39 @@ namespace NCBI
             yyscan_t m_sc;
             AWSReceiver m_receiver;
         };
+
+        class AWSReverseBlock : public ParseBlockInterface
+        {
+        public:
+            AWSReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            virtual ~AWSReverseBlock();
+            virtual ReceiverInterface & GetReceiver() { return m_receiver; }
+            virtual bool format_specific_parse( const char * line, size_t line_size );
+            virtual void SetDebug( bool onOff );
+
+            AWSReceiver m_receiver;
+        };
+
+        class AWSFormatter : public FormatterInterface
+        {
+        public:
+            virtual ~AWSFormatter();
+
+            virtual std::string format();
+
+            virtual void addNameValue( const std::string & name, const t_str & value );
+            virtual void addNameValue( const std::string & name, int64_t value );
+            virtual void addNameValue( const std::string & name, const std::string & value );
+
+        private:
+            std::map< std::string, std::string > kv;
+            std::stringstream ss;
+        };
+
     }
 }
 
+/* ----------- AWSParseBlockFactory ----------- */
 AWSParseBlockFactory::~AWSParseBlockFactory() {}
 
 std::unique_ptr<ParseBlockInterface>
@@ -78,6 +108,18 @@ AWSParseBlockFactory::MakeParseBlock() const
     return std::make_unique<AWSParseBlock>( fmt );
 }
 
+/* ----------- AWSReverseBlockFactory ----------- */
+AWSReverseBlockFactory::~AWSReverseBlockFactory() {}
+
+std::unique_ptr<ParseBlockInterface>
+AWSReverseBlockFactory::MakeParseBlock() const
+{
+     std::unique_ptr<FormatterInterface> fmt = std::make_unique<AWSFormatter>();
+    // return a revers-parseblock....
+    return std::make_unique<AWSReverseBlock>( fmt );
+}
+
+/* ----------- AWSParseBlock ----------- */
 AWSParseBlock::AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt )
 : m_receiver ( fmt )
 {
@@ -103,4 +145,49 @@ AWSParseBlock::format_specific_parse( const char * line, size_t line_size )
     int ret = aws_parse( m_sc, & m_receiver );
     aws__delete_buffer( bs, m_sc );
     return ret == 0;
+}
+
+/* ----------- AWSReverseBlock ----------- */
+AWSReverseBlock::AWSReverseBlock( std::unique_ptr<FormatterInterface> & fmt )
+: m_receiver ( fmt )
+{
+}
+
+AWSReverseBlock::~AWSReverseBlock()
+{
+}
+
+void
+AWSReverseBlock::SetDebug( bool onOff )
+{
+}
+
+bool
+AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
+{
+    /* here we will take the line, and ask the vdb-3 lib to parse it into a JSONValueRef
+       we will inspect it and call setters on the formatter to produce output */
+    return false;
+}
+
+/* ----------- AWSFormatter ----------- */
+AWSFormatter::~AWSFormatter()
+{
+}
+
+string AWSFormatter::format()
+{
+    return std::string();
+}
+
+void AWSFormatter::addNameValue( const std::string & name, const t_str & value )
+{
+}
+
+void AWSFormatter::addNameValue( const std::string & name, int64_t value )
+{
+}
+
+void AWSFormatter::addNameValue( const std::string & name, const std::string & value )
+{
 }

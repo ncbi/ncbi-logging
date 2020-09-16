@@ -28,10 +28,15 @@ AWS2JSN_CMN_SRC = \
 .precious: $(PREFIX_AWS)scanner.cpp $(PREFIX_AWS)scanner.hpp $(PREFIX_AWS)parser.cpp $(PREFIX_AWS)parser.hpp
 
 AWS2JSN_SRC = $(AWS2JSN_CMN_SRC) aws2jsn.cpp
+JSN2AWS_SRC = $(AWS2JSN_CMN_SRC) jsn2aws.cpp
 
 AWS2JSN_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(AWS2JSN_SRC)))
 AWS2JSN_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(AWS2JSN_SRC)))
 AWS2JSN_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(AWS2JSN_SRC)))
+
+JSN2AWS_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(JSN2AWS_SRC)))
+JSN2AWS_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(JSN2AWS_SRC)))
+JSN2AWS_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(JSN2AWS_SRC)))
 
 $(OBJDIR)/$(PREFIX_AWS)parser.dbg.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.dbg.o
 $(OBJDIR)/$(PREFIX_AWS)parser.rel.o:  	$(OBJDIR)/$(PREFIX_AWS)scanner.rel.o
@@ -49,19 +54,32 @@ $(BINDIR)/aws2jsn-rel: $(AWS2JSN_REL_OBJ) $(REL_TOOL_OBJ)
 $(BINDIR)/aws2jsn-prof: $(AWS2JSN_PROF_OBJ) $(PROF_TOOL_OBJ)
 	$(LD) -o $@ $^ $(COMMON_PROF_OBJ) $(GPROFFLAGS) $(LDFLAGS)
 
-aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel
+$(BINDIR)/jsn2aws-dbg: $(JSN2AWS_DBG_OBJ) $(DBG_TOOL_OBJ)
+	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) $(LDFLAGS)
 
-prof: mkdir $(BINDIR)/aws2jsn-prof
+$(BINDIR)/jsn2aws-rel: $(JSN2AWS_REL_OBJ) $(REL_TOOL_OBJ)
+	$(LD) -o $@ $^ $(COMMON_REL_OBJ) $(LDFLAGS)
+
+$(BINDIR)/jsn2aws-prof: $(JSN2AWS_PROF_OBJ) $(PROF_TOOL_OBJ)
+	$(LD) -o $@ $^ $(COMMON_PROF_OBJ) $(GPROFFLAGS) $(LDFLAGS)
+
+aws: mkdir $(BINDIR)/aws2jsn-dbg $(BINDIR)/aws2jsn-rel $(BINDIR)/jsn2aws-dbg $(BINDIR)/jsn2aws-rel
+
+prof: mkdir $(BINDIR)/aws2jsn-prof mkdir $(BINDIR)/jsn2aws-prof
 	#TODO: revive
 
 $(PREFIX_AWS)_TEST_PARSE_SRC = $(AWS2JSN_CMN_SRC) $(PREFIX_AWS)test_parse.cpp
 $(PREFIX_AWS)_TEST_FLEX_SRC = $(PREFIX_AWS)test_flex.cpp $(PREFIX_AWS)scanner.cpp
+$(PREFIX_AWS)_TEST_REVERSE_SRC = $(PREFIX_AWS)test_reverse.cpp $(PREFIX_AWS)parser.cpp $(PREFIX_AWS)scanner.cpp
 
 $(PREFIX_AWS)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS)_TEST_PARSE_SRC)))
 $(PREFIX_AWS)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS)_TEST_PARSE_SRC)))
 
 $(PREFIX_AWS)_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS)_TEST_FLEX_SRC)))
 $(PREFIX_AWS)_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS)_TEST_FLEX_SRC)))
+
+$(PREFIX_AWS)_TEST_REVERSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX_AWS)_TEST_REVERSE_SRC)))
+$(PREFIX_AWS)_TEST_REVERSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX_AWS)_TEST_REVERSE_SRC)))
 
 $(BINDIR)/$(PREFIX_AWS)test_parse-dbg: $($(PREFIX_AWS)_TEST_PARSE_DBG_OBJ)
 	$(LD) -o $@ $^  $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS)
@@ -75,6 +93,12 @@ $(BINDIR)/$(PREFIX_AWS)test_flex-dbg: $($(PREFIX_AWS)_TEST_FLEX_DBG_OBJ)
 $(BINDIR)/$(PREFIX_AWS)test_flex-rel: $($(PREFIX_AWS)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
+$(BINDIR)/$(PREFIX_AWS)test_reverse-dbg: $($(PREFIX_AWS)_TEST_REVERSE_DBG_OBJ)
+	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS)
+
+$(BINDIR)/$(PREFIX_AWS)test_reverse-rel: $($(PREFIX_AWS)_TEST_REVERSE_REL_OBJ)
+	$(LD) -o $@ $^ $(COMMON_REL_OBJ) -lgtest $(LDFLAGS)
+
 parse_test: aws flex_test $(BINDIR)/$(PREFIX_AWS)test_parse-dbg $(BINDIR)/$(PREFIX_AWS)test_parse-rel
 	$(BINDIR)/$(PREFIX_AWS)test_parse-dbg
 	$(BINDIR)/$(PREFIX_AWS)test_parse-rel
@@ -83,7 +107,11 @@ flex_test: aws $(BINDIR)/$(PREFIX_AWS)test_flex-dbg $(BINDIR)/$(PREFIX_AWS)test_
 	$(BINDIR)/$(PREFIX_AWS)test_flex-dbg
 	$(BINDIR)/$(PREFIX_AWS)test_flex-rel
 
-.PHONY: aws prof parse_test flex_test
+reverse_test: aws $(BINDIR)/$(PREFIX_AWS)test_reverse-dbg $(BINDIR)/$(PREFIX_AWS)test_reverse-rel
+	$(BINDIR)/$(PREFIX_AWS)test_reverse-dbg
+	$(BINDIR)/$(PREFIX_AWS)test_reverse-rel
+
+.PHONY: aws prof parse_test flex_test reverse_test
 
 ALL_OBJ = $(AWS2JSN_DBG_OBJ) $(AWS2JSN_REL_OBJ) $(AWS2JSN_PROF_OBJ) \
 $($(PREFIX_AWS)_TEST_PARSE_DBG_OBJ) $($(PREFIX_AWS)_TEST_PARSE_REL_OBJ) \
@@ -102,12 +130,17 @@ aws_clean:
 # acceptance
 
 AWS2JSON = $(BINDIR)/aws2jsn-dbg
+JSON2AWS = $(BINDIR)/jsn2aws-dbg
 
-acc_test: all parse_test
+acc_test: all parse_test reverse_test
 	mkdir -p  actual/$(PREFIX_AWS)testlines
 	cat ../data/aws_testlines.log | $(AWS2JSON) actual/$(PREFIX_AWS)testlines/aws >./actual/$(PREFIX_AWS)testlines/stdout 2>./actual/$(PREFIX_AWS)testlines/stderr \
 						&& diff ../expected/$(PREFIX_AWS)testlines ./actual/$(PREFIX_AWS)testlines
 	@ echo "test_aws passed"
+	mkdir -p  actual/$(PREFIX_AWS)rev_testlines	
+	cat ../data/aws_reparse_1.json | $(JSON2AWS) actual/$(PREFIX_AWS)rev_testlines/aws >./actual/$(PREFIX_AWS)rev_testlines/stdout 2>./actual/$(PREFIX_AWS)rev_testlines/stderr \
+						&& diff ../expected/$(PREFIX_AWS)rev_testlines ./actual/$(PREFIX_AWS)rev_testlines
+	@ echo "test_aws_reverse passed"
 	@ rm -rf actual/$(PREFIX_AWS)*
 	@ echo "done"
 

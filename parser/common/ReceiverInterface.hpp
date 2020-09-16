@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include <memory>
+#include <stdexcept>
 
 #include "types.h"
 #include "Formatters.hpp"
@@ -82,7 +83,13 @@ namespace NCBI
 
             void reportField( const char * message );
 
-            FormatterInterface & GetFormatter() { return * m_fmt.get(); }
+            FormatterInterface & GetFormatter()
+            {
+                FormatterInterface * p = m_fmt.get();
+                if ( nullptr != p )
+                    return * p;
+                throw std::logic_error( "no formatter available" );
+            }
 
         protected:
             std::unique_ptr<FormatterInterface> m_fmt;

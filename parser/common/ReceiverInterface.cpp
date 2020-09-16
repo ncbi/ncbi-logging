@@ -162,6 +162,7 @@ ParseBlockInterface :: receive_one_line( const char * line, size_t line_size, si
 
     if ( receiver . GetCategory() != ReceiverInterface::cat_good )
     {
+        
         receiver.GetFormatter().addNameValue("_line_nr", line_nr);
         receiver.setMember( "_unparsed", { line, line_size, false } );
     }
