@@ -192,26 +192,43 @@ extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const cha
 }
 
 static void
-extract_and_write( const JSONObject &obj, std::stringstream &ss, const char * fieldname )
-{
-    const JSONValue &entry = obj . getValue ( fieldname );
-    const String &S = entry . toString();
-    ss . write( S . data(), S . size() );
-}
-
-static void
 extract_and_set_url( const JSONObject &obj, FormatterInterface &formatter )
 {
-    // todo: handle ommited parts...
-    std::stringstream ss;
-    ss . put( '"' );
-    extract_and_write( obj, ss, "method" );
-    ss . put( ' ' );
-    extract_and_write( obj, ss, "path" );
-    ss . put( ' ' );
-    extract_and_write( obj, ss, "vers" );
-    ss . put( '"' );
-    formatter . addNameValue( "url", ss.str() );    
+    const String & method = obj . getValue ( "method" ) . toString();
+    const String & path = obj . getValue ( "path" ) . toString();
+    const String & vers = obj . getValue ( "vers" ) . toString();
+    if ( method.isEmpty() &&
+         path.isEmpty() &&
+         vers.isEmpty() )
+    {
+        formatter . addNameValue( "url", "-" );
+    }
+    else
+    {
+        // todo: handle ommited parts...
+        std::stringstream ss;
+
+        ss . put( '"' );
+        ss . write( method . data(), method . size() );
+
+        if ( ! method.isEmpty() && ! path.isEmpty() )
+        {
+            ss . put( ' ' );
+        }
+
+        ss . write( path . data(), path . size() );
+
+        if ( ( ! method.isEmpty() || ! path.isEmpty() ) && ! vers.isEmpty() )
+        {
+            ss . put( ' ' );
+        }
+
+        ss . write( vers . data(), vers . size() );
+
+        ss . put( '"' );
+
+        formatter . addNameValue( "url", ss.str() );
+    }
 }
 
 bool
@@ -260,7 +277,7 @@ AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
     {
         std::cerr << e.what() << std::endl;
     }
-    return false;    
+    return false;
 }
 
 /* ----------- AWSFormatter ----------- */

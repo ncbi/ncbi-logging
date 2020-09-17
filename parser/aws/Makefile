@@ -95,14 +95,14 @@ $(BINDIR)/$(PREFIX)_test_flex-rel: $($(PREFIX)_TEST_FLEX_REL_OBJ)
 	$(LD) -o $@ $^ -lgtest -lpthread
 
 #$(BINDIR)/$(PREFIX)_test_reverse-dbg: $(CPREFIX)_Interface.cpp
-$(BINDIR)/$(PREFIX)_test_reverse-dbg: $($(PREFIX)_TEST_REVERSE_DBG_OBJ) 
+$(BINDIR)/$(PREFIX)_test_reverse-dbg: $($(PREFIX)_TEST_REVERSE_DBG_OBJ)
 	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS)
 
 #$(BINDIR)/$(PREFIX)_test_reverse-rel: $(CPREFIX)_Interface.cpp
 $(BINDIR)/$(PREFIX)_test_reverse-rel: $($(PREFIX)_TEST_REVERSE_REL_OBJ)
 	$(LD) -o $@ $^ $(COMMON_REL_OBJ) -lgtest $(LDFLAGS)
 
-parse_test: $(PREFIX) flex_test $(BINDIR)/$(PREFIX)_test_parse-dbg $(BINDIR)/$(PREFIX)_test_parse-rel
+unittest_parse: $(PREFIX) flex_test $(BINDIR)/$(PREFIX)_test_parse-dbg $(BINDIR)/$(PREFIX)_test_parse-rel
 	$(BINDIR)/$(PREFIX)_test_parse-dbg
 	$(BINDIR)/$(PREFIX)_test_parse-rel
 
@@ -110,11 +110,11 @@ flex_test: $(PREFIX) $(BINDIR)/$(PREFIX)_test_flex-dbg $(BINDIR)/$(PREFIX)_test_
 	$(BINDIR)/$(PREFIX)_test_flex-dbg
 	$(BINDIR)/$(PREFIX)_test_flex-rel
 
-reverse_test: $(PREFIX) $(BINDIR)/$(PREFIX)_test_reverse-dbg $(BINDIR)/$(PREFIX)_test_reverse-rel
+unittest_reverse: $(PREFIX) $(BINDIR)/$(PREFIX)_test_reverse-dbg $(BINDIR)/$(PREFIX)_test_reverse-rel
 	$(BINDIR)/$(PREFIX)_test_reverse-dbg
 	$(BINDIR)/$(PREFIX)_test_reverse-rel
 
-.PHONY: $(PREFIX) prof parse_test flex_test reverse_test
+.PHONY: $(PREFIX) prof unittest_parse flex_test unittest_reverse
 
 ALL_OBJ = $($(CPREFIX)2JSN_DBG_OBJ) $($(CPREFIX)2JSN_REL_OBJ) $($(CPREFIX)2JSN_PROF_OBJ) \
 $($(PREFIX)_TEST_PARSE_DBG_OBJ) $($(PREFIX)_TEST_PARSE_REL_OBJ) \
@@ -136,19 +136,33 @@ $(PREFIX)_clean:
 $(CPREFIX)2JSON = $(BINDIR)/$(PREFIX)2jsn-dbg
 JSON2$(CPREFIX) = $(BINDIR)/jsn2$(PREFIX)-dbg
 
-acc_test: all parse_test reverse_test
-	mkdir -p  actual/$(PREFIX)_testlines
+acc_test: all unittest_parse unittest_reverse acctest_parse acctest_reverse
+	@ rm -rf actual/$(PREFIX)_*
+	@ echo "$(PREFIX) tests done"
+
+acctest_parse:
+	mkdir -p actual/$(PREFIX)_testlines
 	cat ../data/$(PREFIX)_testlines.log | $($(CPREFIX)2JSON) actual/$(PREFIX)_testlines/$(PREFIX) >./actual/$(PREFIX)_testlines/stdout 2>./actual/$(PREFIX)_testlines/stderr \
 						&& diff ../expected/$(PREFIX)_testlines ./actual/$(PREFIX)_testlines
-	@ echo "test_$(PREFIX) passed"
-	mkdir -p  actual/$(PREFIX)_rev_testlines	
-	cat ../data/$(PREFIX)_reparse_1.json | $(JSON2$(CPREFIX)) actual/$(PREFIX)_rev_testlines/$(PREFIX) >./actual/$(PREFIX)_rev_testlines/stdout 2>./actual/$(PREFIX)_rev_testlines/stderr \
-						&& diff ../expected/$(PREFIX)_rev_testlines ./actual/$(PREFIX)_rev_testlines
-	@ echo "test_$(PREFIX)_reverse passed"
-	@ rm -rf actual/$(PREFIX)_*
-	@ echo "done"
+	@ echo "$(PREFIX) acctest_parse passed"
 
-.PHONY: acc_test
+JSON1 = ../data/$(PREFIX)_reparse_1.json
+GEN1_DIR = actual/gen1/
+JSON2_DIR = actual/json2/
+GEN2_DIR = actual/gen2/
+
+#TODO: Remove .json from original-format file names
+
+acctest_reverse:
+	mkdir -p  $(GEN1_DIR) $(JSON2_DIR) $(GEN2_DIR)
+	cat $(JSON1) | $(JSON2$(CPREFIX)) $(GEN1_DIR)/$(PREFIX) >$(GEN1_DIR)/stdout 2>$(GEN1_DIR)/stderr \
+		&& diff ../expected/$(PREFIX)_rev_testlines $(GEN1_DIR)
+	# continue the round trip
+	cat $(GEN1_DIR)/$(PREFIX).good.jsonl | $($(CPREFIX)2JSON) $(JSON2_DIR) >$(JSON2_DIR)/stdout 2>$(JSON2_DIR)/stderr
+	cat $(JSON2_DIR)/.good.jsonl | $(JSON2$(CPREFIX)) $(GEN2_DIR)/$(PREFIX) >$(GEN2_DIR)/stdout 2>$(GEN2_DIR)/stderr && diff $(GEN1_DIR) $(GEN2_DIR)
+	@ echo "$(PREFIX) acctest_reverse passed"
+
+.PHONY: acc_test acctest_parse acctest_reverse
 
 #################################################
 # valgrind
