@@ -88,7 +88,7 @@ void verify_file( const std::string & filename, const std::string & content )
 TEST(FileCatWriter, Write)
 {
     {
-        FileCatWriter f( "test" );
+        FileCatWriter f( "test", ".jsonl" );
         f.write( ReceiverInterface::cat_review, "review" );
         f.write( ReceiverInterface::cat_good, "good" );
         f.write( ReceiverInterface::cat_bad, "bad" );
@@ -96,18 +96,18 @@ TEST(FileCatWriter, Write)
         f.write( ReceiverInterface::cat_ignored, "ignored" );
     }
 
-    verify_file( "test.review" + FileCatWriter::extension, "review" );
-    verify_file( "test.good" + FileCatWriter::extension, "good" );
-    verify_file( "test.bad" + FileCatWriter::extension, "bad" );
-    verify_file( "test.unrecog" + FileCatWriter::extension, "unrecog" );
+    verify_file( "test.review.jsonl", "review" );
+    verify_file( "test.good.jsonl", "good" );
+    verify_file( "test.bad.jsonl", "bad" );
+    verify_file( "test.unrecog.jsonl", "unrecog" );
 
     /* verify that the ignored-file does not exist */
-    ASSERT_FALSE( ifstream( "test.ignored" + FileCatWriter::extension ).good() );
+    ASSERT_FALSE( ifstream( "test.ignored.jsonl" ).good() );
 }
 
 TEST(FileCatWriter, Count)
 {
-    FileCatWriter f( "actual/test" );
+    FileCatWriter f( "actual/test", ".jsonl" );
     f.write( ReceiverInterface::cat_review, "review");
     ASSERT_EQ( 1, f.getCounter().get_cat_count( ReceiverInterface::cat_review ) );
 }

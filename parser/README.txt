@@ -27,6 +27,7 @@ $git checkout LOGMON-65
 -------------------------------------------------
 --- for the older ( aka 1 tool for all formats )
 -------------------------------------------------
+$cd v1
 $make
 # there are 2 versions build: log2jsn-dbg ( debug-version ) and log2jsn-rel ( release-version )
 # the release-version is about 2.5 times faster
@@ -48,10 +49,10 @@ $ cat data/gcp_bucket_log.log | bin/log2jsn-rel gcp
 -------------------------------------------------
 --- for the new ( aka 1 tool for each format )
 -------------------------------------------------
-$make v2
+$make
 
 #the run the tests ( depends on google-test! )
-$make test_v2
+$make test
 
 #how to run the new tools:
 #there are 4 of them now: aws2jsn-rel, gcp2jsn-rel, op2jsn-rel and tw2jsn-rel
@@ -93,3 +94,29 @@ zcat XXX.gz | tw2jsn-rel basename
 #we run tests with 10..13 threads on large-memory-machines, resulting in a speed up of 6 - 8 times relative to version 1
 
 # the fastest way of runnig the tools is the combination of '-f' and '-t n'.
+
+-------------------------------------------------
+--- reverse-tool ( for the moment just AWS )
+-------------------------------------------------
+$make
+-the default make-target builds every tool (including the reverse-tool)
+the reverse-tool also in the bin-subdir of the repository
+it is named: jsn2aws-rel
+
+cat XXX.json | jsn2aws-rel basename
+
+the tool expects its input also via stdin
+the tool expects a sequence of json-objects, not a single json-array of objects
+the tool expects a json-object per line
+empty lines are reported as unrecognized lines
+the tool procudes its output into multiple files ( same as the XXX2jsn-tools )
+the extension is ".aws"
+
+#basename.good.aws      ... this is the file you want to use for re-applying the aws2jsn-tool on it
+#basename.review.aws    ... unused, empty
+#basename.bad.jsonl     ... unused, empty
+#basename.unrecog.jsonl ... empty lines, or lines with invalid json
+#basename.stats.jsonl   ... this file has the final line-counts
+
+-the tests are integrated with the "test"-target ( depends on google-test! )
+$make test
