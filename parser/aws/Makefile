@@ -141,7 +141,7 @@ acc_test: all unittest_parse unittest_reverse acctest_parse acctest_reverse
 	@ rm -rf actual/$(PREFIX)_*
 	@ echo "$(PREFIX) tests done"
 
-acctest_parse:
+acctest_parse: all
 	mkdir -p actual/$(PREFIX)_testlines
 	cat ../data/$(PREFIX)_testlines.log | $($(CPREFIX)2JSON) actual/$(PREFIX)_testlines/$(PREFIX) >./actual/$(PREFIX)_testlines/stdout 2>./actual/$(PREFIX)_testlines/stderr \
 						&& diff ../expected/$(PREFIX)_testlines ./actual/$(PREFIX)_testlines
@@ -149,18 +149,35 @@ acctest_parse:
 
 JSON1 = ../data/$(PREFIX)_reparse_1.json
 GEN1_DIR = actual/gen1
-JSON2_DIR = actual/json2
-GEN2_DIR = actual/gen2
 
-#TODO: Remove .json from original-format file names
+JSON1_MT = ../data/$(PREFIX)_reparse_mt.json
+GEN1_MT_DIR = actual/gen1_mt
 
-acctest_reverse:
-	mkdir -p  $(GEN1_DIR) $(JSON2_DIR) $(GEN2_DIR)
+RT_JSN = ../data/$(PREFIX)_roundtrip.json
+RT_ORIG1_DIR = actual/rt_orig1
+RT_JSN_DIR = actual/rt_json
+RT_ORIG2_DIR = actual/rt_orig2
+
+acctest_reverse: all
+	#
+	mkdir -p $(GEN1_DIR)
 	cat $(JSON1) | $(JSON2$(CPREFIX)) $(GEN1_DIR)/$(PREFIX) >$(GEN1_DIR)/stdout 2>$(GEN1_DIR)/stderr \
 		&& diff ../expected/$(PREFIX)_rev_testlines $(GEN1_DIR)
-	# continue the round trip
-	cat $(GEN1_DIR)/$(PREFIX).good.$(PREFIX) | $($(CPREFIX)2JSON) $(JSON2_DIR) >$(JSON2_DIR)/stdout 2>$(JSON2_DIR)/stderr
-	cat $(JSON2_DIR)/.good.jsonl | $(JSON2$(CPREFIX)) $(GEN2_DIR)/$(PREFIX) >$(GEN2_DIR)/stdout 2>$(GEN2_DIR)/stderr && diff $(GEN1_DIR) $(GEN2_DIR)
+	#
+	# multi-threaded
+	mkdir -p $(GEN1_MT_DIR)
+	cat $(JSON1_MT) | $(JSON2$(CPREFIX)) $(GEN1_MT_DIR)/$(PREFIX) -t 2 >$(GEN1_MT_DIR)/stdout 2>$(GEN1_MT_DIR)/stderr \
+		&& diff ../expected/$(PREFIX)_reparse_mt $(GEN1_MT_DIR)
+	#
+	# round trip
+	mkdir -p $(RT_ORIG1_DIR) $(RT_JSN_DIR) $(RT_ORIG2_DIR)
+	# reparse 1
+	cat $(RT_JSN) | $(JSON2$(CPREFIX)) $(RT_ORIG1_DIR)/$(PREFIX) >$(RT_ORIG1_DIR)/stdout 2>$(RT_ORIG1_DIR)/stderr
+	# forward parse the original format
+	cat $(RT_ORIG1_DIR)/$(PREFIX).good.$(PREFIX) | $($(CPREFIX)2JSON) $(RT_JSN_DIR)/ >$(RT_JSN_DIR)/stdout 2>$(RT_JSN_DIR)/stderr
+	# reparse 2, compare the output of 2 reparses
+	cat $(RT_JSN_DIR)/.good.jsonl | $(JSON2$(CPREFIX)) $(RT_ORIG2_DIR)/$(PREFIX) >$(RT_ORIG2_DIR)/stdout 2>$(RT_ORIG2_DIR)/stderr && diff $(RT_ORIG1_DIR) $(RT_ORIG2_DIR)
+	#
 	@ echo "$(PREFIX) acctest_reverse passed"
 
 .PHONY: acc_test acctest_parse acctest_reverse

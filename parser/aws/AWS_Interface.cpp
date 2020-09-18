@@ -237,12 +237,12 @@ AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
     /* here we will take the line, and ask the vdb-3 lib to parse it into a JSONValueRef
        we will inspect it and call setters on the formatter to produce output */
     String src( line, line_size );
+    ReceiverInterface &receiver = GetReceiver();
+    FormatterInterface &formatter = receiver . GetFormatter();
     try
     {
         const JSONValueRef values = JSON::parse( src );
         const JSONObject &obj = values -> toObject();
-        ReceiverInterface &receiver = GetReceiver();
-        FormatterInterface &formatter = receiver . GetFormatter();
 
         extract_and_set( obj, formatter, "owner" );
         extract_and_set( obj, formatter, "bucket" );
@@ -275,7 +275,8 @@ AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
     }
     catch ( const ncbi::Exception &e )
     {
-        std::cerr << e.what() << std::endl;
+        formatter . addNameValue( "exception", e.what().zmsg );
+        receiver . SetCategory( ReceiverInterface::cat_ugly );
     }
     return false;
 }

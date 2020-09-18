@@ -53,6 +53,7 @@ TEST( AWSReverseBlockTest, ReverseEmptyLine )
     string line( "" );
     bool res = pb -> format_specific_parse( line.c_str(), line . size() );
     ASSERT_FALSE( res );
+    ASSERT_EQ( ReceiverInterface::cat_ugly, pb->GetReceiver().GetCategory() );
 }
 
 TEST( AWSReverseBlockTest, ReverseEmptyJson )

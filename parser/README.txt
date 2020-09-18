@@ -40,7 +40,7 @@ $make runtests
 # to process an on-premises log, 1 line per log entry (default)
 $ cat data/some_events.txt | bin/log2jsn-rel op
 
-# to process an aws log (default), pretty-printed 
+# to process an aws log (default), pretty-printed
 $ cat data/aws_bucket_log.log | bin/log2jsn-rel aws readable
 
 # to process a gcp log (default)
@@ -99,7 +99,8 @@ zcat XXX.gz | tw2jsn-rel basename
 --- reverse-tool ( for the moment just AWS )
 -------------------------------------------------
 $make
--the default make-target builds every tool (including the reverse-tool)
+
+the default make-target builds every tool (including the reverse-tool)
 the reverse-tool also in the bin-subdir of the repository
 it is named: jsn2aws-rel
 
@@ -112,11 +113,14 @@ empty lines are reported as unrecognized lines
 the tool procudes its output into multiple files ( same as the XXX2jsn-tools )
 the extension is ".aws"
 
-#basename.good.aws      ... this is the file you want to use for re-applying the aws2jsn-tool on it
-#basename.review.aws    ... unused, empty
-#basename.bad.jsonl     ... unused, empty
-#basename.unrecog.jsonl ... empty lines, or lines with invalid json
-#basename.stats.jsonl   ... this file has the final line-counts
+basename.good.aws      ... this is the file you want to use for re-applying the aws2jsn-tool on it
+basename.review.aws    ... unused, empty
+basename.bad.jsonl     ... unused, empty
+basename.unrecog.jsonl ... empty lines, or lines with invalid json
+basename.stats.jsonl   ... this file has the final line-counts
 
--the tests are integrated with the "test"-target ( depends on google-test! )
+command line option -f is accepted but ignored for now
+command line option -t is accepted (however, since -f has no effect in this tool the performance will be limited by global locks, for now)
+
+the tests for the reverse tool are integrated with the global "test"-target ( depends on google-test! )
 $make test
