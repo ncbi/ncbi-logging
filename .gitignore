@@ -8,3 +8,4 @@ postgresql-*tar.gz
 .gdb_history
 core
 1Mlines.txt.gz
+default.profraw

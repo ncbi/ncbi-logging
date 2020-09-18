@@ -231,12 +231,9 @@ TEST_F( OPTestFixture, parse_server_request_full_extra )
 }
 
 TEST_F( OPTestFixture, parse_server_bad_request )
-{   // TODO: report as bad or review
-    std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"me bad\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
-    ASSERT_EQ( "srv", extract_value( res, "server" ) );
-    ASSERT_THROW( extract_value( res, "method" ), ncbi::Exception );
-    ASSERT_THROW( extract_value( res, "path" ), ncbi::Exception );
-    ASSERT_THROW( extract_value( res, "vers" ), ncbi::Exception );
+{
+    std::string res = try_to_parse_review( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"me bad\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
+    ASSERT_EQ( "{\"_error\":\"Invalid request\",\"_line_nr\":1,\"_unparsed\":\"0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \\\"me bad\\\" 1 2 3 \\\"-\\\" \\\"\\\" \\\"-\\\" port=4 rl=5\",\"agent\":\"\",\"forwarded\":\"-\",\"ip\":\"0123:4567:89ab:cdef::1.2.3.4\",\"port\":\"4\",\"referer\":\"-\",\"req_len\":\"5\",\"req_time\":\"3\",\"res_code\":\"1\",\"res_len\":\"2\",\"server\":\"srv\",\"time\":\"[01/Jan/2020:02:50:24 -0500]\",\"user\":\"usr\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\"}\n", res);
 }
 
 TEST_F( OPTestFixture, parse_request_accession )

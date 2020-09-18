@@ -2,11 +2,13 @@
 
 #include "op_parser.hpp"
 #include "op_scanner.hpp"
+#include <ncbi/json.hpp>
 
 extern YY_BUFFER_STATE op_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
 using namespace NCBI::Logging;
 using namespace std;
+using namespace ncbi;
 
 OPReceiver::OPReceiver( unique_ptr<FormatterInterface> & fmt )
 : ReceiverInterface ( fmt )
@@ -51,9 +53,23 @@ namespace NCBI
             yyscan_t m_sc;
             OPReceiver m_receiver;
         };
+
+        class OPReverseBlock : public ParseBlockInterface
+        {
+        public:
+            OPReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            virtual ~OPReverseBlock();
+            virtual ReceiverInterface & GetReceiver() { return m_receiver; }
+            virtual bool format_specific_parse( const char * line, size_t line_size );
+            virtual void SetDebug( bool onOff );
+
+            OPReceiver m_receiver;
+        };
+
     }
 }
 
+/* ----------- OPParseBlockFactory ----------- */
 OPParseBlockFactory::~OPParseBlockFactory() {}
 
 std::unique_ptr<ParseBlockInterface>
@@ -67,6 +83,18 @@ OPParseBlockFactory::MakeParseBlock() const
     return std::make_unique<OPParseBlock>( fmt );
 }
 
+/* ----------- OPReverseBlockFactory ----------- */
+OPReverseBlockFactory::~OPReverseBlockFactory() {}
+
+std::unique_ptr<ParseBlockInterface>
+OPReverseBlockFactory::MakeParseBlock() const
+{
+     std::unique_ptr<FormatterInterface> fmt = std::make_unique<ReverseFormatter>();
+    // return a revers-parseblock....
+    return std::make_unique<OPReverseBlock>( fmt );
+}
+
+/* ----------- OPReverseBlockFactory ----------- */
 OPParseBlock::OPParseBlock( std::unique_ptr<FormatterInterface> & fmt )
 : m_receiver ( fmt )
 {
@@ -92,4 +120,144 @@ OPParseBlock::format_specific_parse( const char * line, size_t line_size )
     int ret = op_parse( m_sc, & m_receiver );
     op__delete_buffer( bs, m_sc );
     return ret == 0;
+}
+
+/* ----------- OPReverseBlock ----------- */
+OPReverseBlock::OPReverseBlock( std::unique_ptr<FormatterInterface> & fmt )
+: m_receiver ( fmt )
+{ // no need to do anything here
+}
+
+OPReverseBlock::~OPReverseBlock()
+{ // no need to do anything here
+}
+
+void
+OPReverseBlock::SetDebug( bool onOff )
+{ // no need to do anything here
+}
+
+enum Spaces
+{ sp_auto, sp_force, sp_off };
+
+static void
+extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname, Spaces quote_spaces = sp_auto )
+{
+    const JSONValue &entry = obj . getValue ( fieldname );
+    const String &S = entry . toString();
+    if ( S . isEmpty() )
+        formatter . addNameValue( fieldname, "-" );
+    else
+    {
+        switch ( quote_spaces )
+        {
+            case sp_auto:
+                {
+                    if ( S . find( ' ' ) != String::npos )
+                    {
+                        std::stringstream ss;
+                        ss . put ( '"' );
+                        ss . write( S . data(), S . size() );
+                        ss . put ( '"' );
+                        formatter . addNameValue( fieldname, ss . str() );
+                    }
+                    else
+                        formatter . addNameValue( fieldname, S . toSTLString() );
+                }
+                break;
+            case sp_force:
+                {
+                    std::stringstream ss;
+                    ss . put ( '"' );
+                    ss . write( S . data(), S . size() );
+                    ss . put ( '"' );
+                    formatter . addNameValue( fieldname, ss . str() );
+                }
+                break;
+            case sp_off:
+                formatter . addNameValue( fieldname, S.toSTLString() );
+                break;
+        }
+        //todo: look for quotes, if found: escape them!
+    }
+}
+
+static void
+extract_and_set_request( const JSONObject &obj, FormatterInterface &formatter )
+{
+    std::stringstream ss;
+
+    ss . put( '"' );
+
+    const String & method = obj . getValue ( "method" ) . toString();
+    ss . write( method . data(), method . size() );
+
+    const String & path = obj . getValue ( "path" ) . toString();
+    if ( ! path.isEmpty() )
+    {
+        ss . put( ' ' );
+        ss . write( path . data(), path . size() );
+    }
+
+    const String & vers = obj . getValue ( "vers" ) . toString();
+    if ( ! vers.isEmpty() )
+    {
+        ss . put( ' ' );
+        ss . write( vers . data(), vers . size() );
+    }
+
+    ss . put( '"' );
+
+    formatter . addNameValue( "request", ss.str() );
+}
+
+
+bool
+OPReverseBlock::format_specific_parse( const char * line, size_t line_size )
+{
+    /* here we will take the line, and ask the vdb-3 lib to parse it into a JSONValueRef
+       we will inspect it and call setters on the formatter to produce output */
+    String src( line, line_size );
+    ReceiverInterface &receiver = GetReceiver();
+    FormatterInterface &formatter = receiver . GetFormatter();
+    try
+    {
+        const JSONValueRef values = JSON::parse( src );
+        const JSONObject &obj = values -> toObject();
+
+        extract_and_set( obj, formatter, "ip" );
+        formatter . addNameValue( "", "-" );
+        extract_and_set( obj, formatter, "user" );
+        extract_and_set( obj, formatter, "time", sp_off );
+        extract_and_set( obj, formatter, "server" );
+        extract_and_set_request( obj, formatter );
+        extract_and_set( obj, formatter, "res_code" );
+        extract_and_set( obj, formatter, "res_len" );
+        extract_and_set( obj, formatter, "req_time" );
+        extract_and_set( obj, formatter, "referer", sp_force );
+        extract_and_set( obj, formatter, "agent", sp_force );
+        extract_and_set( obj, formatter, "forwarded", sp_force );
+
+        {
+            stringstream ss;
+            ss << "port=" << obj . getValue ( "port" ) . toString() . toSTLString();
+            formatter . addNameValue( "port", ss.str() );
+        }
+
+        {
+            stringstream ss;
+            ss << "rl=" << obj . getValue ( "req_len" ) . toString() . toSTLString();
+            formatter . addNameValue( "req_len", ss.str() );
+        }
+
+        receiver . SetCategory( ReceiverInterface::cat_good );
+
+        return true;
+    }
+    catch ( const ncbi::Exception &e )
+    {
+        formatter . addNameValue( "exception", e.what().zmsg );
+        receiver . SetCategory( ReceiverInterface::cat_ugly );
+    }
+    return false;
 }

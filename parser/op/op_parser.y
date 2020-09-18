@@ -286,7 +286,7 @@ server_and_request
     }
     | server SPACE quoted_list
     {
-        //TODO: reportField(request, $3)
+        lib->reportField( "Invalid request" );
     }
     | request
     {

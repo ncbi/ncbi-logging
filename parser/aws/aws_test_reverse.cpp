@@ -5,39 +5,6 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-TEST( AWSFormatterTest, Create )
-{
-    AWSFormatter fmt;
-}
-
-TEST( AWSFormatterTest, FormatEmptyObj )
-{
-    AWSFormatter fmt;
-    ASSERT_EQ( "", fmt.format() );
-}
-
-TEST( AWSFormatterTest, FormatStrings )
-{
-    AWSFormatter fmt;
-    fmt . addNameValue( "ignored", "value1" );
-    fmt . addNameValue( "ignored", "value2" );
-    fmt . addNameValue( "ignored", "value3" );
-    fmt . addNameValue( "ignored", 100 );
-    t_str s{ "tvalue", 6, false };
-    fmt . addNameValue( "ignored", s );
-    ASSERT_EQ( "value1 value2 value3 100 tvalue", fmt.format() );
-    ASSERT_EQ( "", fmt.format() );
-}
-
-TEST( AWSFormatterTest, FormatNulltstr )
-{
-    AWSFormatter fmt;
-    fmt . addNameValue( "ignored", "value1" );
-    t_str s = { nullptr, 0, false };
-    fmt . addNameValue( "ignored", s );
-    ASSERT_EQ( "value1", fmt.format() );
-}
-
 TEST( AWSReverseBlockTest, Create )
 {
     AWSReverseBlockFactory factory;

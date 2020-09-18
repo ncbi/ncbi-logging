@@ -205,3 +205,37 @@ TEST_F( JsonFastFormatter_Fixture, Format_ctrl_char_28 ) { TestControlChar( 28, 
 TEST_F( JsonFastFormatter_Fixture, Format_ctrl_char_29 ) { TestControlChar( 29, "\\u001d"); }
 TEST_F( JsonFastFormatter_Fixture, Format_ctrl_char_30 ) { TestControlChar( 30, "\\u001e"); }
 TEST_F( JsonFastFormatter_Fixture, Format_ctrl_char_31 ) { TestControlChar( 31, "\\u001f"); }
+
+TEST( ReverseFormatterTest, Create )
+{
+    ReverseFormatter fmt;
+}
+
+TEST( ReverseFormatterTest, FormatEmptyObj )
+{
+    ReverseFormatter fmt;
+    ASSERT_EQ( "", fmt.format() );
+}
+
+TEST( ReverseFormatterTest, FormatStrings )
+{
+    ReverseFormatter fmt;
+    fmt . addNameValue( "ignored", "value1" );
+    fmt . addNameValue( "ignored", "value2" );
+    fmt . addNameValue( "ignored", "value3" );
+    fmt . addNameValue( "ignored", 100 );
+    t_str s{ "tvalue", 6, false };
+    fmt . addNameValue( "ignored", s );
+    ASSERT_EQ( "value1 value2 value3 100 tvalue", fmt.format() );
+    ASSERT_EQ( "", fmt.format() );
+}
+
+TEST( ReverseFormatterTest, FormatNulltstr )
+{
+    ReverseFormatter fmt;
+    fmt . addNameValue( "ignored", "value1" );
+    t_str s = { nullptr, 0, false };
+    fmt . addNameValue( "ignored", s );
+    ASSERT_EQ( "value1", fmt.format() );
+}
+

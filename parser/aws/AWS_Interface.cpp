@@ -77,21 +77,6 @@ namespace NCBI
             AWSReceiver m_receiver;
         };
 
-        class AWSFormatter : public FormatterInterface
-        {
-        public:
-            virtual ~AWSFormatter();
-
-            virtual std::string format();
-
-            virtual void addNameValue( const std::string & name, const t_str & value );
-            virtual void addNameValue( const std::string & name, int64_t value );
-            virtual void addNameValue( const std::string & name, const std::string & value );
-
-        private:
-            std::stringstream ss;
-        };
-
     }
 }
 
@@ -115,7 +100,7 @@ AWSReverseBlockFactory::~AWSReverseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 AWSReverseBlockFactory::MakeParseBlock() const
 {
-     std::unique_ptr<FormatterInterface> fmt = std::make_unique<AWSFormatter>();
+     std::unique_ptr<FormatterInterface> fmt = std::make_unique<ReverseFormatter>();
     // return a revers-parseblock....
     return std::make_unique<AWSReverseBlock>( fmt );
 }
@@ -205,7 +190,6 @@ extract_and_set_url( const JSONObject &obj, FormatterInterface &formatter )
     }
     else
     {
-        // todo: handle ommited parts...
         std::stringstream ss;
 
         ss . put( '"' );
@@ -279,40 +263,4 @@ AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
         receiver . SetCategory( ReceiverInterface::cat_ugly );
     }
     return false;
-}
-
-/* ----------- AWSFormatter ----------- */
-AWSFormatter::~AWSFormatter()
-{
-}
-
-string AWSFormatter::format()
-{
-    string tmp = ss.str();
-    ss.str( "" );
-    return tmp;
-}
-
-void AWSFormatter::addNameValue( const std::string & name, const t_str & value )
-{
-    if ( ( nullptr != value . p ) && ( 0 != value . n ) )
-    {
-        if ( ! ss . str() . empty() )
-            ss . put( ' ' );
-        ss .write( value . p, value . n );
-    }
-}
-
-void AWSFormatter::addNameValue( const std::string & name, int64_t value )
-{
-    if ( ! ss . str() . empty() )
-        ss . put( ' ' );
-    ss << value;
-}
-
-void AWSFormatter::addNameValue( const std::string & name, const std::string & value )
-{
-    if ( ! ss . str() . empty() )
-        ss . put( ' ' );
-    ss .write( value . c_str(), value . size() );
 }

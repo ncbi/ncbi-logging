@@ -63,6 +63,23 @@ namespace NCBI
             std::vector< std::string > kv;
             std::stringstream ss;
         };
+
+        class ReverseFormatter : public FormatterInterface
+        {
+        public:
+            ReverseFormatter() {} //TODO: add the separator
+            virtual ~ReverseFormatter();
+
+            virtual std::string format();
+
+            virtual void addNameValue( const std::string & name, const t_str & value );
+            virtual void addNameValue( const std::string & name, int64_t value );
+            virtual void addNameValue( const std::string & name, const std::string & value );
+
+        private:
+            std::stringstream ss;
+        };
+
     }
 }
 

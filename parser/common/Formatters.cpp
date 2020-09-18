@@ -187,3 +187,39 @@ void JsonFastFormatter::addNameValue( const std::string & name, const std::strin
     t_str tmp { value.c_str(), value.size(), false };
     addNameValue( name, tmp );
 }
+
+/* ----------- ReverseFormatter ----------- */
+ReverseFormatter::~ReverseFormatter()
+{
+}
+
+string ReverseFormatter::format()
+{
+    string tmp = ss.str();
+    ss.str( "" );
+    return tmp;
+}
+
+void ReverseFormatter::addNameValue( const std::string & name, const t_str & value )
+{
+    if ( ( nullptr != value . p ) && ( 0 != value . n ) )
+    {
+        if ( ! ss . str() . empty() )
+            ss . put( ' ' );
+        ss .write( value . p, value . n );
+    }
+}
+
+void ReverseFormatter::addNameValue( const std::string & name, int64_t value )
+{
+    if ( ! ss . str() . empty() )
+        ss . put( ' ' );
+    ss << value;
+}
+
+void ReverseFormatter::addNameValue( const std::string & name, const std::string & value )
+{
+    if ( ! ss . str() . empty() )
+        ss . put( ' ' );
+    ss .write( value . c_str(), value . size() );
+}

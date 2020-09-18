@@ -11,10 +11,10 @@ namespace NCBI
         struct OPReceiver : public ReceiverInterface
         {
             using ReceiverInterface::set;
-            
+
             OPReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
-            typedef enum { 
+            typedef enum {
                 owner = LastMemberId+1,
                 time,
                 server,
@@ -39,6 +39,12 @@ namespace NCBI
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
         };
 
+        class OPReverseBlockFactory : public ParseBlockFactoryInterface
+        {
+        public:
+            virtual ~OPReverseBlockFactory();
+            virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
+        };
 
     }
 }
