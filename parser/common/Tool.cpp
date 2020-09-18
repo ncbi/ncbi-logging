@@ -9,9 +9,10 @@ using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
 
-Tool::Tool( const string & version, ParseBlockFactoryInterface & pbFact )
+Tool::Tool( const string & version, ParseBlockFactoryInterface & pbFact, const std::string &extension )
 :   m_version ( version ),
-    m_pbFact( pbFact )
+    m_pbFact( pbFact ),
+    m_extension( extension )
 {
 }
 
@@ -47,12 +48,12 @@ Tool::run ( int argc, char * argv [] )
         if ( !help && !vers )
         {
             CLineSplitter input( stdin );
-            FileCatWriter outputs( outputBaseName . toSTLString () );
+            FileCatWriter outputs( outputBaseName . toSTLString (), m_extension );
             m_pbFact.setFast( fast );
             m_pbFact.setNumThreads( numThreads );
             m_pbFact.MakeParserDriver( input, outputs ) -> parse_all_lines();
 
-            std::ofstream report( outputBaseName . toSTLString () + ".stats" + FileCatWriter::extension );
+            std::ofstream report( outputBaseName . toSTLString () + ".stats" + m_extension );
             JsonLibFormatter f;
             report << outputs.getCounter().report( f ) << endl;
         }

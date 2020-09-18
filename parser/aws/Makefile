@@ -117,6 +117,7 @@ unittest_reverse: $(PREFIX) $(BINDIR)/$(PREFIX)_test_reverse-dbg $(BINDIR)/$(PRE
 .PHONY: $(PREFIX) prof unittest_parse flex_test unittest_reverse
 
 ALL_OBJ = $($(CPREFIX)2JSN_DBG_OBJ) $($(CPREFIX)2JSN_REL_OBJ) $($(CPREFIX)2JSN_PROF_OBJ) \
+$(JSN2$(CPREFIX)_DBG_OBJ) $(JSN2$(CPREFIX)_REL_OBJ) $(JSN2$(CPREFIX)_PROF_OBJ) \
 $($(PREFIX)_TEST_PARSE_DBG_OBJ) $($(PREFIX)_TEST_PARSE_REL_OBJ) \
 $($(PREFIX)_TEST_FLEX_DBG_OBJ) $($(PREFIX)_TEST_FLEX_REL_OBJ) \
 $($(PREFIX)_TEST_REVERSE_DBG_OBJ) $($(PREFIX)_TEST_REVERSE_REL_OBJ)
@@ -126,7 +127,7 @@ ALL_D = $(subst .o,.d, $(ALL_OBJ) )
 -include $(ALL_D)
 
 $(PREFIX)_clean:
-	@ rm -rf $(ALL_OBJ) $(ALL_D) $(BINDIR)/$(PREFIX)*
+	@ rm -rf $(ALL_OBJ) $(ALL_D) $(BINDIR)/$(PREFIX)* $(BINDIR)/jsn2$(PREFIX)*
 	@ rm -rf ./$(PREFIX)_parser.?pp ./$(PREFIX)_scanner.?pp
 	@ rm -rf *.output
 
@@ -147,9 +148,9 @@ acctest_parse:
 	@ echo "$(PREFIX) acctest_parse passed"
 
 JSON1 = ../data/$(PREFIX)_reparse_1.json
-GEN1_DIR = actual/gen1/
-JSON2_DIR = actual/json2/
-GEN2_DIR = actual/gen2/
+GEN1_DIR = actual/gen1
+JSON2_DIR = actual/json2
+GEN2_DIR = actual/gen2
 
 #TODO: Remove .json from original-format file names
 
@@ -158,7 +159,7 @@ acctest_reverse:
 	cat $(JSON1) | $(JSON2$(CPREFIX)) $(GEN1_DIR)/$(PREFIX) >$(GEN1_DIR)/stdout 2>$(GEN1_DIR)/stderr \
 		&& diff ../expected/$(PREFIX)_rev_testlines $(GEN1_DIR)
 	# continue the round trip
-	cat $(GEN1_DIR)/$(PREFIX).good.jsonl | $($(CPREFIX)2JSON) $(JSON2_DIR) >$(JSON2_DIR)/stdout 2>$(JSON2_DIR)/stderr
+	cat $(GEN1_DIR)/$(PREFIX).good.$(PREFIX) | $($(CPREFIX)2JSON) $(JSON2_DIR) >$(JSON2_DIR)/stdout 2>$(JSON2_DIR)/stderr
 	cat $(JSON2_DIR)/.good.jsonl | $(JSON2$(CPREFIX)) $(GEN2_DIR)/$(PREFIX) >$(GEN2_DIR)/stdout 2>$(GEN2_DIR)/stderr && diff $(GEN1_DIR) $(GEN2_DIR)
 	@ echo "$(PREFIX) acctest_reverse passed"
 

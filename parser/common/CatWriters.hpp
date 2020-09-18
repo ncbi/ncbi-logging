@@ -38,13 +38,12 @@ namespace NCBI
         class FileCatWriter : public CatWriterInterface
         {
         public:
-            FileCatWriter( const std::string & basename );
+            FileCatWriter( const std::string & basename, const std::string & extension );
             virtual ~FileCatWriter();
 
             virtual void write( ReceiverInterface::Category cat, const std::string & s );
 
             const CatCounter& getCounter() const { return ctr; }
-            static const std::string extension;
 
         private:
             std::ofstream review, good, bad, ugly;

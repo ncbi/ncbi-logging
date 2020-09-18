@@ -46,9 +46,7 @@ CatWriterInterface :: ~CatWriterInterface() {}
 
 // FileCatWriter
 
-const std::string FileCatWriter :: extension = ".jsonl";
-
-FileCatWriter :: FileCatWriter( const string & baseName ) :
+FileCatWriter :: FileCatWriter( const string & baseName, const std::string & extension ) :
     review  ( baseName+".review" + extension ),
     good    ( baseName+".good" + extension ),
     bad     ( baseName+".bad" + extension ), 
