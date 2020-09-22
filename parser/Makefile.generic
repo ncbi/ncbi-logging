@@ -139,24 +139,23 @@ $(PREFIX)_clean:
 #################################################
 # acceptance
 
-$(CPREFIX)2JSON = $(BINDIR)/$(PREFIX)2jsn-dbg
-JSON2$(CPREFIX) = $(BINDIR)/jsn2$(PREFIX)-dbg
+FWD_TOOL = $(BINDIR)/$(PREFIX)2jsn-dbg
+REV_TOOL = $(BINDIR)/jsn2$(PREFIX)-dbg
+TMP_DIR = actual/tmp
 
 acc_test: all unittest_parse unittest_reverse acctest_parse acctest_reverse
 	@ rm -rf actual/$(PREFIX)_*
 	@ echo "$(PREFIX) tests done"
 
 acctest_parse: all
-	mkdir -p actual/$(PREFIX)_testlines
-	cat ../data/$(PREFIX)_testlines.log | $($(CPREFIX)2JSON) actual/$(PREFIX)_testlines/$(PREFIX) >./actual/$(PREFIX)_testlines/stdout 2>./actual/$(PREFIX)_testlines/stderr \
-						&& diff ../expected/$(PREFIX)_testlines ./actual/$(PREFIX)_testlines
+	#
+	../runtestcase.sh ../data/$(PREFIX)_testlines.log $(FWD_TOOL) $(TMP_DIR)
+	../diff_results.sh ../expected/$(PREFIX)_testlines $(TMP_DIR)
+	#
 	@ echo "$(PREFIX) acctest_parse passed"
 
 JSON1 = ../data/$(PREFIX)_reparse_1.json
-GEN1_DIR = actual/gen1
-
 JSON1_MT = ../data/$(PREFIX)_reparse_mt.json
-GEN1_MT_DIR = actual/gen1_mt
 
 RT_JSN = ../data/$(PREFIX)_roundtrip.json
 RT_ORIG1_DIR = actual/rt_orig1
@@ -165,23 +164,21 @@ RT_ORIG2_DIR = actual/rt_orig2
 
 acctest_reverse: all
 	#
-	mkdir -p $(GEN1_DIR)
-	cat $(JSON1) | $(JSON2$(CPREFIX)) $(GEN1_DIR)/$(PREFIX) >$(GEN1_DIR)/stdout 2>$(GEN1_DIR)/stderr \
-		&& diff ../expected/$(PREFIX)_rev_testlines $(GEN1_DIR)
+	@../runtestcase.sh $(JSON1) $(REV_TOOL) $(TMP_DIR)
+	@../diff_results.sh ../expected/$(PREFIX)_rev_testlines $(TMP_DIR)
 	#
 	# multi-threaded
-	mkdir -p $(GEN1_MT_DIR)
-	cat $(JSON1_MT) | $(JSON2$(CPREFIX)) $(GEN1_MT_DIR)/$(PREFIX) -t 2 >$(GEN1_MT_DIR)/stdout 2>$(GEN1_MT_DIR)/stderr \
-		&& diff ../expected/$(PREFIX)_reparse_mt $(GEN1_MT_DIR)
+	@../runtestcase.sh $(JSON1_MT) $(REV_TOOL) $(TMP_DIR)
+	@../diff_results.sh ../expected/$(PREFIX)_reparse_mt $(TMP_DIR)
 	#
 	# round trip
-	mkdir -p $(RT_ORIG1_DIR) $(RT_JSN_DIR) $(RT_ORIG2_DIR)
 	# reparse 1
-	cat $(RT_JSN) | $(JSON2$(CPREFIX)) $(RT_ORIG1_DIR)/$(PREFIX) >$(RT_ORIG1_DIR)/stdout 2>$(RT_ORIG1_DIR)/stderr
+	@../runtestcase.sh $(RT_JSN) $(REV_TOOL) $(RT_ORIG1_DIR)
 	# forward parse the original format
-	cat $(RT_ORIG1_DIR)/$(PREFIX).good.$(PREFIX) | $($(CPREFIX)2JSON) $(RT_JSN_DIR)/ >$(RT_JSN_DIR)/stdout 2>$(RT_JSN_DIR)/stderr
+	@../runtestcase.sh $(RT_ORIG1_DIR)/out.good.$(PREFIX) $(FWD_TOOL) $(RT_JSN_DIR)
 	# reparse 2, compare the output of 2 reparses
-	cat $(RT_JSN_DIR)/.good.jsonl | $(JSON2$(CPREFIX)) $(RT_ORIG2_DIR)/$(PREFIX) >$(RT_ORIG2_DIR)/stdout 2>$(RT_ORIG2_DIR)/stderr && diff $(RT_ORIG1_DIR) $(RT_ORIG2_DIR)
+	@../runtestcase.sh $(RT_JSN_DIR)/out.good.jsonl $(REV_TOOL) $(RT_ORIG2_DIR)
+	@../diff_results.sh $(RT_ORIG1_DIR) $(RT_ORIG2_DIR)
 	#
 	@ echo "$(PREFIX) acctest_reverse passed"
 
