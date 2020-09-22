@@ -380,6 +380,30 @@ TEST_F( OPTestFixture, parse_req_len )
     ASSERT_EQ( "5", extract_value( res, "req_len" ) );
 }
 
+TEST_F( OPTestFixture, parse_path_with_url_encoded_slash )
+{   //LOGOMON-90 accessions preceded by %2F
+    std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET sos1%2Fsra-pub-run-2%2FSRR8422826%2FSRR8422826.1 HTTP/1.1\" 1 2 3 \"\" \"\" \"fwd\" port=4 rl=5" );
+    ASSERT_EQ( "SRR8422826", extract_value( res, "accession" ) );
+    ASSERT_EQ( "SRR8422826", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".1", extract_value( res, "extension" ) );
+}
+
+TEST_F( OPTestFixture, parse_path_with_url_encoding_in_extension )
+{
+    std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET /SRR9154112/%2A.fastq%2a HTTP/1.1\" 1 2 3 \"\" \"\" \"fwd\" port=4 rl=5" );
+    ASSERT_EQ( "SRR9154112", extract_value( res, "accession" ) );
+    ASSERT_EQ( "%2A", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".fastq%2a", extract_value( res, "extension" ) );
+}
+
+TEST_F( OPTestFixture, parse_path_with_url_encoded_slash_in_extension )
+{
+    std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET /SRR9154112/%2A.fastq%2f HTTP/1.1\" 1 2 3 \"\" \"\" \"fwd\" port=4 rl=5" );
+    ASSERT_EQ( "SRR9154112", extract_value( res, "accession" ) );
+    ASSERT_EQ( "%2A", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".fastq", extract_value( res, "extension" ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

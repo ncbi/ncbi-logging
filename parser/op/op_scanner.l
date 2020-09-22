@@ -38,15 +38,26 @@ VERS    [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
 I64     [-+]?[0-9]+
 FLOAT   [-+]?[0-9]+\.[0-9]+
 
-CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,%#\[\]<>|`{}^]
-STR_CHARS   "?"|"\."|"\/"|"\\"|{CHARS}|[\x00-\x1f]
+CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,#\[\]<>|`{}^]
+STR_CHARS   [?\.\/\\%]|{CHARS}|[\x00-\x1f]
 
 QSTR        {STR_CHARS}+
 QSTR_ESC    (\\\"|{STR_CHARS})+
 
 ACCESSION   [DES]R[RZXP][0-9]{6,9}
-PATHSTR     {CHARS}+
-PATHEXT     \.(\.|{PATHSTR})*
+
+    /* %2f and %2F (/) are excluded because they are a special token (SLASH) */
+HEXCHAR     [0-9A-Fa-f]
+HEXCHAR_1   [013-9A-Fa-f]
+HEXCHAR_2   [0-9A-Ea-e]
+URL_BYTE_1  %{HEXCHAR_1}{HEXCHAR_2}
+URL_BYTE_2  %{HEXCHAR_1}{HEXCHAR}
+URL_BYTE_3  %{HEXCHAR}{HEXCHAR_2}
+
+URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
+
+PATHSTR     ({URL_BYTE}|{CHARS})+
+PATHEXT     \.{PATHSTR}*
 
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
@@ -105,6 +116,9 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <PATH>\?            { MAKE_STR(); return QMARK; }
 <PATH>\/            { MAKE_STR(); return SLASH; };
 <PATH>\\            { MAKE_STR(); return PATHSTR; };
+<PATH>%2[Ff]        { MAKE_STR(); return SLASH; };
+<PATH>%2[Aa]        { MAKE_STR(); return PATHSTR; };
+<PATH>%             { MAKE_STR(); return PATHSTR; };
 <PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; };

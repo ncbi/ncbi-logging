@@ -176,12 +176,22 @@ TEST_F ( OP_TestFlexFixture, Path_StateReturn )
 
 TEST_F ( OP_TestFlexFixture, Path_Accesssion )
 {
-    const char * input = "/SRR9154112/%2A.fastq%2A";
+    const char * input = "/SRR9154112/%CB.fastq%2a";
     ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
     ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
     ASSERT_EQ( SLASH, NextTokenType( ) );
-    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%2A", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2A", TokenValue() );
+    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%CB", TokenValue() ); // % is a delimiter
+    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2a", TokenValue() );
+}
+
+TEST_F ( OP_TestFlexFixture, Path_Accesssion_URL_encoded_slash )
+{   // %2F is a separate token (important for the parser)
+    const char * input = "%2FSRR9154112%2f.fastq%2f";
+    ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
+    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
+    ASSERT_EQ( SLASH, NextTokenType( ) );
+    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq", TokenValue() );
+    ASSERT_EQ( SLASH, NextTokenType( ) );
 }
 
 TEST_F ( OP_TestFlexFixture, Agent )
