@@ -1,0 +1,1 @@
+130.91.43.130 - - [23/Jun/2020:20:19:14 -0400] sra-download.ncbi.nlm.nih.gov "GET /traces/refseq/CM000678.1 HTTP/1.1" 206 262144 0.006 "-" "blastn_vdb: 2.6.1; C++ 20170804; SRA Toolkit 2.7.36 (phid=noc7d14nos,libc=2.17)" "-" port=443 rl=315

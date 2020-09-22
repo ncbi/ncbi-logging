@@ -137,16 +137,24 @@ OPReverseBlock::SetDebug( bool onOff )
 { // no need to do anything here
 }
 
-enum Spaces
+// how to deal with the value if it contains spaces
+// sp_auto  ... find out if values has spaces, quote the whole value if it has them, if not not quotes
+// sp_force ... do not inspect value for spaces, quote the value always
+// sp_off   ... do not inspect value for spaces, never quote the value
+enum QuoteSpaces
 { sp_auto, sp_force, sp_off };
 
 static void
-extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname, Spaces quote_spaces = sp_auto )
+extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname,
+    QuoteSpaces quote_spaces = sp_auto, bool empty_is_dash = false )
 {
     const JSONValue &entry = obj . getValue ( fieldname );
     const String &S = entry . toString();
     if ( S . isEmpty() )
-        formatter . addNameValue( fieldname, "-" );
+    {
+        if ( empty_is_dash )
+            formatter . addNameValue( fieldname, "-" );
+    }
     else
     {
         switch ( quote_spaces )
@@ -227,13 +235,13 @@ OPReverseBlock::format_specific_parse( const char * line, size_t line_size )
 
         extract_and_set( obj, formatter, "ip" );
         formatter . addNameValue( "", "-" );
-        extract_and_set( obj, formatter, "user" );
+        extract_and_set( obj, formatter, "user", sp_auto, true );
         extract_and_set( obj, formatter, "time", sp_off );
         extract_and_set( obj, formatter, "server" );
         extract_and_set_request( obj, formatter );
         extract_and_set( obj, formatter, "res_code" );
-        extract_and_set( obj, formatter, "res_len" );
-        extract_and_set( obj, formatter, "req_time" );
+        extract_and_set( obj, formatter, "res_len", sp_off, true );
+        extract_and_set( obj, formatter, "req_time", sp_off );
         extract_and_set( obj, formatter, "referer", sp_force );
         extract_and_set( obj, formatter, "agent", sp_force );
         extract_and_set( obj, formatter, "forwarded", sp_force );
