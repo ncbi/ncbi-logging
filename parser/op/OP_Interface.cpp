@@ -94,7 +94,7 @@ OPReverseBlockFactory::MakeParseBlock() const
     return std::make_unique<OPReverseBlock>( fmt );
 }
 
-/* ----------- OPReverseBlockFactory ----------- */
+/* ----------- OPParseBlock----------- */
 OPParseBlock::OPParseBlock( std::unique_ptr<FormatterInterface> & fmt )
 : m_receiver ( fmt )
 {

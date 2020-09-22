@@ -230,6 +230,19 @@ TEST( ReverseFormatterTest, FormatStrings )
     ASSERT_EQ( "", fmt.format() );
 }
 
+TEST( ReverseFormatterTest, FormatStrings_comma_separated )
+{
+    ReverseFormatter fmt( ',' );
+    fmt . addNameValue( "ignored", "value1" );
+    fmt . addNameValue( "ignored", "value2" );
+    fmt . addNameValue( "ignored", "value3" );
+    fmt . addNameValue( "ignored", 100 );
+    t_str s{ "tvalue", 6, false };
+    fmt . addNameValue( "ignored", s );
+    ASSERT_EQ( "value1,value2,value3,100,tvalue", fmt.format() );
+    ASSERT_EQ( "", fmt.format() );
+}
+
 TEST( ReverseFormatterTest, FormatNulltstr )
 {
     ReverseFormatter fmt;

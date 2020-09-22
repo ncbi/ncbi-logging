@@ -2,11 +2,13 @@
 
 #include "gcp_parser.hpp"
 #include "gcp_scanner.hpp"
+#include <ncbi/json.hpp>
 
 extern YY_BUFFER_STATE gcp_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
 using namespace NCBI::Logging;
 using namespace std;
+using namespace ncbi;
 
 GCPReceiver::GCPReceiver( unique_ptr<FormatterInterface> & fmt )
 : ReceiverInterface ( fmt )
@@ -53,8 +55,23 @@ namespace NCBI
             yyscan_t m_sc;
             GCPReceiver m_receiver;
         };
+
+        class GCPReverseBlock : public ParseBlockInterface
+        {
+        public:
+            GCPReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            virtual ~GCPReverseBlock();
+            virtual ReceiverInterface & GetReceiver() { return m_receiver; }
+            virtual bool format_specific_parse( const char * line, size_t line_size );
+            virtual void SetDebug( bool onOff );
+
+            GCPReceiver m_receiver;
+        };
+
     }
 }
+
+/* ----------- GCPParseBlockFactory----------- */
 
 GCPParseBlockFactory::~GCPParseBlockFactory() {}
 
@@ -68,6 +85,8 @@ GCPParseBlockFactory::MakeParseBlock() const
         fmt = std::make_unique<JsonLibFormatter>();
     return std::make_unique<GCPParseBlock>( fmt );
 }
+
+/* ----------- GCPParseBlock----------- */
 
 GCPParseBlock::GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt )
 : m_receiver ( fmt )
@@ -103,4 +122,92 @@ GCPParseBlock::format_specific_parse( const char * line, size_t line_size )
     }
     gcp__delete_buffer( bs, m_sc );
     return ret == 0;
+}
+
+/* ----------- GCPReverseBlockFactory ----------- */
+GCPReverseBlockFactory::~GCPReverseBlockFactory() {}
+
+std::unique_ptr<ParseBlockInterface>
+GCPReverseBlockFactory::MakeParseBlock() const
+{
+     std::unique_ptr<FormatterInterface> fmt = std::make_unique<ReverseFormatter>( ',' );
+    // return a revers-parseblock....
+    return std::make_unique<GCPReverseBlock>( fmt );
+}
+
+/* ----------- GCPReverseBlock ----------- */
+GCPReverseBlock::GCPReverseBlock( std::unique_ptr<FormatterInterface> & fmt )
+: m_receiver ( fmt )
+{ // no need to do anything here
+}
+
+GCPReverseBlock::~GCPReverseBlock()
+{ // no need to do anything here
+}
+
+void
+GCPReverseBlock::SetDebug( bool onOff )
+{ // no need to do anything here
+}
+
+static void
+extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname )
+{
+    const JSONValue &entry = obj . getValue ( fieldname );
+    const String &S = entry . toString();
+    if ( S . isEmpty() )
+    {
+        formatter . addNameValue( fieldname, "\"\"" );
+    }
+    else
+    {
+        std::stringstream ss;
+        ss . put ( '"' );
+        ss . write( S . data(), S . size() );
+        ss . put ( '"' );
+        formatter . addNameValue( fieldname, ss . str() );
+    }
+}
+
+bool
+GCPReverseBlock::format_specific_parse( const char * line, size_t line_size )
+{
+    /* here we will take the line, and ask the vdb-3 lib to parse it into a JSONValueRef
+       we will inspect it and call setters on the formatter to produce output */
+    String src( line, line_size );
+    ReceiverInterface &receiver = GetReceiver();
+    FormatterInterface &formatter = receiver . GetFormatter();
+    try
+    {
+        const JSONValueRef values = JSON::parse( src );
+        const JSONObject &obj = values -> toObject();
+
+        extract_and_set( obj, formatter, "time" );
+        extract_and_set( obj, formatter, "ip" );
+        extract_and_set( obj, formatter, "ip_type" );
+        extract_and_set( obj, formatter, "ip_region" );
+        extract_and_set( obj, formatter, "method" );
+        extract_and_set( obj, formatter, "uri" );
+        extract_and_set( obj, formatter, "status" );
+        extract_and_set( obj, formatter, "request_bytes" );
+        extract_and_set( obj, formatter, "result_bytes" );
+        extract_and_set( obj, formatter, "time_taken" );
+        extract_and_set( obj, formatter, "host" );
+        extract_and_set( obj, formatter, "referer" );
+        extract_and_set( obj, formatter, "agent" );
+        extract_and_set( obj, formatter, "request_id" );
+        extract_and_set( obj, formatter, "operation" );
+        extract_and_set( obj, formatter, "bucket" );
+        extract_and_set( obj, formatter, "path" );
+
+        receiver . SetCategory( ReceiverInterface::cat_good );
+
+        return true;
+    }
+    catch ( const ncbi::Exception &e )
+    {
+        formatter . addNameValue( "exception", e.what().zmsg );
+        receiver . SetCategory( ReceiverInterface::cat_ugly );
+    }
+    return false;
 }

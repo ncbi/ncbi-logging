@@ -41,6 +41,12 @@ namespace NCBI
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
         };
 
+        class GCPReverseBlockFactory : public ParseBlockFactoryInterface
+        {
+        public:
+            virtual ~GCPReverseBlockFactory();
+            virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
+        };
 
     }
 }

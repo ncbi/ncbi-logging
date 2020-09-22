@@ -205,7 +205,7 @@ void ReverseFormatter::addNameValue( const std::string & name, const t_str & val
     if ( ( nullptr != value . p ) && ( 0 != value . n ) )
     {
         if ( ! ss . str() . empty() )
-            ss . put( ' ' );
+            ss . put( separator );
         ss .write( value . p, value . n );
     }
 }
@@ -213,13 +213,13 @@ void ReverseFormatter::addNameValue( const std::string & name, const t_str & val
 void ReverseFormatter::addNameValue( const std::string & name, int64_t value )
 {
     if ( ! ss . str() . empty() )
-        ss . put( ' ' );
+        ss . put( separator );
     ss << value;
 }
 
 void ReverseFormatter::addNameValue( const std::string & name, const std::string & value )
 {
     if ( ! ss . str() . empty() )
-        ss . put( ' ' );
+        ss . put( separator );
     ss .write( value . c_str(), value . size() );
 }

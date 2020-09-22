@@ -67,7 +67,7 @@ namespace NCBI
         class ReverseFormatter : public FormatterInterface
         {
         public:
-            ReverseFormatter() {} //TODO: add the separator
+            ReverseFormatter( char sep = ' ' ) : separator( sep ) {}
             virtual ~ReverseFormatter();
 
             virtual std::string format();
@@ -78,6 +78,7 @@ namespace NCBI
 
         private:
             std::stringstream ss;
+            char separator;
         };
 
     }
