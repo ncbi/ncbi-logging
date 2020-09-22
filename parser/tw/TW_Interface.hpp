@@ -11,10 +11,10 @@ namespace NCBI
         struct TWReceiver : public ReceiverInterface
         {
             using ReceiverInterface::set;
-            
+
             TWReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
-            typedef enum { 
+            typedef enum {
                 id1 = LastMemberId+1,
                 id2,
                 id3,
@@ -38,6 +38,12 @@ namespace NCBI
             virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
         };
 
+        class TWReverseBlockFactory : public ParseBlockFactoryInterface
+        {
+        public:
+            virtual ~TWReverseBlockFactory();
+            virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const;
+        };
 
     }
 }
