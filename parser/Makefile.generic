@@ -78,7 +78,6 @@ $(REV_TOOL)-prof: $(JSN2$(CPREFIX)_PROF_OBJ) $(PROF_TOOL_OBJ)
 $(PREFIX): mkdir $(FWD_TOOL)-dbg $(FWD_TOOL)-rel $(REV_TOOL)-dbg $(REV_TOOL)-rel
 
 prof: mkdir $(FWD_TOOL)-prof $(REV_TOOL)-prof
-	#TODO: revive
 
 $(PREFIX)_TEST_PARSE_SRC = $($(CPREFIX)2JSN_CMN_SRC) $(PREFIX)_test_parse.cpp
 $(PREFIX)_TEST_FLEX_SRC = $(PREFIX)_test_flex.cpp $(PREFIX)_scanner.cpp
@@ -210,8 +209,6 @@ vg : vg_fwd vg_rev
 
 #-------------------------------------------------------------------------------
 # fuzz testing
-
-#TODO: include the reverse tool
 
 clean_fuzz:
 	rm -rf fuzz/

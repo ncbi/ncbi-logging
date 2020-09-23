@@ -7,11 +7,13 @@ test: cmn_test
 
 clean: cmn_clean
 
+prof: cmn_prof
+
 mkdir:
 	@ mkdir -p $(BINDIR) $(OBJDIR)
 	@ echo "mkdir run"
 
-.phony: all test clean mkdir
+.phony: all test clean mkdir prof
 
 #################################################
 # VDB3 Command line parsing
@@ -20,6 +22,7 @@ CMD_SRC = $(CMD_SRC_LOCATION)/cmdline.cpp
 
 CMD_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
 CMD_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
+CMD_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(notdir $(CMD_SRC))))
 
 $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
@@ -27,7 +30,10 @@ $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
 
-cmd: mkdir $(CMD_DBG_OBJ) $(CMD_REL_OBJ)
+$(OBJDIR)/%.prof.o: $(CMD_SRC_LOCATION)/%.cpp
+	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).prof.o
+
+cmd: mkdir $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(CMD_PROF_OBJ)
 
 .phony: cmd
 
@@ -57,6 +63,8 @@ cmn_clean:
 cmn_test: mkdir $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
 	$(BINDIR)/test_common-dbg
 	$(BINDIR)/test_common-rel
+
+cmn_prof: mkdir $(COMMON_PROF_OBJ) $(CMD_PROF_OBJ)
 
 $(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ) $(CMD_DBG_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
