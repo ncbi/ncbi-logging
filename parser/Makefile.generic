@@ -21,7 +21,7 @@ clean: $(PREFIX)_clean
 mkdir:
 	@ mkdir -p $(BINDIR) $(OBJDIR)
 
-.phony: all test clean mkdir
+.phony: all test clean mkdir common_prof prof
 
 #################################################
 # tools to produce
@@ -77,7 +77,10 @@ $(REV_TOOL)-prof: $(JSN2$(CPREFIX)_PROF_OBJ) $(PROF_TOOL_OBJ)
 
 $(PREFIX): mkdir $(FWD_TOOL)-dbg $(FWD_TOOL)-rel $(REV_TOOL)-dbg $(REV_TOOL)-rel
 
-prof: mkdir $(FWD_TOOL)-prof $(REV_TOOL)-prof
+prof: mkdir common_prof $(FWD_TOOL)-prof $(REV_TOOL)-prof
+
+common_prof :
+	$(MAKE) -C ../common prof
 
 $(PREFIX)_TEST_PARSE_SRC = $($(CPREFIX)2JSN_CMN_SRC) $(PREFIX)_test_parse.cpp
 $(PREFIX)_TEST_FLEX_SRC = $(PREFIX)_test_flex.cpp $(PREFIX)_scanner.cpp
