@@ -117,10 +117,14 @@ TEST_F ( OP_TestFlexFixture, QuotedString )
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedNonAscii )
-{   // skip non-ascii characters
+{
     #define str "и"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
-    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( UNRECOGNIZED, NextTokenType() );
+    // unicode tokens come out of the lexer one byte a time...
+    ASSERT_EQ( str[ 0 ], TokenValue()[ 0 ] );
+    ASSERT_EQ( UNRECOGNIZED, NextTokenType() );
+    ASSERT_EQ( str[ 1 ], TokenValue()[ 0 ] );
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedEscapedQuote )

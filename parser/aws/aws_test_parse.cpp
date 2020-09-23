@@ -114,7 +114,7 @@ TEST_F( AWSTestFixture, parse_just_dashes )
 }
 
 TEST_F( AWSTestFixture, parse_embedded_0 )
-{   //TODO: send the line to Review
+{
     string s("- - - \x00 - - - - - - - - - - - - - - - - - - - - -", 49);
     std::string res = try_to_parse_ugly( s );
     ASSERT_EQ(

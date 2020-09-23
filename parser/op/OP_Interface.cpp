@@ -188,7 +188,6 @@ extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const cha
                 formatter . addNameValue( fieldname, S.toSTLString() );
                 break;
         }
-        //todo: look for quotes, if found: escape them!
     }
 }
 

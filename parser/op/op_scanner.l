@@ -104,7 +104,7 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
-<QUOTED>.           ;                                               /* TODO: include in the output token */
+<QUOTED>.           { MAKE_STR(); return UNRECOGNIZED; }
 
 <TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }
 <TIMEFMT>.          { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }

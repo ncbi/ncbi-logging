@@ -124,7 +124,7 @@ TEST_F( GCPTestFixture, lonely_eol )
 }
 
 TEST_F( GCPTestFixture, parse_embedded_0 )
-{   //TODO: send the line to Review
+{
     string s("\"1\",\x00\"18.207.254.142\"", 21);
     std::string res = try_to_parse_ugly( s );
     ASSERT_EQ(
@@ -356,6 +356,7 @@ TEST_F( GCPTestFixture, accession_from_url_double_accession )
 
 TEST_F( GCPTestFixture, bad_object )
 {
+    /* TODO put unrecognizable objects into an new object-field to preserve this information */
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR004257&\"\n" );
     ASSERT_EQ( "", extract_value( res, "accession" ) );

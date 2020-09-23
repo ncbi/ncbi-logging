@@ -429,7 +429,7 @@ object
             $$.extension = $5;
         }
     | QUOTE object_list QUOTE
-        {   // TODO: somehow signal to the back end that we did not understand the pre-parsed object
+        {
             InitRequest( $$ );
             $$ . path = $2;
         }

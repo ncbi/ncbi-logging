@@ -134,7 +134,7 @@ TEST_F( OPTestFixture, lonely_eol )
 }
 
 TEST_F( OPTestFixture, parse_embedded_0 )
-{   //TODO: send the line to Review
+{
     string s("18.207.254.142 - \x00 - ", 21);
     std::string res = try_to_parse_ugly( s );
     ASSERT_EQ(
@@ -294,7 +294,7 @@ TEST_F( OPTestFixture, parse_result_len )
 }
 
 TEST_F( OPTestFixture, parse_result_len_dash )
-{   //TODO: review? bad?
+{
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET url HTTP/1.1\" 1 - 3 \"-\" \"\" \"-\" port=4 rl=5" );
     ASSERT_EQ( "", extract_value( res, "res_len" ) );
 }

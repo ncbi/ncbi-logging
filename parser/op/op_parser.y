@@ -319,7 +319,7 @@ result_code
 
 result_len
     : I64   { SET_VALUE( OPReceiver::res_len, $1 ); }
-    | DASH  { SET_VALUE( OPReceiver::res_len, EmptyTSTR ); } //TODO: review? bad?
+    | DASH  { SET_VALUE( OPReceiver::res_len, EmptyTSTR ); }
     ;
 
 req_time

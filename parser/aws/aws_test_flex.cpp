@@ -147,16 +147,18 @@ TEST_F ( AWS_TestFlexFixture, QuotedString )
     #undef str
 }
 TEST_F ( AWS_TestFlexFixture, QuotedNonAscii )
-{   // TODO properly address UTF-8 codepoints,
+{
     #define str "и"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( UNRECOGNIZED, NextTokenType() );
-    // TODO we cannot compare yet the proper TakenValue....
-    // ASSERT_EQ( str, TokenValue() );
+    // unicode tokens come out of the lexer one byte a time...
+    ASSERT_EQ( str[ 0 ], TokenValue()[ 0 ] );
+    ASSERT_EQ( UNRECOGNIZED, NextTokenType() );
+    ASSERT_EQ( str[ 1 ], TokenValue()[ 0 ] );
     #undef str
 }
 TEST_F ( AWS_TestFlexFixture, QuotedEscapedQuote )
-{   // skip non-ascii characters
+{
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
     ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_TRUE ( token . s . escaped );

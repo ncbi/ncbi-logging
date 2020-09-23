@@ -131,7 +131,6 @@ void parse_thread_worker( unique_ptr<ParseBlockInterface> pb,
             pb -> receive_one_line ( line -> c_str(), line -> size(), line_nr );
 
             ReceiverInterface::Category cat = receiver . GetCategory();
-            //TODO: experiment with unique_ptr and/or naked pointers (also see Queues.hpp)
             shared_ptr< string > output( make_shared< string >( fmt . format() ) );
 
             while ( ! out_q -> enqueue( output, cat ) )
