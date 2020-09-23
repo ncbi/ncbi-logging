@@ -196,7 +196,6 @@ extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const cha
         }
         else
             formatter . addNameValue( fieldname, S . toSTLString() );
-        //todo: look for quotes, if found: escape them!
     }
 }
 

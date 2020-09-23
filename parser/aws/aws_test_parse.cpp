@@ -539,35 +539,18 @@ TEST_F( AWSTestFixture, extra_data )
         );
 }
 
+TEST_F( AWSTestFixture, quote_in_agent )
+{
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"linux64 sra-toolkit \\\"test-sra.2.8.2 (phid=noc7737000,libc=2.17)\" - - - - - - -" );
+    ASSERT_EQ( "linux64 sra-toolkit \\\"test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
+}
 
-//TODO: reportField
+TEST_F( AWSTestFixture, quote_in_path )
+{
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - -" );
+    ASSERT_EQ( "a\\\"", extract_value( res, "path" ) );
+}
 
-#if 0
-TEST (TestHelper, StringEscaped)
-{
-    JsonFormatter f;
-    t_str v;
-    INIT_TSTR_ESC( v, "\\\"");
-    string s = f.format( "key", v );
-    cout << endl << s << endl;
-    ASSERT_EQ ( "{\"key\":\"\\\"\"}", s );
-}
-TEST (TestHelper, StringEscaped_Multiple)
-{
-    t_str s = { "abc\\\"\\\"", 7, true };
-    ASSERT_EQ( string("abc\"\""), ToString( s ) );
-}
-TEST (TestHelper, StringEscaped_TrailingSlash)
-{
-    t_str s = { "\\", 1, true };
-    ASSERT_EQ( string("\\"), ToString( s ) );
-}
-TEST (TestHelper, StringEscaped_NotEscapedCharacter)
-{
-    t_str s = { "\\n", 2, true };
-    ASSERT_EQ( string("\\n"), ToString( s ) );
-}
-#endif
 
 TEST_F( AWSTestFixture, MultiThreading )
 {
