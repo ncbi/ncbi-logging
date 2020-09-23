@@ -57,15 +57,6 @@ COMMON_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(COMMON_SRC)))
 COMMON_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(COMMON_SRC)))
 COMMON_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(COMMON_SRC)))
 
-#################################################
-# valgrind
-
-VG_OPTIONS := --leak-check=full --error-exitcode=1
-
-# which version to run under valginrd (uncomment one)
-BUILD = dbg
-#BUILD = rel
-
 #-------------------------------------------------------------------------------
 # fuzz testing
 
