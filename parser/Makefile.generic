@@ -149,8 +149,8 @@ acc_test: all unittest_parse unittest_reverse acctest_parse acctest_reverse
 
 acctest_parse: all
 	#
-	../runtestcase.sh ../data/$(PREFIX)_testlines.log $(FWD_TOOL) $(TMP_DIR)
-	../diff_results.sh ../expected/$(PREFIX)_testlines $(TMP_DIR)
+	@ ../runtestcase.sh ../data/$(PREFIX)_testlines.log $(FWD_TOOL) $(TMP_DIR)
+	@ ../diff_results.sh ../expected/$(PREFIX)_testlines $(TMP_DIR)
 	#
 	@ echo "$(PREFIX) acctest_parse passed"
 
@@ -164,21 +164,21 @@ RT_ORIG2_DIR = actual/rt_orig2
 
 acctest_reverse: all
 	#
-	@../runtestcase.sh $(JSON1) $(REV_TOOL) $(TMP_DIR)
-	@../diff_results.sh ../expected/$(PREFIX)_rev_testlines $(TMP_DIR)
+	@ ../runtestcase.sh $(JSON1) $(REV_TOOL) $(TMP_DIR)
+	@ ../diff_results.sh ../expected/$(PREFIX)_rev_testlines $(TMP_DIR)
 	#
 	# multi-threaded
-	@../runtestcase.sh $(JSON1_MT) $(REV_TOOL) $(TMP_DIR)
-	@../diff_results.sh ../expected/$(PREFIX)_reparse_mt $(TMP_DIR)
+	@ ../runtestcase.sh $(JSON1_MT) $(REV_TOOL) $(TMP_DIR)
+	@ ../diff_results.sh ../expected/$(PREFIX)_reparse_mt $(TMP_DIR)
 	#
 	# round trip
 	# reparse 1
-	@../runtestcase.sh $(RT_JSN) $(REV_TOOL) $(RT_ORIG1_DIR)
+	@ ../runtestcase.sh $(RT_JSN) $(REV_TOOL) $(RT_ORIG1_DIR)
 	# forward parse the original format
-	@../runtestcase.sh $(RT_ORIG1_DIR)/out.good.$(PREFIX) $(FWD_TOOL) $(RT_JSN_DIR)
+	@ ../runtestcase.sh $(RT_ORIG1_DIR)/out.good.$(PREFIX) $(FWD_TOOL) $(RT_JSN_DIR)
 	# reparse 2, compare the output of 2 reparses
-	@../runtestcase.sh $(RT_JSN_DIR)/out.good.jsonl $(REV_TOOL) $(RT_ORIG2_DIR)
-	@../diff_results.sh $(RT_ORIG1_DIR) $(RT_ORIG2_DIR)
+	@ ../runtestcase.sh $(RT_JSN_DIR)/out.good.jsonl $(REV_TOOL) $(RT_ORIG2_DIR)
+	@ ../diff_results.sh $(RT_ORIG1_DIR) $(RT_ORIG2_DIR)
 	#
 	@ echo "$(PREFIX) acctest_reverse passed"
 

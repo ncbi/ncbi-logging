@@ -7,9 +7,10 @@ EXPECTED=$2
 diff ${EXPECTED} ${ACTUAL}
 retVal=$?
 if [ $retVal -ne 0 ]; then
-    echo "runtestcase.sh: diff ${EXPECTED} ${ACTUAL} failed $?"
+    echo "diff_results.sh: diff ${EXPECTED} ${ACTUAL} failed $?"
     exit 1
 fi
 
+echo "diff_results.sh: files in ${EXPECTED} and ${ACTUAL} match"
 exit 0
 
