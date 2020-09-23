@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ReceiverInterface.hpp"
+#include "ParserInterface.hpp"
 
 #include <memory>
 
@@ -11,10 +12,10 @@ namespace NCBI
         struct GCPReceiver : public ReceiverInterface
         {
             using ReceiverInterface::set;
-            
+
             GCPReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
-            typedef enum { 
+            typedef enum {
                 time = LastMemberId+1,
                 ip_type,
                 ip_region,

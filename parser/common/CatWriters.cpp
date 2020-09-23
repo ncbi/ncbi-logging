@@ -1,5 +1,7 @@
 #include "CatWriters.hpp"
 
+#include "Formatters.hpp"
+
 using namespace NCBI :: Logging;
 using namespace std;
 
@@ -15,20 +17,20 @@ CatCounter::CatCounter()
     }
 }
 
-unsigned long int 
+unsigned long int
 CatCounter::get_cat_count( ReceiverInterface::Category cat ) const
 {
     return cat_counts [ cat ];
 }
 
-void 
+void
 CatCounter::count( ReceiverInterface::Category cat )
 {
     ++ cat_counts.at( cat );
     ++ total;
 }
 
-string 
+string
 CatCounter::report( FormatterInterface & fmt ) const
 {
     fmt.addNameValue("_total", get_total());
@@ -49,18 +51,18 @@ CatWriterInterface :: ~CatWriterInterface() {}
 FileCatWriter :: FileCatWriter( const string & baseName, const std::string & extension ) :
     review  ( baseName+".review" + extension ),
     good    ( baseName+".good" + extension ),
-    bad     ( baseName+".bad" + extension ), 
+    bad     ( baseName+".bad" + extension ),
     ugly    ( baseName+".unrecog" + extension )
 {
 }
 
-FileCatWriter :: ~FileCatWriter() 
+FileCatWriter :: ~FileCatWriter()
 {
 }
 
 void FileCatWriter :: write( ReceiverInterface::Category cat, const string & s )
 {
-    switch ( cat )    
+    switch ( cat )
     {
     case ReceiverInterface::cat_review :    review << s << endl; break;
     case ReceiverInterface::cat_good :      good.write( s.c_str(), s.size() ); good.put( '\n' ); break;
@@ -69,18 +71,18 @@ void FileCatWriter :: write( ReceiverInterface::Category cat, const string & s )
     case ReceiverInterface::cat_ignored :   break;
     default: throw logic_error( "Unknown Category" ); break;
     }
-    ctr.count( cat ); 
+    ctr.count( cat );
 }
 
 // StringCatWriter
 
-StringCatWriter :: ~StringCatWriter() 
+StringCatWriter :: ~StringCatWriter()
 {
 }
 
 void StringCatWriter :: write( ReceiverInterface::Category cat, const string & s )
 {
-    switch ( cat )    
+    switch ( cat )
     {
     case ReceiverInterface::cat_review :    review << s << endl; break;
     case ReceiverInterface::cat_good :      good << s << endl; break;

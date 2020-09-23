@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "CatWriters.hpp"
+#include "Formatters.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;
@@ -60,10 +61,10 @@ TEST(CatCounter, Report)
     cc.count(ReceiverInterface::cat_ignored);
     cc.count(ReceiverInterface::cat_ignored);
 
-    JsonLibFormatter fmt; 
-    ASSERT_EQ( 
-        "{\"_total\":15,\"bad\":3,\"good\":2,\"ignored\":5,\"review\":1,\"unrecog\":4}", 
-        cc.report( fmt ) 
+    JsonLibFormatter fmt;
+    ASSERT_EQ(
+        "{\"_total\":15,\"bad\":3,\"good\":2,\"ignored\":5,\"review\":1,\"unrecog\":4}",
+        cc.report( fmt )
     );
 }
 

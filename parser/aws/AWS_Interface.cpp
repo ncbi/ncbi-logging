@@ -2,7 +2,10 @@
 
 #include "aws_parser.hpp"
 #include "aws_scanner.hpp"
+
 #include <ncbi/json.hpp>
+
+#include "Formatters.hpp"
 
 extern YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -65,14 +68,40 @@ namespace NCBI
             AWSReceiver m_receiver;
         };
 
-        class AWSReverseBlock : public ParseBlockInterface
+
+bool
+ReverseBlock::format_specific_parse( const char * line, size_t line_size )
+{
+    /* here we will take the line, and ask the vdb-3 lib to parse it into a JSONValueRef
+       we will inspect it and call setters on the formatter to produce output */
+    String src( line, line_size );
+    ReceiverInterface &receiver = GetReceiver();
+    FormatterInterface & formatter = receiver . GetFormatter();
+    try
+    {
+        const JSONValueRef values = JSON::parse( src );
+        extract_members( values -> toObject() );
+        receiver . SetCategory( ReceiverInterface::cat_good );
+
+        return true;
+    }
+    catch ( const ncbi::Exception &e )
+    {
+        formatter . addNameValue( "exception", e.what().zmsg );
+        receiver . SetCategory( ReceiverInterface::cat_ugly );
+    }
+    return false;
+}
+
+        class AWSReverseBlock : public ReverseBlock
         {
         public:
             AWSReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
             virtual ~AWSReverseBlock();
+
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
-            virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
+
+            virtual void extract_members( const JSONObject &obj );
 
             AWSReceiver m_receiver;
         };
@@ -143,11 +172,6 @@ AWSReverseBlock::~AWSReverseBlock()
 { // no need to do anything here
 }
 
-void
-AWSReverseBlock::SetDebug( bool onOff )
-{ // no need to do anything here
-}
-
 static void
 extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname, bool quote_spaces = true )
 {
@@ -215,52 +239,33 @@ extract_and_set_url( const JSONObject &obj, FormatterInterface &formatter )
     }
 }
 
-bool
-AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
+void
+AWSReverseBlock::extract_members( const JSONObject &obj )
 {
-    /* here we will take the line, and ask the vdb-3 lib to parse it into a JSONValueRef
-       we will inspect it and call setters on the formatter to produce output */
-    String src( line, line_size );
-    ReceiverInterface &receiver = GetReceiver();
-    FormatterInterface &formatter = receiver . GetFormatter();
-    try
-    {
-        const JSONValueRef values = JSON::parse( src );
-        const JSONObject &obj = values -> toObject();
+    FormatterInterface & formatter = GetReceiver() . GetFormatter();
 
-        extract_and_set( obj, formatter, "owner" );
-        extract_and_set( obj, formatter, "bucket" );
-        extract_and_set( obj, formatter, "time", false );
-        extract_and_set( obj, formatter, "ip" );
-        extract_and_set( obj, formatter, "requester" );
-        extract_and_set( obj, formatter, "request_id" );
-        extract_and_set( obj, formatter, "operation" );
-        extract_and_set( obj, formatter, "key" );
-        extract_and_set_url( obj, formatter );
-        extract_and_set( obj, formatter, "res_code" );
-        extract_and_set( obj, formatter, "error" );
-        extract_and_set( obj, formatter, "res_len" );
-        extract_and_set( obj, formatter, "obj_size" );
-        extract_and_set( obj, formatter, "total_time" );
-        extract_and_set( obj, formatter, "turnaround_time" );
-        extract_and_set( obj, formatter, "referer" );
-        extract_and_set( obj, formatter, "agent" );
-        extract_and_set( obj, formatter, "version_id" );
-        extract_and_set( obj, formatter, "host_id", false );
-        extract_and_set( obj, formatter, "sig_ver" );
-        extract_and_set( obj, formatter, "cipher_suite" );
-        extract_and_set( obj, formatter, "auth_type" );
-        extract_and_set( obj, formatter, "host_header" );
-        extract_and_set( obj, formatter, "tls_version" );
-
-        receiver . SetCategory( ReceiverInterface::cat_good );
-
-        return true;
-    }
-    catch ( const ncbi::Exception &e )
-    {
-        formatter . addNameValue( "exception", e.what().zmsg );
-        receiver . SetCategory( ReceiverInterface::cat_ugly );
-    }
-    return false;
+    extract_and_set( obj, formatter, "owner" );
+    extract_and_set( obj, formatter, "bucket" );
+    extract_and_set( obj, formatter, "time", false );
+    extract_and_set( obj, formatter, "ip" );
+    extract_and_set( obj, formatter, "requester" );
+    extract_and_set( obj, formatter, "request_id" );
+    extract_and_set( obj, formatter, "operation" );
+    extract_and_set( obj, formatter, "key" );
+    extract_and_set_url( obj, formatter );
+    extract_and_set( obj, formatter, "res_code" );
+    extract_and_set( obj, formatter, "error" );
+    extract_and_set( obj, formatter, "res_len" );
+    extract_and_set( obj, formatter, "obj_size" );
+    extract_and_set( obj, formatter, "total_time" );
+    extract_and_set( obj, formatter, "turnaround_time" );
+    extract_and_set( obj, formatter, "referer" );
+    extract_and_set( obj, formatter, "agent" );
+    extract_and_set( obj, formatter, "version_id" );
+    extract_and_set( obj, formatter, "host_id", false );
+    extract_and_set( obj, formatter, "sig_ver" );
+    extract_and_set( obj, formatter, "cipher_suite" );
+    extract_and_set( obj, formatter, "auth_type" );
+    extract_and_set( obj, formatter, "host_header" );
+    extract_and_set( obj, formatter, "tls_version" );
 }

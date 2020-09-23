@@ -2,8 +2,10 @@
 
 #include <cmdline.hpp>
 
+#include "ParserInterface.hpp"
 #include "CatWriters.hpp"
 #include "LineSplitters.hpp"
+#include "Formatters.hpp"
 
 using namespace std;
 using namespace NCBI::Logging;

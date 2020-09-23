@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ReceiverInterface.hpp"
+#include "ParserInterface.hpp"
 
 #include <memory>
 

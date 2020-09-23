@@ -4,6 +4,8 @@
 #include "op_scanner.hpp"
 #include <ncbi/json.hpp>
 
+#include "Formatters.hpp"
+
 extern YY_BUFFER_STATE op_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
 using namespace NCBI::Logging;

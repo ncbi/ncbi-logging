@@ -47,6 +47,7 @@ COMMON_SRC = \
 	CatWriters.cpp \
 	Formatters.cpp \
 	ReceiverInterface.cpp \
+	ParserInterface.cpp \
 	Queues.cpp \
 	LineSplitters.cpp \
 	Tool.cpp \

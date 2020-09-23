@@ -1,3 +1,4 @@
+# COMMON_SRC
 include ../Makefile.set
 
 all: cmd common
@@ -29,17 +30,6 @@ $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 cmd: mkdir $(CMD_DBG_OBJ) $(CMD_REL_OBJ)
 
 .phony: cmd
-
-#################################################
-# utility modules
-
-COMMON_SRC = \
-	CatWriters.cpp \
-	Formatters.cpp \
-	ReceiverInterface.cpp \
-	Queues.cpp \
-	LineSplitters.cpp \
-	Tool.cpp
 
 #################################################
 # unit tests for formatter/catwriter/etc
