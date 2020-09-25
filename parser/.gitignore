@@ -25,6 +25,11 @@ tw_parser.cpp
 tw_parser.hpp
 tw_scanner.cpp
 tw_scanner.hpp
+jwt_parser.cpp
+jwt_parser.hpp
+jwt_scanner.cpp
+jwt_scanner.hpp
+
 
 # fuzz-testing temporaries
 fuzz

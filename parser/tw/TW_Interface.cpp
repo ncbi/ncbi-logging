@@ -31,12 +31,20 @@ void TWReceiver::set( TW_Members m, const t_str & v )
     CASE( sid )
     CASE( service )
     CASE( event )
-    CASE( msg )
+    case msg :  setMember( "msg", v );
+                msg_for_postprocess = std::string( v.p, v.n );
+                break;
+    //CASE( msg )
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
+}
+
+void TWReceiver::post_process( void )
+{
+
 }
 
 namespace NCBI

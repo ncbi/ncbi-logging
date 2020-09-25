@@ -76,6 +76,8 @@ namespace NCBI
 
             void reportField( const char * message );
 
+            virtual void post_process( void ) { }
+
             FormatterInterface & GetFormatter();
 
         protected:

@@ -287,4 +287,3 @@ TEST( ReverseFormatterTest, FormatNulltstr )
     fmt . addNameValue( "ignored", s );
     ASSERT_EQ( "value1", fmt.format() );
 }
-

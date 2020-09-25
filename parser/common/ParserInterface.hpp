@@ -27,17 +27,6 @@ namespace NCBI
             void receive_one_line( const char * line, size_t line_size, size_t line_nr );
         };
 
-        class ReverseBlock : public ParseBlockInterface
-        {
-        public:
-            virtual ~ReverseBlock() {}
-
-            virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void extract_members( const ncbi::JSONObject &obj ) = 0;
-
-            virtual void SetDebug( bool onOff ) {}
-        };
-
         class ParseBlockFactoryInterface
         {
         public:
