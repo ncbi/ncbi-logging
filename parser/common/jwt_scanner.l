@@ -13,9 +13,11 @@
 %option stack
 %option debug
 
-%%
+BASE64 [A-Za-z0-9\-_]+={0,2}
 
-.*               { MAKE_STR(); return STR; }
+%%
+ey{BASE64}\.ey{BASE64}\.{BASE64}    { MAKE_STR(); return JWT; }
+.                                   { MAKE_STR(); return STR; }
 
 %%
 

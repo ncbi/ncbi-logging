@@ -42,17 +42,28 @@ using namespace NCBI::Logging;
 
 %token<s> JWT STR
 
+%type<s> str_list str_token
+
 %start jwt_line
 
 %%
 
 jwt_line
-    : STR
-    {
-        YYACCEPT;
-    }
+    : str_list
     | error     { YYABORT; }
     ;
+
+str_token
+    : JWT { lib -> setJwt( $1 ); }
+    | STR
+    ;
+
+str_list
+    : str_token
+    | str_list str_token
+    | %empty { $$ = EmptyTSTR; }
+    ;
+
 
 %%
 

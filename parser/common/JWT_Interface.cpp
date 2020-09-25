@@ -14,22 +14,16 @@ using namespace ncbi;
 
 
 JWTReceiver::JWTReceiver( unique_ptr<FormatterInterface> & fmt )
-: ReceiverInterface ( fmt )
+: ReceiverInterface ( fmt ), m_jwtCount ( 0 )
 {
 }
 
-void JWTReceiver::set( JWT_Members m, const t_str & v )
+void JWTReceiver::setJwt( const t_str & v )
 {
-#define CASE(mem) case mem: setMember( #mem, v ); break;
-    switch( m )
-    {
-    CASE( jwt1 )
-    CASE( jwt2 )
-    default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
-    }
-#undef CASE
-    if ( m_cat == cat_unknown )
-        m_cat = cat_good;
+    stringstream mem;
+    ++m_jwtCount;
+    mem << "jwt" << m_jwtCount;
+    setMember( mem.str().c_str(), v );
 }
 
 JWTParseBlock::JWTParseBlock( JWTReceiver & receiver )

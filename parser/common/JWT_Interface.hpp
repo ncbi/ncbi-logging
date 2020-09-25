@@ -13,12 +13,9 @@ namespace NCBI
 
             JWTReceiver( std::unique_ptr<FormatterInterface> & fmt );
 
-            typedef enum {
-                jwt1 = LastMemberId+1,
-                jwt2,
-                TW_LastMemberId = jwt2
-            } JWT_Members; // all are t_str values
-            virtual void set( JWT_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
+            void setJwt( const t_str & v );
+
+            size_t m_jwtCount;
         };
 
         class JWTParseBlock : public ParseBlockInterface
