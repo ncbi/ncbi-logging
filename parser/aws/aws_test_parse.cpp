@@ -15,14 +15,12 @@ using namespace NCBI::Logging;
 
 TEST(AWSReceiverTest, Create)
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    AWSReceiver e ( f );
+    AWSReceiver e ( make_shared<JsonLibFormatter>() );
 }
 
 TEST(AWSReceiverTest, Setters)
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    AWSReceiver e ( f );
+    AWSReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
     INIT_TSTR( v, "i_p");
@@ -92,8 +90,7 @@ TEST_F( AWSTestFixture, lonely_eol )
 
 TEST_F( AWSTestFixture, Setters_BadUTF8 )
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    AWSReceiver e ( f );
+    AWSReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
     INIT_TSTR( v, "7dd\xFFga" );

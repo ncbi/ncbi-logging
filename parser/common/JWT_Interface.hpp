@@ -11,7 +11,7 @@ namespace NCBI
         {
             using ReceiverInterface::set;
 
-            JWTReceiver( std::unique_ptr<FormatterInterface> & fmt );
+            JWTReceiver( FormatterRef fmt );
 
             void setJwt( const t_str & v );
 
@@ -21,7 +21,7 @@ namespace NCBI
         class JWTParseBlock : public ParseBlockInterface
         {
         public:
-            JWTParseBlock( JWTReceiver & receiver );
+            JWTParseBlock( JWTReceiver receiver );
             virtual ~JWTParseBlock();
 
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }

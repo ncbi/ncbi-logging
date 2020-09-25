@@ -13,7 +13,7 @@ using namespace NCBI::Logging;
 using namespace std;
 using namespace ncbi;
 
-AWSReceiver::AWSReceiver( unique_ptr<FormatterInterface> & fmt )
+AWSReceiver::AWSReceiver( ReceiverInterface::FormatterRef fmt )
 : ReceiverInterface ( fmt )
 {
 }
@@ -58,7 +58,7 @@ namespace NCBI
         class AWSParseBlock : public ParseBlockInterface
         {
         public:
-            AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            AWSParseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~AWSParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -71,7 +71,7 @@ namespace NCBI
         class AWSReverseBlock : public ParseBlockInterface
         {
         public:
-            AWSReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            AWSReverseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~AWSReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -89,11 +89,11 @@ AWSParseBlockFactory::~AWSParseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 AWSParseBlockFactory::MakeParseBlock() const
 {
-    std::unique_ptr<FormatterInterface> fmt;
+    ReceiverInterface::FormatterRef fmt;
     if ( m_fast )
-        fmt = std::make_unique<JsonFastFormatter>();
+        fmt = std::make_shared<JsonFastFormatter>();
     else
-        fmt = std::make_unique<JsonLibFormatter>();
+        fmt = std::make_shared<JsonLibFormatter>();
     return std::make_unique<AWSParseBlock>( fmt );
 }
 
@@ -103,13 +103,13 @@ AWSReverseBlockFactory::~AWSReverseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 AWSReverseBlockFactory::MakeParseBlock() const
 {
-     std::unique_ptr<FormatterInterface> fmt = std::make_unique<ReverseFormatter>();
+    ReceiverInterface::FormatterRef fmt = std::make_shared<ReverseFormatter>();
     // return a revers-parseblock....
     return std::make_unique<AWSReverseBlock>( fmt );
 }
 
 /* ----------- AWSParseBlock ----------- */
-AWSParseBlock::AWSParseBlock( std::unique_ptr<FormatterInterface> & fmt )
+AWSParseBlock::AWSParseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 {
     aws_lex_init( &m_sc );
@@ -137,7 +137,7 @@ AWSParseBlock::format_specific_parse( const char * line, size_t line_size )
 }
 
 /* ----------- AWSReverseBlock ----------- */
-AWSReverseBlock::AWSReverseBlock( std::unique_ptr<FormatterInterface> & fmt )
+AWSReverseBlock::AWSReverseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 { // no need to do anything here
 }

@@ -14,7 +14,7 @@ namespace NCBI
         {
             using ReceiverInterface::set;
 
-            AWSReceiver( std::unique_ptr<FormatterInterface> & fmt );
+            AWSReceiver( ReceiverInterface::FormatterRef fmt );
 
             typedef enum {
                 owner = LastMemberId+1,

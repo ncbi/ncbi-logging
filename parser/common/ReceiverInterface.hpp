@@ -43,7 +43,9 @@ namespace NCBI
 
         struct ReceiverInterface
         {
-            ReceiverInterface( std::unique_ptr<FormatterInterface> & p_fmt );
+            typedef std::shared_ptr<FormatterInterface> FormatterRef;
+
+            ReceiverInterface( FormatterRef p_fmt );
 
             virtual ~ReceiverInterface();
 
@@ -81,7 +83,7 @@ namespace NCBI
             FormatterInterface & GetFormatter();
 
         protected:
-            std::unique_ptr<FormatterInterface> m_fmt;
+            FormatterRef m_fmt;
             Category m_cat;
         };
 

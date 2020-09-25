@@ -13,7 +13,7 @@ namespace NCBI
         {
             using ReceiverInterface::set;
 
-            GCPReceiver( std::unique_ptr<FormatterInterface> & fmt );
+            GCPReceiver( ReceiverInterface::FormatterRef fmt );
 
             typedef enum {
                 time = LastMemberId+1,

@@ -5,6 +5,7 @@
 #include <ncbi/json.hpp>
 
 #include "Formatters.hpp"
+#include "JWT_Interface.hpp"
 
 extern YY_BUFFER_STATE tw_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -12,7 +13,7 @@ using namespace NCBI::Logging;
 using namespace std;
 using namespace ncbi;
 
-TWReceiver::TWReceiver( unique_ptr<FormatterInterface> & fmt )
+TWReceiver::TWReceiver( ReceiverInterface::FormatterRef fmt )
 : ReceiverInterface ( fmt )
 {
 }
@@ -44,7 +45,9 @@ void TWReceiver::set( TW_Members m, const t_str & v )
 
 void TWReceiver::post_process( void )
 {
-
+    JWTReceiver jwt( m_fmt );
+    JWTParseBlock pb ( jwt );
+    pb.format_specific_parse( msg_for_postprocess.c_str(), msg_for_postprocess.size() );
 }
 
 namespace NCBI
@@ -54,7 +57,7 @@ namespace NCBI
         class TWParseBlock : public ParseBlockInterface
         {
         public:
-            TWParseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            TWParseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~TWParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -67,7 +70,7 @@ namespace NCBI
         class TWReverseBlock : public ParseBlockInterface
         {
         public:
-            TWReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            TWReverseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~TWReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -83,7 +86,7 @@ TWParseBlockFactory::~TWParseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 TWParseBlockFactory::MakeParseBlock() const
 {
-    std::unique_ptr<FormatterInterface> fmt;
+    ReceiverInterface::FormatterRef fmt;
     if ( m_fast )
         fmt = std::make_unique<JsonFastFormatter>();
     else
@@ -91,7 +94,7 @@ TWParseBlockFactory::MakeParseBlock() const
     return std::make_unique<TWParseBlock>( fmt );
 }
 
-TWParseBlock::TWParseBlock( std::unique_ptr<FormatterInterface> & fmt )
+TWParseBlock::TWParseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 {
     tw_lex_init( &m_sc );
@@ -124,13 +127,13 @@ TWReverseBlockFactory::~TWReverseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 TWReverseBlockFactory::MakeParseBlock() const
 {
-     std::unique_ptr<FormatterInterface> fmt = std::make_unique<ReverseFormatter>();
+    ReceiverInterface::FormatterRef fmt = std::make_unique<ReverseFormatter>();
     // return a revers-parseblock....
     return std::make_unique<TWReverseBlock>( fmt );
 }
 
 /* ----------- TWReverseBlock ----------- */
-TWReverseBlock::TWReverseBlock( std::unique_ptr<FormatterInterface> & fmt )
+TWReverseBlock::TWReverseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 { // no need to do anything here
 }

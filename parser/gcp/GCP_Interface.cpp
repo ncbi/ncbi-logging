@@ -12,7 +12,7 @@ using namespace NCBI::Logging;
 using namespace std;
 using namespace ncbi;
 
-GCPReceiver::GCPReceiver( unique_ptr<FormatterInterface> & fmt )
+GCPReceiver::GCPReceiver( ReceiverInterface::FormatterRef fmt )
 : ReceiverInterface ( fmt )
 {
 }
@@ -48,7 +48,7 @@ namespace NCBI
         class GCPParseBlock : public ParseBlockInterface
         {
         public:
-            GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            GCPParseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~GCPParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -61,7 +61,7 @@ namespace NCBI
         class GCPReverseBlock : public ParseBlockInterface
         {
         public:
-            GCPReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            GCPReverseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~GCPReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -80,7 +80,7 @@ GCPParseBlockFactory::~GCPParseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 GCPParseBlockFactory::MakeParseBlock() const
 {
-    std::unique_ptr<FormatterInterface> fmt;
+    ReceiverInterface::FormatterRef fmt;
     if ( m_fast )
         fmt = std::make_unique<JsonFastFormatter>();
     else
@@ -90,7 +90,7 @@ GCPParseBlockFactory::MakeParseBlock() const
 
 /* ----------- GCPParseBlock----------- */
 
-GCPParseBlock::GCPParseBlock( std::unique_ptr<FormatterInterface> & fmt )
+GCPParseBlock::GCPParseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 {
     gcp_lex_init( &m_sc );
@@ -132,13 +132,13 @@ GCPReverseBlockFactory::~GCPReverseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 GCPReverseBlockFactory::MakeParseBlock() const
 {
-     std::unique_ptr<FormatterInterface> fmt = std::make_unique<ReverseFormatter>( ',' );
+    ReceiverInterface::FormatterRef fmt = std::make_unique<ReverseFormatter>( ',' );
     // return a revers-parseblock....
     return std::make_unique<GCPReverseBlock>( fmt );
 }
 
 /* ----------- GCPReverseBlock ----------- */
-GCPReverseBlock::GCPReverseBlock( std::unique_ptr<FormatterInterface> & fmt )
+GCPReverseBlock::GCPReverseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 { // no need to do anything here
 }

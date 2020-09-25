@@ -16,14 +16,12 @@ using namespace NCBI::Logging;
 
 TEST(LogOPEventTest, Create)
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    OPReceiver e ( f );
+    OPReceiver e ( make_shared<JsonLibFormatter>() );
 }
 
 TEST(LogOPEventTest, Setters)
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    OPReceiver e ( f );
+    OPReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
     INIT_TSTR( v, "i_p");
@@ -76,8 +74,7 @@ class OPTestFixture : public ParseTestFixture< OPParseBlockFactory >
 
 TEST_F( OPTestFixture, Setters_BadUTF8 )
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    OPReceiver e ( f );
+    OPReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
     INIT_TSTR( v, "7dd\xFFga" );
@@ -90,8 +87,7 @@ TEST_F( OPTestFixture, Setters_BadUTF8 )
 
 TEST_F( OPTestFixture, Setters_GoodUTF8_lib )
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    OPReceiver e ( f );
+    OPReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
     auto s = u8"попробуем 产品公司求购 ";

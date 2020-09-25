@@ -16,14 +16,12 @@ using namespace NCBI::Logging;
 
 TEST(GCPReceiverTest, Create)
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    GCPReceiver e ( f );
+    GCPReceiver e ( make_shared<JsonLibFormatter>() );
 }
 
 TEST(LogGCPEventTest, Setters)
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    GCPReceiver e ( f );
+    GCPReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
     INIT_TSTR( v, "i_p");
@@ -79,8 +77,7 @@ class GCPTestFixture : public ParseTestFixture< GCPParseBlockFactory >
 
 TEST_F( GCPTestFixture, Setters_BadUTF8 )
 {
-    std::unique_ptr<FormatterInterface> f = make_unique<JsonLibFormatter>();
-    GCPReceiver e ( f );
+    GCPReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
     INIT_TSTR( v, "7dd\xFFga" );

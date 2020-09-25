@@ -13,7 +13,7 @@ using namespace std;
 using namespace ncbi;
 
 
-JWTReceiver::JWTReceiver( unique_ptr<FormatterInterface> & fmt )
+JWTReceiver::JWTReceiver( FormatterRef fmt )
 : ReceiverInterface ( fmt ), m_jwtCount ( 0 )
 {
 }
@@ -26,7 +26,7 @@ void JWTReceiver::setJwt( const t_str & v )
     setMember( mem.str().c_str(), v );
 }
 
-JWTParseBlock::JWTParseBlock( JWTReceiver & receiver )
+JWTParseBlock::JWTParseBlock( JWTReceiver receiver )
 : m_receiver ( receiver )
 {
     jwt_lex_init( &m_sc );

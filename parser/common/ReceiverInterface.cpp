@@ -7,8 +7,8 @@
 using namespace NCBI::Logging;
 using namespace std;
 
-ReceiverInterface::ReceiverInterface( unique_ptr<FormatterInterface> & p_fmt )
-: m_fmt ( p_fmt.release() ), m_cat ( cat_unknown )
+ReceiverInterface::ReceiverInterface( FormatterRef p_fmt )
+: m_fmt ( p_fmt ), m_cat ( cat_unknown )
 {
 }
 
@@ -49,9 +49,12 @@ ReceiverInterface::setMember( const char * mem, const t_str & v )
     catch ( const ncbi::InvalidUTF8String & ex )
     {
         // report
-        stringstream msg;
-        msg << ex.what().zmsg << " in '" << mem << "'";
-        reportField( msg.str().c_str() );
+        if ( m_cat != cat_review )
+        {
+            stringstream msg;
+            msg << ex.what().zmsg << " in '" << mem << "'";
+            reportField( msg.str().c_str() );
+        }
 
         // sanitize and retry
         m_fmt -> addNameValue( mem, sanitize( v ) );

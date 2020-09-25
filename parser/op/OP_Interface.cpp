@@ -12,7 +12,7 @@ using namespace NCBI::Logging;
 using namespace std;
 using namespace ncbi;
 
-OPReceiver::OPReceiver( unique_ptr<FormatterInterface> & fmt )
+OPReceiver::OPReceiver( ReceiverInterface::FormatterRef fmt )
 : ReceiverInterface ( fmt )
 {
 }
@@ -46,7 +46,7 @@ namespace NCBI
         class OPParseBlock : public ParseBlockInterface
         {
         public:
-            OPParseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            OPParseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~OPParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -59,7 +59,7 @@ namespace NCBI
         class OPReverseBlock : public ParseBlockInterface
         {
         public:
-            OPReverseBlock( std::unique_ptr<FormatterInterface> & fmt );
+            OPReverseBlock( ReceiverInterface::FormatterRef fmt );
             virtual ~OPReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
@@ -77,7 +77,7 @@ OPParseBlockFactory::~OPParseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 OPParseBlockFactory::MakeParseBlock() const
 {
-    std::unique_ptr<FormatterInterface> fmt;
+    ReceiverInterface::FormatterRef fmt;
     if ( m_fast )
         fmt = std::make_unique<JsonFastFormatter>();
     else
@@ -91,13 +91,13 @@ OPReverseBlockFactory::~OPReverseBlockFactory() {}
 std::unique_ptr<ParseBlockInterface>
 OPReverseBlockFactory::MakeParseBlock() const
 {
-     std::unique_ptr<FormatterInterface> fmt = std::make_unique<ReverseFormatter>();
+    ReceiverInterface::FormatterRef fmt = std::make_unique<ReverseFormatter>();
     // return a revers-parseblock....
     return std::make_unique<OPReverseBlock>( fmt );
 }
 
 /* ----------- OPParseBlock----------- */
-OPParseBlock::OPParseBlock( std::unique_ptr<FormatterInterface> & fmt )
+OPParseBlock::OPParseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 {
     op_lex_init( &m_sc );
@@ -125,7 +125,7 @@ OPParseBlock::format_specific_parse( const char * line, size_t line_size )
 }
 
 /* ----------- OPReverseBlock ----------- */
-OPReverseBlock::OPReverseBlock( std::unique_ptr<FormatterInterface> & fmt )
+OPReverseBlock::OPReverseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 { // no need to do anything here
 }
