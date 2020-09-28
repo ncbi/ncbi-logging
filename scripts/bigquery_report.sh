@@ -21,6 +21,22 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
+    "select max(datetime_trunc(start_ts, day)) as gs_max_day from strides_analytics.gs_fixed"
+
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
+    "select max(datetime_trunc(start_ts, day)) as op_max_day from strides_analytics.op_fixed"
+
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
+    "select max(datetime_trunc(start_ts, day)) as s3_max_day from strides_analytics.s3_fixed"
+
+
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
     "select source, count(*) as external_records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export where domain not like '%nih.gov%' group by source order by source "
 
 
