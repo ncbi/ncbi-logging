@@ -26,10 +26,10 @@ date; echo "parse S3"
 ./parse_new.sh S3  | ts >> "$HOME"/logs/parse_new_s3."$DATE".log 2>&1
 date; echo "parse GS"
 ./parse.sh GS      | ts >> "$HOME"/parse_gs.log 2>&1
-./parse_new.sh GS  | ts >> "$HOME"/logs/parse_new_gs."$DATE"log 2>&1
+./parse_new.sh GS  | ts >> "$HOME"/logs/parse_new_gs."$DATE".log 2>&1
 date; echo "parse OP"
 ./parse.sh OP      | ts >> "$HOME"/parse_op.log 2>&1
-./parse_new.sh OP  | ts >> "$HOME"/logs/parse_new_op."$DATE"log 2>&1
+./parse_new.sh OP  | ts >> "$HOME"/logs/parse_new_op."$DATE".log 2>&1
 
 date; echo "s3_lister"
 ./s3_lister.sh | ts >> "$HOME"/s3_lister.log 2>&1
@@ -37,9 +37,11 @@ date; echo "s3_lister"
 dow=$(date +%u)
 if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
     date; echo "bigquery_export"
-    ./bigquery_export.sh | ts >> "$HOME"/bigquery_export.log 2>&1
-    ./bigquery_report.sh | ts >> "$HOME"/logs/bigquery_report."$DATE".log 2>&1
-    ./bigquery_summary.sh | ts >> "$HOME"/bigquery_summary.log 2>&1
+    ./bigquery_export.sh  | ts >> "$HOME"/logs/bigquery_export."$DATE".log 2>&1
+    ./bigquery_report.sh  | ts >> "$HOME"/logs/bigquery_report."$DATE".log 2>&1
+    ./bigquery_summary.sh | ts >> "$HOME"/logs/bigquery_summary."$DATE".log 2>&1
+
+    mailx -s "BigQuery Report" vartanianmh@ncbi.nlm.nih.gov < "$HOME"/logs/bigquery_report."$DATE".log
 fi
 
 echo "    --- Daily Processing Complete ($$) ---"
