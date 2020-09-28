@@ -1,4 +1,5 @@
 -- sqlite3 rdns.db < rdns.sql
+-- Update uniq_ips below first
 
 .headers on
 .bail on
@@ -7,7 +8,7 @@
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20200722.json  uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20200914.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;

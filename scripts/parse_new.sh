@@ -8,7 +8,7 @@
 # done
 # cat days | xargs -P 10 -I % ./parse.sh GS %
 
-USAGE="Usage: $0 {S3,GS,OP} YYYY_MM_DD"
+USAGE="Usage: $0 {S3,GS,OP} [YYYY_MM_DD [bucket]]"
 
 #sleep $((RANDOM / 500))
 
@@ -24,10 +24,17 @@ case "$#" in
     1)
         PROVIDER=$1
         YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d") #_%H%
+        BUCKET_ONLY=""
         ;;
     2)
         PROVIDER=$1
         YESTERDAY_UNDER=$2
+        BUCKET_ONLY=""
+        ;;
+    3)
+        PROVIDER=$1
+        YESTERDAY_UNDER=$2
+        BUCKET_ONLY=$3
         ;;
     *)
         echo "$USAGE"
@@ -53,17 +60,16 @@ echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 
 case "$PROVIDER" in
     OP)
-        PARSER_BIN="op2jsn-rel"
-        #WILDCARD='*access*'
+#        PARSER_BIN="op2jsn-rel"
         WILDCARD='*'
 #        buckets=("OP") # TODO
         ;;
     GS)
-        PARSER_BIN="gcp2jsn-rel"
+#        PARSER_BIN="gcp2jsn-rel"
         WILDCARD='*'
         ;;
     S3)
-        PARSER_BIN="aws2jsn-rel"
+#        PARSER_BIN="aws2jsn-rel"
         WILDCARD='*'
         ;;
     *)
@@ -74,14 +80,26 @@ case "$PROVIDER" in
 esac
 
 for LOG_BUCKET in "${buckets[@]}"; do
-    echo "  Parsing $LOG_BUCKET..."
     BUCKET_NAME=$(sqlcmd "select distinct bucket_name from buckets where cloud_provider='$PROVIDER' and log_bucket='$LOG_BUCKET' limit 1")
+    if [ -n "$BUCKET_ONLY" ]; then
+        if [ "$BUCKET_NAME" != "$BUCKET_ONLY" ]; then
+            echo "Skipping $BUCKET_NAME != $BUCKET_ONLY"
+            continue
+        fi
+    fi
+
+    echo "  Parsing $LOG_BUCKET..."
     echo "BUCKET_NAME is $BUCKET_NAME"
 
+    PARSER_REC=$(sqlcmd "select parser_binary || ':' || parser_options from log_formats where log_format = (select log_format from buckets where cloud_provider='$PROVIDER' and bucket_name='$BUCKET_NAME')")
+    PARSER_BIN=$(echo "$PARSER_REC" | cut -d':' -f 1)
+    PARSER_OPT=$(echo "$PARSER_REC" | cut -d':' -f 2)
+
+    echo "PARSER_BIN is '$PARSER_BIN', PARSER_OPT is '$PARSER_OPT'"
     if [ "$PROVIDER" = "OP" ]; then
-        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
-            BUCKET_NAME="srafiles"
-        fi
+#        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
+#            BUCKET_NAME="srafiles"
+#        fi
         LOG_BUCKET="OP-${BUCKET_NAME}"
     fi
 
@@ -100,65 +118,67 @@ for LOG_BUCKET in "${buckets[@]}"; do
     ls -hl "$TGZ"
 
     echo "  Counting $TGZ ..."
-    totalwc=$(tar -xaOf "$TGZ" | wc -l | cut -f1 -d' ')
-    touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
+    totalwc=$(tar -xaOf "$TGZ" "$WILDCARD" | wc -l | cut -f1 -d' ')
+    #touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
     VERSION=$($PARSER_BIN --version)
     echo "  Parsing $TGZ (pattern=$WILDCARD), $totalwc lines with $PARSER_BIN $VERSION..."
 
     BASE="$LOG_BUCKET.$YESTERDAY_DASH"
+    echo "BASE is $BASE"
+    set +e
     tar -xaOf "$TGZ" "$WILDCARD" | \
         time "$PARSER_BIN" -f -t 4 "$BASE" \
+        > "$BASE.stdout" \
         2> "$BASE.stderr"
+    echo "Returned $?"
     rm -f "$TGZ"
-    head "$BASE.stderr"
-#    touch "$BASE.ugly" # TODO
+    head -v "$BASE.stderr"
+    echo "==="
 
     ls -l
 
-#    mv "$BASE.good" "$BASE.good.jsonl"
-#    mv "$BASE.bad" "$BASE.bad.jsonl"
-#    mv "$BASE.review" "$BASE.review.jsonl"
-#    mv "$BASE.stderr" "$BASE.stderr.jsonl"
     echo
 
     echo "  Record format is:"
     head -1 "$BASE.good.jsonl" | jq -SM .
 
-    set +e
-    grep "\"accepted\":false," "$BASE.good.jsonl" > \
-        "$BASE.unrecognized.jsonl"
-    grep "\"accepted\":true," "$BASE.good.jsonl" > \
-        "$BASE.recognized.jsonl"
-    rm -f "$BASE.good"
-    set -e
 
-    # "accepted": true,
-    unrecwc=$(wc -l "$BASE.unrecognized.jsonl" | cut -f1 -d' ')
+    touch "$BASE.bad.jsonl"
+    touch "$BASE.good.jsonl"
+    touch "$BASE.review.jsonl"
+    touch "$BASE.ugly.jsonl"
+    touch "$BASE.unrecog.jsonl"
+    cat "$BASE.unrecog.jsonl" "$BASE.bad.jsonl" "$BASE.review.jsonl" "$BASE.ugly.jsonl" > "$BASE.unrecognized.jsonl"
+    rm -f "$BASE.unrecog.jsonl" "$BASE.bad.jsonl" "$BASE.review.jsonl" "$BASE.ugly.jsonl"
+    mv "$BASE.good.jsonl" "$BASE.recognized.jsonl"
     recwc=$(wc -l "$BASE.recognized.jsonl" | cut -f1 -d' ')
-
     printf "Recognized lines:   %8d\n" "$recwc"
+    unrecwc=$(wc -l "$BASE.unrecognized.jsonl" | cut -f1 -d' ')
     printf "Unrecognized lines: %8d\n" "$unrecwc"
 
-    if [ ! -s "unrecognized.$BASE.jsonl" ]; then
-        rm -f "unrecognized.$BASE.jsonl"
+    if [ ! -s "$BASE.recognized.jsonl" ]; then
+        echo "ERROR: Empty $BASE.recognized.jsonl"
+        #continue
     fi
 
-    echo "  splitting"
-    split -a 3 -d -e -l 10000000 --additional-suffix=.jsonl \
-        - "recognized.$BASE" \
+    if [ ! -s "$BASE.unrecognized.jsonl" ]; then
+        rm -f "$BASE.unrecognized.jsonl"
+    fi
+
+    echo
+    echo "  Splitting ..."
+    # -e no empty
+    split -a 3 -d -l 10000000 --additional-suffix=.jsonl \
+        - "$BASE.recognized." \
         < "$BASE.recognized.jsonl"
 
-    rm -f "recognized.$BASE.jsonl"
-#        fi
+    rm -f "$BASE.recognized.jsonl"
 
-    ls -l
-    echo "  Gzipping $BASE..."
-    gzip -f -v -9 ./"*recognized.$BASE.jsonl"
+    echo "  Gzipping ..."
+    gzip -f -v ./"$BASE."*recognized.*.jsonl
 
-    ls -l
-
-    echo "  Summarizing..."
+    echo -n "  Summarizing... "
     {
         printf "{"
         printf '"log_bucket": "%s",' "$LOG_BUCKET"
@@ -170,9 +190,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         printf '"recognized_lines" : %d,' "$recwc"
         printf '"unrecognized_lines" : %d'  "$unrecwc"
         printf "}"
-    } > "$TGZ.json"
-    jq -S -c . < "$TGZ.json" > "summary.$TGZ.jsonl"
-    cat "summary.$TGZ.jsonl"
+    } | jq -S -c . | tee "$BASE.summary.jsonl"
 
     ls -l
     echo "  Uploading..."
@@ -180,9 +198,13 @@ for LOG_BUCKET in "${buckets[@]}"; do
     export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil cp ./*ecognized."$BASE"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-    gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-    gsutil cp ./"summary.$TGZ.jsonl" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
+    gsutil cp ./"$BASE"*ecognized* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
+    gsutil cp ./"$BASE".stderr "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
+    gsutil cp ./"$BASE".stats.jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
+    gsutil cp ./"$BASE".summary.jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
+
+    gsutil ls -lh "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/$BASE*"
+
     cd ..
     rm -rf "$PARSE_DEST"
 echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."

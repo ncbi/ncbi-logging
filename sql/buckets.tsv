@@ -67,28 +67,28 @@ GS	sra-pub-zq-7		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	
 GS	sra-pub-zq-8		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL - BQS	GS log	cold
 GS	sra-pub-zq-9		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL - BQS	GS log	cold
 OP	faspgap	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fasp*/access_*.gz		public	false	nginx log	nginx log	hot
-OP	faspgap1	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	faspgap11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	faspgap12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	faspgap21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	faspgap22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	faspgap3	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	faspgap31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	faspgap32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap1	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap1/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap11/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap12/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap21/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap22/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap3	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap3/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap31/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	faspgap32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap32/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	ftp	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp*/access_*gz		public	false	nginx log	nginx log	hot
-OP	ftp1	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp13	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp2	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	ftp33	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp1	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp1/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp11/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp12/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp13	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp13/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp2	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp2/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp21/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp22/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp31/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp32/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	ftp33	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp33/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	gapsview	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gaps*/access_*.gz		public	false	nginx log	nginx log	hot
-OP	gapsview11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	gapsview21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	gapsview11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gapsview11/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	gapsview21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gapsview21/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	sdl-index-err	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*err_*.gz		public	false	nginx log	traceweb	hot
 OP	sdl-index-log	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*log_*.gz		public	false	nginx log	traceweb	hot
 OP	sdl-index-trace	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*trace_*.gz		public	false	nginx log	traceweb	hot
@@ -101,18 +101,18 @@ OP	sdl-sdlr-trace	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applo
 OP	sdl-sra-err	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra.*.err*.gz		public	false	nginx log	traceweb	hot
 OP	sdl-sra-log	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/sra.*.log_*.gz		public	false	nginx log	traceweb	hot
 OP	sdl-sra-trace	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/trace.*.gz		public	false	nginx log	traceweb	hot
-OP	srafiles11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles13	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles23	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles33	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles34	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles35	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
-OP	srafiles36	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles*/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles11/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles12	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles12/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles13	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles13/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles21	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles21/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles22	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles22/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles23	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles23/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles31	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles31/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles32	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles32/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles33	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles33/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles34	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles34/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles35	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles35/access.log_??????*gz		public	false	nginx log	nginx log	hot
+OP	srafiles36	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles36/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	sweb	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/weblog/local_archive/*/*/*/sweb*/*.gz		public	false	nginx log	nginx log	hot
 S3	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
 S3	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot

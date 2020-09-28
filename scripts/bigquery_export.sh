@@ -205,6 +205,59 @@ bq -q query \
 
 fi # skipload
 
+echo " #### UDFs"
+    QUERY=$(cat <<-ENDOFQUERY
+CREATE OR REPLACE FUNCTION strides_analytics.expand_bucket (bucket STRING, path STRING)
+RETURNS STRING
+AS
+ (case
+        WHEN ends_with(bucket, '-us-east-1') THEN bucket || '  (Athena metadata)'
+        WHEN ends_with(bucket, '-cov2') and
+            regexp_contains(path, r'sra-src') THEN bucket || ' (Original)'
+        WHEN ends_with(bucket, '-cov2') and
+            regexp_contains(path, r'run') THEN bucket || ' (ETL + BQS)'
+        WHEN regexp_contains(bucket, r'sra-pub-assembly-1') THEN bucket || ' (ETL - BQS)'
+        WHEN regexp_contains(bucket, r'-zq-') THEN bucket || ' (ETL - BQS)'
+        WHEN regexp_contains(bucket, r'-run-') THEN bucket || ' (ETL + BQS)'
+        WHEN regexp_contains(bucket, r'-src-') THEN bucket || ' (Original)'
+        WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
+    ELSE bucket || ' (Unknown)'
+    END)
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+# See LOGMON-93
+    QUERY=$(cat <<-ENDOFQUERY
+    CREATE OR REPLACE FUNCTION strides_analytics.map_extension (extension STRING)
+    RETURNS STRING
+    AS
+    (case
+    WHEN regexp_contains(extension, r'\.bam') THEN 'BAM'
+    WHEN regexp_contains(extension, r'\.cram') THEN 'CRAM'
+    WHEN regexp_contains(extension, r'\.fastq') OR regexp_contains(extension, r'\.fq') THEN 'FASTQ'
+    WHEN regexp_contains(extension, r'\.hdf5') OR regexp_contains(extension, r'\.bax\.h5') THEN 'HDF5-BAX'
+    WHEN regexp_contains(extension, r'\.hdf5') OR regexp_contains(extension, r'\.bas.h5') THEN 'HDF5-BAS'
+    WHEN regexp_contains(extension, r'\.zq') THEN 'ZQ'
+    WHEN regexp_contains(extension , r'/traces/refseq') THEN 'RefSeq'
+    WHEN regexp_contains(extension , r'/traces%2Frefseq') THEN 'RefSeq'
+    WHEN regexp_contains(extension , r'/sra-pub-refseq') THEN 'RefSeq'
+    WHEN regexp_contains(extension , r'/traces/wgs') THEN 'WGS'
+    WHEN regexp_contains(extension , r'/traces%2Fwgs') THEN 'WGS'
+    WHEN regexp_contains(extension , r'/sragap') THEN 'dbGaP'
+    WHEN regexp_contains(extension , r'/kmer') THEN 'kMer'
+    WHEN regexp_contains(extension, '[DES]R[RZ]{6,10}') THEN 'SRA ETL'
+    WHEN regexp_contains(extension, r'\.tar.gz') THEN 'TARGZ'
+    WHEN regexp_contains(extension, r'\.tar') THEN 'TAR'
+    ELSE 'other'
+    END)
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+
 echo " #### gs_fixed"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
@@ -218,22 +271,12 @@ echo " #### gs_fixed"
     host as host,
     method as http_operation,
     path as request_uri,
+    strides_analytics.map_extension(path) as extension,
     referer as referer,
     regexp_extract(path,r'[DES]R[RZ][0-9]{5,10}') as accession,
     result_bytes as bytes_sent,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
-    case
-        WHEN regexp_contains(bucket, r'-run-') THEN bucket || ' (ETL + BQS)'
-        WHEN regexp_contains(bucket, r'-zq-') THEN bucket || ' (ETL - BQS)'
-        WHEN regexp_contains(bucket, r'-src-') THEN bucket || ' (Original)'
-        WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
-        WHEN ends_with(bucket, '-cov2') and
-            regexp_contains(path, r'sra-src') THEN bucket || ' (Original)'
-        WHEN ends_with(bucket, '-cov2') and
-            regexp_contains(path, r'run') THEN bucket || ' (ETL + BQS)'
-        WHEN regexp_contains(bucket, r'sra-pub-assembly-1') THEN bucket || ' (ETL - BQS)'
-    ELSE bucket || ' (Unknown)'
-    END as bucket,
+    strides_analytics.expand_bucket(bucket, path) as bucket,
     source as source,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.strides_analytics.gs_parsed\\\`
@@ -279,19 +322,11 @@ echo " #### s3_fixed"
     host_header as host,
     cast (case WHEN res_len='' THEN '0' ELSE res_len END as int64) as bytes_sent,
     path as request_uri,
+    strides_analytics.map_extension(path) as extension,
     referer as referer,
     replace(agent, '-head', '') as user_agent,
     source as source,
-    case
-        WHEN regexp_contains(bucket, r'-run-') THEN bucket || ' (ETL + BQS)'
-        WHEN regexp_contains(bucket, r'-zq-') THEN bucket || ' (ETL - BQS)'
-        WHEN regexp_contains(bucket, r'-src-') THEN bucket || ' (Original)'
-        WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
-        WHEN ends_with(bucket, '-cov2') and
-            regexp_contains(path, r'sra-src') THEN bucket || ' (Original)'
-        WHEN ends_with(bucket, '-cov2') and
-            regexp_contains(path, r'run') THEN bucket || ' (ETL + BQS)'
-    ELSE bucket || ' (Unknown)'
+    strides_analytics.expand_bucket(bucket, path) as bucket,
     END as bucket,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.strides_analytics.s3_parsed\\\`
@@ -334,6 +369,7 @@ echo " #### op_fixed"
     server as host,
     res_len as bytes_sent,
     path as request_uri,
+    strides_analytics.map_extension(path) as extension,
     referer as referer,
     replace(agent, '-head', '') as user_agent,
     'OP' as source,
@@ -372,6 +408,7 @@ SELECT
     remote_ip as remote_ip,
     http_operation as http_operation,
     request_uri as request_uri,
+    extension as extension,
     referer as referer,
     source as source,
     start_ts,
@@ -390,6 +427,7 @@ UNION ALL SELECT
     remote_ip as remote_ip,
     http_operation as http_operation,
     request_uri as request_uri,
+    extension as extension,
     referer as referer,
     source as source,
     start_ts,
@@ -408,6 +446,7 @@ UNION ALL SELECT
     remote_ip as remote_ip,
     http_operation as http_operation,
     request_uri as request_uri,
+    extension as extension,
     referer as referer,
     source as source,
     start_ts,
@@ -447,6 +486,7 @@ echo " ###  summary_grouped"
     string_agg(distinct http_operation order by http_operation) as http_operations,
     string_agg(distinct http_status order by http_status) as http_statuses,
     string_agg(distinct referer) as referers,
+    string_agg(distinct extension order by extension) as file_ext,
     sum(bytes_sent) as bytes_sent,
     current_datetime() as export_time
     FROM \\\`strides_analytics.detail_export\\\`

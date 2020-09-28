@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USAGE="Usage: $0 {S3,GS,OP} [YYYY_MM_DD]"
+USAGE="Usage: $0 {S3,GS,OP} [YYYY_MM_DD [bucket]]"
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
@@ -13,10 +13,17 @@ case "$#" in
     1)
         PROVIDER=$1
         YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d") #_%H%
+        BUCKET_ONLY=""
         ;;
     2)
         PROVIDER=$1
         YESTERDAY_UNDER=$2
+        BUCKET_ONLY=""
+        ;;
+    3)
+        PROVIDER=$1
+        YESTERDAY_UNDER=$2
+        BUCKET_ONLY=$3
         ;;
     *)
         echo "$USAGE"
@@ -29,6 +36,12 @@ YESTERDAY=${YESTERDAY_UNDER//_}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
 echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
+
+if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
+    echo "Invalid date: $YESTERDAY_UNDER"
+    echo "$USAGE"
+    exit 2
+fi
 
 case "$PROVIDER" in
     S3)
@@ -51,9 +64,16 @@ buckets=$(sqlcmd "select distinct log_bucket from buckets where scope='public' a
 readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 for LOG_BUCKET in "${buckets[@]}"; do
-    echo "Processing $LOG_BUCKET"
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
     BUCKET_NAME=$(sqlcmd "select distinct bucket_name from buckets where cloud_provider='$PROVIDER' and log_bucket='$LOG_BUCKET' limit 1")
+    if [ -n "$BUCKET_ONLY" ]; then
+        if [ "$BUCKET_NAME" != "$BUCKET_ONLY" ]; then
+            echo "Skipping $BUCKET_NAME != $BUCKET_ONLY"
+            continue
+        fi
+    fi
+
+    echo "Processing $LOG_BUCKET"
     echo "BUCKET_NAME is $BUCKET_NAME"
 
     if [ "$PROVIDER" = "GS" ]; then
@@ -70,9 +90,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
     fi
 
     if [ "$PROVIDER" = "OP" ]; then
-        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
-            BUCKET_NAME="srafiles"
-        fi
+#        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
+#            BUCKET_NAME="srafiles"
+#        fi
 
         if [ "$YESTERDAY" -lt "20180701" ]; then
             files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
