@@ -327,7 +327,6 @@ echo " #### s3_fixed"
     replace(agent, '-head', '') as user_agent,
     source as source,
     strides_analytics.expand_bucket(bucket, path) as bucket,
-    END as bucket,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.strides_analytics.s3_parsed\\\`
     WHERE accepted=true
@@ -486,7 +485,7 @@ echo " ###  summary_grouped"
     string_agg(distinct http_operation order by http_operation) as http_operations,
     string_agg(distinct http_status order by http_status) as http_statuses,
     string_agg(distinct referer) as referers,
-    string_agg(distinct extension order by extension) as file_ext,
+    string_agg(distinct extension order by extension) as file_exts,
     sum(bytes_sent) as bytes_sent,
     current_datetime() as export_time
     FROM \\\`strides_analytics.detail_export\\\`
@@ -528,13 +527,14 @@ echo " ###  op_sess"
     bucket, source, num_requests, start_ts, end_ts,
     http_operations,
     http_statuses,
-    referers, bytes_sent, export_time)
+    referers, bytes_sent, export_time, file_exts)
     SELECT
         acc, agent, ip, domain,
         domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
         replace(cmds,' ',','),
         replace(status,' ',','),
-        '', bytecount, current_datetime()
+        '', bytecount, current_datetime(),
+        strides_analytics.map_extension(accession)
     FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
     WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
     AND start between '2019-03-01' and '2020-04-21'
@@ -703,6 +703,7 @@ echo " ###  summary_export"
     http_operations,
     http_statuses,
     referers,
+    file_exts,
     bytes_sent,
     current_datetime() as export_time,
     case
