@@ -14,19 +14,30 @@ using namespace ncbi;
 
 
 JWTReceiver::JWTReceiver( FormatterRef fmt )
-: ReceiverInterface ( fmt ), m_jwtCount ( 0 )
+: ReceiverInterface ( fmt ), seen_jwt ( false )
 {
+}
+
+void
+JWTReceiver::closeJwt()
+{
+    if ( seen_jwt )
+    {
+        m_fmt->closeArray();
+    }
 }
 
 void JWTReceiver::setJwt( const t_str & v )
 {
-    stringstream mem;
-    ++m_jwtCount;
-    mem << "jwt" << m_jwtCount;
-    setMember( mem.str().c_str(), v );
+    if ( ! seen_jwt )
+    {
+        seen_jwt = true;
+        m_fmt -> addArray( "jwt" );
+    }
+    m_fmt -> addArrayValue( v );
 }
 
-JWTParseBlock::JWTParseBlock( JWTReceiver receiver )
+JWTParseBlock::JWTParseBlock( JWTReceiver & receiver )
 : m_receiver ( receiver )
 {
     jwt_lex_init( &m_sc );
@@ -50,5 +61,6 @@ JWTParseBlock::format_specific_parse( const char * line, size_t line_size )
     YY_BUFFER_STATE bs = jwt_scan_bytes( line, line_size, m_sc );
     int ret = jwt_parse( m_sc, & m_receiver );
     jwt__delete_buffer( bs, m_sc );
+    m_receiver.closeJwt();
     return ret == 0;
 }

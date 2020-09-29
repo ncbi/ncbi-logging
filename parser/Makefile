@@ -102,7 +102,10 @@ acc_test: jq
 #################################################
 # valgrind
 
-vg : vg_op vg_gcp vg_aws vg_tw
+vg : vg_cmn vg_op vg_gcp vg_aws vg_tw
+
+vg_cmn:
+	$(MAKE) -C common vg
 
 vg_aws :
 	$(MAKE) -C aws vg
@@ -116,7 +119,7 @@ vg_op :
 vg_tw :
 	$(MAKE) -C tw vg
 
-.PHONY: vg_op vg_gcp vg_aws vg_tw vg
+.PHONY: vg_cmn vg_op vg_gcp vg_aws vg_tw vg
 
 #-------------------------------------------------------------------------------
 # fuzz testing

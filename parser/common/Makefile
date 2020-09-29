@@ -82,7 +82,14 @@ $(BINDIR)/test_common-rel: $(TEST_SUPPORT_REL_OBJ) $(CMD_REL_OBJ)
 .PHONY: common cmn_clean cmn_test
 
 #-------------------------------------------------------------------------------
-# vg: TBD
+VG_OPTIONS := --leak-check=full --error-exitcode=1
+VG_BUILD = dbg
+#VG_BUILD = rel
+
+vg : $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
+	valgrind $(VG_OPTIONS) $(BINDIR)/test_common-$(VG_BUILD)
+
+.phony: vg
 
 #-------------------------------------------------------------------------------
 # fuzz testing: TBD

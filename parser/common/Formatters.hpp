@@ -25,6 +25,10 @@ namespace NCBI
             virtual void addNameValue( const std::string & name, int64_t value ) = 0;
             virtual void addNameValue( const std::string & name, const std::string & value ) = 0;
 
+            virtual void addArray( const std::string & name ) = 0;
+            virtual void addArrayValue( const t_str & value ) = 0;
+            virtual void closeArray() = 0;
+
         protected:
             std::string & unEscape( const t_str & value, std::string & str ) const; // appends to the end of str, returns updated str
         };
@@ -44,8 +48,15 @@ namespace NCBI
             virtual void addNameValue( const std::string & name, int64_t value );
             virtual void addNameValue( const std::string & name, const std::string & value );
 
+            virtual void addArray( const std::string & name );
+            virtual void addArrayValue( const t_str & value );
+            virtual void closeArray();
+
         private:
             ncbi :: JSONObjectRef j;
+
+            std :: string arrayName;
+            ncbi :: JSONArrayRef openArray;
         };
 
         class JsonFastFormatter : public FormatterInterface
@@ -59,9 +70,14 @@ namespace NCBI
             virtual void addNameValue( const std::string & name, int64_t value );
             virtual void addNameValue( const std::string & name, const std::string & value );
 
+            virtual void addArray( const std::string & name );
+            virtual void addArrayValue( const t_str & value );
+            virtual void closeArray();
+
         private:
             std::vector< std::string > kv;
             std::stringstream ss;
+            bool first_in_array;
         };
 
         class ReverseFormatter : public FormatterInterface
@@ -75,6 +91,10 @@ namespace NCBI
             virtual void addNameValue( const std::string & name, const t_str & value );
             virtual void addNameValue( const std::string & name, int64_t value );
             virtual void addNameValue( const std::string & name, const std::string & value );
+
+            virtual void addArray( const std::string & name ) {}
+            virtual void addArrayValue( const t_str & value ) {}
+            virtual void closeArray() {}
 
         private:
             std::stringstream ss;

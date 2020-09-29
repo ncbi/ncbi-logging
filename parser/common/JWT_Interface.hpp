@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "ReceiverInterface.hpp"
 #include "ParserInterface.hpp"
 
@@ -14,14 +16,15 @@ namespace NCBI
             JWTReceiver( FormatterRef fmt );
 
             void setJwt( const t_str & v );
+            void closeJwt();
 
-            size_t m_jwtCount;
+            bool seen_jwt;
         };
 
         class JWTParseBlock : public ParseBlockInterface
         {
         public:
-            JWTParseBlock( JWTReceiver receiver );
+            JWTParseBlock( JWTReceiver & receiver );
             virtual ~JWTParseBlock();
 
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }

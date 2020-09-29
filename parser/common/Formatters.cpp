@@ -68,6 +68,25 @@ JsonLibFormatter::addNameValue( const std::string & name, const std::string & va
     j -> addValue( String ( name.c_str(), name.size() ), JSON::makeString( String( value.c_str(), value.size() ) ) );
 }
 
+void
+JsonLibFormatter::addArray( const std::string & name )
+{
+    arrayName = name;
+    openArray = ncbi::JSON::makeArray();
+}
+
+void
+JsonLibFormatter::addArrayValue( const t_str & value )
+{
+    openArray -> appendValue( JSON::makeString( String( value.p, value.n ) ) );
+}
+
+void
+JsonLibFormatter::closeArray()
+{
+    j -> addValue( String ( arrayName.c_str(), arrayName.size() ), openArray.release() );
+}
+
 /* ------------------------------------------------------------------------------------------ */
 
 std::ostream& operator<< (std::ostream& os, const t_str & s)
@@ -173,7 +192,7 @@ void JsonFastFormatter::addNameValue( const std::string & name, const t_str & va
 
 void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 {
-    ss.str( "" );
+    ss . str( "" );
     ss . put( '"' );
     ss . write( name.c_str(), name.size() );
     ss . put( '"' );
@@ -186,6 +205,41 @@ void JsonFastFormatter::addNameValue( const std::string & name, const std::strin
 {
     t_str tmp { value.c_str(), value.size(), false };
     addNameValue( name, tmp );
+}
+
+void
+JsonFastFormatter::addArray( const std::string & name )
+{
+    ss . str( "" );
+    ss . put( '"' );
+    ss . write( name.c_str(), name.size() );
+    ss . put( '"' );
+    ss . put( ':' );
+    ss . put( '[' );
+    first_in_array = true;
+}
+
+void
+JsonFastFormatter::addArrayValue( const t_str & value )
+{
+    if ( ! first_in_array )
+    {
+        ss . put( ',' );
+    }
+    else
+    {
+        first_in_array = false;
+    }
+    ss . put( '"' );
+    ss . write( value.p, value.n );
+    ss . put( '"' );
+}
+
+void
+JsonFastFormatter::closeArray()
+{
+    ss . put( ']' );
+    kv.push_back( ss . str() );
 }
 
 /* ----------- ReverseFormatter ----------- */

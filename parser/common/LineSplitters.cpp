@@ -82,7 +82,8 @@ size_t CLineSplitter::size( void ) const
 }
 
 BufLineSplitter::BufLineSplitter( const char * buf, size_t size  )
-:   m_f( fmemopen( ( void * )buf, size, "r" ) ), m_splitter( m_f )
+:   m_f( buf == nullptr ? nullptr : fmemopen( ( void * )buf, size, "r" ) ),
+    m_splitter( m_f )
 {
 }
 

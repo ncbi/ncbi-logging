@@ -30,13 +30,15 @@ TEST( JWT_Parsing, NoJwt )
 
 TEST( JWT_Parsing, Jwt )
 {
-    JWTReceiver receiver( make_shared<JsonFastFormatter>() );
+    auto fmt = make_shared<JsonFastFormatter>();
+    JWTReceiver receiver( fmt );
     JWTParseBlock pb( receiver );
 
     const string jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc0NGY2MGU5ZmI1MTVhMmEwMWMxMWViZWIyMjg3MTI4NjA1NDA3MTEiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwczovL3d3dy5uY2JpLm5sbS5uaWguZ292IiwiYXpwIjoiMTA5MDI3MzA5Mzc3ODQwMDg5NTA2IiwiZW1haWwiOiIxMDc2Nzc1Njk3Mjg0LWNvbXB1dGVAZGV2ZWxvcGVyLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZXhwIjoxNTk2ODk1OTUyLCJnb29nbGUiOnsiY29tcHV0ZV9lbmdpbmUiOnsiaW5zdGFuY2VfY3JlYXRpb25fdGltZXN0YW1wIjoxNTk1MTQ5OTg0LCJpbnN0YW5jZV9pZCI6IjI5MTE2NjU1NjAyNjEwMTM4NTMiLCJpbnN0YW5jZV9uYW1lIjoiaW5zdGFuY2UtMSIsInByb2plY3RfaWQiOiJnb2xkLW9wdGljcy0yNjI0MDciLCJwcm9qZWN0X251bWJlciI6MTA3Njc3NTY5NzI4NCwiem9uZSI6InVzLWNlbnRyYWwxLWEifX0sImlhdCI6MTU5Njg5MjM1MiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tIiwic3ViIjoiMTA5MDI3MzA5Mzc3ODQwMDg5NTA2In0.TaaroLHnzskyEzb1gavhvzWAVBT3_gjZ2n5FV36OEHPKwE0tazIx7vcdvA2CEhKLiI7Gfcr-ilRnrPBeucZfxXMiceO5C6ddwnBHyF05d6iw4kDVFm0-k39qgt8XIRLK6vHDs1sswhoBGJ1lrJrGr4-JbwwXwcEYZ2wqh9XQmwX7wOszNtWV-InGVEjp5Dvwyi2R64J6efvR6M_ZI9PGbqsdTHueKqeezqdRxYG0DA8yNOT18Z8CHm2y2ZIODJv7cF18iviShv2AA5KMRkXiy_aySyUBdZDuPoXqMd2cnmMsmb0xfus_8LYl42r5wk7JO5tmDyQYPqG6CZGia-o55A";
     string str = string("ident=") + jwt;
     pb.format_specific_parse( str.c_str(), str.size() );
-    ASSERT_EQ( string ("{\"jwt1\":\"" ) + jwt + "\"}", receiver.GetFormatter().format() );
+
+    ASSERT_EQ( string ("{\"jwt\":[\"" ) + jwt + "\"]}", fmt->format() );
 }
 
 TEST( JWT_Parsing, Multiple_Jwt )
@@ -50,7 +52,7 @@ TEST( JWT_Parsing, Multiple_Jwt )
 
     string str = string("ident=") + jwt1 + "&jwt1=" + jwt2 + "&jwt2=" + jwt3;
     pb.format_specific_parse( str.c_str(), str.size() );
-    ASSERT_EQ( string ("{\"jwt1\":\"" ) + jwt1 + "\",\"jwt2\":\"" + jwt2 + "\",\"jwt3\":\"" + jwt3 + "\"}",
+    ASSERT_EQ( string ("{\"jwt\":[\"" ) + jwt1 + "\",\"" + jwt2 + "\",\"" + jwt3 + "\"]}",
                 receiver.GetFormatter().format() );
 }
 
