@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <set>
 
 #include "types.h"
 
@@ -76,7 +77,9 @@ namespace NCBI
 
         private:
             std::vector< std::string > kv;
+            std::set< std::string > seen;
             std::stringstream ss;
+            std::string m_array_name;
             bool first_in_array;
         };
 
@@ -92,6 +95,8 @@ namespace NCBI
             virtual void addNameValue( const std::string & name, int64_t value );
             virtual void addNameValue( const std::string & name, const std::string & value );
 
+            // not used in a reverse formatter, but we need at least an empty impl.
+            // to implement the abstract functions in the FormatterInterface
             virtual void addArray( const std::string & name ) {}
             virtual void addArrayValue( const t_str & value ) {}
             virtual void closeArray() {}

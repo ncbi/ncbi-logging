@@ -53,19 +53,37 @@ JSONValueRef ToJsonString( const t_str & in )
 void
 JsonLibFormatter::addNameValue( const std::string & name, const t_str & value )
 {
-    j -> addValue( String ( name.c_str(), name.size() ), ToJsonString ( value ) );
+    try
+    {
+        j -> addValue( String ( name.c_str(), name.size() ), ToJsonString ( value ) );
+    }
+    catch( ncbi::JSONUniqueConstraintViolation & )
+    {
+    }
 }
 
 void
 JsonLibFormatter::addNameValue( const std::string & name, int64_t value )
 {
-    j -> addValue( String ( name.c_str(), name.size() ), JSON::makeInteger( value ) );
+    try
+    {
+        j -> addValue( String ( name.c_str(), name.size() ), JSON::makeInteger( value ) );
+    }
+    catch( ncbi::JSONUniqueConstraintViolation & )
+    {
+    }
 }
 
 void
 JsonLibFormatter::addNameValue( const std::string & name, const std::string & value )
 {
-    j -> addValue( String ( name.c_str(), name.size() ), JSON::makeString( String( value.c_str(), value.size() ) ) );
+    try
+    {
+        j -> addValue( String ( name.c_str(), name.size() ), JSON::makeString( String( value.c_str(), value.size() ) ) );
+    }
+    catch( ncbi::JSONUniqueConstraintViolation & )
+    {
+    }
 }
 
 void
@@ -84,7 +102,13 @@ JsonLibFormatter::addArrayValue( const t_str & value )
 void
 JsonLibFormatter::closeArray()
 {
-    j -> addValue( String ( arrayName.c_str(), arrayName.size() ), openArray.release() );
+    try
+    {
+        j -> addValue( String ( arrayName.c_str(), arrayName.size() ), openArray.release() );
+    }
+    catch( ncbi::JSONUniqueConstraintViolation & )
+    {
+    }
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -175,30 +199,39 @@ JsonFastFormatter::format()
         s . write( item.c_str(), item.size() );
     }
     kv.clear();
+    seen.clear();
     s . put ( '}' );
     return s.str();
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const t_str & value )
 {
-    ss.str( "" );
-    ss . put( '"' );
-    ss . write( name.c_str(), name.size() );
-    ss . put( '"' );
-    ss . put( ':' );
-    ss << value;    /* here exception can happen */
-    kv.push_back( ss.str() );
+    if ( seen . find( name ) == seen.end() )
+    {
+        ss.str( "" );
+        ss . put( '"' );
+        ss . write( name.c_str(), name.size() );
+        ss . put( '"' );
+        ss . put( ':' );
+        ss << value;    /* here exception can happen */
+        kv.push_back( ss.str() );
+        seen . insert( name );
+    }
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 {
-    ss . str( "" );
-    ss . put( '"' );
-    ss . write( name.c_str(), name.size() );
-    ss . put( '"' );
-    ss . put( ':' );
-    ss << value;
-    kv.push_back( ss.str() );
+    if ( seen . find( name ) == seen.end() )
+    {
+        ss . str( "" );
+        ss . put( '"' );
+        ss . write( name.c_str(), name.size() );
+        ss . put( '"' );
+        ss . put( ':' );
+        ss << value;
+        kv.push_back( ss.str() );
+        seen . insert( name );
+    }
 }
 
 void JsonFastFormatter::addNameValue( const std::string & name, const std::string & value )
@@ -216,6 +249,7 @@ JsonFastFormatter::addArray( const std::string & name )
     ss . put( '"' );
     ss . put( ':' );
     ss . put( '[' );
+    m_array_name = name;
     first_in_array = true;
 }
 
@@ -238,8 +272,12 @@ JsonFastFormatter::addArrayValue( const t_str & value )
 void
 JsonFastFormatter::closeArray()
 {
-    ss . put( ']' );
-    kv.push_back( ss . str() );
+    if ( seen . find( m_array_name ) == seen.end() )
+    {
+        ss . put( ']' );
+        kv.push_back( ss . str() );
+    }
+    m_array_name.clear();
 }
 
 /* ----------- ReverseFormatter ----------- */

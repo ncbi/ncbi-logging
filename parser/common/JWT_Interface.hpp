@@ -11,8 +11,6 @@ namespace NCBI
     {
         struct JWTReceiver : public ReceiverInterface
         {
-            using ReceiverInterface::set;
-
             JWTReceiver( FormatterRef fmt );
 
             void setJwt( const t_str & v );
@@ -32,7 +30,6 @@ namespace NCBI
 
             virtual void SetDebug( bool onOff );
 
-            //yyscan_t m_sc;
             void * m_sc;
             JWTReceiver & m_receiver;
         };

@@ -51,6 +51,7 @@ using namespace NCBI::Logging;
 jwt_line
     : str_list
     | error     { YYABORT; }
+    | %empty    { }    
     ;
 
 str_token
@@ -61,7 +62,6 @@ str_token
 str_list
     : str_token
     | str_list str_token
-    | %empty { $$ = EmptyTSTR; }
     ;
 
 

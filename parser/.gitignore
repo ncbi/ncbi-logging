@@ -29,6 +29,10 @@ jwt_parser.cpp
 jwt_parser.hpp
 jwt_scanner.cpp
 jwt_scanner.hpp
+agent_parser.cpp
+agent_parser.hpp
+agent_scanner.cpp
+agent_scanner.hpp
 
 
 # fuzz-testing temporaries

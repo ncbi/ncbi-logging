@@ -1,6 +1,5 @@
 %{
 #include "jwt_parser.hpp"
-//#include "jwt_scanner.hpp"
 #include "stdint.h"
 
 #define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)

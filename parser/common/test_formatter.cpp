@@ -103,6 +103,13 @@ TEST_F (JsonLibFormatter_Fixture, Format_array)
     ASSERT_EQ ( "{\"key\":[\"123\",\"456\"]}", f.format() );
 }
 
+TEST_F (JsonLibFormatter_Fixture, twice_the_same )
+{
+    f.addNameValue( "key", "abc" );
+    f.addNameValue( "key", "123" );
+    ASSERT_EQ ( "{\"key\":\"abc\"}", f.format() );
+}
+
 TEST_F( JsonLibFormatter_Fixture, Format_ctrl_char_0 ) { TestControlChar( 0, "\\u0000"); }
 TEST_F( JsonLibFormatter_Fixture, Format_ctrl_char_1 ) { TestControlChar( 1, "\\u0001"); }
 TEST_F( JsonLibFormatter_Fixture, Format_ctrl_char_2 ) { TestControlChar( 2, "\\u0002"); }
@@ -229,6 +236,13 @@ TEST_F (JsonFastFormatter_Fixture, Format_array)
     f.addArrayValue( s2 );
     f.closeArray();
     ASSERT_EQ ( "{\"key\":[\"123\",\"456\"]}", f.format() );
+}
+
+TEST_F (JsonFastFormatter_Fixture, twice_the_same )
+{
+    f.addNameValue( "key", "abc" );
+    f.addNameValue( "key", "123" );
+    ASSERT_EQ ( "{\"key\":\"abc\"}", f.format() );
 }
 
 TEST_F( JsonFastFormatter_Fixture, Format_ctrl_char_0 ) { TestControlChar( 0, "\\u0000"); }

@@ -54,6 +54,9 @@ COMMON_SRC = \
 	jwt_scanner.cpp \
 	jwt_parser.cpp \
 	JWT_Interface.cpp \
+	agent_scanner.cpp \
+	agent_parser.cpp \
+	AGENT_Interface.cpp \
 	cmdline.cpp
 
 COMMON_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(COMMON_SRC)))
