@@ -47,20 +47,20 @@ using namespace NCBI::Logging;
 
 agent_line
     : error     { YYABORT; }
-    | %empty        {}    
+    | %empty        {}
     | token_list    {}
     ;
 
 /* duplicate calls to lib->set() with same member-id will be ignored */
 
 agent_token
-    : OS            { lib -> set( AGENTReceiver::os, $1 ); }
-    | T_PHIDCE      { lib -> set( AGENTReceiver::phid_compute_env, $1 ); }
-    | T_PHIDGUID    { lib -> set( AGENTReceiver::phid_guid, $1 ); }
-    | T_PHIDSESS    { lib -> set( AGENTReceiver::phid_session_id, $1 ); }
-    | T_TOOL        { lib -> set( AGENTReceiver::tool, $1 ); }
-    | T_TOOLVERS    { lib -> set( AGENTReceiver::release, $1 ); }
-    | T_LIBC        { lib -> set( AGENTReceiver::libc, $1 ); }
+    : OS            { lib -> set( AGENTReceiver::vdb_os, $1 ); }
+    | T_PHIDCE      { lib -> set( AGENTReceiver::vdb_phid_compute_env, $1 ); }
+    | T_PHIDGUID    { lib -> set( AGENTReceiver::vdb_phid_guid, $1 ); }
+    | T_PHIDSESS    { lib -> set( AGENTReceiver::vdb_phid_session_id, $1 ); }
+    | T_TOOL        { lib -> set( AGENTReceiver::vdb_tool, $1 ); }
+    | T_TOOLVERS    { lib -> set( AGENTReceiver::vdb_release, $1 ); }
+    | T_LIBC        { lib -> set( AGENTReceiver::vdb_libc, $1 ); }
     ;
 
 token_list

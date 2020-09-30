@@ -26,21 +26,6 @@ namespace NCBI
 
         inline void InitRequest( t_request & r ) { memset( & r, 0, sizeof ( r ) ); }
 
-        typedef struct t_agent
-        {
-            t_str       original;
-
-            t_str       vdb_os;
-            t_str       vdb_tool;
-            t_str       vdb_release;
-            t_str       vdb_phid_compute_env;
-            t_str       vdb_phid_guid;
-            t_str       vdb_phid_session_id;
-            t_str       vdb_libc;
-        } t_agent;
-
-        inline void InitAgent( t_agent & r ) { memset( & r, 0, sizeof ( r ) ); }
-
         struct ReceiverInterface
         {
             typedef std::shared_ptr<FormatterInterface> FormatterRef;
@@ -67,11 +52,10 @@ namespace NCBI
                 unparsed,
                 agent,
                 request,
-                LastMemberId = unparsed
+                LastMemberId = request
             } Members;
 
-            void set( Members m, const t_str & v ); // for agent and request, use the methods below
-            void setAgent( const t_agent & a );
+            void set( Members m, const t_str & v ); // for request, use the method below
             void setRequest( const t_request & r );
 
             void setMember( const char * mem, const t_str & v );

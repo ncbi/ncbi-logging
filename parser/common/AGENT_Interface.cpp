@@ -23,13 +23,13 @@ void AGENTReceiver::set( AGENT_Members m, const t_str & v )
 #define CASE(mem) case mem: setMember( #mem, v ); break;
     switch( m )
     {
-        CASE( os )
-        CASE( tool )
-        CASE( release )
-        CASE( phid_compute_env )
-        CASE( phid_guid )
-        CASE( phid_session_id )
-        CASE( libc )
+        CASE( vdb_os )
+        CASE( vdb_tool )
+        CASE( vdb_release )
+        CASE( vdb_phid_compute_env )
+        CASE( vdb_phid_guid )
+        CASE( vdb_phid_session_id )
+        CASE( vdb_libc )
         default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
@@ -63,5 +63,17 @@ AGENTParseBlock::format_specific_parse( const char * line, size_t line_size )
     YY_BUFFER_STATE bs = agent_scan_bytes( line, line_size, m_sc );
     int ret = agent_parse( m_sc, & m_receiver );
     agent__delete_buffer( bs, m_sc );
+
+    // any members that were not found should be set to empty string
+    // if they are set already, the extra call to set() will be ignored
+    t_str empty = {nullptr, 0, false };
+    m_receiver.set( AGENTReceiver::vdb_os, empty );
+    m_receiver.set( AGENTReceiver::vdb_phid_compute_env, empty );
+    m_receiver.set( AGENTReceiver::vdb_phid_guid, empty );
+    m_receiver.set( AGENTReceiver::vdb_phid_session_id, empty );
+    m_receiver.set( AGENTReceiver::vdb_tool, empty );
+    m_receiver.set( AGENTReceiver::vdb_release, empty );
+    m_receiver.set( AGENTReceiver::vdb_libc, empty );
+
     return ret == 0;
 }

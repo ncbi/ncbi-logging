@@ -5,6 +5,7 @@
 #include <ncbi/json.hpp>
 
 #include "Formatters.hpp"
+#include "AGENT_Interface.hpp"
 
 extern YY_BUFFER_STATE op_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -37,6 +38,13 @@ void OPReceiver::set( OP_Members m, const t_str & v )
 #undef CASE
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
+}
+
+void OPReceiver::post_process( void )
+{
+    AGENTReceiver agt( m_fmt );
+    AGENTParseBlock pb ( agt );
+    pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
 }
 
 namespace NCBI

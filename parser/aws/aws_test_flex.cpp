@@ -221,26 +221,51 @@ TEST_F ( AWS_TestFlexFixture, Path_Accesssion )
 
 TEST_F ( AWS_TestFlexFixture, Agent )
 {
-    const char * input = "\"linux64 sra-toolkit fasterq-dump.2.10.7 (phid=noc86d2998,libc=2.17)\"";
+    const char * input = "\"linux64 blah blah\"";
 
     aws__scan_bytes( input, strlen( input ), sc );
-    //aws_set_debug ( 1, sc );
     aws_start_UserAgent( sc );
     ASSERT_EQ( QUOTE, NextTokenType() );
-    ASSERT_EQ( OS, NextTokenType() ); ASSERT_EQ( "linux64", TokenValue() );
-    ASSERT_EQ( SPACE, NextTokenType() ); ASSERT_EQ( " ", TokenValue() );
-    ASSERT_EQ( SRA_TOOLKIT, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
-    ASSERT_EQ( SPACE, NextTokenType() );
-
-    ASSERT_EQ( SRATOOLVERS, NextTokenType() ); ASSERT_EQ( "fasterq-dump.2.10.7", TokenValue() );
-
-    ASSERT_EQ( SPACE, NextTokenType() );
-    ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( "(", TokenValue() );
-    ASSERT_EQ( PHIDVALUE, NextTokenType() ); ASSERT_EQ( "phid=noc86d2998", TokenValue() );
-    ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ",", TokenValue() );
-    ASSERT_EQ( LIBCVERSION, NextTokenType() ); ASSERT_EQ( "libc=2.17", TokenValue() );
-    ASSERT_EQ( AGENTSTR, NextTokenType() ); ASSERT_EQ( ")", TokenValue() );
+    ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "linux64 blah blah", TokenValue() );
     ASSERT_EQ( QUOTE, NextTokenType() );
+}
+
+TEST_F ( AWS_TestFlexFixture, Agent_Dash )
+{
+    const char * input = "\"sra-toolkit\"";
+
+    aws__scan_bytes( input, strlen( input ), sc );
+    aws_start_UserAgent( sc );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "sra-toolkit", TokenValue() );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+}
+
+TEST_F ( AWS_TestFlexFixture, Agent_Escaped_quote )
+{
+    const char * input = "\"linux64 \\\"sra\"";
+    aws__scan_bytes( input, strlen( input ), sc );
+    aws_start_UserAgent( sc );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "linux64 \\\"sra", TokenValue() );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+}
+
+TEST_F ( AWS_TestFlexFixture, Agent_Empty )
+{
+    const char * input = "\"\"";
+    aws__scan_bytes( input, strlen( input ), sc );
+    aws_start_UserAgent( sc );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+}
+
+TEST_F ( AWS_TestFlexFixture, Agent_NakedDash )
+{
+    const char * input = "- - -";
+    aws__scan_bytes( input, strlen( input ), sc );
+    aws_start_UserAgent( sc );
+    ASSERT_EQ( DASH, NextTokenType() ); ASSERT_EQ( "-", TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, TLS_Version )

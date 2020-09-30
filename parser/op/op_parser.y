@@ -44,7 +44,6 @@ using namespace NCBI::Logging;
 {
     t_str s;
     t_request req;
-    t_agent agent;
 }
 
 %token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC SPACE SLASH QMARK
@@ -60,7 +59,7 @@ using namespace NCBI::Logging;
 %type<req> request_tail_elem request_tail url_with_optional_params
 %type<s> ip user req_time referer forwarded method server
 %type<s> quoted_list quoted_list_body quoted_list_elem url_params
-%type<agent> agent vdb_agent_token vdb_agent
+%type<s> agent vdb_agent
 %type<s> result_code result_len port req_len referer_token referer_list
 
 %start line
@@ -81,8 +80,8 @@ log_onprem
       result_code  SPACE
       result_len  SPACE
       req_time  SPACE
-      referer { op_start_UserAgent( scanner ); } SPACE
-      agent { op_pop_state( scanner ); }  SPACE
+      referer SPACE
+      { op_start_UserAgent( scanner ); } agent { op_pop_state( scanner ); } SPACE
       forwarded  SPACE
       port  SPACE
       req_len
@@ -345,82 +344,18 @@ referer
     | QUOTE QUOTE               { SET_VALUE( OPReceiver::referer, EmptyTSTR ); }
     ;
 
-vdb_agent_token
-    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; }
-    | SRATOOLVERS
-        {
-            InitAgent( $$ );
-            $$.original = $1;
-            const char * dot = strchr( $1 . p, '.' );
-            $$ . vdb_tool . p = $1 . p;
-            $$ . vdb_tool . n = dot - $1 . p;
-            /* skip the leading dot */
-            $$ . vdb_release . p = dot + 1;
-            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1;
-        }
-    | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; }
-    | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
-    | SPACE         { InitAgent( $$ ); $$.original = $1; }
-    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; }
-    ;
-
 vdb_agent
-    : vdb_agent_token           { $$ = $1; }
-    | vdb_agent vdb_agent_token
-    {
-        $$ = $1;
-        MERGE_TSTR( $$ . original, $2 . original );
-        if ( $2 . vdb_phid_compute_env . n > 0 )
-        {
-            $$ . vdb_phid_compute_env . p = $2 . vdb_phid_compute_env . p + 5;
-            $$ . vdb_phid_compute_env . n = 3;
-
-            /*
-                the whole token is either 14 or 15 chars long!
-                guid is either 3 or 4 chars long, the other parts have fixed length.
-            */
-            int guid_len = $2 . vdb_phid_compute_env . n - 11;
-            $$ . vdb_phid_guid . p = $2 . vdb_phid_compute_env . p + 8;
-            $$ . vdb_phid_guid . n = guid_len;
-
-            $$ . vdb_phid_session_id . p = $$ . vdb_phid_guid . p + guid_len;
-            $$ . vdb_phid_session_id . n = 3;
-        }
-        else if ( $2 . vdb_libc . n > 0 )
-        {
-            $$ . vdb_libc . p = $2 . vdb_libc . p + 5;
-            $$ . vdb_libc . n = $2 . vdb_libc . n - 5;
-        }
-        else if ( $2 . vdb_tool . n > 0 )
-        {
-            $$ . vdb_tool = $2 . vdb_tool;
-            $$ . vdb_release = $2 . vdb_release;
-        }
-    }
-    | vdb_agent OS
-    {
-        $$ = $1;
-        MERGE_TSTR( $$ . original, $2 );
-    }
+    : QSTR              { $$ = $1; }
+    | vdb_agent QSTR     { $$ = $1; MERGE_TSTR( $$, $2 ); }
     ;
 
 agent
-    : QUOTE OS vdb_agent QUOTE
+    : QUOTE vdb_agent QUOTE
         {
-            $3 . vdb_os = $2;
-            MERGE_TSTR( $2, $3 . original );
-            $3 . original = $2;
-            lib->setAgent( $3 );
+            lib -> set( ReceiverInterface::agent, $2 );
+            lib -> agent_for_postprocess = string( $2.p, $2.n );
         }
-    | QUOTE vdb_agent QUOTE
-        {
-            lib->setAgent( $2 );
-        }
-    | QUOTE QUOTE
-        {
-            InitAgent( $$ );
-            lib->setAgent( $$ );
-        }
+    | QUOTE QUOTE       { lib -> set( ReceiverInterface::agent, EmptyTSTR ); }
     ;
 
 forwarded

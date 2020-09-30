@@ -57,23 +57,8 @@ KEYEXT      \.(\.|{KEYSTR})*
 STR     [.\-a-zA-Z0-9_]+
 STR1    [/:+=%@&*!~;$\],#.\-a-zA-Z0-9_\[]+
 
-AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/]
-AGENTDELIMS     [(),=\\]
-AGENTSTR        {AGENTCHARS}+
-OS              "linux64"|"mac64"|"win64"
-VERSION23       [0-9]+(\.[0-9]+){1,2}
-LIBCVERSION     "libc="{VERSION23}
-SRATOOL         "abi-dump"|"align-cache"|"align-info"|"dbgap-mount-tool"|"fastdump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kdb-meta"|"kget"|"pileup-stats"|"prefetch"|"sam-dump"|"sff-dump"|"sra-pileup"|"sra-search"|"sra-stat"|"srapath"|"test-dependencies"|"test-sra"|"vdb-copy"|"vdb-dump"|"vdb-validate"
-SRATOOLVERS     {SRATOOL}\.{VERSION23}
-    /* TODO */
-    /* UNKNOWNTOOLVERS      [a-z]([a-z\-])+{VERSION23} */
-    /* TESTVERS             test-([a-z\-])+{VERSION23} */
-
-PHIDCHAR        [0-9a-f]
-PHIDCE          "noc"|({PHIDCHAR}{3})
-PHIDGUID        "nog"|({PHIDCHAR}{4})
-PHIDSESS        "nos"|({PHIDCHAR}{3})
-PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
+AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/(),=\\. ]
+AGENTSTR        (\\\"|{AGENTCHARS})+
 
 INT4            [0-9]{4}
 INT3            [0-9]{3}
@@ -90,7 +75,7 @@ S3_EXT_REQ_ID    {BASE64}
 
 RESULTCODE      ([0-9]{3})|"-"
 
-%x QUOTED TIMEFMT KEY PATH AGENT TLSVERSION HOSTID IPADDR RESCODE REFERER REST_OF_LINE
+%x QUOTED TIMEFMT KEY PATH AGENT_OPEN AGENT TLSVERSION HOSTID IPADDR RESCODE REFERER REST_OF_LINE
 
 %%
 
@@ -139,18 +124,15 @@ RESULTCODE      ([0-9]{3})|"-"
 <KEY>{KEYSTR}       { MAKE_STR(); return PATHSTR; }
 <KEY>.              { return yytext[0]; }
 
-<AGENT>{OS}             { MAKE_STR(); return OS; }
-<AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
-<AGENT>{PHIDVALUE}      { MAKE_STR(); return PHIDVALUE; }
-<AGENT>{SRATOOLVERS}    { MAKE_STR(); return SRATOOLVERS; }
-<AGENT>{LIBCVERSION}    { MAKE_STR(); return LIBCVERSION; }
-<AGENT>{SPACE}          { MAKE_STR(); return SPACE; }
-<AGENT>-                { MAKE_STR(); return DASH; }
-<AGENT>\\\"             { MAKE_STR(); return AGENTSTR; }
-<AGENT>\"               { MAKE_STR(); return QUOTE; }
-<AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
-<AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
-<AGENT>.                { MAKE_STR(); return AGENTSTR; }
+    /* Agent can be a naked dash or a quoted string.
+       In case of quoted string (the AGENT state) we consume everything between the quotes and
+       return it as a sequence of STR tokens */
+<AGENT_OPEN>\"      { yy_pop_state( yyscanner ); yy_push_state( AGENT, yyscanner ); MAKE_STR(); return QUOTE; }
+<AGENT_OPEN>-       { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
+
+<AGENT>\"           { yy_pop_state( yyscanner ); MAKE_STR(); return QUOTE; }
+<AGENT>{AGENTSTR}   { MAKE_STR(); return STR; }
+<AGENT>.            { MAKE_STR(); return STR; }
 
 <TLSVERSION>{TLSVERSION}    { MAKE_STR(); return TLS_VERSION; }
 <TLSVERSION>\"              { MAKE_STR(); return QUOTE; }
@@ -206,7 +188,7 @@ void aws_start_key( yyscan_t yyscanner )
 
 void aws_start_UserAgent( yyscan_t yyscanner )
 {
-    yy_push_state( AGENT, yyscanner );
+    yy_push_state( AGENT_OPEN, yyscanner );
 }
 
 void aws_start_TLS_vers( yyscan_t yyscanner )

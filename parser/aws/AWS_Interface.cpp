@@ -6,6 +6,7 @@
 #include <ncbi/json.hpp>
 
 #include "Formatters.hpp"
+#include "AGENT_Interface.hpp"
 
 extern YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -44,11 +45,19 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
     CASE( host_header )
     CASE( tls_version )
     CASE( _extra )
+
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
+}
+
+void AWSReceiver::post_process( void )
+{
+    AGENTReceiver agt( m_fmt );
+    AGENTParseBlock pb ( agt );
+    pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
 }
 
 namespace NCBI

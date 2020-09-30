@@ -22,6 +22,8 @@ void aws_error( yyscan_t locp, NCBI::Logging::AWSReceiver * lib, const char* msg
 
 #define SET_VALUE( selector, source ) ( lib -> set( (selector), (source) ) )
 
+const t_str EmptyTSTR = { "", 0, false };
+
 %}
 
 %code requires
@@ -51,14 +53,12 @@ using namespace NCBI::Logging;
 {
     t_str s;
     t_request req;
-    t_agent agent;
 }
 
 %token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
 %token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID TIME_FMT RESULTCODE
 %token COLON QUOTE OB CB
 %token UNRECOGNIZED
-%token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
 
 %type<s> time
 %type<s> ip referer method qstr_list dash string_or_dash
@@ -67,7 +67,7 @@ using namespace NCBI::Logging;
 %type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
 %type<s> x_amz_id_2
 %type<req> request aws_key aws_quoted_key url_token url_list url key_token
-%type<agent> agent vdb_agent vdb_agent_token
+%type<s> agent vdb_agent
 
 %start line
 
@@ -94,11 +94,8 @@ log_aws
       aws_obj_size SPACE
       aws_total_time SPACE
       aws_turnaround_time SPACE
-      referer
-      { aws_start_UserAgent( scanner ); }
-      SPACE agent
-      { aws_pop_state( scanner ); }
-      SPACE
+      referer SPACE
+      { aws_start_UserAgent( scanner ); } agent SPACE
       aws_version_id SPACE
       { aws_start_host_id( scanner ); }
       aws_host_id
@@ -115,9 +112,7 @@ log_aws
         // combine data from aws_key and request
         if ( $18 . path . n == 1 && $18 . path . p[ 0 ] == '-' )
         {
-            t_str empty;
-            EMPTY_TSTR( empty );
-            SET_VALUE( AWSReceiver::key, empty );
+            SET_VALUE( AWSReceiver::key, EmptyTSTR );
         }
         else
         {
@@ -410,92 +405,19 @@ referer
         }
     ;
 
-vdb_agent_token
-    : SRA_TOOLKIT   { InitAgent( $$ ); $$.original = $1; }
-    | SRATOOLVERS
-        {
-            InitAgent( $$ );
-            $$.original = $1;
-            const char * dot = strchr( $1 . p, '.' );
-            $$ . vdb_tool . p = $1 . p;
-            $$ . vdb_tool . n = dot - $1 . p;
-            /* skip the leading dot */
-            $$ . vdb_release . p = dot + 1;
-            $$ . vdb_release . n = $1 . n - ( dot - $1 . p ) - 1;
-        }
-    | LIBCVERSION   { InitAgent( $$ ); $$.original = $1; $$.vdb_libc = $1; }
-    | PHIDVALUE     { InitAgent( $$ ); $$.original = $1; $$.vdb_phid_compute_env = $1; }
-    | SPACE         { InitAgent( $$ ); $$.original = $1; }
-    | AGENTSTR      { InitAgent( $$ ); $$.original = $1; }
-    ;
-
 vdb_agent
-    : vdb_agent_token           { $$ = $1; }
-    | vdb_agent vdb_agent_token
-    {
-        $$ = $1;
-        MERGE_TSTR( $$ . original, $2 . original );
-        if ( $2 . vdb_phid_compute_env . n > 0 )
-        {
-            $$ . vdb_phid_compute_env . p = $2 . vdb_phid_compute_env . p + 5;
-            $$ . vdb_phid_compute_env . n = 3;
-
-            /*
-                the whole token is either 14 or 15 chars long!
-                guid is either 3 or 4 chars long, the other parts have fixed length.
-            */
-            int guid_len = $2 . vdb_phid_compute_env . n - 11;
-            $$ . vdb_phid_guid . p = $2 . vdb_phid_compute_env . p + 8;
-            $$ . vdb_phid_guid . n = guid_len;
-
-            $$ . vdb_phid_session_id . p = $$ . vdb_phid_guid . p + guid_len;
-            $$ . vdb_phid_session_id . n = 3;
-        }
-        else if ( $2 . vdb_libc . n > 0 )
-        {
-            $$ . vdb_libc . p = $2 . vdb_libc . p + 5;
-            $$ . vdb_libc . n = $2 . vdb_libc . n - 5;
-        }
-        else if ( $2 . vdb_tool . n > 0 )
-        {
-            $$ . vdb_tool = $2 . vdb_tool;
-            $$ . vdb_release = $2 . vdb_release;
-        }
-    }
-    | vdb_agent OS
-    {
-        $$ = $1;
-        MERGE_TSTR( $$ . original, $2 );
-    }
+    : STR               { $$ = $1; }
+    | vdb_agent STR     { $$ = $1; MERGE_TSTR( $$, $2 ); }
     ;
 
 agent
-    : QUOTE OS vdb_agent QUOTE
+    : QUOTE vdb_agent QUOTE
         {
-            t_agent temp;
-            InitAgent( temp );
-            temp . original = $2;
-            MERGE_TSTR( temp . original, $3 . original );
-            $$ = $3;
-            $$ . original = temp . original;
-            $$ . vdb_os = $2;
-            lib -> setAgent( $$ );
+            lib -> set( ReceiverInterface::agent, $2 );
+            lib -> agent_for_postprocess = string( $2.p, $2.n );
         }
-    | QUOTE vdb_agent QUOTE
-        {
-            $$ = $2;
-            lib -> setAgent( $$ );
-        }
-    | QUOTE QUOTE
-        {
-            InitAgent( $$ );
-            lib -> setAgent( $$ );
-        }
-    | dash
-        {
-            InitAgent( $$ );
-            lib -> setAgent( $$ );
-        }
+    | QUOTE QUOTE       { lib -> set( ReceiverInterface::agent, EmptyTSTR ); }
+    | DASH              { lib -> set( ReceiverInterface::agent, EmptyTSTR ); }
     ;
 
 time

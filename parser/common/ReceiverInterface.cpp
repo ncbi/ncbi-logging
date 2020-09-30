@@ -77,27 +77,12 @@ ReceiverInterface::set( Members m, const t_str & v )
     case ip:        setMember( "ip", v); break;
     case referer:   setMember( "referer", v); break;
     case unparsed:  setMember( "unparsed", v); break;
+    case agent:     setMember( "agent", v); break;
 
-    case agent:
     case request:
     default:
         throw std::logic_error( "invalid ReceiverInterface::Member" );
     }
-    if ( m_cat == cat_unknown )
-        m_cat = cat_good;
-}
-
-void
-ReceiverInterface::setAgent( const t_agent & a )
-{
-    setMember( "agent",                  a . original );
-    setMember( "vdb_os",                 a . vdb_os );
-    setMember( "vdb_tool",               a . vdb_tool );
-    setMember( "vdb_release",            a . vdb_release );
-    setMember( "vdb_phid_compute_env",   a . vdb_phid_compute_env );
-    setMember( "vdb_phid_guid",          a . vdb_phid_guid );
-    setMember( "vdb_phid_session_id",    a . vdb_phid_session_id );
-    setMember( "vdb_libc",               a . vdb_libc );
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }

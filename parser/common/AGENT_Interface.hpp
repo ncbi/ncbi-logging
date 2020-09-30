@@ -14,13 +14,13 @@ namespace NCBI
             AGENTReceiver( FormatterRef fmt );
 
             typedef enum {
-                os = LastMemberId+1,
-                tool,
-                release,
-                phid_compute_env,
-                phid_guid,
-                phid_session_id,
-                libc
+                vdb_os = LastMemberId+1,
+                vdb_tool,
+                vdb_release,
+                vdb_phid_compute_env,
+                vdb_phid_guid,
+                vdb_phid_session_id,
+                vdb_libc
             } AGENT_Members;
 
             virtual void set( AGENT_Members m, const t_str & );

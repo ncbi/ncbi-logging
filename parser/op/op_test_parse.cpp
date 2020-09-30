@@ -30,17 +30,8 @@ TEST(LogOPEventTest, Setters)
     e.set( ReceiverInterface::referer, v );
     INIT_TSTR( v, "unp");
     e.set( ReceiverInterface::unparsed, v );
-    t_agent a = {
-        {"o", 1, false },
-        {"v_o", 3, false },
-        {"v_t", 3, false },
-        {"v_r", 3, false },
-        {"v_c", 3, false },
-        {"v_g", 3, false },
-        {"v_s", 3, false },
-        {"v_l", 3, false }
-    };
-    e.setAgent( a );
+    INIT_TSTR( v, "agt");
+    e.set( ReceiverInterface::agent, v );
 
     t_request r = {
         { "m", 1, false },
@@ -64,7 +55,7 @@ TEST(LogOPEventTest, Setters)
     INIT_TSTR( v, "res"); e.set(OPReceiver::res_len, v);
 
     ASSERT_EQ (
-        "{\"accession\":\"a\",\"agent\":\"o\",\"extension\":\"e\",\"filename\":\"f\",\"forwarded\":\"fwd\",\"ip\":\"i_p\",\"method\":\"m\",\"owner\":\"own\",\"path\":\"p\",\"port\":\"prt\",\"referer\":\"ref\",\"req_len\":\"rql\",\"req_time\":\"rqt\",\"res_code\":\"rqc\",\"res_len\":\"res\",\"time\":\"tim\",\"unparsed\":\"unp\",\"user\":\"use\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}",
+        "{\"accession\":\"a\",\"agent\":\"agt\",\"extension\":\"e\",\"filename\":\"f\",\"forwarded\":\"fwd\",\"ip\":\"i_p\",\"method\":\"m\",\"owner\":\"own\",\"path\":\"p\",\"port\":\"prt\",\"referer\":\"ref\",\"req_len\":\"rql\",\"req_time\":\"rqt\",\"res_code\":\"rqc\",\"res_len\":\"res\",\"time\":\"tim\",\"unparsed\":\"unp\",\"user\":\"use\",\"vers\":\"v\"}",
         e.GetFormatter().format() );
 }
 
@@ -229,7 +220,7 @@ TEST_F( OPTestFixture, parse_server_request_full_extra )
 TEST_F( OPTestFixture, parse_server_bad_request )
 {
     std::string res = try_to_parse_review( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"me bad\" 1 2 3 \"-\" \"\" \"-\" port=4 rl=5" );
-    ASSERT_EQ( "{\"_error\":\"Invalid request\",\"_line_nr\":1,\"_unparsed\":\"0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \\\"me bad\\\" 1 2 3 \\\"-\\\" \\\"\\\" \\\"-\\\" port=4 rl=5\",\"agent\":\"\",\"forwarded\":\"-\",\"ip\":\"0123:4567:89ab:cdef::1.2.3.4\",\"port\":\"4\",\"referer\":\"-\",\"req_len\":\"5\",\"req_time\":\"3\",\"res_code\":\"1\",\"res_len\":\"2\",\"server\":\"srv\",\"time\":\"[01/Jan/2020:02:50:24 -0500]\",\"user\":\"usr\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\"}\n", res);
+    ASSERT_EQ( "{\"_error\":\"Invalid request\",\"_line_nr\":1,\"_unparsed\":\"0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \\\"me bad\\\" 1 2 3 \\\"-\\\" \\\"\\\" \\\"-\\\" port=4 rl=5\",\"agent\":\"\",\"forwarded\":\"-\",\"ip\":\"0123:4567:89ab:cdef::1.2.3.4\",\"port\":\"4\",\"referer\":\"-\",\"req_len\":\"5\",\"req_time\":\"3\",\"res_code\":\"1\",\"res_len\":\"2\",\"server\":\"srv\",\"time\":\"[01/Jan/2020:02:50:24 -0500]\",\"user\":\"usr\"}\n", res);
 }
 
 TEST_F( OPTestFixture, parse_request_accession )

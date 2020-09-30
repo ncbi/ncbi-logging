@@ -30,17 +30,8 @@ TEST(LogGCPEventTest, Setters)
     e.set( ReceiverInterface::referer, v );
     INIT_TSTR( v, "unp");
     e.set( ReceiverInterface::unparsed, v );
-    t_agent a = {
-        {"o", 1, false },
-        {"v_o", 3, false },
-        {"v_t", 3, false },
-        {"v_r", 3, false },
-        {"v_c", 3, false },
-        {"v_g", 3, false },
-        {"v_s", 3, false },
-        {"v_l", 3, false }
-    };
-    e.setAgent( a );
+    INIT_TSTR( v, "agt");
+    e.set( ReceiverInterface::agent, v );
 
     t_request r = {
         { "m", 1, false },
@@ -67,7 +58,7 @@ TEST(LogGCPEventTest, Setters)
     INIT_TSTR( v, "buc"); e.set(GCPReceiver::bucket, v);
 
     ASSERT_EQ (
-        "{\"accession\":\"a\",\"agent\":\"o\",\"bucket\":\"buc\",\"extension\":\"e\",\"filename\":\"f\",\"host\":\"h\",\"ip\":\"i_p\",\"ip_region\":\"ipr\",\"ip_type\":\"ipt\",\"method\":\"m\",\"operation\":\"ope\",\"path\":\"p\",\"referer\":\"ref\",\"request_bytes\":\"rqb\",\"request_id\":\"rid\",\"result_bytes\":\"rsb\",\"status\":\"sta\",\"time\":\"tim\",\"time_taken\":\"tt\",\"unparsed\":\"unp\",\"uri\":\"uri\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\"}",
+        "{\"accession\":\"a\",\"agent\":\"agt\",\"bucket\":\"buc\",\"extension\":\"e\",\"filename\":\"f\",\"host\":\"h\",\"ip\":\"i_p\",\"ip_region\":\"ipr\",\"ip_type\":\"ipt\",\"method\":\"m\",\"operation\":\"ope\",\"path\":\"p\",\"referer\":\"ref\",\"request_bytes\":\"rqb\",\"request_id\":\"rid\",\"result_bytes\":\"rsb\",\"status\":\"sta\",\"time\":\"tim\",\"time_taken\":\"tt\",\"unparsed\":\"unp\",\"uri\":\"uri\",\"vers\":\"v\"}",
         e.GetFormatter().format() );
 }
 

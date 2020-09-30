@@ -62,23 +62,8 @@ PATHEXT     \.{PATHSTR}*
 SPACE   " "
 STR     [.\-a-zA-Z0-9_]+
 
-AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/]
-AGENTDELIMS     [(),=\\]
-AGENTSTR        {AGENTCHARS}+
-OS              "linux64"|"mac64"|"win64"
-VERSION23       [0-9]+(\.[0-9]+){1,2}
-LIBCVERSION     "libc="{VERSION23}
-SRATOOL         "abi-dump"|"align-cache"|"align-info"|"dbgap-mount-tool"|"fastdump"|"fasterq-dump"|"fastq-dump"|"illumina-dump"|"kdb-meta"|"kget"|"pileup-stats"|"prefetch"|"sam-dump"|"sff-dump"|"sra-pileup"|"sra-search"|"sra-stat"|"srapath"|"test-dependencies"|"test-sra"|"vdb-copy"|"vdb-dump"|"vdb-validate"
-SRATOOLVERS     {SRATOOL}\.{VERSION23}
-    /* TODO */
-    /* UNKNOWNTOOLVERS      [a-z]([a-z\-])+{VERSION23} */
-    /* TESTVERS             test-([a-z\-])+{VERSION23} */
-
-PHIDCHAR        [0-9a-f]
-PHIDCE          "noc"|({PHIDCHAR}{3})
-PHIDGUID        "nog"|({PHIDCHAR}{4})
-PHIDSESS        "nos"|({PHIDCHAR}{3})
-PHIDVALUE       "phid="{PHIDCE}{PHIDGUID}{PHIDSESS}
+AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/(),=\\. ]
+AGENTSTR        (\\\"|{AGENTCHARS})+
 
 INT4            [0-9]{4}
 INT3            [0-9]{3}
@@ -123,17 +108,9 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
 <PATH>.             { return yytext[0]; };
 
-<AGENT>{OS}             { MAKE_STR(); return OS; }
-<AGENT>"sra-toolkit"    { MAKE_STR(); return SRA_TOOLKIT; }
-<AGENT>{PHIDVALUE}      { MAKE_STR(); return PHIDVALUE; }
-<AGENT>{SRATOOLVERS}    { MAKE_STR(); return SRATOOLVERS; }
-<AGENT>{LIBCVERSION}    { MAKE_STR(); return LIBCVERSION; }
-<AGENT>{SPACE}          { MAKE_STR(); return SPACE; }
-<AGENT>\\\"             { MAKE_STR(); return AGENTSTR; }
-<AGENT>\"               { MAKE_STR(); return QUOTE; }
-<AGENT>{AGENTSTR}       { MAKE_STR(); return AGENTSTR; }
-<AGENT>{AGENTDELIMS}    { MAKE_STR(); return AGENTSTR; }
-<AGENT>.                { MAKE_STR(); return AGENTSTR; };
+<AGENT>\"           { MAKE_STR(); return QUOTE; }
+<AGENT>{AGENTSTR}   { MAKE_STR(); return QSTR; }
+<AGENT>.            { MAKE_STR(); return QSTR; }
 
 {IPV4ADDR}      { MAKE_STR(); return IPV4; }
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }

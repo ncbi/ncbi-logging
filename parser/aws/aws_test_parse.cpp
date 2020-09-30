@@ -29,17 +29,8 @@ TEST(AWSReceiverTest, Setters)
     e.set( ReceiverInterface::referer, v );
     INIT_TSTR( v, "unp");
     e.set( ReceiverInterface::unparsed, v );
-    t_agent a = {
-        {"o", 1, false },
-        {"v_o", 3, false },
-        {"v_t", 3, false },
-        {"v_r", 3, false },
-        {"v_c", 3, false },
-        {"v_g", 3, false },
-        {"v_s", 3, false },
-        {"v_l", 3, false }
-    };
-    e.setAgent( a );
+    INIT_TSTR( v, "agt");
+    e.set( ReceiverInterface::agent, v );
 
     t_request r = {
         { "m", 1, false },
@@ -74,7 +65,7 @@ TEST(AWSReceiverTest, Setters)
     INIT_TSTR( v, "tls"); e.set(AWSReceiver::tls_version, v);
 
     ASSERT_EQ (
-        "{\"accession\":\"a\",\"agent\":\"o\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"extension\":\"e\",\"filename\":\"f\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vdb_libc\":\"v_l\",\"vdb_os\":\"v_o\",\"vdb_phid_compute_env\":\"v_c\",\"vdb_phid_guid\":\"v_g\",\"vdb_phid_session_id\":\"v_s\",\"vdb_release\":\"v_r\",\"vdb_tool\":\"v_t\",\"vers\":\"v\",\"version_id\":\"ver\"}",
+        "{\"accession\":\"a\",\"agent\":\"agt\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"extension\":\"e\",\"filename\":\"f\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vers\":\"v\",\"version_id\":\"ver\"}",
         e.GetFormatter().format() );
 }
 
@@ -124,7 +115,7 @@ TEST_F( AWSTestFixture, parse_quoted_dashes )
 {
     std::string res = try_to_parse_good( "\"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\" \"-\"" );
     ASSERT_EQ(
-        "{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
+        "{\"accession\":\"\",\"agent\":\"-\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
         res
         );
 }
@@ -419,39 +410,6 @@ TEST_F( AWSTestFixture, parse_agent )
 {
     std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\" - - - - - - -" );
     ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
-    ASSERT_EQ( "linux64", extract_value( res, "vdb_os" ) );
-    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
-    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
-    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
-    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
-    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
-    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
-}
-
-TEST_F( AWSTestFixture, parse_agent_no_os )
-{
-    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\" - - - - - - -" );
-    ASSERT_EQ( "sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
-    ASSERT_EQ( "", extract_value( res, "vdb_os" ) );
-    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
-    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
-    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
-    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
-    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
-    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
-}
-
-TEST_F( AWSTestFixture, parse_agent_os_in_middle )
-{
-    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)linux64\" - - - - - - -" );
-    ASSERT_EQ( "sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)linux64", extract_value( res, "agent" ) );
-    ASSERT_EQ( "", extract_value( res, "vdb_os" ) );
-    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
-    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
-    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
-    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
-    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
-    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
 }
 
 TEST_F( AWSTestFixture, parse_agent_empty )
@@ -531,7 +489,7 @@ TEST_F( AWSTestFixture, extra_data )
 {
     std::string res = try_to_parse_review( "- - - - - - - - - - - - - - - - - - - - - - - - more tokens follow" );
     ASSERT_EQ(
-        "{\"_error\":\"Extra fields discovered\",\"_extra\":\"more tokens follow\",\"_line_nr\":1,\"_unparsed\":\"- - - - - - - - - - - - - - - - - - - - - - - - more tokens follow\",\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
+        "{\"_error\":\"Extra fields discovered\",\"_extra\":\"more tokens follow\",\"_line_nr\":1,\"_unparsed\":\"- - - - - - - - - - - - - - - - - - - - - - - - more tokens follow\",\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
         res
         );
 }
