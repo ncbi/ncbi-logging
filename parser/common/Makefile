@@ -47,6 +47,7 @@ TEST_SUPPORT_SRC = $(COMMON_SRC) \
 	test_linesplitter.cpp \
 	test_jwt_parsing.cpp \
 	test_agent_parsing.cpp \
+	test_url_parsing.cpp \
 	test_support_main.cpp
 
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
@@ -62,12 +63,16 @@ jwt_parser.hpp : jwt_parser.cpp
 
 agent_parser.hpp : agent_parser.cpp
 
+url_parser.hpp : url_parser.cpp
+
 cmn_clean:
 	@ rm -rf $(ALL_OBJ) $(ALL_D)
 	@ rm -rf jwt_scanner.cpp jwt_scanner.hpp
 	@ rm -rf jwt_parser.cpp jwt_parser.hpp
 	@ rm -rf agent_scanner.cpp agent_scanner.hpp
 	@ rm -rf agent_parser.cpp agent_parser.hpp
+	@ rm -rf url_scanner.cpp url_scanner.hpp
+	@ rm -rf url_parser.cpp url_parser.hpp
 	@ rm -rf $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
 
 cmn_test: mkdir $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
@@ -78,6 +83,7 @@ cmn_prof: mkdir $(COMMON_PROF_OBJ) $(CMD_PROF_OBJ)
 
 .precious: jwt_scanner.cpp jwt_scanner.hpp jwt_parser.cpp jwt_parser.hpp
 .precious: agent_scanner.cpp agent_scanner.hpp agent_parser.cpp agent_parser.hpp
+.precious: url_scanner.cpp url_scanner.hpp url_parser.cpp url_parser.hpp
 
 $(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ) $(CMD_DBG_OBJ)
 	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
