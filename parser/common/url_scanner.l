@@ -8,9 +8,11 @@
         yylval -> s . str . n = yyleng; \
         yylval -> s . str . escaped = false; \
         yylval -> s . mode = acc_before; \
+        EMPTY_TSTR( yylval -> s . accession ); \
         EMPTY_TSTR( yylval -> s . filename ); \
         EMPTY_TSTR( yylval -> s . extension ); \
         yylval -> s . apply_accession = false; \
+        yylval -> s . after_qmark = false; \
     } while(false)
 
 %}
@@ -22,25 +24,45 @@
 %option debug
 
 ACCESSION   [DES]R[RZ][0-9]{6,9}
-DELIMITER   (%|%2C)+
+ /* DELIMITER   (%|%2C)+ */
 SLASH       (\/|%2F)
-CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\] ^{}]
-PATHSTR     {CHARS}+
+QMARK       "?"
+QUERY_SEP   [&;]
+EQUAL       "="
+HASH        "#"
+
+CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}\.]
+PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}
+PATHSTR     {PATHCHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
 
- /*%x*/
+QUERY_TOKEN [A-Za-z0-9\.\-_~@:]+
+QUERY_SLASH "%2F"
+
+%x QUERYSTATE FRAGSTATE
 
 %%
 
 [ \t]+          { /*TODO: has to be URL-encodeed, so an error? */ }
 
-{ACCESSION}     { MAKE_STR(); return ACCESSION; }
+ /* {ACCESSION}     { MAKE_STR(); return ACCESSION; } */
 {SLASH}         { MAKE_STR(); return SLASH; }
-{DELIMITER}     { MAKE_STR(); return DELIMITER; }
 {PATHSTR}       { MAKE_STR(); return PATHSTR; }
-{PATHEXT}       { MAKE_STR(); return PATHEXT; }
+ /* {PATHEXT}       { MAKE_STR(); return PATHEXT; } */
+{QMARK}         { yy_push_state( QUERYSTATE, yyscanner ); MAKE_STR(); return QMARK; }
+{HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }
 
-.               { /*TODO: ignore or return? */ }
+<QUERYSTATE>{QUERY_SEP}     { MAKE_STR(); return QUERY_SEP; }
+<QUERYSTATE>{EQUAL}         { MAKE_STR(); return EQUAL; }
+ /* <QUERYSTATE>{ACCESSION}     { MAKE_STR(); return ACCESSION; } */
+ /* <QUERYSTATE>{QUERY_SLASH}   { MAKE_STR(); return QUERY_TOKEN; } */
+<QUERYSTATE>{QUERY_TOKEN}   { MAKE_STR(); return QUERY_TOKEN; }
+<QUERYSTATE>{HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }
+<QUERYSTATE>.               { MAKE_STR(); return UNRECOGNIZED; }
+
+<FRAGSTATE>.*               { MAKE_STR(); return FRAGMENT_TOKEN; } 
+
+.                           { MAKE_STR(); return UNRECOGNIZED; }
 
 %%
 

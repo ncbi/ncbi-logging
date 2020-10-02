@@ -27,8 +27,19 @@
         {
             case ACCESSION:
             {
-                to . accession = from . str;
-                to . apply_accession = true;
+                if ( to . after_qmark )
+                {
+                    if ( to . accession . n == 0 )
+                    {
+                        to . accession = from . str;
+                        to . apply_accession = true;
+                    }
+                }
+                else
+                {
+                    to . accession = from . str;
+                    to . apply_accession = true;
+                }
                 break;
             }
             case PATHSTR:
@@ -44,7 +55,14 @@
             case SLASH:
             {
                 to . apply_accession = false;
+                break;
             }
+            case QMARK:
+            {
+                to . after_qmark = true;
+                break;
+            }
+
             default:
                 break;
         }
@@ -66,11 +84,11 @@
         eAccessionMode mode;
         int   type;
         bool  apply_accession;
+        bool  after_qmark;
         t_str accession;
         t_str filename;
         t_str extension;
     } Node;
-
 }
 
 %union
@@ -78,8 +96,13 @@
     Node s;
 }
 
-%token<s> ACCESSION DELIMITER PATHSTR PATHEXT SLASH
-%type<s> url_token token_list
+%token<s> ACCESSION PATHSTR PATHEXT SLASH
+%token<s> QMARK QUERY_SEP EQUAL QUERY_TOKEN
+%token<s> HASH FRAGMENT_TOKEN UNRECOGNIZED
+
+%type<s> path path_list path_token
+%type<s> query query_list query_key query_value query_entry
+%type<s> fragment
 
 %start url_line
 
@@ -87,8 +110,11 @@
 
 url_line
     : error         { YYABORT; }
-    | %empty        {}
-    | token_list
+    | path query fragment
+    ;
+
+path
+    : path_list
     {
         lib->set(URLReceiver::accession, $1 . accession );
 
@@ -102,61 +128,57 @@ url_line
         }
         lib->set( URLReceiver::extension, $1 . extension );
     }
+    | %empty  {}
     ;
 
-url_token
-    : DELIMITER
-    | ACCESSION { $$ = $1; $$ . type = ACCESSION; }
+path_token
+    : ACCESSION { $$ = $1; $$ . type = ACCESSION; }
     | PATHSTR   { $$ = $1; $$ . type = PATHSTR; }
     | PATHEXT   { $$ = $1; $$ . type = PATHEXT; }
     | SLASH     { $$ = $1; $$ . type = SLASH; }
     ;
 
-token_list
-    : url_token
+path_list
+    : path_token
         {
             $$ = $1;
             Merge( $$, $1 );
         }
-    | token_list url_token
+    | path_list path_token
         {
-//printf( "$1=%i $2=%i\n", $1.mode, $2.mode );
             $$ = $1;
             Merge( $$, $2 );
-
-/*            switch ( $1 . mode )
-            {
-            case acc_before:
-                if ( $2 . type == ACCESSION )
-                {
-                    lib->set( URLReceiver::accession, $2 . str );
-                    $$ . accession = $2 . str;
-                    $$ . mode = acc_inside;
-                }
-                break;
-            case acc_inside:
-                switch ( $2 . type )
-                {
-                case ACCESSION:
-                case PATHSTR:
-                    {
-                        $$ . filename = $2 . str;
-                        break;
-                    }
-                case PATHEXT:
-                    {
-                        $$ . extension = $2 . str;
-                        break;
-                    }
-                default:
-                    break;
-                }
-                break;
-            default:
-                break;
-            }
-*/
         }
+    ;
+
+query
+    : QMARK query_list
+    | %empty {}
+    ;
+
+query_list
+    : query_entry
+    | query_list QUERY_SEP query_entry
+    ;
+
+query_key
+    : QUERY_TOKEN
+    ;
+
+query_value
+    : QUERY_TOKEN
+    | %empty   {} 
+    ;
+
+query_entry
+    : query_key EQUAL query_value
+    | QUERY_TOKEN
+    | %empty    {}
+    ;
+
+fragment
+    : HASH FRAGMENT_TOKEN
+    | %empty    {}
     ;
 
 %%
