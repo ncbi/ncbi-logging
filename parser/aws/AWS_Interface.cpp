@@ -163,33 +163,42 @@ AWSReverseBlock::SetDebug( bool onOff )
 static void
 extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname, bool quote_spaces = true )
 {
-    const JSONValue &entry = obj . getValue ( fieldname );
-    const String &S = entry . toString();
-    if ( S . isEmpty() )
+    if ( ! obj . exists ( fieldname ) )
+    {
         formatter . addNameValue( fieldname, "-" );
+    }
     else
     {
-        if ( quote_spaces )
+        const JSONValue & entry = obj . getValue ( fieldname );
+        const String & S = entry . toString();
+        if ( S . isEmpty() )
+            formatter . addNameValue( fieldname, "-" );
+        else
         {
-            if ( S . find( ' ' ) != String::npos )
+            if ( quote_spaces )
             {
-                std::stringstream ss;
-                ss . put ( '"' );
-                ss . write( S . data(), S . size() );
-                ss . put ( '"' );
-                formatter . addNameValue( fieldname, ss . str() );
+                if ( S . find( ' ' ) != String::npos )
+                {
+                    std::stringstream ss;
+                    ss . put ( '"' );
+                    ss . write( S . data(), S . size() );
+                    ss . put ( '"' );
+                    formatter . addNameValue( fieldname, ss . str() );
+                }
+                else
+                    formatter . addNameValue( fieldname, S . toSTLString() );
             }
             else
                 formatter . addNameValue( fieldname, S . toSTLString() );
         }
-        else
-            formatter . addNameValue( fieldname, S . toSTLString() );
     }
+
 }
 
 static void
 extract_and_set_url( const JSONObject &obj, FormatterInterface &formatter )
 {
+    // assume all 3 parts of the request are present in Json, even if empty
     const String & method = obj . getValue ( "method" ) . toString();
     const String & path = obj . getValue ( "path" ) . toString();
     const String & vers = obj . getValue ( "vers" ) . toString();
