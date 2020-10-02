@@ -27,19 +27,7 @@
         {
             case ACCESSION:
             {
-                if ( to . after_qmark )
-                {
-                    if ( to . accession . n == 0 )
-                    {
-                        to . accession = from . str;
-                        to . apply_accession = true;
-                    }
-                }
-                else
-                {
-                    to . accession = from . str;
-                    to . apply_accession = true;
-                }
+                to . accession = from . str;
                 break;
             }
             case PATHSTR:
@@ -49,24 +37,35 @@
             }
             case PATHEXT:
             {
+                if ( to . type == ACCESSION )
+                {   // SRR000123.ext : use SRR000123 as both accession and filename
+                    to . filename = to . accession;
+                }
                 to . extension = from . str;
                 break;
             }
-            case SLASH:
-            {
-                to . apply_accession = false;
-                break;
-            }
-            case QMARK:
-            {
-                to . after_qmark = true;
-                break;
-            }
-
             default:
                 break;
         }
+        to . type = from . type;
     }
+
+    void QueryMerge( Node & to, const Node & from)
+    {
+        switch ( from . type )
+        {
+            case ACCESSION:
+            {
+                to . accession = from . str;
+                break;
+            }
+            default:
+                break;
+        }
+        to . type = from . type;
+    }
+
+    void Init_Node( Node& n) { memset( & n, 0, sizeof n ); }
 
 %}
 
@@ -81,14 +80,13 @@
 
     typedef struct {
         t_str str;
-        eAccessionMode mode;
         int   type;
-        bool  apply_accession;
-        bool  after_qmark;
+
         t_str accession;
         t_str filename;
         t_str extension;
     } Node;
+
 }
 
 %union
@@ -109,33 +107,46 @@
 %%
 
 url_line
-    : error         { YYABORT; }
+    : error             { YYABORT; }
     | path query fragment
+        {
+            // look at accessions detected in path and/or query, decide whit to use
+            if ( $1 . accession . n > 0 )
+            {
+                lib->set( URLReceiver::accession, $1 . accession );
+
+                if ( $1 . filename . n == 0 )
+                {
+                    if ( $1 . extension . n == 0 )
+                    {   // use the accession
+                        lib->set( URLReceiver::filename, $1 . accession );
+                    }
+                }
+                else
+                {
+                    lib->set( URLReceiver::filename, $1 . filename );
+                }
+
+                lib->set( URLReceiver::extension, $1 . extension );
+            }
+            else // use the query
+            {
+                lib->set( URLReceiver::accession, $2 . accession );
+            }
+        }
+    | path query error  { lib->reportField( "Invalid URL query" ); YYACCEPT; }
     ;
 
 path
-    : path_list
-    {
-        lib->set(URLReceiver::accession, $1 . accession );
-
-        if ( $1 . filename . n == 0 && $1 . apply_accession )
-        {   // no filename; use the accession
-            lib->set( URLReceiver::filename, $1 . accession );
-        }
-        else
-        {
-            lib->set( URLReceiver::filename, $1 . filename );
-        }
-        lib->set( URLReceiver::extension, $1 . extension );
-    }
-    | %empty  {}
+    : path_list { $$ = $1; }
+    | %empty    { Init_Node( $$ ); }
     ;
 
 path_token
-    : ACCESSION { $$ = $1; $$ . type = ACCESSION; }
-    | PATHSTR   { $$ = $1; $$ . type = PATHSTR; }
-    | PATHEXT   { $$ = $1; $$ . type = PATHEXT; }
-    | SLASH     { $$ = $1; $$ . type = SLASH; }
+    : ACCESSION         { $$ = $1; $$ . type = ACCESSION; }
+    | PATHSTR           { $$ = $1; $$ . type = PATHSTR; }
+    | PATHEXT           { $$ = $1; $$ . type = PATHEXT; }
+    | SLASH             { $$ = $1; $$ . type = SLASH; }
     ;
 
 path_list
@@ -152,32 +163,41 @@ path_list
     ;
 
 query
-    : QMARK query_list
-    | %empty {}
+    : QMARK query_list { $$ = $2; }
+    | %empty { Init_Node( $$ ); }
     ;
 
 query_list
     : query_entry
+        {
+            $$  = $1;
+        }
     | query_list QUERY_SEP query_entry
+        {
+            $$ = $1;
+            QueryMerge( $$, $3 );
+        }
     ;
 
 query_key
-    : QUERY_TOKEN
+    : QUERY_TOKEN { Init_Node( $$ ); }
     ;
 
 query_value
-    : QUERY_TOKEN
-    | %empty   {} 
+    : ACCESSION     { $$ = $1; $$ . type = ACCESSION; }
+    | QUERY_TOKEN   { $$ = $1; $$ . type = QUERY_TOKEN; }
+    | %empty        { Init_Node( $$ ); }
     ;
 
 query_entry
-    : query_key EQUAL query_value
-    | QUERY_TOKEN
-    | %empty    {}
+    : query_key EQUAL query_value { $$ = $3; }
+    | QUERY_TOKEN   { $$ = $1; }
+    | %empty        { Init_Node( $$ ); }
     ;
 
 fragment
-    : HASH FRAGMENT_TOKEN
+    : HASH
+    | HASH FRAGMENT_TOKEN
     | %empty    {}
     ;
 

@@ -47,8 +47,8 @@ TEST_SUPPORT_SRC = $(COMMON_SRC) \
 	test_linesplitter.cpp \
 	test_jwt_parsing.cpp \
 	test_agent_parsing.cpp \
-	test_url_parsing.cpp \
 	test_url_flex.cpp \
+	test_url_parsing.cpp \
 	test_support_main.cpp
 
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))

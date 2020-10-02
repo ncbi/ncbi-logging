@@ -19,8 +19,6 @@ namespace NCBI
                 extension
             } URL_Members;
 
-            typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode;
-
             virtual void set( URL_Members m, const t_str & );
         };
 

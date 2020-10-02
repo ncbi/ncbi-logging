@@ -37,6 +37,23 @@ class URLTestFixture : public ParseTestFixture< URLParseBlockFactory >
 {
 };
 
+TEST_F( URLTestFixture, PathOnly )      { ASSERT_NE( "", try_to_parse_good( "path" ) ); }
+TEST_F( URLTestFixture, LongerPath )    { ASSERT_NE( "", try_to_parse_good( "/path/a/b.ext/c" ) ); }
+
+TEST_F( URLTestFixture, PathQuery )             { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?key=v1" ) ); }
+TEST_F( URLTestFixture, PathLongerQuery )       { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?k1=v1&k2=v2" ) ); }
+TEST_F( URLTestFixture, PathQueryNoEqual )      { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?k1v1&k2v2" ) ); }
+TEST_F( URLTestFixture, PathQuerySemicolon )    { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?k1v1;k2v2" ) ); }
+TEST_F( URLTestFixture, QueryOnly )             { ASSERT_NE( "", try_to_parse_good( "?k1v1;k2v2" ) ); }
+
+TEST_F( URLTestFixture, PathQueryFragment ) { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?query#fragment" ) ); }
+TEST_F( URLTestFixture, EmptyFragment )     { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?query#" ) ); }
+
+TEST_F( URLTestFixture, PathBadQuery1 )
+{
+    ASSERT_NE( "", try_to_parse_review( "/path/a/b/c?qu/ery" ) );
+}
+
 //
 // If there is no '?':
 //  input               accession          filename        extension
@@ -66,20 +83,23 @@ class URLTestFixture : public ParseTestFixture< URLParseBlockFactory >
 //  same rules apply to the substring following the '?'
 //  ?a=A1&b=A2          A2                                  .ext
 
-#if 0
 TEST_F( URLTestFixture, JustAccession )
 {
     const std::string res = try_to_parse_good( "SRR000123" );
     ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
-    ASSERT_EQ( "SRR000123", extract_value( res, "filename" ) ); // when filename+extension are missing, use the accession
-    ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( URLTestFixture, MultipleAccessionsNoFile )
+TEST_F( URLTestFixture, MultipleAccessions )
 {
     const std::string res = try_to_parse_good( "SRR000123/SRR000456/SRR000789" );
     ASSERT_EQ( "SRR000789", extract_value( res, "accession" ) );
-    ASSERT_EQ( "SRR000789", extract_value( res, "filename" ) ); // when filename+extension are missing, use the last accession
+}
+
+TEST_F( URLTestFixture, AccessionFilename )
+{
+    const std::string res = try_to_parse_good( "SRR000123/filename" );
+    ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
@@ -91,6 +111,22 @@ TEST_F( URLTestFixture, AccessionFilenameExtension )
     ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
 }
 
+TEST_F( URLTestFixture, AccessionIsTheFilenameIfMissing )
+{   // when filename+extension are missing, use the accession as filename
+    const std::string res = try_to_parse_good( "SRR000123" );
+    ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
+    ASSERT_EQ( "SRR000123", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, AccessionExtension )
+{   // filename is missing but there is an extension, leave the filename empty
+    const std::string res = try_to_parse_good( "SRR000123/.ext" );
+    ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
+}
+
 TEST_F( URLTestFixture, AccessionAsFilename )
 {
     const std::string res = try_to_parse_good( "SRR000123.ext1.ext2.ext3" );
@@ -99,16 +135,8 @@ TEST_F( URLTestFixture, AccessionAsFilename )
     ASSERT_EQ( ".ext1.ext2.ext3", extract_value( res, "extension" ) );
 }
 
-TEST_F( URLTestFixture, AccessionExtension )
-{
-    const std::string res = try_to_parse_good( "SRR000123/.ext" );
-    ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
-    ASSERT_EQ( "", extract_value( res, "filename" ) );
-    ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
-}
-
 TEST_F( URLTestFixture, MultipleFilenames )
-{
+{   // capture the leaf filename/ext
     const std::string res = try_to_parse_good( "SRR000123/f1.ext1/f2.ext2" );
     ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
     ASSERT_EQ( "f2", extract_value( res, "filename" ) );
@@ -121,14 +149,6 @@ TEST_F( URLTestFixture, TwoAccessions_Second_will_be_filename )
     ASSERT_EQ( "SRR000456", extract_value( res, "accession" ) );
     ASSERT_EQ( "SRR000456", extract_value( res, "filename" ) );
     ASSERT_EQ( ".ext2", extract_value( res, "extension" ) );
-}
-
-TEST_F( URLTestFixture, AccessionFilename )
-{
-    const std::string res = try_to_parse_good( "SRR000123/filename" );
-    ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
-    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
-    ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
 TEST_F( URLTestFixture, FilenameBeforeAccession )
@@ -147,14 +167,6 @@ TEST_F( URLTestFixture, Accession_Something_Filename )
     ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
 }
 
-TEST_F( URLTestFixture, MultilpeAccessions )
-{
-    const std::string res = try_to_parse_good( "/SRR000123/SRR1755353/filename.fastq.gz" );
-    ASSERT_EQ( "SRR1755353", extract_value( res, "accession" ) );
-    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
-    ASSERT_EQ( ".fastq.gz", extract_value( res, "extension" ) );
-}
-
 //---------------------------------------------------------------------
 
 TEST_F( URLTestFixture, QMJustAccession )
@@ -164,6 +176,8 @@ TEST_F( URLTestFixture, QMJustAccession )
     ASSERT_EQ( "SRR000123", extract_value( res, "filename" ) ); // when filename+extension are missing, use the accession
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
+
+#if 0
 
 TEST_F( URLTestFixture, PathQMAccession )
 {

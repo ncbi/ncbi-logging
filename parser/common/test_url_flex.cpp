@@ -50,13 +50,13 @@ public:
 };
 
 TEST_F ( URL_TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan( "" ) ); }
-// TEST_F ( URL_TestFlexFixture, Accession6 )      { ASSERT_EQ( ACCESSION, StartScan( "SRR123456" ) ); ASSERT_EQ( "SRR123456", TokenValue() ); }
-// TEST_F ( URL_TestFlexFixture, Accession7 )      { ASSERT_EQ( ACCESSION, StartScan( "DRR1234567" ) ); ASSERT_EQ( "DRR1234567", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, Accession6 )      { ASSERT_EQ( ACCESSION, StartScan( "SRR123456" ) ); ASSERT_EQ( "SRR123456", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, Accession7 )      { ASSERT_EQ( ACCESSION, StartScan( "DRR1234567" ) ); ASSERT_EQ( "DRR1234567", TokenValue() ); }
 TEST_F ( URL_TestFlexFixture, Slash1 )          { ASSERT_EQ( SLASH,     StartScan( "/" ) ); }
 TEST_F ( URL_TestFlexFixture, Slash2 )          { ASSERT_EQ( SLASH,     StartScan( "%2F" ) ); }
 TEST_F ( URL_TestFlexFixture, PathStr )         { ASSERT_EQ( PATHSTR,   StartScan( "abc&12=34" ) ); ASSERT_EQ( "abc&12=34", TokenValue() ); }
-// TEST_F ( URL_TestFlexFixture, PathExt1 )        { ASSERT_EQ( PATHEXT,   StartScan( ".txt" ) ); ASSERT_EQ( ".txt", TokenValue() ); }
-// TEST_F ( URL_TestFlexFixture, PathExt2 )        { ASSERT_EQ( PATHEXT,   StartScan( ".txt.1.2" ) ); ASSERT_EQ( ".txt.1.2", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, PathExt1 )        { ASSERT_EQ( PATHEXT,   StartScan( ".txt" ) ); ASSERT_EQ( ".txt", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, PathExt2 )        { ASSERT_EQ( PATHEXT,   StartScan( ".txt.1.2" ) ); ASSERT_EQ( ".txt.1.2", TokenValue() ); }
 
 TEST_F ( URL_TestFlexFixture, PathTokens )
 {
@@ -68,7 +68,9 @@ TEST_F ( URL_TestFlexFixture, PathTokens )
     ASSERT_EQ( "part2", TokenValue() );
     ASSERT_EQ( SLASH, NextTokenType() );
     ASSERT_EQ( PATHSTR, NextTokenType() );
-    ASSERT_EQ( "leaf.txt", TokenValue() );
+    ASSERT_EQ( "leaf", TokenValue() );
+    ASSERT_EQ( PATHEXT, NextTokenType() );
+    ASSERT_EQ( ".txt", TokenValue() );
 }
 
 TEST_F ( URL_TestFlexFixture, Qmark )           { ASSERT_EQ( QMARK,     StartScan( "?" ) ); }

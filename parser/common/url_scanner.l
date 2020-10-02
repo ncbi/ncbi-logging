@@ -7,12 +7,9 @@
         yylval -> s . str . p = yytext; \
         yylval -> s . str . n = yyleng; \
         yylval -> s . str . escaped = false; \
-        yylval -> s . mode = acc_before; \
         EMPTY_TSTR( yylval -> s . accession ); \
         EMPTY_TSTR( yylval -> s . filename ); \
         EMPTY_TSTR( yylval -> s . extension ); \
-        yylval -> s . apply_accession = false; \
-        yylval -> s . after_qmark = false; \
     } while(false)
 
 %}
@@ -24,14 +21,13 @@
 %option debug
 
 ACCESSION   [DES]R[RZ][0-9]{6,9}
- /* DELIMITER   (%|%2C)+ */
 SLASH       (\/|%2F)
 QMARK       "?"
 QUERY_SEP   [&;]
 EQUAL       "="
 HASH        "#"
 
-CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}\.]
+CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}]
 PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}
 PATHSTR     {PATHCHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
@@ -45,10 +41,10 @@ QUERY_SLASH "%2F"
 
 [ \t]+          { /*TODO: has to be URL-encodeed, so an error? */ }
 
- /* {ACCESSION}     { MAKE_STR(); return ACCESSION; } */
+{ACCESSION}     { MAKE_STR(); return ACCESSION; }
 {SLASH}         { MAKE_STR(); return SLASH; }
 {PATHSTR}       { MAKE_STR(); return PATHSTR; }
- /* {PATHEXT}       { MAKE_STR(); return PATHEXT; } */
+{PATHEXT}       { MAKE_STR(); return PATHEXT; }
 {QMARK}         { yy_push_state( QUERYSTATE, yyscanner ); MAKE_STR(); return QMARK; }
 {HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }
 
@@ -60,7 +56,7 @@ QUERY_SLASH "%2F"
 <QUERYSTATE>{HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }
 <QUERYSTATE>.               { MAKE_STR(); return UNRECOGNIZED; }
 
-<FRAGSTATE>.*               { MAKE_STR(); return FRAGMENT_TOKEN; } 
+<FRAGSTATE>.*               { MAKE_STR(); return FRAGMENT_TOKEN; }
 
 .                           { MAKE_STR(); return UNRECOGNIZED; }
 
