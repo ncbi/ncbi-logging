@@ -81,26 +81,26 @@ TEST_F ( URL_TestFlexFixture, Equal )           { ASSERT_EQ( QMARK,     StartSca
 TEST_F ( URL_TestFlexFixture, QToken1 )
 {
     ASSERT_EQ( QMARK, StartScan( "?a1=b" ) );
-    ASSERT_EQ( QUERY_TOKEN, NextTokenType() );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "a1", TokenValue() );
     ASSERT_EQ( EQUAL, NextTokenType() );
-    ASSERT_EQ( QUERY_TOKEN, NextTokenType() );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "b", TokenValue() );
 }
 
 TEST_F ( URL_TestFlexFixture, QToken2 )
 {
     ASSERT_EQ( QMARK, StartScan( "?a1=b&bb=t1" ) );
-    ASSERT_EQ( QUERY_TOKEN, NextTokenType() );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "a1", TokenValue() );
     ASSERT_EQ( EQUAL, NextTokenType() );
-    ASSERT_EQ( QUERY_TOKEN, NextTokenType() );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "b", TokenValue() );
     ASSERT_EQ( QUERY_SEP, NextTokenType() );
-    ASSERT_EQ( QUERY_TOKEN, NextTokenType() );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "bb", TokenValue() );
     ASSERT_EQ( EQUAL, NextTokenType() );
-    ASSERT_EQ( QUERY_TOKEN, NextTokenType() );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "t1", TokenValue() );
 }
 
