@@ -6,6 +6,7 @@
 #include <ncbi/json.hpp>
 
 #include "Formatters.hpp"
+#include "URL_Interface.hpp"
 #include "AGENT_Interface.hpp"
 
 extern YY_BUFFER_STATE aws_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
@@ -55,9 +56,28 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
 
 void AWSReceiver::post_process( void )
 {
-    AGENTReceiver agt( m_fmt );
-    AGENTParseBlock pb ( agt );
-    pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+    {
+        AGENTReceiver agt( m_fmt );
+        AGENTParseBlock pb ( agt );
+        // agent_for_postprocess has been set in the .y file
+        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+    }
+
+    {
+        URLReceiver url( m_fmt );
+        URLParseBlock pb ( url );
+        // [key/path]_for_postprocess has been set in the .y file
+        pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
+
+        // if the key did set accession/filename/extension - the setters in the second parse will be ignored
+        pb.format_specific_parse( path_for_postprocess.c_str(), path_for_postprocess.size() );
+
+        url . finalize();
+    }
+
+    agent_for_postprocess . clear();
+    key_for_postprocess . clear();
+    path_for_postprocess . clear();
 }
 
 namespace NCBI

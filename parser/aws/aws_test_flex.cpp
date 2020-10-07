@@ -211,12 +211,8 @@ TEST_F ( AWS_TestFlexFixture, Path_StateReturn )
 TEST_F ( AWS_TestFlexFixture, Path_Accesssion )
 {
     const char * input = "/SRR9154112%2F%2A.fastq";
-    ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
-    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType( ) );
-    ASSERT_EQ( PERCENT, NextTokenType() ); ASSERT_EQ( "%", TokenValue() );
-    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "2A", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq", TokenValue() );
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( input ) );
+    ASSERT_EQ( input, TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, Agent )
@@ -292,17 +288,18 @@ TEST_F ( AWS_TestFlexFixture, Host_ID )
     ASSERT_EQ( S3_EXT_REQ_ID, NextTokenType() ); ASSERT_EQ( "LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc=", TokenValue() );
 }
 
-TEST_F ( AWS_TestFlexFixture, KEYSTR_KEYEXT )
+TEST_F ( AWS_TestFlexFixture, KEYSTR )
 {
-    const char * input = "AIDA&I\\SBTT%LPG=XGH6?YFFAY.A&B\\C%D=F?X";
+    const char * input = "AIDA&I\\SBTT%LPG=XGH6?YFFAY.A&B\\C%D=F?X STOP";
 
     aws__scan_bytes( input, strlen( input ), sc );
     //aws_set_debug ( 1, sc );
     aws_start_key( sc );
     ASSERT_EQ( PATHSTR, NextTokenType() );
-    ASSERT_EQ( "AIDA&I\\SBTT%LPG=XGH6?YFFAY", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() );
-    ASSERT_EQ( ".A&B\\C%D=F?X", TokenValue() );
+    ASSERT_EQ( "AIDA&I\\SBTT%LPG=XGH6?YFFAY.A&B\\C%D=F?X", TokenValue() );
+    ASSERT_EQ( SPACE, NextTokenType() );    
+//    ASSERT_EQ( PATHEXT, NextTokenType() );
+//    ASSERT_EQ( ".A&B\\C%D=F?X", TokenValue() );
 }
 
 TEST_F ( AWS_TestFlexFixture, RestOfLine )

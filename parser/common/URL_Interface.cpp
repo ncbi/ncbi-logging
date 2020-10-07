@@ -18,19 +18,16 @@ URLReceiver::URLReceiver( FormatterRef fmt )
 {
 }
 
-void URLReceiver::set( URL_Members m, const t_str & v )
+void URLReceiver::finalize( void )
 {
-#define CASE(mem) case mem: setMember( #mem, v ); break;
-    switch( m )
-    {
-        CASE( accession )
-        CASE( filename )
-        CASE( extension )
-        default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
-    }
-#undef CASE
-    if ( m_cat == cat_unknown )
-        m_cat = cat_good;
+    // todo: drop the boolean in t_str
+    setMember( "accession", t_str{ m_accession.c_str(), m_accession.size(), false } );
+    setMember( "filename",  t_str{ m_filename.c_str(), m_filename.size(), false } );
+    setMember( "extension", t_str{ m_extension.c_str(), m_extension.size(), false } ); 
+    m_accession . clear();
+    m_filename . clear();
+    m_extension . clear();
+    m_cat = cat_good;   
 }
 
 /* -------------------------------------------------------------------------- */
@@ -63,9 +60,6 @@ URLParseBlock::format_specific_parse( const char * line, size_t line_size )
     // any members that were not found should be set to empty string
     // if they are set already, the extra call to set() will be ignored
     t_str empty = {nullptr, 0, false };
-    m_receiver.set( URLReceiver::accession, empty );
-    m_receiver.set( URLReceiver::filename, empty );
-    m_receiver.set( URLReceiver::extension, empty );
 
     return ret == 0;
 }

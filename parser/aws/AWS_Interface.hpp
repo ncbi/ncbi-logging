@@ -45,6 +45,8 @@ namespace NCBI
             virtual void post_process( void );
 
             std::string agent_for_postprocess;
+            std::string key_for_postprocess;
+            std::string path_for_postprocess;
         };
 
         class AWSParseBlockFactory : public ParseBlockFactoryInterface

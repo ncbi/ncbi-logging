@@ -42,20 +42,14 @@ SPACE       " "
 CHARS       [A-Za-z0-9\-_~!*'();:@+$,#\[\]^{}]
 CTRLCHARS   [\x00-\x08\x0a-\x1f]
 QCHARS      [.?&=%/\\]|{CHARS}|{CTRLCHARS}
-KEYCHARS    [?&=%\\]|{CHARS}
 
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
 
-ACCESSION   [DES]R[RZXP][0-9]{6,9}
-PATHSTR     (\\\"|{CHARS})+
-PATHEXT     \.(\.|{PATHSTR})*
+PATHSTR     {QSTR_ESC}
 
-KEYSTR      {KEYCHARS}+
-KEYEXT      \.(\.|{KEYSTR})*
-
-STR     [.\-a-zA-Z0-9_]+
-STR1    [/:+=%@&*!~;$\],#.\-a-zA-Z0-9_\[]+
+STR         [.\-a-zA-Z0-9_]+
+STR1        [/:+=%@&*!~;$\],#.\-a-zA-Z0-9_\[]+
 
 AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/(),=\\. ]
 AGENTSTR        (\\\"|{AGENTCHARS})+
@@ -66,12 +60,12 @@ INT2            [0-9]{2}
 TIMEZONE        [-+]?[0-9]{4}
 TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZONE}"]"
 
-TLSV           [0-9]+(\.[0-9]+){0,2}
-TLSVERSION     "TLSv"{TLSV}
+TLSV            [0-9]+(\.[0-9]+){0,2}
+TLSVERSION      "TLSv"{TLSV}
 
-X_AMZ_ID_2       [A-Z0-9]{21}
-BASE64           [A-Za-z0-9+/]+={0,2}
-S3_EXT_REQ_ID    {BASE64}
+X_AMZ_ID_2      [A-Z0-9]{21}
+BASE64          [A-Za-z0-9+/]+={0,2}
+S3_EXT_REQ_ID   {BASE64}
 
 RESULTCODE      ([0-9]{3})|"-"
 
@@ -105,24 +99,13 @@ RESULTCODE      ([0-9]{3})|"-"
 
 <PATH>{SPACE}       { yy_pop_state( yyscanner ); return SPACE; }
 <PATH>\"            { yy_pop_state( yyscanner ); return QUOTE; }
-<PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
-<PATH>\/            { MAKE_STR(); return SLASH; }
-<PATH>=             { MAKE_STR(); return EQUAL; }
-<PATH>&             { MAKE_STR(); return AMPERSAND; }
-<PATH>\?            { MAKE_STR(); return QMARK; }
-<PATH>%2F           { MAKE_STR(); return SLASH; }
-<PATH>%             { MAKE_STR(); return PERCENT; }
-<PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
-<PATH>.             { return yytext[0]; }
+<PATH>.             { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
 <KEY>{SPACE}        { yy_pop_state( yyscanner ); return SPACE; }
 <KEY>\"             { yy_pop_state( yyscanner ); return QUOTE; }
-<KEY>{ACCESSION}    { MAKE_STR(); return ACCESSION; }
-<KEY>\/             { MAKE_STR(); return SLASH; }
-<KEY>{KEYEXT}       { MAKE_STR(); return PATHEXT; }
-<KEY>{KEYSTR}       { MAKE_STR(); return PATHSTR; }
-<KEY>.              { return yytext[0]; }
+<KEY>{PATHSTR}      { MAKE_STR(); return PATHSTR; }
+<KEY>.              { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
     /* Agent can be a naked dash or a quoted string.
        In case of quoted string (the AGENT state) we consume everything between the quotes and

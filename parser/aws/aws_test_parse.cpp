@@ -23,49 +23,38 @@ TEST(AWSReceiverTest, Setters)
     AWSReceiver e ( make_shared<JsonLibFormatter>() );
 
     t_str v;
-    INIT_TSTR( v, "i_p");
-    e.set( ReceiverInterface::ip, v );
-    INIT_TSTR( v, "ref");
-    e.set( ReceiverInterface::referer, v );
-    INIT_TSTR( v, "unp");
-    e.set( ReceiverInterface::unparsed, v );
-    INIT_TSTR( v, "agt");
-    e.set( ReceiverInterface::agent, v );
+    INIT_TSTR( v, "i_p"); e.set( ReceiverInterface::ip, v );
+    INIT_TSTR( v, "ref"); e.set( ReceiverInterface::referer, v );
+    INIT_TSTR( v, "unp"); e.set( ReceiverInterface::unparsed, v );
+    INIT_TSTR( v, "agt"); e.set( ReceiverInterface::agent, v );
 
-    t_request r = {
-        { "m", 1, false },
-        { "p", 1, false },
-        { "v", 1, false },
-        { "a", 1, false },
-        { "f", 1, false },
-        { "e", 1, false },
-        acc_before
-    };
-    e.setRequest( r );
+    INIT_TSTR( v, "m" ); e.set( AWSReceiver::method, v );
+    INIT_TSTR( v, "p" ); e.set( AWSReceiver::path, v );
+    INIT_TSTR( v, "v" ); e.set( AWSReceiver::vers, v );
 
-    INIT_TSTR( v, "own"); e.set(AWSReceiver::owner, v);
-    INIT_TSTR( v, "buc"); e.set(AWSReceiver::bucket, v);
-    INIT_TSTR( v, "tim"); e.set(AWSReceiver::time, v);
-    INIT_TSTR( v, "req"); e.set(AWSReceiver::requester, v);
-    INIT_TSTR( v, "req_id");e.set(AWSReceiver::request_id, v);
-    INIT_TSTR( v, "ope"); e.set(AWSReceiver::operation, v);
-    INIT_TSTR( v, "key"); e.set(AWSReceiver::key, v);
-    INIT_TSTR( v, "cod"); e.set(AWSReceiver::res_code, v);
-    INIT_TSTR( v, "err"); e.set(AWSReceiver::error, v);
-    INIT_TSTR( v, "res"); e.set(AWSReceiver::res_len, v);
-    INIT_TSTR( v, "obj"); e.set(AWSReceiver::obj_size, v);
-    INIT_TSTR( v, "tot"); e.set(AWSReceiver::total_time, v);
-    INIT_TSTR( v, "tur"); e.set(AWSReceiver::turnaround_time, v);
-    INIT_TSTR( v, "ver"); e.set(AWSReceiver::version_id, v);
-    INIT_TSTR( v, "host");e.set(AWSReceiver::host_id, v);
-    INIT_TSTR( v, "sig"); e.set(AWSReceiver::sig_ver, v);
-    INIT_TSTR( v, "cip"); e.set(AWSReceiver::cipher_suite, v);
-    INIT_TSTR( v, "aut"); e.set(AWSReceiver::auth_type, v);
-    INIT_TSTR( v, "hos"); e.set(AWSReceiver::host_header, v);
-    INIT_TSTR( v, "tls"); e.set(AWSReceiver::tls_version, v);
+    INIT_TSTR( v, "own"); e.set( AWSReceiver::owner, v);
+    INIT_TSTR( v, "buc"); e.set( AWSReceiver::bucket, v);
+    INIT_TSTR( v, "tim"); e.set( AWSReceiver::time, v);
+    INIT_TSTR( v, "req"); e.set( AWSReceiver::requester, v);
+    INIT_TSTR( v, "req_id");e.set( AWSReceiver::request_id, v);
+    INIT_TSTR( v, "ope"); e.set( AWSReceiver::operation, v);
+    INIT_TSTR( v, "key"); e.set( AWSReceiver::key, v);
+    INIT_TSTR( v, "cod"); e.set( AWSReceiver::res_code, v);
+    INIT_TSTR( v, "err"); e.set( AWSReceiver::error, v);
+    INIT_TSTR( v, "res"); e.set( AWSReceiver::res_len, v);
+    INIT_TSTR( v, "obj"); e.set( AWSReceiver::obj_size, v);
+    INIT_TSTR( v, "tot"); e.set( AWSReceiver::total_time, v);
+    INIT_TSTR( v, "tur"); e.set( AWSReceiver::turnaround_time, v);
+    INIT_TSTR( v, "ver"); e.set( AWSReceiver::version_id, v);
+    INIT_TSTR( v, "host");e.set( AWSReceiver::host_id, v);
+    INIT_TSTR( v, "sig"); e.set( AWSReceiver::sig_ver, v);
+    INIT_TSTR( v, "cip"); e.set( AWSReceiver::cipher_suite, v);
+    INIT_TSTR( v, "aut"); e.set( AWSReceiver::auth_type, v);
+    INIT_TSTR( v, "hos"); e.set( AWSReceiver::host_header, v);
+    INIT_TSTR( v, "tls"); e.set( AWSReceiver::tls_version, v);
 
     ASSERT_EQ (
-        "{\"accession\":\"a\",\"agent\":\"agt\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"extension\":\"e\",\"filename\":\"f\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vers\":\"v\",\"version_id\":\"ver\"}",
+        "{\"agent\":\"agt\",\"auth_type\":\"aut\",\"bucket\":\"buc\",\"cipher_suite\":\"cip\",\"error\":\"err\",\"host_header\":\"hos\",\"host_id\":\"host\",\"ip\":\"i_p\",\"key\":\"key\",\"method\":\"m\",\"obj_size\":\"obj\",\"operation\":\"ope\",\"owner\":\"own\",\"path\":\"p\",\"referer\":\"ref\",\"request_id\":\"req_id\",\"requester\":\"req\",\"res_code\":\"cod\",\"res_len\":\"res\",\"sig_ver\":\"sig\",\"time\":\"tim\",\"tls_version\":\"tls\",\"total_time\":\"tot\",\"turnaround_time\":\"tur\",\"unparsed\":\"unp\",\"vers\":\"v\",\"version_id\":\"ver\"}",
         e.GetFormatter().format() );
 }
 
@@ -219,7 +208,7 @@ TEST_F( AWSTestFixture, parse_key_with_qmark )
     ASSERT_EQ( "ERR792423/5141526_s1_p0.bas.h5.1?ab", extract_value( res, "key" ) );
     ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
     ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
-    ASSERT_EQ( ".bas.h5.1?ab", extract_value( res, "extension" ) );
+    ASSERT_EQ( ".bas.h5.1", extract_value( res, "extension" ) );
 }
 
 TEST_F( AWSTestFixture, parse_key_with_pct )
@@ -256,15 +245,6 @@ TEST_F( AWSTestFixture, parse_key_multiple_accessions )
     ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
     ASSERT_EQ( "5141526_s1_p0", extract_value( res, "filename" ) );
     ASSERT_EQ( ".bas.h5.1", extract_value( res, "extension" ) );
-}
-
-TEST_F( AWSTestFixture, parse_key_no_accessions )
-{   // pick the last accession
-    std::string res = try_to_parse_good( "- - - - - - - abc.12/5141526_s1_p0.bas.h5.1 - - - - - - - - - - - - - - - -" );
-    ASSERT_EQ( "abc.12/5141526_s1_p0.bas.h5.1", extract_value( res, "key" ) );
-    ASSERT_EQ( "", extract_value( res, "accession" ) );
-    ASSERT_EQ( "", extract_value( res, "filename" ) );
-    ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
 TEST_F( AWSTestFixture, parse_key_multiple_path_segments )
@@ -309,7 +289,7 @@ TEST_F( AWSTestFixture, parse_request )
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
     ASSERT_EQ( "?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url", extract_value( res, "path" ) );
     ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
-    ASSERT_EQ( "SRR11060177", extract_value( res, "accession" ) );
+    ASSERT_EQ( "SRR99999999", extract_value( res, "accession" ) );
     ASSERT_EQ( "filename", extract_value( res, "filename" ) );
     ASSERT_EQ( ".1", extract_value( res, "extension" ) );
 }
@@ -347,7 +327,7 @@ TEST_F( AWSTestFixture, parse_request_no_method )
 }
 
 TEST_F( AWSTestFixture, parse_key_and_request )
-{   // the key wins
+{   // the key wins, if 
     std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1 \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" - - - - - - - - - - - - - - -" );
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
     ASSERT_EQ( "?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url", extract_value( res, "path" ) );
@@ -487,9 +467,10 @@ TEST_F( AWSTestFixture, percent_in_key )
 
 TEST_F( AWSTestFixture, extra_data )
 {
+    // because the state is to-review the post-processing is not called, that is the reason why access/filename/extension are missing
     std::string res = try_to_parse_review( "- - - - - - - - - - - - - - - - - - - - - - - - more tokens follow" );
     ASSERT_EQ(
-        "{\"_error\":\"Extra fields discovered\",\"_extra\":\"more tokens follow\",\"_line_nr\":1,\"_unparsed\":\"- - - - - - - - - - - - - - - - - - - - - - - - more tokens follow\",\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
+        "{\"_error\":\"Extra fields discovered\",\"_extra\":\"more tokens follow\",\"_line_nr\":1,\"_unparsed\":\"- - - - - - - - - - - - - - - - - - - - - - - - more tokens follow\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n",
         res
         );
 }
@@ -506,6 +487,15 @@ TEST_F( AWSTestFixture, quote_in_path )
     ASSERT_EQ( "a\\\"", extract_value( res, "path" ) );
 }
 
+TEST_F( AWSTestFixture, two_lines_with_and_without_accessions )
+{
+    std::string src1 = "- - - - - - - SRR123456.1 - - - - - - - - - - - - - - - -";
+    std::string src2 = "- - - - - - - - - - - - - - - - - - - - - - - -";
+    std::string src = src1 + "\n" + src2;
+    std::string res = try_to_parse_good( src );
+
+    ASSERT_EQ( "{\"accession\":\"SRR123456\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\".1\",\"filename\":\"SRR123456\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"SRR123456.1\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n", res );
+}
 
 TEST_F( AWSTestFixture, MultiThreading )
 {

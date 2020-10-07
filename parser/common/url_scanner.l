@@ -27,7 +27,7 @@ QUERY_SEP   [&;]
 EQUAL       "="
 HASH        "#"
 
-CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}]
+CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}%]
 PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}
 PATHSTR     {PATHCHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
@@ -52,7 +52,7 @@ QUERY_EXT   \.(\.|{QUERY_TOKEN})*
 <QUERYSTATE>{QUERY_SEP}     { MAKE_STR(); return QUERY_SEP; }
 <QUERYSTATE>{EQUAL}         { MAKE_STR(); return EQUAL; }
 <QUERYSTATE>{ACCESSION}     { MAKE_STR(); return ACCESSION; }
-<QUERYSTATE>{SLASH}         { MAKE_STR(); return QUERY_TOKEN; }
+<QUERYSTATE>{SLASH}         { MAKE_STR(); return SLASH; }
 <QUERYSTATE>{QUERY_EXT}     { MAKE_STR(); return PATHEXT; }
 <QUERYSTATE>{QUERY_TOKEN}   { MAKE_STR(); return PATHSTR; }
 <QUERYSTATE>{HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }

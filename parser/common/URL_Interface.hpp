@@ -13,13 +13,11 @@ namespace NCBI
         {
             URLReceiver( FormatterRef fmt );
 
-            typedef enum {
-                accession = LastMemberId+1,
-                filename,
-                extension
-            } URL_Members;
+            void finalize( void );
 
-            virtual void set( URL_Members m, const t_str & );
+            std::string m_accession;
+            std::string m_filename;
+            std::string m_extension;
         };
 
         class URLParseBlock : public ParseBlockInterface

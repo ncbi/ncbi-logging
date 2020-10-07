@@ -18,23 +18,39 @@ TEST( URL_Parsing, EmptyString )
     URLReceiver receiver( make_shared<JsonFastFormatter>() );
     URLParseBlock pb( receiver );
     pb.format_specific_parse( "", 0 );
+    receiver . finalize();
     ASSERT_EQ( "{\"accession\":\"\",\"extension\":\"\",\"filename\":\"\"}", receiver.GetFormatter().format() );
 }
 
-class URLParseBlockFactory : public ParseBlockFactoryInterface
+class TestURLParseBlock : public URLParseBlock
 {
 public:
-    URLParseBlockFactory() : m_receiver( std::make_shared<JsonLibFormatter>() ) {}
-    virtual ~URLParseBlockFactory() {}
+    TestURLParseBlock( URLReceiver & receiver ) : URLParseBlock( receiver ) {}
+
+    bool format_specific_parse( const char * line, size_t line_size )
+    {
+        bool res = URLParseBlock::format_specific_parse( line, line_size );
+        URLReceiver & receiver = static_cast< URLReceiver & > ( GetReceiver() );
+        receiver.finalize();
+        return res;
+    }
+};
+
+class TestURLParseBlockFactory : public ParseBlockFactoryInterface
+{
+public:
+    TestURLParseBlockFactory() : m_receiver( std::make_shared<JsonLibFormatter>() ) {}
+    virtual ~TestURLParseBlockFactory() {}
     virtual std::unique_ptr<ParseBlockInterface> MakeParseBlock() const
     {
-        return std::make_unique<URLParseBlock>( m_receiver );
+        return std::make_unique<TestURLParseBlock>( m_receiver );
     }
     URLReceiver mutable m_receiver;
 };
 
-class URLTestFixture : public ParseTestFixture< URLParseBlockFactory >
+class URLTestFixture : public ParseTestFixture< TestURLParseBlockFactory >
 {
+
 };
 
 TEST_F( URLTestFixture, PathOnly )      { ASSERT_NE( "", try_to_parse_good( "path" ) ); }
@@ -49,38 +65,10 @@ TEST_F( URLTestFixture, QueryOnly )             { ASSERT_NE( "", try_to_parse_go
 TEST_F( URLTestFixture, PathQueryFragment ) { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?query#fragment" ) ); }
 TEST_F( URLTestFixture, EmptyFragment )     { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?query#" ) ); }
 
-//
-// If there is no '?':
-//  input               accession          filename        extension
-//  A                   A                   A                           OK
-//  A1/A2/A3            A3                  A3                          OK
-//  A/f.ext             A                   f               .ext        OK
-//  A.ext               A                   A               .ext        OK
-//  A/.ext              A                                   .ext        OK
-//  A/f1.ext1/f2.ext2   A                   f2              .ext        OK
-//  A1/A2.ext           A2                  A2              .ext        OK
-//  A/f                 A                   f                           OK
-//  f1/A/f2.ext         A                   f2              .ext        OK
-//  A/f1/f2.ext         A                   f2              .ext        OK
-//  A1/A2/A3/f.ext      A3                  f               .ext        OK
-
-// If there is a '?':
-// ?A                   A                   A                           OK
-// f1/f2?A              A                   f2                          OK
-// f1/f2.ext?A          A                   f2              .ext        OK
-// f1.ext/f2?A          A                   f2              .ext        OK  !!! weird !!!
-// A1?A2                A1                  A1                          OK
-// A1?f2                A1                  f2                          OK
-// A1?f2.ext            A1                  f2              .ext        OK
-// /?k1=A1&k2=f2.ext    A1                  f2              .ext
-
-//  If thereis a '?' and no accession to the left of it,
-//  same rules apply to the substring following the '?'
-//  ?a=A1&b=A2          A2                                  .ext
-
 TEST_F( URLTestFixture, JustAccession )
 {
     const std::string res = try_to_parse_good( "SRR000123" );
+    std::cout << res << std::endl;
     ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
 }
 
@@ -162,6 +150,70 @@ TEST_F( URLTestFixture, Accession_Something_Filename )
     ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
 }
 
+TEST_F( URLTestFixture, NoAccession_But_Filename )
+{
+    const std::string res = try_to_parse_good( "/storage/filename.ext" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, PathWithPct )
+{
+    const std::string res = try_to_parse_good( "ERR792423/5141526_%s1_p0.bas.h5.1%ab" );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_%s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1%ab", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, PathWithSlashURLEnc )
+{
+    const std::string res = try_to_parse_good( "ERR792423%2F5141526_%s1_p0.bas.h5.1%ab" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "ERR792423%2F5141526_%s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".bas.h5.1%ab", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, KeepFilenameAndExtensionTogether1 )
+{
+    const std::string res = try_to_parse_good( "/somewhere.1/filename.2" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".2", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, KeepFilenameAndExtensionTogether2 )
+{
+    const std::string res = try_to_parse_good( "/somewhere.1/filename" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, TakeFilenameOnlyAfterAccession )
+{
+    const std::string res = try_to_parse_good( "/somewhere.1/SRR123456" );
+    ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
+    ASSERT_EQ( "SRR123456", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, DoNotMixFilenamAndExtensionFormDifferentPathSegments1 )
+{
+    const std::string res = try_to_parse_good( "/somewhere.1/.2" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".2", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, ThereIsAEscapedQuoteInThePath )
+{
+    const std::string res = try_to_parse_good( "a\\\"" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
 //---------------------------------------------------------------------
 
 TEST_F( URLTestFixture, QMJustAccession )
@@ -240,3 +292,58 @@ TEST_F( URLTestFixture, QMAccesionFilenameExt )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
+TEST_F( URLTestFixture, QMNoAccession_But_Filename )
+{
+    const std::string res = try_to_parse_good( "/?key=storage/filename.ext" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QMNoAccession_prefer_Filename_from_path )
+{
+    const std::string res = try_to_parse_good( "/filename1.ext1?key=storage/filename2.ext2" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename1", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".ext1", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QMKeepFilenameAndExtensionTogether1 )
+{
+    const std::string res = try_to_parse_good( "/?p=somewhere.1/filename.2" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".2", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QMKeepFilenameAndExtensionTogether2 )
+{
+    const std::string res = try_to_parse_good( "/?p=somewhere.1/filename" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QMTakeFilenameOnlyAfterAccession )
+{
+    const std::string res = try_to_parse_good( "/?ex=somewhere.1/SRR123456" );
+    ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
+    ASSERT_EQ( "SRR123456", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QMDoNotMixFilenamAndExtensionFormDifferentPathSegments1 )
+{
+    const std::string res = try_to_parse_good( "/?p=somewhere.1/.2" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".2", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QMDoNotMixFilenamAndExtensionFormDifferentPathSegments2 )
+{
+    const std::string res = try_to_parse_good( "/?p=somewhere.1%2Ffilename.2" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "filename", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".2", extract_value( res, "extension" ) );
+}

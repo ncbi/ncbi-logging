@@ -59,14 +59,6 @@ ReceiverInterface::setMember( const char * mem, const t_str & v )
         // sanitize and retry
         m_fmt -> addNameValue( mem, sanitize( v ) );
     }
-    /*
-    catch( const ncbi::Exception & ex)
-    {
-    }
-    catch( const std::exception & ex)
-    {
-    }
-    */
 }
 
 void
@@ -74,28 +66,14 @@ ReceiverInterface::set( Members m, const t_str & v )
 {
     switch( m )
     {
-    case ip:        setMember( "ip", v); break;
-    case referer:   setMember( "referer", v); break;
-    case unparsed:  setMember( "unparsed", v); break;
-    case agent:     setMember( "agent", v); break;
-
-    case request:
-    default:
-        throw std::logic_error( "invalid ReceiverInterface::Member" );
+    case ip:        setMember( "ip", v ); break;
+    case referer:   setMember( "referer", v ); break;
+    case unparsed:  setMember( "unparsed", v ); break;
+    case agent:     setMember( "agent", v ); break;
+    case method:    setMember( "method", v ); break;
+    case path:      setMember( "path", v ); break;
+    case vers:      setMember( "vers", v ); break;
     }
-    if ( m_cat == cat_unknown )
-        m_cat = cat_good;
-}
-
-void
-ReceiverInterface::setRequest( const t_request & r )
-{
-    setMember( "method",    r . method );
-    setMember( "path",      r . path );
-    setMember( "vers",      r . vers );
-    setMember( "accession", r . accession );
-    setMember( "filename",  r . filename );
-    setMember( "extension", r . extension );
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
 }
@@ -126,4 +104,3 @@ FormatterInterface & ReceiverInterface::GetFormatter()
         return * p;
     throw std::logic_error( "no formatter available" );
 }
-

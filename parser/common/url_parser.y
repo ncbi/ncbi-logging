@@ -36,11 +36,14 @@
             case ACCESSION:
             {
                 ret . accession = from . str;
+                ret . filename = EmptyTSTR;
+                ret . extension = EmptyTSTR;
                 break;
             }
             case PATHSTR:
             {
                 ret . filename = from . str;
+                ret . extension = EmptyTSTR;
                 break;
             }
             case PATHEXT:
@@ -52,6 +55,12 @@
                     ret . filename = to . accession;
                 }
                 ret . extension = from . str;
+                break;
+            }
+            case SLASH:
+            {
+                ret . filename = EmptyTSTR;
+                ret . extension = EmptyTSTR;
                 break;
             }
             default:
@@ -109,49 +118,80 @@ url_line
             // look at accessions detected in path and/or query, decide which to use
             if ( $1 . accession . n > 0 )
             {
-                lib->set( URLReceiver::accession, $1 . accession );
-
-                // file and extension from Path if exist
-                if ( $1 . filename . n > 0 )
+                if ( lib -> m_accession . empty() )
                 {
-                    lib->set( URLReceiver::filename,    $1 . filename );
-                    lib->set( URLReceiver::extension,   $1 . extension );
-                }
-                else if ( $1 . extension . n > 0 )
-                {   // extension, empty filename on the path; use the accession as filename
-                    lib->set( URLReceiver::filename, EmptyTSTR );
-                    lib->set( URLReceiver::extension, $1 . extension );
-                }
-                else // $1 . extension . n == 0
-                {   // no filename or extension on the path; use the accession as filename
-                    //TODO: use filename/extension from URL
-                    lib->set( URLReceiver::filename, $1.accession );
-                    lib->set( URLReceiver::extension, EmptyTSTR );
+                    lib -> m_accession = std::string( $1 . accession . p, $1 . accession . n );
+                    lib -> m_filename . clear();
+                    lib -> m_extension . clear();
+
+                    // file and extension from Path if exist
+                    if ( $1 . filename . n > 0 )
+                    {
+                        lib -> m_filename  = std::string( $1 . filename . p, $1 . filename . n );
+                        lib -> m_extension = std::string( $1 . extension . p, $1 . extension . n );
+                    }
+                    else if ( $1 . extension . n > 0 )
+                    {   // extension, empty filename on the path; use the accession as filename
+                        lib -> m_filename  . clear();
+                        lib -> m_extension = std::string( $1 . extension . p, $1 . extension . n );
+                    }
+                    else // $1 . extension . n == 0
+                    {   // no filename or extension on the path; use the accession as filename
+                        lib -> m_filename  = std::string( $1 . accession . p, $1 . accession . n );
+                        lib -> m_extension . clear();
+                    }
                 }
             }
             else if ( $2 . accession . n > 0 )
             { // use the accession, filename and extension from the query
-                lib->set( URLReceiver::accession, $2 . accession );
 
-                if ( $2 . filename . n > 0 )
+                if ( lib -> m_accession . empty() )
                 {
-                    lib->set( URLReceiver::filename,    $2 . filename );
-                    lib->set( URLReceiver::extension,   $2 . extension );
-                }
-                else if ( $2 . extension . n > 0 )
-                {   // extension, empty filename in the query; use the accession as filename
-                    // lib->set( URLReceiver::filename, EmptyTSTR );
-                    // lib->set( URLReceiver::extension, $2 . extension );
-                }
-                else // $2 . extension . n == 0
-                {   // no filename or extension in the query; use the accession as filename
-                    lib->set( URLReceiver::filename, $2 . accession );
-                    lib->set( URLReceiver::extension, EmptyTSTR );
+                    lib -> m_accession = std::string( $2 . accession . p, $2 . accession . n );
+                    lib -> m_filename . clear();
+                    lib -> m_extension . clear();
+
+                    if ( $2 . filename . n > 0 )
+                    {
+                        lib -> m_filename  = std::string( $2 . filename . p, $2 . filename . n );
+                        lib -> m_extension = std::string( $2 . extension . p, $2 . extension . n );
+                    }
+                    else if ( $2 . extension . n > 0 )
+                    {   // extension, empty filename in the query; use the accession as filename
+                        // TODO make test
+                        // lib -> m_filename . clear();
+                        // lib -> m_extension = std::string( $2 . extension . p, $2 . extension . n );
+                    }
+                    else // $2 . extension . n == 0
+                    {   // no filename or extension in the query; use the accession as filename
+                        lib -> m_filename  = std::string( $2 . accession . p, $2 . accession . n );
+                        lib -> m_extension . clear();
+                    }
                 }
             }
-            // no accessions; use the filename/extension from the Path if present
-            // from the URL otherwise
-
+            else
+            { // no accession found what-so-ever
+                if ( $1 . filename . n > 0 )
+                {  // if we found a filename in the path
+                    lib -> m_filename  = std::string( $1 . filename . p, $1 . filename . n );
+                    lib -> m_extension = std::string( $1 . extension . p, $1 . extension . n );
+                }
+                else if ( $2 . filename . n > 0 )
+                {  // if not take the filename from the query, which may be empty
+                    lib -> m_filename  = std::string( $2 . filename . p, $2 . filename . n );
+                    lib -> m_extension = std::string( $2 . extension . p, $2 . extension . n );
+                }
+                else if ( $1 . extension . n > 0 )
+                {
+                    lib -> m_filename  = std::string( $1 . filename . p, $1 . filename . n );
+                    lib -> m_extension = std::string( $1 . extension . p, $1 . extension . n );
+                }
+                else if ( $2 . extension . n > 0 )
+                {
+                    lib -> m_filename  = std::string( $2 . filename . p, $2 . filename . n );
+                    lib -> m_extension = std::string( $2 . extension . p, $2 . extension . n );
+                }
+            }
             YYACCEPT;
         }
     | path query error  { lib->reportField( "Invalid URL query" ); YYACCEPT; }
@@ -188,6 +228,7 @@ query_token
     : ACCESSION         { $$ = $1; $$ . type = ACCESSION; $$ . accession = $$ . str; }
     | PATHSTR           { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
     | PATHEXT           { $$ = $1; $$ . type = PATHEXT; $$ . extension = $$ . str; }
+    | SLASH             { $$ = $1; $$ . type = SLASH; }
     | QUERY_TOKEN       { $$ = $1; $$ . type = QUERY_TOKEN; }
     ;
 
@@ -220,8 +261,6 @@ query_list
     | query_list QUERY_SEP query_entry
         {
             // if $3 has more elements than $1, use $3
-//printf("$1=%.*s $3=%.*s\n", $1.accession.n, $1.accession.p, $3.accession.n, $3.accession.p );
-
             if ( $1.accession.n == 0 )
             {
                 if ( $3.accession.n > 0 )
