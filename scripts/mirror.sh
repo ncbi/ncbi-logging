@@ -125,9 +125,8 @@ for LOG_BUCKET in "${buckets[@]}"; do
     if [ "$PROVIDER" = "S3" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/"
         mkdir -p "$MIRROR"
-        cd "$MIRROR" || exit
 
-        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR ..."
+        echo "Profile is $PROFILE, $PROVIDER concatenating to $MIRROR ..."
         if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
             export AWS_PROFILE="opendata"
         fi
@@ -137,8 +136,15 @@ for LOG_BUCKET in "${buckets[@]}"; do
         fi
         WILDCARD="${YESTERDAY_DASH}-*"
 
-        aws s3 sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD" --quiet
+        for HH in $(seq 0 1 23); do
+            PREFIX=$(printf "%s-%0.2d" "${YESTERDAY_DASH}" "$HH")
+            echo "Concatenating $PREFIX..."
+            time ./s3_cat.py "$LOG_BUCKET" "${PREFIX}-" "$AWS_PROFILE" > "$MIRROR"/"$PREFIX"-combine
+        done
+
+        #aws s3 sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD" --quiet
     fi
+    cd "$MIRROR" || exit
 
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
@@ -156,7 +162,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "Copying $TGZ to $DEST_BUCKET"
     gsutil cp "$TGZ" "$DEST_BUCKET"
 
-    if [ "$PROVIDER" = "OP" ]; then
+    if [ "$PROVIDER" != "GS" ]; then
         cd ..
         rm -rf "$MIRROR"
     fi

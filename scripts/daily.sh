@@ -11,8 +11,8 @@ set +e
 
 mkdir -p "$HOME"/logs
 
-date; echo "mirror.sh GS"
-./mirror.sh GS | ts >> "$HOME"/mirror_gs.log 2>&1
+#date; echo "mirror.sh GS"
+#./mirror.sh GS | ts >> "$HOME"/mirror_gs.log 2>&1
 date; echo "mirror.sh OP"
 ./mirror.sh OP | ts >> "$HOME"/mirror_op.log 2>&1
 date; echo "mirror.sh S3"

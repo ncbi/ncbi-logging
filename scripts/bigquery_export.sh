@@ -534,7 +534,7 @@ echo " ###  op_sess"
         replace(cmds,' ',','),
         replace(status,' ',','),
         '', bytecount, current_datetime(),
-        strides_analytics.map_extension(accession)
+        strides_analytics.map_extension(acc)
     FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
     WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
     AND start between '2019-03-01' and '2020-04-21'
