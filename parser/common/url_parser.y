@@ -158,9 +158,8 @@ url_line
                     }
                     else if ( $2 . extension . n > 0 )
                     {   // extension, empty filename in the query; use the accession as filename
-                        // TODO make test
-                        // lib -> m_filename . clear();
-                        // lib -> m_extension = std::string( $2 . extension . p, $2 . extension . n );
+                        lib -> m_filename . clear();
+                        lib -> m_extension = std::string( $2 . extension . p, $2 . extension . n );
                     }
                     else // $2 . extension . n == 0
                     {   // no filename or extension in the query; use the accession as filename

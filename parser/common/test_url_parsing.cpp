@@ -308,6 +308,14 @@ TEST_F( URLTestFixture, QMNoAccession_prefer_Filename_from_path )
     ASSERT_EQ( ".ext1", extract_value( res, "extension" ) );
 }
 
+TEST_F( URLTestFixture, UseExtensionFromQueryIfNotInPath )
+{
+    const std::string res = try_to_parse_good( "/?key=SRR000123/.ext2" );
+    ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".ext2", extract_value( res, "extension" ) );
+}
+
 TEST_F( URLTestFixture, QMKeepFilenameAndExtensionTogether1 )
 {
     const std::string res = try_to_parse_good( "/?p=somewhere.1/filename.2" );
@@ -347,3 +355,4 @@ TEST_F( URLTestFixture, QMDoNotMixFilenamAndExtensionFormDifferentPathSegments2 
     ASSERT_EQ( "filename", extract_value( res, "filename" ) );
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
 }
+
