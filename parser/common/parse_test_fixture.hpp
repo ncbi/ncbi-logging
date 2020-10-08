@@ -47,6 +47,7 @@ namespace NCBI
                     SingleThreadedDriver p( input, s_outputs, pbFact.MakeParseBlock() );
                     p . setDebug( debug );
                     p . parse_all_lines(); // does the parsing and generates the report
+                    pb = p.getParseBlock();
                 }
 
                 std::string try_to_parse_good( const std::string &line, bool debug = false )
@@ -96,7 +97,12 @@ namespace NCBI
                     }
                 }
 
+                //ParseTestFixture() : pb ( nullptr ) {}
+                //~ParseTestFixture() { delete pb; }
+
                 TestCatWriter s_outputs;
+                //ParseBlockInterface * pb;
+                std::unique_ptr<ParseBlockInterface> pb;
         };
 
     }

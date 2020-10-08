@@ -23,11 +23,11 @@ void URLReceiver::finalize( void )
     // todo: drop the boolean in t_str
     setMember( "accession", t_str{ m_accession.c_str(), m_accession.size(), false } );
     setMember( "filename",  t_str{ m_filename.c_str(), m_filename.size(), false } );
-    setMember( "extension", t_str{ m_extension.c_str(), m_extension.size(), false } ); 
+    setMember( "extension", t_str{ m_extension.c_str(), m_extension.size(), false } );
     m_accession . clear();
     m_filename . clear();
     m_extension . clear();
-    m_cat = cat_good;   
+    m_cat = cat_good;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -61,5 +61,5 @@ URLParseBlock::format_specific_parse( const char * line, size_t line_size )
     // if they are set already, the extra call to set() will be ignored
     t_str empty = {nullptr, 0, false };
 
-    return ret == 0;
+    return ret == 0 && ! m_receiver.m_accession.empty();
 }

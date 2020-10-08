@@ -69,6 +69,12 @@ namespace NCBI
             virtual void parse_all_lines();
             void setDebug ( bool onOff ) { m_debug = onOff; }
 
+            // for testing
+            std::unique_ptr<ParseBlockInterface> getParseBlock()
+            {
+                return std::move( m_pb );
+            }
+
         protected:
             bool m_debug;
             std::unique_ptr<ParseBlockInterface> m_pb;

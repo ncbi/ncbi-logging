@@ -25,15 +25,20 @@ TEST( URL_Parsing, EmptyString )
 class TestURLParseBlock : public URLParseBlock
 {
 public:
-    TestURLParseBlock( URLReceiver & receiver ) : URLParseBlock( receiver ) {}
+    TestURLParseBlock( URLReceiver & receiver )
+    :   URLParseBlock( receiver ),
+        found_accession ( false )
+    {}
 
     bool format_specific_parse( const char * line, size_t line_size )
     {
-        bool res = URLParseBlock::format_specific_parse( line, line_size );
+        found_accession = URLParseBlock::format_specific_parse( line, line_size );
         URLReceiver & receiver = static_cast< URLReceiver & > ( GetReceiver() );
         receiver.finalize();
-        return res;
+        return true;
     }
+
+    bool found_accession;
 };
 
 class TestURLParseBlockFactory : public ParseBlockFactoryInterface
@@ -65,11 +70,19 @@ TEST_F( URLTestFixture, QueryOnly )             { ASSERT_NE( "", try_to_parse_go
 TEST_F( URLTestFixture, PathQueryFragment ) { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?query#fragment" ) ); }
 TEST_F( URLTestFixture, EmptyFragment )     { ASSERT_NE( "", try_to_parse_good( "/path/a/b/c?query#" ) ); }
 
+TEST_F( URLTestFixture, NoAccession )
+{
+    const std::string res = try_to_parse_good( "WRR000123" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+
+    ASSERT_FALSE( static_cast<const TestURLParseBlock * >( pb . get() ) -> found_accession );
+}
 TEST_F( URLTestFixture, JustAccession )
 {
     const std::string res = try_to_parse_good( "SRR000123" );
-    std::cout << res << std::endl;
     ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
+
+    ASSERT_TRUE( static_cast<const TestURLParseBlock * >( pb . get() ) -> found_accession );
 }
 
 TEST_F( URLTestFixture, MultipleAccessions )

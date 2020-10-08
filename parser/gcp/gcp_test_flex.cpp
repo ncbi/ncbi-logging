@@ -156,61 +156,6 @@ TEST_F ( GCP_TestFlexFixture, Path_StateReturn )
     ASSERT_EQ( COMMA, NextTokenType() );
 }
 
-TEST_F ( GCP_TestFlexFixture, Path_Accesssion )
-{
-    const char * input = "ERR4080068";
-    ASSERT_EQ( ACCESSION, StartPath( input ) ); ASSERT_EQ( input, TokenValue() );
-}
-
-TEST_F ( GCP_TestFlexFixture, Path_AccesssionSlash )
-{
-    const char * input = "ERR4080068/";
-    ASSERT_EQ( ACCESSION, StartPath( input ) ); ASSERT_EQ( "ERR4080068", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType() );
-}
-
-TEST_F ( GCP_TestFlexFixture, Path_AccesssionSlashFilename )
-{
-    const char * input = "ERR4080068/HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001";
-    ASSERT_EQ( ACCESSION, StartPath( input ) ); ASSERT_EQ( "ERR4080068", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( PATHSTR, NextTokenType() );
-    ASSERT_EQ( "HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001", TokenValue() );
-}
-
-TEST_F ( GCP_TestFlexFixture, Path_AccesssionSlashFilename_Ext )
-{
-    const char * input = "ERR4080068/HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001.fq";
-    ASSERT_EQ( ACCESSION, StartPath( input ) ); ASSERT_EQ( "ERR4080068", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( PATHSTR, NextTokenType() );
-    ASSERT_EQ( "HG04194_ATATGGAT-CTGTATTA_HFM5LDSXX_L002_001", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() );
-    ASSERT_EQ( ".fq", TokenValue() );
-}
-
-TEST_F ( GCP_TestFlexFixture, Path_NameSlashAccesssionSlashFilename_Ext )
-{
-    const char * input = "SRP123456/ERR4080068/qwe.ff";
-    ASSERT_EQ( PATHSTR, StartPath( input ) ); ASSERT_EQ( "SRP123456", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "ERR4080068", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "qwe", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".ff", TokenValue() );
-}
-
-TEST_F ( GCP_TestFlexFixture, Path_NameSlashAccesssionSlashFilename_Ext_v2 )
-{
-    const char * input = "SRP123456%2FERR4080068%2Fqwe.ff";
-    ASSERT_EQ( PATHSTR, StartPath( input ) ); ASSERT_EQ( "SRP123456", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "ERR4080068", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType() );
-    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "qwe", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".ff", TokenValue() );
-}
-
 TEST_F ( GCP_TestFlexFixture, Agent )
 {
     const char * input = "\"linux64 sra-toolkit fasterq-dump.2.10.7 (phid=noc86d2998,libc=2.17)\"";

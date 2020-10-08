@@ -21,7 +21,7 @@
 %option debug
 
 ACCESSION   [DES]R[RZ][0-9]{6,9}
-SLASH       (\/|%2F)
+SLASH       \/
 QMARK       "?"
 QUERY_SEP   [&;]
 EQUAL       "="
@@ -33,7 +33,18 @@ PATHSTR     {PATHCHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
 
 QUERYCHARS  [A-Za-z0-9\-_~@:]
-QUERY_TOKEN {QUERYCHARS}+
+    /* %2f and %2F (/) are excluded because they are a special token (SLASH) */
+HEXCHAR     [0-9A-Fa-f]
+HEXCHAR_1   [013-9A-Fa-f]
+HEXCHAR_2   [0-9A-Ea-e]
+URL_BYTE_1  %{HEXCHAR_1}{HEXCHAR_2}
+URL_BYTE_2  %{HEXCHAR_1}{HEXCHAR}
+URL_BYTE_3  %{HEXCHAR}{HEXCHAR_2}
+URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
+
+    /* allowing unncoded / in a query is not by the rules but real world examples use it */
+QUERY_SLASH (\/|%2F|%2f)
+QUERY_TOKEN ({URL_BYTE}|{QUERYCHARS})+
 QUERY_EXT   \.(\.|{QUERY_TOKEN})*
 
 %x QUERYSTATE FRAGSTATE
@@ -52,7 +63,7 @@ QUERY_EXT   \.(\.|{QUERY_TOKEN})*
 <QUERYSTATE>{QUERY_SEP}     { MAKE_STR(); return QUERY_SEP; }
 <QUERYSTATE>{EQUAL}         { MAKE_STR(); return EQUAL; }
 <QUERYSTATE>{ACCESSION}     { MAKE_STR(); return ACCESSION; }
-<QUERYSTATE>{SLASH}         { MAKE_STR(); return SLASH; }
+<QUERYSTATE>{QUERY_SLASH}   { MAKE_STR(); return SLASH; }
 <QUERYSTATE>{QUERY_EXT}     { MAKE_STR(); return PATHEXT; }
 <QUERYSTATE>{QUERY_TOKEN}   { MAKE_STR(); return PATHSTR; }
 <QUERYSTATE>{HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }

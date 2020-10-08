@@ -6,6 +6,7 @@
 
 #include "Formatters.hpp"
 #include "AGENT_Interface.hpp"
+#include "URL_Interface.hpp"
 
 extern YY_BUFFER_STATE gcp_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -47,6 +48,34 @@ void GCPReceiver::post_process( void )
     AGENTReceiver agt( m_fmt );
     AGENTParseBlock pb ( agt );
     pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+
+    {
+        URLReceiver url( m_fmt );
+        URLParseBlock pb ( url );
+        // [object/url]_for_postprocess has been set in the .y file
+        if ( pb.format_specific_parse( object_for_postprocess.c_str(), object_for_postprocess.size() ) )
+        {
+            t_str path = { object_for_postprocess.c_str(), object_for_postprocess.size(), false };
+            set( ReceiverInterface::path, path );
+        }
+        else
+        {
+            //pb.SetDebug( true );
+            pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+            t_str path = { url_for_postprocess.c_str(), url_for_postprocess.size(), false };
+            set( ReceiverInterface::path, path );
+        }
+
+        url . finalize();
+    }
+
+    // version is always empty in GCP
+    t_str empty = { nullptr, 0, false };
+    set( ReceiverInterface::vers, empty );
+
+    agent_for_postprocess . clear();
+    object_for_postprocess . clear();
+    url_for_postprocess . clear();
 }
 
 namespace NCBI

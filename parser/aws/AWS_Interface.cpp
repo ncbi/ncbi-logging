@@ -66,18 +66,16 @@ void AWSReceiver::post_process( void )
     {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
-        // [key/path]_for_postprocess has been set in the .y file
+        // [key/url]_for_postprocess has been set in the .y file
         pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
-
-        // if the key did set accession/filename/extension - the setters in the second parse will be ignored
-        pb.format_specific_parse( path_for_postprocess.c_str(), path_for_postprocess.size() );
+        pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
 
         url . finalize();
     }
 
     agent_for_postprocess . clear();
     key_for_postprocess . clear();
-    path_for_postprocess . clear();
+    url_for_postprocess . clear();
 }
 
 namespace NCBI

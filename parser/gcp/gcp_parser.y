@@ -39,20 +39,18 @@ using namespace NCBI::Logging;
 
 %union
 {
-    t_str s;
-    t_request req;
+    t_str s; //TODO: get rid of the union
 }
 
-%token<s> IPV4 IPV6 QSTR I64 PATHSTR PATHEXT ACCESSION SLASH
+%token<s> IPV4 IPV6 QSTR I64 PATHSTR PATHEXT SLASH
 %token<s> EQUAL AMPERSAND QMARK PERCENT
 %token QUOTE COMMA UNRECOGNIZED
 %token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
 
 %type<s> ip ip_region method host referrer
-%type<s> ext_opt ext_list ext_elem file_opt file_list file_elem object_token object_list
 %type<s> req_id operation bucket hdr_item hdr_item_text
 %type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
-%type<req> object url url_list url_token
+%type<s> object url
 %type<s> agent vdb_agent
 
 %start line
@@ -87,9 +85,9 @@ hdr_item
 
 log_gcp
     : time COMMA ip COMMA ip_type COMMA ip_region COMMA method COMMA
-      { gcp_start_URL( scanner ); }
+       { gcp_start_URL( scanner ); }
       url
-      { gcp_pop_state( scanner ); }
+       { gcp_pop_state( scanner ); }
       COMMA status COMMA req_bytes COMMA res_bytes COMMA time_taken COMMA host COMMA
       referrer COMMA
       { gcp_start_UserAgent( scanner ); }
@@ -99,22 +97,6 @@ log_gcp
       { gcp_start_URL( scanner ); }
       object
       { gcp_pop_state( scanner ); }
-    {
-        t_request req = $12;
-
-        if ( $38 . accession . n > 0 )
-        {   // the cloud did populate the object-field
-            req = $38;
-        }
-
-        if ( req . filename . n == 0 && req . extension . n == 0 )
-        {   // reuse the accession as the filename
-            req . filename = req . accession;
-        }
-
-        req . method = $9;
-        lib -> setRequest( req );
-    }
     ;
 
 time
@@ -137,7 +119,7 @@ ip_region
     ;
 
 method
-    : QUOTE QSTR QUOTE      { $$ = $2; }
+    : QUOTE QSTR QUOTE      { $$ = $2; lib->set( GCPReceiver::method, $2 ); }
     ;
 
 status
@@ -196,184 +178,22 @@ bucket
     | QUOTE QUOTE           { lib->set( GCPReceiver::bucket, EmptyTSTR ); }
     ;
 
-/*
-    typedef enum { acc_before = 0, acc_inside, acc_after } eAccessionMode; (defined in log_lines.hpp)
-
-        for a url_token node, set to
-            'acc_inside' if it is an ACCESSION
-            'acc_after'  if it is a delimiter
-
-        for a url_list node, describes the state of URL parsing:
-            'acc_before' - no accession has been seen yet
-            'acc_inside' - we are between the first accession and the following delimiter,
-                            capture the filename and extension tokens
-            'acc_after'  - we are past delimiter following an accession,
-                            no further action necessary
- */
-
-url_token
-    : SLASH         { InitRequest( $$ ); $$ . path = $1; }
-    | EQUAL         { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
-    | AMPERSAND     { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
-    | QMARK         { InitRequest( $$ ); $$ . path = $1; $$.accession_mode = acc_after; }
-    | PERCENT       { InitRequest( $$ ); $$ . path = $1; }
-    | ACCESSION
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-            $$ . accession = $1;
-            $$ . accession_mode = acc_inside;
-        }
-    | PATHSTR       { InitRequest( $$ ); $$ . path = $1; $$ . filename = $1; }
-    | PATHEXT       { InitRequest( $$ ); $$ . path = $1; $$ . extension = $1; }
-    ;
-
- /* This is a collection of url tokens and accessions.
-    We are looking for the first accession and filename/extension that follow it.*/
-url_list
-    :  url_token
-        {
-            $$ = $1;
-            if ( $1 . accession_mode == acc_after )
-            {   /* a delimiter seen before an accession */
-                $$ . accession_mode = acc_before;
-            }
-        }
-    |  url_list url_token
-        {
-            $$ = $1;
-            MERGE_TSTR( $$ . path, $2 . path );
-            switch ( $$.accession_mode )
-            {
-            case acc_before:
-                if ( $2.accession_mode == acc_inside )
-                {
-                    $$ . accession = $2 . accession;
-                    $$ . accession_mode = acc_inside;
-                }
-                break;
-            case acc_inside:
-                switch ( $2 . accession_mode )
-                {
-                case acc_inside:
-                    $$ . filename  = $2 . accession;
-                    break;
-                case acc_after:
-                    $$ . accession_mode = acc_after;
-                    break;
-                default:
-                    if ( $2 . filename . n > 0 )    $$ . filename  = $2 . filename;
-                    if ( $2 . extension . n > 0 )   $$ . extension = $2 . extension;
-                }
-                break;
-            }
-        }
-    ;
-
 url
-    : QUOTE url_list QUOTE
-        {
-            $$ = $2;
-            lib -> set( GCPReceiver::uri, $$.path );
-        }
-    | QUOTE QUOTE
-        {
-            InitRequest( $$ );
-            lib -> set( GCPReceiver::uri, $$.path );
-        }
-    ;
-
-object_token
-    : SLASH         { $$ = $1; }
-    | PATHSTR       { $$ = $1; }
-    | PATHEXT       { $$ = $1; }
-    | EQUAL         { $$ = $1; }
-    | AMPERSAND     { $$ = $1; }
-    | QMARK         { $$ = $1; }
-    | PERCENT       { $$ = $1; }
-    ;
-
-object_list
-    : object_token
+    :  QUOTE PATHSTR QUOTE
     {
-        $$ = $1;
+        lib->set( GCPReceiver::uri, $2 );
+        lib -> url_for_postprocess = string( $2.p, $2.n );
     }
-    | object_list object_token
-    {
-        $$ = $1;
-        MERGE_TSTR( $$, $2 );
-    }
-    | object_list ACCESSION
-    {
-        $$ = $1;
-        MERGE_TSTR( $$, $2 );
-    }
-    ;
-
-file_opt
-    : file_list     { $$ = $1; }
-    |               { EMPTY_TSTR($$); }
-    ;
-
-file_list
-    : file_elem             { $$ = $1; }
-    | file_list file_elem   { $$ = $1; MERGE_TSTR( $$, $2 ); }
-    ;
-
-file_elem
-    : ACCESSION     { $$ = $1; }
-    | PATHSTR       { $$ = $1; }
-    | EQUAL         { $$ = $1; }
-    | AMPERSAND     { $$ = $1; }
-    ;
-
-ext_opt
-    : ext_list      { $$ = $1; }
-    |               { EMPTY_TSTR($$); }
-    ;
-
-ext_list
-    : PATHEXT           { $$ = $1; }
-    | ext_list ext_elem { $$ = $1; MERGE_TSTR( $$, $2 ); }
-    ;
-
-ext_elem
-    : ACCESSION     { $$ = $1; }
-    | PATHSTR       { $$ = $1; }
-    | PATHEXT       { $$ = $1; }
-    | EQUAL         { $$ = $1; }
-    | AMPERSAND     { $$ = $1; }
+    |  QUOTE QUOTE
+        { lib->set( GCPReceiver::uri, EmptyTSTR ); }
     ;
 
 object
-    : QUOTE ACCESSION SLASH file_opt ext_opt QUOTE
+    : QUOTE PATHSTR QUOTE
         {
-            InitRequest( $$ );
-
-            $$.path . p = $2 . p;
-            $$.path . n = $2 . n + 1 + $4 . n + $5 . n;
-
-            $$.accession = $2;
-            $$.filename  = $4;
-            $$.extension = $5;
+            lib -> object_for_postprocess = string( $2.p, $2.n );
         }
-    | QUOTE object_list QUOTE
-        {
-            InitRequest( $$ );
-            $$ . path = $2;
-        }
-    | QUOTE QUOTE
-        {
-             InitRequest( $$ );
-        }
-    | error object_list QUOTE
-        {   // TODO: somehow signal to the back end that we did not understand the pre-parsed object
-            InitRequest( $$ );
-        }
-    | error QUOTE
-        {   // TODO: somehow signal to the back end that we did not understand the pre-parsed object
-            InitRequest( $$ );
-        }
+    |  QUOTE QUOTE {}
     ;
 
 q_i64

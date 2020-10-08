@@ -39,9 +39,7 @@ QCHARS      [.?&=%/\x00-\x1f]|{CHARS}
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
 
-ACCESSION   [DES]R[RZ][0-9]{6,9}
-PATHSTR     {CHARS}+
-PATHEXT     \.(\.|{PATHSTR})*
+PATHSTR     {QSTR_ESC}
 
 SPACE   " "
 
@@ -67,17 +65,9 @@ AGENTSTR        (\\\"|{AGENTCHARS})+
 <QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED(); return QSTR; }
 <QUOTED>.           { }
 
-<PATH>\"            { return QUOTE; }
-<PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
-<PATH>\/            { MAKE_STR(); return SLASH; };
-<PATH>=             { MAKE_STR(); return EQUAL; };
-<PATH>&             { MAKE_STR(); return AMPERSAND; };
-<PATH>\?            { MAKE_STR(); return QMARK; };
-<PATH>%2F           { MAKE_STR(); return SLASH; };
-<PATH>%             { MAKE_STR(); return PERCENT; };
-<PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
+<PATH>\"            { MAKE_STR(); return QUOTE; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
-<PATH>.             { return yytext[0]; };
+<PATH>.             { MAKE_STR(); return UNRECOGNIZED; }
 
 <AGENT>\"           { MAKE_STR(); return QUOTE; }
 <AGENT>{AGENTSTR}   { MAKE_STR(); return QSTR; }
