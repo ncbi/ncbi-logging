@@ -68,16 +68,15 @@ readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 
 if [ "$PROVIDER" = "OP" ]; then
-    buckets=("OP")
+    buckets=("OP-srafiles11" "OP-srafiles12" "OP-srafiles13" "OP-srafiles21" "OP-srafiles22" "OP-srafiles23" "OP-srafiles31" "OP-srafiles32" "OP-srafiles33" "OP-srafiles34" "OP-srafiles35" "OP-srafiles36" "OP-ftp" "OP-ftp1" "OP-ftp11" "OP-ftp12" "OP-ftp13" "OP-ftp2" "OP-ftp21" "OP-ftp22" "OP-ftp31" "OP-ftp32" "OP-ftp33" "OP")
 fi
 
+df -HT .
 for LOG_BUCKET in "${buckets[@]}"; do
-    echo "  Parsing $LOG_BUCKET..."
-
+    echo "  LOG_BUCKET=$LOG_BUCKET"
     PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
-    df -HT .
 
     SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
@@ -85,7 +84,10 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" .
+    gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" . || true
+    if [ ! -s "$TGZ" ]; then
+        continue
+    fi
     ls -hl "$TGZ"
 
     if [ "$PROVIDER" = "OP" ]; then
@@ -101,6 +103,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel --version)
 
+    echo "  Parsing $LOG_BUCKET..."
     tar -xaOf "$TGZ" "$wildcard" | \
         time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
         "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
@@ -138,7 +141,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 #        if [ "$recwc" -gt 1000000 ]; then
 #            echo "jsonl too large, splitting"
             echo "  splitting"
-            split -a 3 -d -e -l 10000000 --additional-suffix=.jsonl \
+            split -a 3 -d -e -l 20000000 --additional-suffix=.jsonl \
                 - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
                 < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
