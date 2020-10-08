@@ -227,6 +227,13 @@ TEST_F( URLTestFixture, ThereIsAEscapedQuoteInThePath )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
+TEST_F( URLTestFixture, ExampleFromOP )
+{
+    const std::string res = try_to_parse_good( "sos1%2Fsra-pub-run-2%2FSRR8422826%2FSRR8422826.1" );
+    ASSERT_EQ( "SRR8422826", extract_value( res, "accession" ) );
+    ASSERT_EQ( "SRR8422826", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".1", extract_value( res, "extension" ) );
+}
 //---------------------------------------------------------------------
 
 TEST_F( URLTestFixture, QMJustAccession )

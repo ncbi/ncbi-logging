@@ -61,6 +61,7 @@ void AWSReceiver::post_process( void )
         AGENTParseBlock pb ( agt );
         // agent_for_postprocess has been set in the .y file
         pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        agent_for_postprocess . clear();
     }
 
     {
@@ -69,13 +70,11 @@ void AWSReceiver::post_process( void )
         // [key/url]_for_postprocess has been set in the .y file
         pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
         pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
-
         url . finalize();
-    }
+        key_for_postprocess . clear();
+        url_for_postprocess . clear();
 
-    agent_for_postprocess . clear();
-    key_for_postprocess . clear();
-    url_for_postprocess . clear();
+    }
 }
 
 namespace NCBI

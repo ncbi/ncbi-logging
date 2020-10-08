@@ -160,12 +160,6 @@ TEST_F ( OP_TestFlexFixture, IPV6_11_3 )   { TestIPV6 ( "::ffff:0000:1.2.3.4" );
 TEST_F ( OP_TestFlexFixture, IPV6_12_1 )   { TestIPV6 ( "cdef::1.2.3.4" ); }
 TEST_F ( OP_TestFlexFixture, IPV6_12_2 )   { TestIPV6 ( "0123:4567:89ab:cdef::1.2.3.4" ); }
 
-TEST_F ( OP_TestFlexFixture, Path_State )
-{
-    ASSERT_EQ( PATHSTR, StartScanInURL_State( "a" ) );
-    ASSERT_EQ( "a", TokenValue() );
-}
-
 TEST_F ( OP_TestFlexFixture, Path_StateReturn )
 {   // scanner state manipulation
     const char * input = "a b";
@@ -178,24 +172,11 @@ TEST_F ( OP_TestFlexFixture, Path_StateReturn )
     ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "b", TokenValue() );
 }
 
-TEST_F ( OP_TestFlexFixture, Path_Accesssion )
+TEST_F ( OP_TestFlexFixture, Path_Token )
 {
-    const char * input = "/SRR9154112/%CB.fastq%2a";
-    ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
-    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType( ) );
-    ASSERT_EQ( PATHSTR, NextTokenType() ); ASSERT_EQ( "%CB", TokenValue() ); // % is a delimiter
-    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq%2a", TokenValue() );
-}
-
-TEST_F ( OP_TestFlexFixture, Path_Accesssion_URL_encoded_slash )
-{   // %2F is a separate token (important for the parser)
-    const char * input = "%2FSRR9154112%2f.fastq%2f";
-    ASSERT_EQ( SLASH, StartScanInURL_State( input ) );
-    ASSERT_EQ( ACCESSION, NextTokenType() ); ASSERT_EQ( "SRR9154112", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType( ) );
-    ASSERT_EQ( PATHEXT, NextTokenType() ); ASSERT_EQ( ".fastq", TokenValue() );
-    ASSERT_EQ( SLASH, NextTokenType( ) );
+    const char * input = "%2F/SRR9154112/%CB.fastq%2a";
+    ASSERT_EQ( PATHSTR, StartScanInURL_State( input ) );
+    ASSERT_EQ( "%2F/SRR9154112/%CB.fastq%2a", TokenValue() );
 }
 
 TEST_F ( OP_TestFlexFixture, Agent )

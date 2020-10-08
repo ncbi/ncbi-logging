@@ -33,6 +33,7 @@ namespace NCBI
             virtual void post_process( void );
 
             std::string agent_for_postprocess;
+            std::string url_for_postprocess;
         };
 
         class OPParseBlockFactory : public ParseBlockFactoryInterface

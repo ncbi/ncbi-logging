@@ -6,6 +6,7 @@
 
 #include "Formatters.hpp"
 #include "AGENT_Interface.hpp"
+#include "URL_Interface.hpp"
 
 extern YY_BUFFER_STATE op_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -42,9 +43,19 @@ void OPReceiver::set( OP_Members m, const t_str & v )
 
 void OPReceiver::post_process( void )
 {
-    AGENTReceiver agt( m_fmt );
-    AGENTParseBlock pb ( agt );
-    pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+    {
+        AGENTReceiver agt( m_fmt );
+        AGENTParseBlock pb ( agt );
+        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        agent_for_postprocess.clear();
+    }
+    {
+        URLReceiver url( m_fmt );
+        URLParseBlock pb ( url );
+        pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+        url . finalize();
+        url_for_postprocess.clear();
+    }
 }
 
 namespace NCBI

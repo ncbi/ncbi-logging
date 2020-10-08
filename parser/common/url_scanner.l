@@ -21,18 +21,20 @@
 %option debug
 
 ACCESSION   [DES]R[RZ][0-9]{6,9}
-SLASH       \/
+SLASH       (\/|%2F|%2f)
 QMARK       "?"
 QUERY_SEP   [&;]
 EQUAL       "="
 HASH        "#"
+PERCENT     "%"
 
-CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}%]
-PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}
+//CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}]
+CMNCHARS    [A-Za-z013-9\-_~!*'();:@+$,\[\] ^{}]
+PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}|{PERCENT}
 PATHSTR     {PATHCHARS}+
 PATHEXT     \.(\.|{PATHSTR})*
 
-QUERYCHARS  [A-Za-z0-9\-_~@:]
+QUERYCHARS  [A-Za-z0-9\-_~@:?]
     /* %2f and %2F (/) are excluded because they are a special token (SLASH) */
 HEXCHAR     [0-9A-Fa-f]
 HEXCHAR_1   [013-9A-Fa-f]

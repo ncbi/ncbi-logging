@@ -45,9 +45,12 @@ void GCPReceiver::set( GCP_Members m, const t_str & v )
 
 void GCPReceiver::post_process( void )
 {
-    AGENTReceiver agt( m_fmt );
-    AGENTParseBlock pb ( agt );
-    pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+    {
+        AGENTReceiver agt( m_fmt );
+        AGENTParseBlock pb ( agt );
+        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        agent_for_postprocess . clear();        
+    }
 
     {
         URLReceiver url( m_fmt );
@@ -67,15 +70,13 @@ void GCPReceiver::post_process( void )
         }
 
         url . finalize();
+        object_for_postprocess . clear();
+        url_for_postprocess . clear();
     }
 
     // version is always empty in GCP
     t_str empty = { nullptr, 0, false };
     set( ReceiverInterface::vers, empty );
-
-    agent_for_postprocess . clear();
-    object_for_postprocess . clear();
-    url_for_postprocess . clear();
 }
 
 namespace NCBI

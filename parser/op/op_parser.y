@@ -43,22 +43,16 @@ using namespace NCBI::Logging;
 %union
 {
     t_str s;
-    t_request req;
 }
 
-%token<s> STR MONTH IPV4 IPV6 FLOAT METHOD VERS QSTR QSTR_ESC SPACE SLASH QMARK
-%token<s> I64
-%token DOT DASH COLON QUOTE OB CB PORT RL CR LF
-%token UNRECOGNIZED
-%token<s> PATHSTR PATHEXT ACCESSION
-%token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS
-%token<s> PAREN_OPEN PAREN_CLOSE COMMA PHIDVALUE TIME_FMT
+%token<s> STR IPV4 IPV6 FLOAT I64 METHOD VERS QSTR QSTR_ESC SPACE
+%token<s> DASH QUOTE PORT RL UNRECOGNIZED
+%token<s> PATHSTR AGENTSTR TIME_FMT
 
-%type<s> time
-%type<req> server_and_request request url url_token url_entry
-%type<req> request_tail_elem request_tail url_with_optional_params
+%type<s> time server_and_request request space_and_url
+%type<s> request_tail_elem request_tail
 %type<s> ip user req_time referer forwarded method server
-%type<s> quoted_list quoted_list_body quoted_list_elem url_params
+%type<s> quoted_list quoted_list_body quoted_list_elem
 %type<s> agent vdb_agent
 %type<s> result_code result_len port req_len referer_token referer_list
 
@@ -86,6 +80,9 @@ log_onprem
       port  SPACE
       req_len
     {
+        // in case the productions did not find vers/path, set them here to make them at least empty in the ouput
+        SET_VALUE( OPReceiver::vers, EmptyTSTR );
+        SET_VALUE( OPReceiver::path, EmptyTSTR );
     }
     ;
 
@@ -108,7 +105,7 @@ time
     ;
 
 method
-    : METHOD        { $$ = $1; }
+    : METHOD            { SET_VALUE( OPReceiver::method, $1 ); }
     ;
 
 server
@@ -116,173 +113,37 @@ server
     | STR               { SET_VALUE( OPReceiver::server, $1 ); }
     ;
 
-url_token
-    : SLASH
+space_and_url
+    : SPACE { op_start_URL ( scanner ); } PATHSTR
         {
-            InitRequest( $$ );
-            $$ . path = $1;
-        }
-    | ACCESSION
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-            $$ . accession = $1;
-        }
-    | PATHSTR
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-            $$ . filename = $1;
-        }
-    | PATHEXT
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-            $$ . extension = $1;
-        }
-    ;
-
-url_params
-    : QMARK                 { $$ = $1; }
-    | url_params SLASH      { $$ = $1; $$ . n += $2 . n; }
-    | url_params ACCESSION  { $$ = $1; $$ . n += $2 . n; }
-    | url_params PATHSTR    { $$ = $1; $$ . n += $2 . n; }
-    | url_params PATHEXT    { $$ = $1; $$ . n += $2 . n; }
-    | url_params QMARK      { $$ = $1; $$ . n += $2 . n; }
-    ;
-
-url
-    : url_token
-        {
-            $$ = $1;
-            if ( $1 . accession . n > 0 )
-            {
-                $$ . filename  = $1 . accession;
-            }
-        }
-    | url url_token
-        {
-            $$ = $1;
-            $$ . path . n += $2 . path . n;
-
-            // clear the filename and extension after every slash - to make sure we catch only the last
-            // filename and extension in case of middle segments existing
-            if ( $2 . path . n == 1 && $2 . path . p[ 0 ] == '/' )
-            {
-                $$ . filename . n = 0;
-                $$ . extension . n = 0;
-            }
-            else if ( $2 . accession . n > 0 )
-            {
-                // we will use the last non-empty accession-looking token
-                $$ . accession = $2 . accession;
-                $$ . filename  = $2 . accession;
-            }
-            else if ( $2 . filename . n > 0 )
-            {
-                $$ . filename  = $2 . filename;
-                $$ . extension . n = 0;
-            }
-            else if ( $2 . extension . n > 0 )
-            {
-                $$ . extension = $2 . extension;
-            }
-        }
-    ;
-
-url_with_optional_params
-    : url
-        {
-            $$ = $1;
-        }
-    | url url_params
-        {
-            $$ = $1;
-            $$ . path . n += $2 . n;
-        }
-    ;
-
-url_entry
-    : SPACE { op_start_URL ( scanner ); } url_with_optional_params
-        {
-            $$ = $3;
+            lib -> url_for_postprocess = string( $3.p, $3.n );
+            SET_VALUE( OPReceiver::path, $3 );
             op_pop_state ( scanner );
         }
     ;
 
 request_tail_elem
-    : VERS
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-            $$ . vers = $1;
-        }
-    | QSTR
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-        }
-    | QSTR_ESC
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-        }
-    | METHOD
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-        }
-    | SPACE
-        {
-            InitRequest( $$ );
-            $$ . path = $1;
-        }
+    : VERS      { SET_VALUE( OPReceiver::vers, $1 ); }
+    | QSTR      { }
+    | QSTR_ESC  { }
+    | METHOD    { }
+    | SPACE     { }
     ;
 
 request_tail
-    : request_tail_elem
-        { $$ = $1; }
-    | request_tail request_tail_elem
-        {
-            $$ = $1;
-            $$ . path . n += $2 . path .n;
-            $$ . path . escaped = $1 . path . escaped || $2 . path . escaped;
-        }
+    : request_tail_elem                 { }
+    | request_tail request_tail_elem    { }
     ;
 
 request
-    : QUOTE method url_entry SPACE request_tail QUOTE
-    {
-        $$ = $3;
-        $$.method = $2;
-        $$.vers   = $5 . vers;
-    }
-    | QUOTE method url_entry SPACE QUOTE
-    {
-        $$ = $3;
-        $$.method = $2;
-    }
-    | QUOTE method url_entry QUOTE
-    {
-        $$ = $3;
-        $$.method = $2;
-
-        // the scanner was in the PATH state, consumed the closing QUOTE and popped the state,
-        // returning to the QUOTED state which we should get out of as well
-        op_pop_state ( scanner );
-    }
-    | QUOTE method QUOTE
-    {
-        InitRequest( $$ );
-        $$.method = $2;
-    }
+    : QUOTE method space_and_url SPACE request_tail QUOTE { }
+    | QUOTE method space_and_url SPACE QUOTE { }
+    | QUOTE method space_and_url QUOTE { }
+    | QUOTE method QUOTE { }
     ;
 
 server_and_request
-    : server SPACE request
-    {
-        lib->setRequest( $3 );
-    }
+    : server SPACE request              {  }
     | server SPACE quoted_list
     {
         lib->reportField( "Invalid request" );
@@ -290,7 +151,6 @@ server_and_request
     | request
     {
         SET_VALUE( OPReceiver::server, EmptyTSTR );
-        lib->setRequest( $1 );
     }
     ;
 
@@ -344,8 +204,9 @@ referer
     | QUOTE QUOTE               { SET_VALUE( OPReceiver::referer, EmptyTSTR ); }
     ;
 
+// todo: convert vdb-agent to a single token
 vdb_agent
-    : QSTR              { $$ = $1; }
+    : QSTR               { $$ = $1; }
     | vdb_agent QSTR     { $$ = $1; MERGE_TSTR( $$, $2 ); }
     ;
 

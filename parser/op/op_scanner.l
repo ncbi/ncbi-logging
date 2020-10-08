@@ -30,37 +30,22 @@ IPV6_9      :((:{IPV6SEG}){1,7}|:)
 IPV6_10     fe80:(:{IPV6SEG}){0,4}%[0-9a-zA-Z]{1,}
 IPV6_11     ::(ffff(:0{1,4}){0,1}:){0,1}{IPV4ADDR}
 IPV6_12     ({IPV6SEG}:){1,4}:{IPV4ADDR}
-IPV6ADDR   {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_8}|{IPV6_9}|{IPV6_10}|{IPV6_11}|{IPV6_12}
+IPV6ADDR    {IPV6_1}|{IPV6_2}|{IPV6_3}|{IPV6_4}|{IPV6_5}|{IPV6_6}|{IPV6_7}|{IPV6_8}|{IPV6_9}|{IPV6_10}|{IPV6_11}|{IPV6_12}
 
-MONTH   "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
-METHOD  "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"|"PROPFIND"
-VERS    [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
-I64     [-+]?[0-9]+
-FLOAT   [-+]?[0-9]+\.[0-9]+
+METHOD          "GET"|"HEAD"|"POST"|"OPTIONS"|"PUT"|"DELETE"|"TRACE"|"CONNECT"|"PROPFIND"
+VERS            [Hh][Tt][Tt][Pp]"/"([0-9/.]*)
+I64             [-+]?[0-9]+
+FLOAT           [-+]?[0-9]+\.[0-9]+
 
-CHARS       [A-Za-z0-9\-_~!*'();:@&=+$,#\[\]<>|`{}^]
-STR_CHARS   [?\.\/\\%]|{CHARS}|[\x00-\x1f]
+CHARS           [A-Za-z0-9\-_~!*'();:@&=+$,#\[\]<>|`{}^]
+STR_CHARS       [?\.\/\\%]|{CHARS}|[\x00-\x1f]
 
-QSTR        {STR_CHARS}+
-QSTR_ESC    (\\\"|{STR_CHARS})+
+QSTR            {STR_CHARS}+
+QSTR_ESC        (\\\"|{STR_CHARS})+
+PATHSTR         {QSTR_ESC}
 
-ACCESSION   [DES]R[RZXP][0-9]{6,9}
-
-    /* %2f and %2F (/) are excluded because they are a special token (SLASH) */
-HEXCHAR     [0-9A-Fa-f]
-HEXCHAR_1   [013-9A-Fa-f]
-HEXCHAR_2   [0-9A-Ea-e]
-URL_BYTE_1  %{HEXCHAR_1}{HEXCHAR_2}
-URL_BYTE_2  %{HEXCHAR_1}{HEXCHAR}
-URL_BYTE_3  %{HEXCHAR}{HEXCHAR_2}
-
-URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
-
-PATHSTR     ({URL_BYTE}|{CHARS})+
-PATHEXT     \.{PATHSTR}*
-
-SPACE   " "
-STR     [.\-a-zA-Z0-9_]+
+SPACE           " "
+STR             [.\-a-zA-Z0-9_]+
 
 AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/(),=\\. ]
 AGENTSTR        (\\\"|{AGENTCHARS})+
@@ -69,6 +54,7 @@ INT4            [0-9]{4}
 INT3            [0-9]{3}
 INT2            [0-9]{2}
 TIMEZONE        [-+]?[0-9]{4}
+MONTH           "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZONE}"]"
 
 %x QUOTED PATH AGENT TIMEFMT
@@ -94,19 +80,8 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }
 <TIMEFMT>.          { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
-<PATH>{ACCESSION}   { MAKE_STR(); return ACCESSION; }
-<PATH>{SPACE}       { MAKE_STR(); return SPACE; }
-<PATH>\\\"          { MAKE_STR(); return PATHSTR; }
-<PATH>\"            { MAKE_STR(); return QUOTE; }
-<PATH>\?            { MAKE_STR(); return QMARK; }
-<PATH>\/            { MAKE_STR(); return SLASH; };
-<PATH>\\            { MAKE_STR(); return PATHSTR; };
-<PATH>%2[Ff]        { MAKE_STR(); return SLASH; };
-<PATH>%2[Aa]        { MAKE_STR(); return PATHSTR; };
-<PATH>%             { MAKE_STR(); return PATHSTR; };
-<PATH>{PATHEXT}     { MAKE_STR(); return PATHEXT; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
-<PATH>.             { return yytext[0]; };
+<PATH>.             { MAKE_STR(); return UNRECOGNIZED; };
 
 <AGENT>\"           { MAKE_STR(); return QUOTE; }
 <AGENT>{AGENTSTR}   { MAKE_STR(); return QSTR; }
@@ -116,7 +91,6 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 {IPV6ADDR}      { MAKE_STR(); return IPV6; }
 {FLOAT}         { MAKE_STR(); return FLOAT; }
 {I64}           { MAKE_STR(); return I64; }
-{MONTH}         { MAKE_STR(); return MONTH; }
 {STR}           { MAKE_STR(); return STR; }
 
 .               { MAKE_STR(); return UNRECOGNIZED; }
