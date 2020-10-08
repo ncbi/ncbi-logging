@@ -220,7 +220,7 @@ url
     : SPACE { aws_start_URL( scanner ); } PATHSTR
     {
         SET_VALUE( AWSReceiver::path, $3 );
-        lib -> path_for_postprocess = string( $3.p, $3.n );
+        lib -> url_for_postprocess = string( $3.p, $3.n );
     }
     ;
 
