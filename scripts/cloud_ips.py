@@ -85,7 +85,7 @@ with urllib.request.urlopen(
     AWS_JSON = response.read()
 
 with urllib.request.urlopen(
-    "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20200914.json"
+    "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20201005.json"
 ) as response:
     AZURE_JSON = json.load(response)
 

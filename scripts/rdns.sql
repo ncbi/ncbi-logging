@@ -1,5 +1,5 @@
--- sqlite3 rdns.db < rdns.sql
 -- Update uniq_ips below first
+-- sqlite3 rdns.db < rdns.sql
 
 .headers on
 .bail on
@@ -8,7 +8,7 @@
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20200914.json  uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201009.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -181,10 +181,11 @@ WHERE IP LIKE '152.16.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'utexas.edu'
+SET DOMAIN = 'utexas.edu (University of Texas)'
 WHERE IP LIKE '206.76.%'
   OR IP LIKE'206.77.%'
-OR IP LIKE '129.112.%';
+OR IP LIKE '129.112.%'
+OR IP LIKE '129.106.%';
 
 
 UPDATE RDNS
@@ -650,7 +651,8 @@ WHERE IP LIKE '129.74.%';
 
 UPDATE RDNS
 SET DOMAIN = 'uq.edu.au (University of Queensland)'
-WHERE IP LIKE '130.102.%';
+WHERE IP LIKE '130.102.%'
+OR IP LIKE  '203.101.%';
 
 
 UPDATE RDNS
@@ -1015,7 +1017,8 @@ WHERE IP LIKE '203.0.19.%';
 
 UPDATE RDNS
 SET DOMAIN='ethz.ch (Swiss Federal Institute of Technology Zurich)'
-WHERE IP LIKE '82.130.8%';
+WHERE IP LIKE '82.130.8%'
+or IP LIKE '130.60.%';
 
 UPDATE RDNS
 SET DOMAIN='init7.net (Switzerland Init Seven AG)'
@@ -1085,6 +1088,20 @@ where ip like '202.241.%';
 update rdns
 set domain='cam.ac.uk (University of Cambridge)'
 where ip like '131.111.%';
+
+update rdns
+set domain='nyp.org (New York Presbyterian Hospital)'
+where ip like '156.145.%';
+
+update rdns
+set domain='umn.edu (University of Minnesota)'
+where ip like '128.101.%';
+
+update rdns
+set domain='buffalo.edu (SUNY Buffalo)'
+where ip like '128.205.%';
+
+
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
