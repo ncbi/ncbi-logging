@@ -12,6 +12,10 @@
         EMPTY_TSTR( yylval -> s . extension ); \
     } while(false)
 
+#define RETURN( token ) do { MAKE_STR(); return token; } while ( false )
+
+#define POP() yy_pop_state( yyscanner )
+#define PUSH( state ) yy_push_state( state, yyscanner )
 %}
 
 %option noyywrap yylineno
@@ -27,14 +31,13 @@ QUERY_SEP   [&;]
 EQUAL       "="
 HASH        "#"
 PERCENT     "%"
+DOT         \.
 
-//CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}]
-CMNCHARS    [A-Za-z013-9\-_~!*'();:@+$,\[\] ^{}]
-PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}|{PERCENT}
+CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}]
+PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}|{URL_BYTE}
 PATHSTR     {PATHCHARS}+
-PATHEXT     \.(\.|{PATHSTR})*
 
-QUERYCHARS  [A-Za-z0-9\-_~@:?]
+QUERYCHARS  [A-Za-z0-9\-_~@:?<>]
     /* %2f and %2F (/) are excluded because they are a special token (SLASH) */
 HEXCHAR     [0-9A-Fa-f]
 HEXCHAR_1   [013-9A-Fa-f]
@@ -45,35 +48,52 @@ URL_BYTE_3  %{HEXCHAR}{HEXCHAR_2}
 URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
 
     /* allowing unncoded / in a query is not by the rules but real world examples use it */
-QUERY_SLASH (\/|%2F|%2f)
 QUERY_TOKEN ({URL_BYTE}|{QUERYCHARS})+
-QUERY_EXT   \.(\.|{QUERY_TOKEN})*
 
-%x QUERYSTATE FRAGSTATE
+%x EXTENSION QUERYSTATE QUERY_EXTENSION FRAGSTATE
 
 %%
 
 [ \t]+          { /*TODO: has to be URL-encodeed, so an error? */ }
 
-{ACCESSION}     { MAKE_STR(); return ACCESSION; }
-{SLASH}         { MAKE_STR(); return SLASH; }
-{PATHSTR}       { MAKE_STR(); return PATHSTR; }
-{PATHEXT}       { MAKE_STR(); return PATHEXT; }
-{QMARK}         { yy_push_state( QUERYSTATE, yyscanner ); MAKE_STR(); return QMARK; }
-{HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }
+{ACCESSION}     { RETURN(  ACCESSION ); }
+{SLASH}         { RETURN(  SLASH ); }
+{PERCENT}       { RETURN(  PERCENT ); }
+{DOT}           { PUSH( EXTENSION ); RETURN( DOT ); }
+{PATHSTR}       { RETURN( PATHSTR ); }
+{QMARK}         { PUSH( QUERYSTATE ); RETURN( QMARK ); }
+{HASH}          { PUSH( FRAGSTATE ); RETURN( HASH ); }
 
-<QUERYSTATE>{QUERY_SEP}     { MAKE_STR(); return QUERY_SEP; }
-<QUERYSTATE>{EQUAL}         { MAKE_STR(); return EQUAL; }
-<QUERYSTATE>{ACCESSION}     { MAKE_STR(); return ACCESSION; }
-<QUERYSTATE>{QUERY_SLASH}   { MAKE_STR(); return SLASH; }
-<QUERYSTATE>{QUERY_EXT}     { MAKE_STR(); return PATHEXT; }
-<QUERYSTATE>{QUERY_TOKEN}   { MAKE_STR(); return PATHSTR; }
-<QUERYSTATE>{HASH}          { yy_push_state( FRAGSTATE, yyscanner ); MAKE_STR(); return HASH; }
-<QUERYSTATE>.               { MAKE_STR(); return UNRECOGNIZED; }
+<EXTENSION>{SLASH}         { POP(); RETURN( SLASH ); }
+<EXTENSION>{QMARK}         { POP(); PUSH( QUERYSTATE ); RETURN( QMARK ); }
+<EXTENSION>{HASH}          { POP(); PUSH( FRAGSTATE ); RETURN( HASH ); }
+<EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
+<EXTENSION>{DOT}           { RETURN( EXTSTR ); }
+<EXTENSION>{PATHSTR}       { RETURN( EXTSTR ); }
+<EXTENSION>.               { RETURN( UNRECOGNIZED ); }
 
-<FRAGSTATE>.*               { MAKE_STR(); return FRAGMENT_TOKEN; }
+<QUERYSTATE>{QUERY_SEP}         { RETURN( QUERY_SEP ); }
+<QUERYSTATE>{EQUAL}             { RETURN( EQUAL ); }
+<QUERYSTATE>{ACCESSION}         { RETURN( ACCESSION ); }
+<QUERYSTATE>{SLASH}             { RETURN( SLASH ); }
+<QUERYSTATE>{PERCENT}           { RETURN( PERCENT ); }
+<QUERYSTATE>{DOT}               { PUSH( QUERY_EXTENSION ); RETURN( DOT ); }
+<QUERYSTATE>{QUERY_TOKEN}       { RETURN( PATHSTR ); }
+<QUERYSTATE>{HASH}              { PUSH( FRAGSTATE ); RETURN( HASH ); }
+<QUERYSTATE>.                   { RETURN( UNRECOGNIZED ); }
 
-.                           { MAKE_STR(); return UNRECOGNIZED; }
+<QUERY_EXTENSION>{QUERY_SEP}     { POP(); RETURN( QUERY_SEP ); }
+<QUERY_EXTENSION>{EQUAL}         { POP(); RETURN( EQUAL ); }
+<QUERY_EXTENSION>{SLASH}         { POP(); RETURN( SLASH ); }
+<QUERY_EXTENSION>{HASH}          { POP(); POP(); PUSH( FRAGSTATE ); RETURN( HASH ); }
+<QUERY_EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
+<QUERY_EXTENSION>{DOT}           { RETURN( EXTSTR ); }
+<QUERY_EXTENSION>{QUERY_TOKEN}   { RETURN( EXTSTR ); }
+<QUERY_EXTENSION>.               { RETURN( UNRECOGNIZED ); }
+
+<FRAGSTATE>.*               { RETURN( FRAGMENT_TOKEN ); }
+
+.                           { RETURN( UNRECOGNIZED ); }
 
 %%
 

@@ -35,16 +35,15 @@ ParseBlockInterface :: receive_one_line( const char * line, size_t line_size, si
     {
         receiver . SetCategory( ReceiverInterface::cat_ugly );
     }
+    else if ( receiver . GetCategory() == ReceiverInterface::cat_good )
+    {
+        receiver.post_process();
+    }
 
     if ( receiver . GetCategory() != ReceiverInterface::cat_good )
     {
-
         receiver.GetFormatter().addNameValue("_line_nr", line_nr);
         receiver.setMember( "_unparsed", { line, line_size, false } );
-    }
-    else
-    {
-        receiver.post_process();
     }
 }
 

@@ -101,6 +101,13 @@ TEST_F( OPTestFixture, ErrorRecovery )
                 s_outputs.get_good() );
 }
 
+TEST_F( OPTestFixture, bad_path )
+{
+    std::string res = try_to_parse_review( "13.59.252.14 - - [07/Jun/2020:01:09:44 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET ..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5Cwindows\\x5Cwin.ini HTTP/1.1\" 400 150 0.012 \"-\" \"-\" \"-\" port=80 rl=0" );
+    ASSERT_EQ( "1", extract_value( res, "_line_nr" ) );
+    ASSERT_EQ( "Invalid URL query", extract_value( res, "_error" ) );
+}
+
 TEST_F( OPTestFixture, unrecognized_char )
 {
     std::string res = try_to_parse_ugly( "line1 \07" );
@@ -171,6 +178,12 @@ TEST_F( OPTestFixture, parse_noserver_request_full )
     ASSERT_EQ( "", extract_value( res, "server" ) );
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
     ASSERT_EQ( "url", extract_value( res, "path" ) );
+    ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
+}
+
+TEST_F( OPTestFixture, parse_request_invalid_with_version )
+{   // go through the tail of path to find a version, even if the request is invalid
+    std::string res = try_to_parse_good( "159.226.149.175 - - [15/Aug/2018:10:31:47 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"HEAD /srapub/SRR5385591.sra > SRR5385591.sra.out 2>&1 HTTP/1.1\" 404 0 0.000 \"-\" \"linux64 sra-toolkit test-sra.2.8.2\" \"-\" port=443 rl=164" );
     ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
 }
 
@@ -381,8 +394,8 @@ TEST_F( OPTestFixture, parse_path_with_url_encoded_slash_in_extension )
 {
     std::string res = try_to_parse_good( "0123:4567:89ab:cdef::1.2.3.4 - usr [01/Jan/2020:02:50:24 -0500] srv \"GET /SRR9154112/%2A.fastq%2f HTTP/1.1\" 1 2 3 \"\" \"\" \"fwd\" port=4 rl=5" );
     ASSERT_EQ( "SRR9154112", extract_value( res, "accession" ) );
-    ASSERT_EQ( "%2A", extract_value( res, "filename" ) );
-    ASSERT_EQ( ".fastq", extract_value( res, "extension" ) );
+    ASSERT_EQ( "SRR9154112", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
 extern "C"

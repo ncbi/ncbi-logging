@@ -123,6 +123,14 @@ TEST_F( URLTestFixture, AccessionExtension )
     ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
 }
 
+TEST_F( URLTestFixture, PathDotOnly )
+{
+    const std::string res = try_to_parse_good( "/." );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".", extract_value( res, "extension" ) );
+}
+
 TEST_F( URLTestFixture, AccessionAsFilename )
 {
     const std::string res = try_to_parse_good( "SRR000123.ext1.ext2.ext3" );
@@ -182,8 +190,8 @@ TEST_F( URLTestFixture, PathWithPct )
 TEST_F( URLTestFixture, PathWithSlashURLEnc )
 {
     const std::string res = try_to_parse_good( "ERR792423%2F5141526_%s1_p0.bas.h5.1%ab" );
-    ASSERT_EQ( "", extract_value( res, "accession" ) );
-    ASSERT_EQ( "ERR792423%2F5141526_%s1_p0", extract_value( res, "filename" ) );
+    ASSERT_EQ( "ERR792423", extract_value( res, "accession" ) );
+    ASSERT_EQ( "5141526_%s1_p0", extract_value( res, "filename" ) );
     ASSERT_EQ( ".bas.h5.1%ab", extract_value( res, "extension" ) );
 }
 
@@ -227,13 +235,23 @@ TEST_F( URLTestFixture, ThereIsAEscapedQuoteInThePath )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( URLTestFixture, ExampleFromOP )
+TEST_F( URLTestFixture, EncodedSlashInPath )
 {
     const std::string res = try_to_parse_good( "sos1%2Fsra-pub-run-2%2FSRR8422826%2FSRR8422826.1" );
     ASSERT_EQ( "SRR8422826", extract_value( res, "accession" ) );
     ASSERT_EQ( "SRR8422826", extract_value( res, "filename" ) );
     ASSERT_EQ( ".1", extract_value( res, "extension" ) );
 }
+
+
+TEST_F( URLTestFixture, Investigate )
+{
+    const std::string res = try_to_parse_good( "/cgi-bin/d6rw1r5y.asp?<script>document.cookie=%22testtifh=7678;%22</script>" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "d6rw1r5y", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".asp", extract_value( res, "extension" ) );
+}
+
 //---------------------------------------------------------------------
 
 TEST_F( URLTestFixture, QMJustAccession )
@@ -374,5 +392,13 @@ TEST_F( URLTestFixture, QMDoNotMixFilenamAndExtensionFormDifferentPathSegments2 
     ASSERT_EQ( "", extract_value( res, "accession" ) );
     ASSERT_EQ( "filename", extract_value( res, "filename" ) );
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QM_QM_in_extension )
+{   // '?' inside a query is threated as a regular character
+    const std::string res = try_to_parse_good( "/?p=somewhere.?1" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "somewhere", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".?1", extract_value( res, "extension" ) );
 }
 

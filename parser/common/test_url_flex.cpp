@@ -57,12 +57,32 @@ TEST_F ( URL_TestFlexFixture, Slash1 )          { ASSERT_EQ( SLASH,     StartSca
 TEST_F ( URL_TestFlexFixture, Slash2 )          { ASSERT_EQ( SLASH,     StartScan( "%2F" ) ); }
 
 TEST_F ( URL_TestFlexFixture, PathStr )         { ASSERT_EQ( PATHSTR,   StartScan( "abc&12=34" ) ); ASSERT_EQ( "abc&12=34", TokenValue() ); }
-TEST_F ( URL_TestFlexFixture, PathExt1 )        { ASSERT_EQ( PATHEXT,   StartScan( ".txt" ) ); ASSERT_EQ( ".txt", TokenValue() ); }
-TEST_F ( URL_TestFlexFixture, PathExt2 )        { ASSERT_EQ( PATHEXT,   StartScan( ".txt.1.2" ) ); ASSERT_EQ( ".txt.1.2", TokenValue() ); }
+
+TEST_F ( URL_TestFlexFixture, Percent )         { ASSERT_EQ( PERCENT,     StartScan( "%" ) ); }
+TEST_F ( URL_TestFlexFixture, PathStrWithPct )
+{
+    ASSERT_EQ( PATHSTR,   StartScan( "a%c/12=34" ) );
+    ASSERT_EQ( "a", TokenValue() );
+    ASSERT_EQ( PERCENT, NextTokenType() );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
+    ASSERT_EQ( "c", TokenValue() );
+}
+TEST_F ( URL_TestFlexFixture, PathStrWithURLEncoding )
+{
+    ASSERT_EQ( PATHSTR,   StartScan( "a%1f/12=34" ) );
+    ASSERT_EQ( "a%1f", TokenValue() );
+}
+
+TEST_F ( URL_TestFlexFixture, PathDot )
+{
+    ASSERT_EQ( DOT,   StartScan( ".txt" ) );
+    ASSERT_EQ( EXTSTR, NextTokenType() );
+    ASSERT_EQ( "txt", TokenValue() );
+}
 
 TEST_F ( URL_TestFlexFixture, PathTokens )
 {
-    ASSERT_EQ( SLASH, StartScan( "/part1/part2/leaf.txt" ) );
+    ASSERT_EQ( SLASH, StartScan( "/part1/part2/leaf.txt/a" ) );
     ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "part1", TokenValue() );
     ASSERT_EQ( SLASH, NextTokenType() );
@@ -71,8 +91,12 @@ TEST_F ( URL_TestFlexFixture, PathTokens )
     ASSERT_EQ( SLASH, NextTokenType() );
     ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "leaf", TokenValue() );
-    ASSERT_EQ( PATHEXT, NextTokenType() );
-    ASSERT_EQ( ".txt", TokenValue() );
+    ASSERT_EQ( DOT,   NextTokenType() );
+    ASSERT_EQ( EXTSTR, NextTokenType() );
+    ASSERT_EQ( "txt", TokenValue() );
+    ASSERT_EQ( SLASH, NextTokenType() ); // scanner is back to the default state
+    ASSERT_EQ( PATHSTR, NextTokenType() );
+    ASSERT_EQ( "a", TokenValue() );
 }
 
 TEST_F ( URL_TestFlexFixture, Qmark )           { ASSERT_EQ( QMARK,     StartScan( "?" ) ); }
@@ -109,12 +133,17 @@ TEST_F ( URL_TestFlexFixture, QToken2 )
 TEST_F ( URL_TestFlexFixture, QEncodedValues )
 {   // in the query, recognize %2f and %2F as s separte token (SLASH),
     // other encodings as regular characters
-    ASSERT_EQ( QMARK, StartScan( "?a1=b%cd&e=f%2fgh" ) );
+    ASSERT_EQ( QMARK, StartScan( "?a1=b%cd%g&e=f%2fgh" ) );
     ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "a1", TokenValue() );
     ASSERT_EQ( EQUAL, NextTokenType() );
+
     ASSERT_EQ( PATHSTR, NextTokenType() );
-    ASSERT_EQ( "b%cd", TokenValue() );
+    ASSERT_EQ( "b%cd", TokenValue() );  // cd is hex!
+    ASSERT_EQ( PERCENT, NextTokenType() );// g is not hex!
+    ASSERT_EQ( PATHSTR, NextTokenType() );
+    ASSERT_EQ( "g", TokenValue() );
+
     ASSERT_EQ( QUERY_SEP, NextTokenType() );
     ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "e", TokenValue() );

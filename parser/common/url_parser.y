@@ -23,11 +23,11 @@
 
     Node Merge( const Node & to, const Node & from)
     {
-// printf("accession=%.*s<-%.*s\n", to.accession.n, to.accession.p, from.accession.n, from.accession.p );
-// printf("filename=%.*s<-%.*s\n", to.filename.n, to.filename.p, from.filename.n, from.filename.p );
-// printf("extension=%.*s<-%.*s\n", to.extension.n, to.extension.p, from.extension.n, from.extension.p );
-// printf("from.str=%.*s\n", from.str.n, from.str.p );
-// printf("from.type=%i\n", from.type );
+//   printf("accession=%.*s<-%.*s\n", to.accession.n, to.accession.p, from.accession.n, from.accession.p );
+//   printf("filename=%.*s<-%.*s\n", to.filename.n, to.filename.p, from.filename.n, from.filename.p );
+//  printf("extension=%.*s<-%.*s\n", to.extension.n, to.extension.p, from.extension.n, from.extension.p );
+//  printf("from.str=%.*s\n", from.str.n, from.str.p );
+//  printf("from.type=%i\n", from.type );
 
         Node ret = to;
 
@@ -100,13 +100,12 @@
     Node s;
 }
 
-%token<s> ACCESSION PATHSTR PATHEXT SLASH
+%token<s> ACCESSION PATHSTR DOT SLASH PERCENT PATHEXT EXTSTR EXTPERCENT
 %token<s> QMARK QUERY_SEP EQUAL QUERY_TOKEN
 %token<s> HASH FRAGMENT_TOKEN UNRECOGNIZED
 
-%type<s> path path_list path_token
-%type<s> query query_list query_key query_entry query_token_list query_token
-%type<s> fragment
+%type<s> path path_list extension ext_list ext_element path_element
+%type<s> query query_list query_key query_entry fragment value_list value_element
 
 %start url_line
 
@@ -194,62 +193,96 @@ url_line
             YYACCEPT;
         }
     | path query error  { lib->reportField( "Invalid URL query" ); YYACCEPT; }
+    /*| path error        { lib->reportField( "Invalid URL path" ); YYACCEPT; }*/
+    /*| error             { lib->reportField( "Invalid URL path" ); YYACCEPT; }*/
     ;
 
 /********************************************* Path ***************************************/
+
+ext_element
+    : EXTSTR        { $$ = $1; }
+    | EXTPERCENT    { $$ = $1; }
+    ;
+
+ext_list
+    : ext_element           { $$ = $1; }
+    | ext_list ext_element  { $$ = $1; MERGE_TSTR( $$ . str, $2 . str ); }
+    ;
+
+extension
+    : DOT ext_list
+        {
+            $$ = $1;
+            MERGE_TSTR( $$ . str, $2 . str );
+            $$ . type = PATHEXT;
+        }
+    | DOT
+        {
+            $$ = $1;
+            $$ . type = PATHEXT;
+        }
+    ;
+
+path_element
+    : ACCESSION     { $$ = $1; $$ . type = ACCESSION; $$ . accession = $$ . str; }
+    | PATHSTR       { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
+    | PERCENT       { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
+    | extension     { $$ = $1; }
+    | SLASH         { $$ = $1; $$ . type = SLASH; }
+    ;
+
+path_list
+    : path_element              { $$ = $1; }
+    | path_list path_element
+        {
+            if ( $1 . type == PATHSTR && $2 . type == PATHSTR )
+            {   // filenames in a path can come as a sequence of tokens (e.g. "dir/a%b");
+                // reassemble consequtive PATHSTRs into a single filename if needed
+                $$ . filename = $1 . filename;
+                MERGE_TSTR( $$ . filename, $2 . filename );
+            }
+            else
+            {
+                $$ = Merge( $1, $2 );
+            }
+        }
+    ;
 
 path
     : path_list { $$ = $1; }
     | %empty    { Init_Node( $$ ); }
     ;
 
-path_token
-    : ACCESSION         { $$ = $1; $$ . type = ACCESSION; $$ . accession = $$ . str; }
-    | PATHSTR           { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
-    | PATHEXT           { $$ = $1; $$ . type = PATHEXT; $$ . extension = $$ . str; }
-    | SLASH             { $$ = $1; $$ . type = SLASH; }
-    ;
-
-path_list
-    : path_token
-        {
-            $$ = $1;
-        }
-    | path_list path_token
-        {
-            $$ = Merge( $1, $2 );
-        }
-    ;
-
 /********************************************* URL ***************************************/
 
-query_token
-    : ACCESSION         { $$ = $1; $$ . type = ACCESSION; $$ . accession = $$ . str; }
-    | PATHSTR           { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
-    | PATHEXT           { $$ = $1; $$ . type = PATHEXT; $$ . extension = $$ . str; }
-    | SLASH             { $$ = $1; $$ . type = SLASH; }
-    | QUERY_TOKEN       { $$ = $1; $$ . type = QUERY_TOKEN; }
+value_element
+    : ACCESSION     { $$ = $1; $$ . type = ACCESSION; $$ . accession = $$ . str; }
+    | PATHSTR       { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
+    | PERCENT       { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
+    | SLASH         { $$ = $1; $$ . type = SLASH; }
+    | extension     { $$ = $1; }
     ;
 
-query_token_list
-    : query_token
+value_list
+    : value_element                     { $$ = $1; }
+    | value_list value_element          { $$ = Merge( $1, $2 ); }
+    | value_list value_element EQUAL
         {
-            $$ = $1;
-        }
-    | query_token_list query_token
-        {
+            MERGE_TSTR( $2 . str, $3 . str );
+            $$ . type = PATHSTR;
             $$ = Merge( $1, $2 );
         }
+    | EQUAL                             { $$ = $1; $$ . type = PATHSTR; }
     ;
 
 query_key
-    : QUERY_TOKEN   { Init_Node( $$ ); }
-    | PATHSTR       { Init_Node( $$ ); }
+    : QUERY_TOKEN  {}
+    | PATHSTR      {}
     ;
 
 query_entry
-    : query_key EQUAL query_token_list  { /* ignore the key, report the value */ $$ = $3; }
-    | query_token_list                  { $$ = $1; }
+    : query_key EQUAL value_list  { /* ignore the key, report the value */ $$ = $3; }
+    | value_list                  { $$ = $1; }
     ;
 
 query_list
