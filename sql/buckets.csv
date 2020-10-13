@@ -34,6 +34,10 @@ GS,sra-ca-zq-5,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"E
 GS,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-logs-1,logmon,private,true,"ETL - BQS","GS log",hot
 GS,sra-pub-run-1,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
 GS,sra-pub-run-1-logs,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-10,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-11,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-12,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
+GS,sra-pub-run-13,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
 GS,sra-pub-run-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
 GS,sra-pub-run-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
 GS,sra-pub-run-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,"ETL + BQS","GS log",cold
@@ -48,6 +52,10 @@ GS,sra-pub-src-11,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,tru
 GS,sra-pub-src-12,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
 GS,sra-pub-src-13,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
 GS,sra-pub-src-14,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-15,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-16,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-17,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
+GS,sra-pub-src-18,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
 GS,sra-pub-src-2,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",hot
 GS,sra-pub-src-3,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
 GS,sra-pub-src-4,,nih-sra-datastore,sra-pub-logs-1,strides-analytics,public,true,Original,"GS log",cold
@@ -150,6 +158,10 @@ S3,sra-ca-zq-6,,nih-sra-datastore-protected,sra-ca-run-logs,logmon,private,true,
 S3,sra-pub-metadata-us-east-1,"Athena metadata",Efremov,sra-pub-src-1-logs,s3_readers,public,false,metadata,"S3 log",hot
 S3,sra-pub-run-1,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
 S3,sra-pub-run-1-logs,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-10,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-11,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-12,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
+S3,sra-pub-run-13,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
 S3,sra-pub-run-2,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
 S3,sra-pub-run-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
 S3,sra-pub-run-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL + BQS","S3 log",cold
@@ -166,6 +178,10 @@ S3,sra-pub-src-11,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,
 S3,sra-pub-src-12,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
 S3,sra-pub-src-13,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
 S3,sra-pub-src-14,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-15,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-16,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-17,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
+S3,sra-pub-src-18,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
 S3,sra-pub-src-2,,nih-nlm-ncbi-sra-opendata,sra-pub-src-1-logs,s3_readers,public,true,Original,"S3 log",hot
 S3,sra-pub-src-3,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold
 S3,sra-pub-src-4,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,Original,"S3 log",cold

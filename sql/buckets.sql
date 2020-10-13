@@ -106,6 +106,10 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-11'
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-12');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-13');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-14');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-15');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-16');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-17');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-src-18');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-2');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-3');
@@ -115,6 +119,10 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-6')
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-7');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-8');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-9');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-10');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-11');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-12');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-13');
 
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-2');
