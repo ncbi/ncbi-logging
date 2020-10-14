@@ -105,7 +105,6 @@ TEST_F ( OP_TestFlexFixture, Embedded_CtlChars )
     ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_EQ( 14, token . s . n );
     ASSERT_EQ( 0, memcmp( str, token . s . p, token . s . n ) );
-    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedString )
@@ -113,7 +112,6 @@ TEST_F ( OP_TestFlexFixture, QuotedString )
     #define str ".Bl0-_~!*'();:@&=+$,/%#[]?\\<>|`{}^"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( QSTR, NextTokenType() ); ASSERT_EQ( str, TokenValue() );
-    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     #undef str
 }
 TEST_F ( OP_TestFlexFixture, QuotedNonAscii )
@@ -131,7 +129,6 @@ TEST_F ( OP_TestFlexFixture, QuotedEscapedQuote )
 {
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
     ASSERT_EQ( QSTR, NextTokenType() );
-    ASSERT_TRUE ( token . s . escaped );
     ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str

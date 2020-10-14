@@ -19,7 +19,7 @@
 
     void url_error( yyscan_t locp, NCBI::Logging::URLReceiver * lib, const char* msg );
 
-    const t_str EmptyTSTR = { "", 0, false };
+    const t_str EmptyTSTR = { "", 0 };
 
     Node Merge( const Node & to, const Node & from)
     {

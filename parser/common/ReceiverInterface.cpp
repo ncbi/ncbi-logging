@@ -84,7 +84,7 @@ void ReceiverInterface::reportField( const char * message )
         m_cat = cat_review;
     try
     {
-        t_str msg { message, strlen( message ), false };
+        t_str msg { message, strlen( message ) };
         m_fmt -> addNameValue( "_error", msg );
     }
     catch ( const ncbi::InvalidUTF8String & ex )

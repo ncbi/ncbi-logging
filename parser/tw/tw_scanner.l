@@ -2,7 +2,7 @@
 #include "tw_parser.hpp"
 #include "stdint.h"
 
-#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; } while(false)
 
 %}
 

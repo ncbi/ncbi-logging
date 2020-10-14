@@ -2,8 +2,7 @@
 #include "gcp_parser.hpp"
 #include "stdint.h"
 
-#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
-#define MAKE_STR_ESCAPED()  do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = true; }  while(false)
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; } while(false)
 
 %}
 
@@ -62,7 +61,7 @@ AGENTSTR        (\\\"|{AGENTCHARS})+
 <QUOTED>{IPV4ADDR}  { MAKE_STR(); return IPV4; }
 <QUOTED>{IPV6ADDR}  { MAKE_STR(); return IPV6; }
 <QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
-<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED(); return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR(); return QSTR; }
 <QUOTED>.           { }
 
 <PATH>\"            { MAKE_STR(); return QUOTE; }

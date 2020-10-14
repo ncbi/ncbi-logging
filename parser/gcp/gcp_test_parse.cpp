@@ -11,8 +11,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-#define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); (t).escaped = false; } while (false)
-#define INIT_TSTR_ESC(t, s) do { (t).p = s; (t).n = strlen(s); (t).escaped = true; } while (false)
+#define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); } while (false)
 
 TEST(GCPReceiverTest, Create)
 {
@@ -39,13 +38,13 @@ TEST(LogGCPEventTest, Setters)
 
     INIT_TSTR( v, "tim"); e.set(GCPReceiver::time, v);
     INIT_TSTR( v, "ipt"); e.set(GCPReceiver::ip_type, v);
-    INIT_TSTR( v, "ipr");e.set(GCPReceiver::ip_region, v);
+    INIT_TSTR( v, "ipr"); e.set(GCPReceiver::ip_region, v);
     INIT_TSTR( v, "uri"); e.set(GCPReceiver::uri, v);
     INIT_TSTR( v, "sta"); e.set(GCPReceiver::status, v);
     INIT_TSTR( v, "rqb"); e.set(GCPReceiver::request_bytes, v);
     INIT_TSTR( v, "rsb"); e.set(GCPReceiver::result_bytes, v);
-    INIT_TSTR( v, "tt"); e.set(GCPReceiver::time_taken, v);
-    INIT_TSTR( v, "h"); e.set(GCPReceiver::host, v);
+    INIT_TSTR( v, "tt");  e.set(GCPReceiver::time_taken, v);
+    INIT_TSTR( v, "h");   e.set(GCPReceiver::host, v);
     INIT_TSTR( v, "rid"); e.set(GCPReceiver::request_id, v);
     INIT_TSTR( v, "ope"); e.set(GCPReceiver::operation, v);
     INIT_TSTR( v, "buc"); e.set(GCPReceiver::bucket, v);

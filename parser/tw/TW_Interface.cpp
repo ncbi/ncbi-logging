@@ -154,7 +154,7 @@ extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const cha
 {
     const JSONValue &entry = obj . getValue ( fieldname );
     const String &S = entry . toString();
-    t_str s = { S . data(), S . size(), false };
+    t_str s = { S . data(), S . size() };
     formatter . addNameValue( fieldname, s );
 }
 

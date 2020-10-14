@@ -19,7 +19,7 @@ using namespace NCBI::Logging;
 
 void op_error( yyscan_t locp, NCBI::Logging::OPReceiver * lib, const char* msg );
 
-const t_str EmptyTSTR = { "", 0, false };
+const t_str EmptyTSTR = { "", 0 };
 
 #define SET_VALUE( selector, source )   ( lib -> set( (selector), (source) ) )
 
@@ -167,9 +167,9 @@ quoted_list_elem
 
 quoted_list_body
     : quoted_list_elem                          { $$ = $1; }
-    | quoted_list_body SPACE quoted_list_elem   { $$ = $1; $$.n += 1 + $3.n; $$.escaped = $1.escaped || $3.escaped; }
+    | quoted_list_body SPACE quoted_list_elem   { $$ = $1; $$.n += 1 + $3.n; }
     | quoted_list_body SPACE                    { $$ = $1; $$.n += 1; }
-    | quoted_list_body METHOD                   { $$ = $1; $$.n += $2.n; $$.escaped = $1.escaped || $2.escaped; }
+    | quoted_list_body METHOD                   { $$ = $1; $$.n += $2.n; }
     ;
 
 result_code

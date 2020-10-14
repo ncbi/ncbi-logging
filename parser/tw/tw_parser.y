@@ -19,7 +19,7 @@ using namespace NCBI::Logging;
 
 void tw_error( yyscan_t locp, NCBI::Logging::TWReceiver * lib, const char* msg );
 
-const t_str EmptyTSTR = { "", 0, false };
+const t_str EmptyTSTR = { "", 0 };
 
 #define SET_VALUE( selector, source )   ( lib -> set( (selector), (source) ) )
 

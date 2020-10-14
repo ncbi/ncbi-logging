@@ -2,8 +2,7 @@
 #include "op_parser.hpp"
 #include "stdint.h"
 
-#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; } while(false)
-#define MAKE_STR_ESCAPED()  do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = true; }  while(false)
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; } while(false)
 
 %}
 
@@ -74,7 +73,7 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
 <QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
-<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR();   return QSTR; }
 <QUOTED>.           { MAKE_STR(); return UNRECOGNIZED; }
 
 <TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }

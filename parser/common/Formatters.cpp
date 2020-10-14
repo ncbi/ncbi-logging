@@ -236,7 +236,7 @@ void JsonFastFormatter::addNameValue( const std::string & name, int64_t value )
 
 void JsonFastFormatter::addNameValue( const std::string & name, const std::string & value )
 {
-    t_str tmp { value.c_str(), value.size(), false };
+    t_str tmp { value.c_str(), value.size() };
     addNameValue( name, tmp );
 }
 

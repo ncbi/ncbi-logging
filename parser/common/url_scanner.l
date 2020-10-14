@@ -6,7 +6,6 @@
     do { \
         yylval -> s . str . p = yytext; \
         yylval -> s . str . n = yyleng; \
-        yylval -> s . str . escaped = false; \
         EMPTY_TSTR( yylval -> s . accession ); \
         EMPTY_TSTR( yylval -> s . filename ); \
         EMPTY_TSTR( yylval -> s . extension ); \

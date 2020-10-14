@@ -11,8 +11,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-#define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); (t).escaped = false; } while (false)
-#define INIT_TSTR_ESC(t, s) do { (t).p = s; (t).n = strlen(s); (t).escaped = true; } while (false)
+#define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); } while (false)
 
 TEST(LogOPEventTest, Create)
 {

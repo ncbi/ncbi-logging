@@ -33,7 +33,7 @@ TEST_F( JsonLibFormatter_Fixture, FormatEmpty )
 
 TEST_F( JsonLibFormatter_Fixture, Format_t_str )
 {
-    const t_str str = { "v", 1, false };
+    const t_str str = { "v", 1 };
     f.addNameValue("a", str);
     ASSERT_EQ("{\"a\":\"v\"}", f.format());
 
@@ -50,7 +50,7 @@ TEST_F( JsonLibFormatter_Fixture, Format_string )
 
 TEST_F( JsonLibFormatter_Fixture, Format_t_str_quote )
 {
-    const t_str str = { "v\"", 2, true };
+    const t_str str = { "v\"", 2 };
     f.addNameValue("a", str);
     ASSERT_EQ("{\"a\":\"v\\\"\"}", f.format());
 }
@@ -95,9 +95,9 @@ TEST_F (JsonLibFormatter_Fixture, StringEscaped)
 TEST_F (JsonLibFormatter_Fixture, Format_array)
 {
     f.addArray( "key" );
-    const t_str s1 = { "123", 3, false };
+    const t_str s1 = { "123", 3 };
     f.addArrayValue( s1 );
-    const t_str s2 = { "456", 3, false };
+    const t_str s2 = { "456", 3 };
     f.addArrayValue( s2 );
     f.closeArray();
     ASSERT_EQ ( "{\"key\":[\"123\",\"456\"]}", f.format() );
@@ -168,7 +168,7 @@ TEST_F( JsonFastFormatter_Fixture, FormatEmpty )
 
 TEST_F( JsonFastFormatter_Fixture, Format_t_str )
 {
-    const t_str str = { "v", 1, false };
+    const t_str str = { "v", 1 };
     f.addNameValue("a", str);
     ASSERT_EQ("{\"a\":\"v\"}", f.format());
 
@@ -185,7 +185,7 @@ TEST_F( JsonFastFormatter_Fixture, Format_string )
 
 TEST_F( JsonFastFormatter_Fixture, Format_t_str_quote )
 {
-    const t_str str = { "v\"", 2, true };
+    const t_str str = { "v\"", 2 };
     f.addNameValue("a", str);
     ASSERT_EQ("{\"a\":\"v\\\"\"}", f.format());
 }
@@ -230,9 +230,9 @@ TEST_F (JsonFastFormatter_Fixture, StringEscaped)
 TEST_F (JsonFastFormatter_Fixture, Format_array)
 {
     f.addArray( "key" );
-    const t_str s1 = { "123", 3, false };
+    const t_str s1 = { "123", 3 };
     f.addArrayValue( s1 );
-    const t_str s2 = { "456", 3, false };
+    const t_str s2 = { "456", 3 };
     f.addArrayValue( s2 );
     f.closeArray();
     ASSERT_EQ ( "{\"key\":[\"123\",\"456\"]}", f.format() );
@@ -296,7 +296,7 @@ TEST( ReverseFormatterTest, FormatStrings )
     fmt . addNameValue( "ignored", "value2" );
     fmt . addNameValue( "ignored", "value3" );
     fmt . addNameValue( "ignored", 100 );
-    t_str s{ "tvalue", 6, false };
+    t_str s{ "tvalue", 6 };
     fmt . addNameValue( "ignored", s );
     ASSERT_EQ( "value1 value2 value3 100 tvalue", fmt.format() );
     ASSERT_EQ( "", fmt.format() );
@@ -309,7 +309,7 @@ TEST( ReverseFormatterTest, FormatStrings_comma_separated )
     fmt . addNameValue( "ignored", "value2" );
     fmt . addNameValue( "ignored", "value3" );
     fmt . addNameValue( "ignored", 100 );
-    t_str s{ "tvalue", 6, false };
+    t_str s{ "tvalue", 6 };
     fmt . addNameValue( "ignored", s );
     ASSERT_EQ( "value1,value2,value3,100,tvalue", fmt.format() );
     ASSERT_EQ( "", fmt.format() );
@@ -319,7 +319,7 @@ TEST( ReverseFormatterTest, FormatNulltstr )
 {
     ReverseFormatter fmt;
     fmt . addNameValue( "ignored", "value1" );
-    t_str s = { nullptr, 0, false };
+    t_str s = { nullptr, 0 };
     fmt . addNameValue( "ignored", s );
     ASSERT_EQ( "value1", fmt.format() );
 }

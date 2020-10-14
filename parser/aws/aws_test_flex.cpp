@@ -115,7 +115,6 @@ TEST_F ( AWS_TestFlexFixture, Embedded_CtlChars )
     ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_EQ( 14, token . s . n );
     ASSERT_EQ( 0, memcmp( str, token . s . p, token . s . n ) );
-    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     #undef str
 }
 
@@ -143,7 +142,6 @@ TEST_F ( AWS_TestFlexFixture, QuotedString )
     #define str ".Bl0-_~!*'();:@&=+$,/%#[]"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( QSTR, NextTokenType() ); ASSERT_EQ( str, TokenValue() );
-    ASSERT_FALSE ( token . s . escaped ); // no '\' inside
     #undef str
 }
 TEST_F ( AWS_TestFlexFixture, QuotedNonAscii )
@@ -161,7 +159,6 @@ TEST_F ( AWS_TestFlexFixture, QuotedEscapedQuote )
 {
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
     ASSERT_EQ( QSTR, NextTokenType() );
-    ASSERT_TRUE ( token . s . escaped );
     ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str
@@ -297,7 +294,7 @@ TEST_F ( AWS_TestFlexFixture, KEYSTR )
     aws_start_key( sc );
     ASSERT_EQ( PATHSTR, NextTokenType() );
     ASSERT_EQ( "AIDA&I\\SBTT%LPG=XGH6?YFFAY.A&B\\C%D=F?X", TokenValue() );
-    ASSERT_EQ( SPACE, NextTokenType() );    
+    ASSERT_EQ( SPACE, NextTokenType() );
 //    ASSERT_EQ( PATHEXT, NextTokenType() );
 //    ASSERT_EQ( ".A&B\\C%D=F?X", TokenValue() );
 }

@@ -19,7 +19,7 @@ using namespace NCBI::Logging;
 
 void jwt_error( yyscan_t locp, NCBI::Logging::JWTReceiver * lib, const char* msg );
 
-const t_str EmptyTSTR = { "", 0, false };
+const t_str EmptyTSTR = { "", 0 };
 
 #define SET_VALUE( selector, source )   ( lib -> set( (selector), (source) ) )
 

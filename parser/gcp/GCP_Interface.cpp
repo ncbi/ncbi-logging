@@ -56,7 +56,7 @@ ReceiverInterface::Category GCPReceiver::post_process( void )
         // Todo : make it behave like AWS ( aka set the path in the parser.y not here )
         if ( res && ! url . m_accession . empty() )
         {
-            t_str path = { object_for_postprocess.c_str(), object_for_postprocess.size(), false };
+            t_str path = { object_for_postprocess.c_str(), object_for_postprocess.size() };
             set( ReceiverInterface::path, path );
         }
         else
@@ -64,7 +64,7 @@ ReceiverInterface::Category GCPReceiver::post_process( void )
             res = pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
             if ( res )
             {
-                t_str path = { url_for_postprocess.c_str(), url_for_postprocess.size(), false };
+                t_str path = { url_for_postprocess.c_str(), url_for_postprocess.size() };
                 set( ReceiverInterface::path, path );
             }
         }
@@ -76,7 +76,7 @@ ReceiverInterface::Category GCPReceiver::post_process( void )
     }
 
     // version is always empty in GCP
-    t_str empty = { nullptr, 0, false };
+    t_str empty = { nullptr, 0 };
     set( ReceiverInterface::vers, empty );
     return cat_res;
 }

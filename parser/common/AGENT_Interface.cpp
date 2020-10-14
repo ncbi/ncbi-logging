@@ -75,7 +75,7 @@ AGENTParseBlock::format_specific_parse( const char * line, size_t line_size )
 
     // any members that were not found should be set to empty string
     // if they are set already, the extra call to set() will be ignored
-    t_str empty = {nullptr, 0, false };
+    t_str empty = {nullptr, 0 };
     m_receiver.set( AGENTReceiver::vdb_os, empty );
     m_receiver.set( AGENTReceiver::vdb_phid_compute_env, empty );
     m_receiver.set( AGENTReceiver::vdb_phid_guid, empty );

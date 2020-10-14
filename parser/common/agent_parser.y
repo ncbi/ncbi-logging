@@ -19,7 +19,7 @@ using namespace NCBI::Logging;
 
 void agent_error( yyscan_t locp, NCBI::Logging::AGENTReceiver * lib, const char* msg );
 
-const t_str EmptyTSTR = { "", 0, false };
+const t_str EmptyTSTR = { "", 0 };
 
 %}
 

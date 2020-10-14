@@ -21,9 +21,9 @@ URLReceiver::URLReceiver( FormatterRef fmt )
 void URLReceiver::finalize( void )
 {
     // todo: drop the boolean in t_str
-    setMember( "accession", t_str{ m_accession.c_str(), m_accession.size(), false } );
-    setMember( "filename",  t_str{ m_filename.c_str(), m_filename.size(), false } );
-    setMember( "extension", t_str{ m_extension.c_str(), m_extension.size(), false } );
+    setMember( "accession", t_str{ m_accession.c_str(), m_accession.size() } );
+    setMember( "filename",  t_str{ m_filename.c_str(), m_filename.size() } );
+    setMember( "extension", t_str{ m_extension.c_str(), m_extension.size() } );
     m_accession . clear();
     m_filename . clear();
     m_extension . clear();

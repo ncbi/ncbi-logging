@@ -22,7 +22,7 @@ void aws_error( yyscan_t locp, NCBI::Logging::AWSReceiver * lib, const char* msg
 
 #define SET_VALUE( selector, source ) ( lib -> set( (selector), (source) ) )
 
-const t_str EmptyTSTR = { "", 0, false };
+const t_str EmptyTSTR = { "", 0 };
 
 %}
 

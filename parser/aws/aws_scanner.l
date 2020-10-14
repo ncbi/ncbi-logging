@@ -2,9 +2,8 @@
 #include "aws_parser.hpp"
 #include "stdint.h"
 
-#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; /*printf("\nSTR %s\n", yytext );*/ } while(false)
-#define MAKE_STR1()         do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = false; /*printf("\nSTR1 %s\n", yytext );*/ } while(false)
-#define MAKE_STR_ESCAPED()  do { yylval -> s . p = yytext; yylval -> s . n = yyleng; yylval -> s . escaped = true; }  while(false)
+#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; /*printf("\nSTR %s\n", yytext );*/ } while(false)
+#define MAKE_STR1()         do { yylval -> s . p = yytext; yylval -> s . n = yyleng; /*printf("\nSTR1 %s\n", yytext );*/ } while(false)
 
 %}
 
@@ -84,8 +83,8 @@ RESULTCODE      ([0-9]{3})|"-"
 <QUOTED>\t          { MAKE_STR(); return SPACE; }
 <QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
-<QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
-<QUOTED>{QSTR_ESC}  { MAKE_STR_ESCAPED();   return QSTR; }
+<QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR(); return QSTR; }
 <QUOTED>.           { MAKE_STR(); return UNRECOGNIZED; }
 
 {STR}           { MAKE_STR(); return STR; }
@@ -143,7 +142,7 @@ RESULTCODE      ([0-9]{3})|"-"
 <REFERER>\"             { yy_pop_state( yyscanner ); MAKE_STR(); return QUOTE; }
 <REFERER>\\\"           { MAKE_STR(); return QSTR; }
 <REFERER>{QSTR}         { MAKE_STR(); return QSTR; }
-<REFERER>{QSTR_ESC}     { MAKE_STR_ESCAPED(); return QSTR; }
+<REFERER>{QSTR_ESC}     { MAKE_STR(); return QSTR; }
 <REFERER>.              { MAKE_STR(); return QSTR; }
 
 <REST_OF_LINE>.*        { MAKE_STR(); return STR; }

@@ -10,8 +10,7 @@
 using namespace std;
 using namespace NCBI::Logging;
 
-#define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); (t).escaped = false; } while (false)
-#define INIT_TSTR_ESC(t, s) do { (t).p = s; (t).n = strlen(s); (t).escaped = true; } while (false)
+#define INIT_TSTR(t, s)     do { (t).p = s; (t).n = strlen(s); } while (false)
 
 TEST(AWSReceiverTest, Create)
 {
@@ -327,7 +326,7 @@ TEST_F( AWSTestFixture, parse_request_no_method )
 }
 
 TEST_F( AWSTestFixture, parse_key_and_request )
-{   // the key wins, if 
+{   // the key wins, if
     std::string res = try_to_parse_good( "- - - - - - - ERR792423/5141526_s1_p0.bas.h5.1 \"GET ?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url HTTP/1.1\" - - - - - - - - - - - - - - -" );
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
     ASSERT_EQ( "?list-type=2&delimiter=%2F&prefix=SRR11060177%2FSRR99999999/filename.1&morefilenames.moreextensions.1&name=SRR000123&encoding-type=url", extract_value( res, "path" ) );

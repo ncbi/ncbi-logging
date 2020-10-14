@@ -19,7 +19,7 @@ using namespace NCBI::Logging;
 
 void gcp_error( yyscan_t locp, NCBI::Logging::GCPReceiver * lib, const char* msg );
 
-const t_str EmptyTSTR = { "", 0, false };
+const t_str EmptyTSTR = { "", 0 };
 
 %}
 
