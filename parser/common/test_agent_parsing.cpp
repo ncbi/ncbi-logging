@@ -7,17 +7,11 @@
 using namespace NCBI::Logging;
 using namespace std;
 
-TEST( AGENT_Parsing, Create )
-{
-    AGENTReceiver receiver( make_shared<JsonFastFormatter>() );
-    AGENTParseBlock pb( receiver );
-}
-
 TEST( AGENT_Parsing, EmptyString )
 {
     AGENTReceiver receiver( make_shared<JsonFastFormatter>() );
-    AGENTParseBlock pb( receiver );
-    pb.format_specific_parse( "", 0 );
+    string input;
+    receiver . ParseUserAgent ( input );
     ASSERT_EQ( "{\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\"}",
         receiver.GetFormatter().format() );
 }

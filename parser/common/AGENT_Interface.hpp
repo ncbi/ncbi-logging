@@ -25,8 +25,11 @@ namespace NCBI
 
             virtual void set( AGENT_Members m, const t_str & );
             virtual Category post_process( void ) { return cat_good; }
+
+            Category ParseUserAgent( std::string & source );
         };
 
+        // exposed for testing
         class AGENTParseBlock : public ParseBlockInterface
         {
         public:
@@ -41,5 +44,6 @@ namespace NCBI
             void * m_sc;
             AGENTReceiver & m_receiver;
         };
+
     }
 }

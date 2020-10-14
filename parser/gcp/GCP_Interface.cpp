@@ -45,14 +45,7 @@ void GCPReceiver::set( GCP_Members m, const t_str & v )
 
 ReceiverInterface::Category GCPReceiver::post_process( void )
 {
-    ReceiverInterface::Category cat_res;
-    {
-        AGENTReceiver agt( m_fmt );
-        AGENTParseBlock pb ( agt );
-        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
-        agent_for_postprocess . clear();
-        cat_res = agt.GetCategory();
-    }
+    ReceiverInterface::Category cat_res = AGENTReceiver( m_fmt ) . ParseUserAgent( agent_for_postprocess );
 
     if ( cat_res == ReceiverInterface::cat_good )
     {

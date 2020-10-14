@@ -56,17 +56,7 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
 
 ReceiverInterface::Category AWSReceiver::post_process( void )
 {
-    ReceiverInterface::Category cat_res;
-    {
-        // Todo : this can be pushed into a common helper-function in ReceiverInterface
-        // for all 3 : AWS, GCP and OP
-        AGENTReceiver agt( m_fmt );
-        AGENTParseBlock pb ( agt );
-        // agent_for_postprocess has been set in the .y file
-        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
-        agent_for_postprocess . clear();
-        cat_res = agt.GetCategory();
-    }
+    ReceiverInterface::Category cat_res = AGENTReceiver( m_fmt ) . ParseUserAgent( agent_for_postprocess );
 
     if ( cat_res == ReceiverInterface::cat_good )
     {
@@ -74,7 +64,7 @@ ReceiverInterface::Category AWSReceiver::post_process( void )
         URLParseBlock pb ( url );
         // [key/url]_for_postprocess has been set in the .y file
         bool res = pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
-        if ( res && url . m_accession.empty() ) 
+        if ( res && url . m_accession.empty() )
             pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
         cat_res = url.GetCategory();
         url . finalize();

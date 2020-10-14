@@ -12,7 +12,6 @@ using namespace NCBI::Logging;
 using namespace std;
 using namespace ncbi;
 
-
 AGENTReceiver::AGENTReceiver( FormatterRef fmt )
 : ReceiverInterface ( fmt )
 {
@@ -35,6 +34,16 @@ void AGENTReceiver::set( AGENT_Members m, const t_str & v )
 #undef CASE
     if ( m_cat == cat_unknown )
         m_cat = cat_good;
+}
+
+ReceiverInterface::Category
+AGENTReceiver::ParseUserAgent( string & source )
+{
+    AGENTParseBlock pb ( *this );
+    // handle failure of parser (set cat to ugly) here and everywhere in post-process
+    pb.format_specific_parse( source.c_str(), source.size() );
+    source.clear();
+    return GetCategory();
 }
 
 /* -------------------------------------------------------------------------- */
