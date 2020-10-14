@@ -35,6 +35,9 @@ void JWTReceiver::setJwt( const t_str & v )
         m_fmt -> addArray( "jwt" );
     }
     m_fmt -> addArrayValue( v );
+
+    if ( m_cat == cat_unknown )
+        m_cat = cat_good;
 }
 
 JWTParseBlock::JWTParseBlock( JWTReceiver & receiver )
@@ -61,6 +64,10 @@ JWTParseBlock::format_specific_parse( const char * line, size_t line_size )
     YY_BUFFER_STATE bs = jwt_scan_bytes( line, line_size, m_sc );
     int ret = jwt_parse( m_sc, & m_receiver );
     jwt__delete_buffer( bs, m_sc );
-    m_receiver.closeJwt();
+    m_receiver . closeJwt();
+    if ( ret != 0 )
+        m_receiver . SetCategory( ReceiverInterface::cat_ugly );
+    else if ( m_receiver .GetCategory() == ReceiverInterface::cat_unknown )
+        m_receiver . SetCategory( ReceiverInterface::cat_good );
     return ret == 0;
 }

@@ -75,5 +75,7 @@ AGENTParseBlock::format_specific_parse( const char * line, size_t line_size )
     m_receiver.set( AGENTReceiver::vdb_release, empty );
     m_receiver.set( AGENTReceiver::vdb_libc, empty );
 
+    if ( ret != 0 )
+        m_receiver . SetCategory( ReceiverInterface::cat_ugly );
     return ret == 0;
 }

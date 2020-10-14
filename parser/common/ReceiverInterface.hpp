@@ -46,7 +46,7 @@ namespace NCBI
             void setMember( const char * mem, const t_str & v );
             void reportField( const char * message );
 
-            virtual bool post_process( void ) { return true; }
+            virtual Category post_process( void ) = 0;
 
             FormatterInterface & GetFormatter();
 

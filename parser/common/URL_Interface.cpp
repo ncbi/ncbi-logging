@@ -27,7 +27,6 @@ void URLReceiver::finalize( void )
     m_accession . clear();
     m_filename . clear();
     m_extension . clear();
-    m_cat = cat_good;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -57,5 +56,9 @@ URLParseBlock::format_specific_parse( const char * line, size_t line_size )
     int ret = url_parse( m_sc, & m_receiver );
     url__delete_buffer( bs, m_sc );
 
-    return ret == 0; //&& ! m_receiver.m_accession.empty();
+    if ( ret != 0 )
+        m_receiver . SetCategory( ReceiverInterface::cat_ugly );
+    else if ( m_receiver .GetCategory() == ReceiverInterface::cat_unknown )
+        m_receiver . SetCategory( ReceiverInterface::cat_good );
+    return ret == 0;
 }

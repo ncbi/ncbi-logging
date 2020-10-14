@@ -33,11 +33,6 @@ HASH        "#"
 PERCENT     "%"
 DOT         \.
 
-CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}]
-PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}|{URL_BYTE}
-PATHSTR     {PATHCHARS}+
-
-QUERYCHARS  [A-Za-z0-9\-_~@:?<>|\\`]
     /* %2f and %2F (/) are excluded because they are a special token (SLASH) */
 HEXCHAR     [0-9A-Fa-f]
 HEXCHAR_1   [013-9A-Fa-f]
@@ -47,8 +42,13 @@ URL_BYTE_2  %{HEXCHAR_1}{HEXCHAR}
 URL_BYTE_3  %{HEXCHAR}{HEXCHAR_2}
 URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
 
-    /* allowing unncoded / in a query is not by the rules but real world examples use it */
-QUERY_TOKEN ({URL_BYTE}|{QUERYCHARS})+
+ /* CMNCHARS    [A-Za-z0-9\-_~!*'():@+$,\[\] ^{}\\"] */
+PATHCHARS     [^/?#%.]
+PATHSTR      ({URL_BYTE}|{PATHCHARS})+
+
+ /* allowing unncoded / in a query is not by the rules but real world examples use it */
+QUERYCHARS   [^/&;=#%.]
+QUERY_TOKEN  ({URL_BYTE}|{QUERYCHARS})+
 
 %x EXTENSION QUERYSTATE QUERY_EXTENSION FRAGSTATE
 
@@ -70,7 +70,7 @@ QUERY_TOKEN ({URL_BYTE}|{QUERYCHARS})+
 <EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
 <EXTENSION>{DOT}           { RETURN( EXTSTR ); }
 <EXTENSION>{PATHSTR}       { RETURN( EXTSTR ); }
-<EXTENSION>.               { RETURN( UNRECOGNIZED ); }
+ /* <EXTENSION>.               { RETURN( UNRECOGNIZED ); } */
 
 <QUERYSTATE>{QUERY_SEP}         { RETURN( QUERY_SEP ); }
 <QUERYSTATE>{EQUAL}             { RETURN( EQUAL ); }
@@ -80,7 +80,7 @@ QUERY_TOKEN ({URL_BYTE}|{QUERYCHARS})+
 <QUERYSTATE>{DOT}               { PUSH( QUERY_EXTENSION ); RETURN( DOT ); }
 <QUERYSTATE>{QUERY_TOKEN}       { RETURN( PATHSTR ); }
 <QUERYSTATE>{HASH}              { PUSH( FRAGSTATE ); RETURN( HASH ); }
-<QUERYSTATE>.                   { RETURN( UNRECOGNIZED ); }
+ /* <QUERYSTATE>.                   { RETURN( UNRECOGNIZED ); } */
 
 <QUERY_EXTENSION>{QUERY_SEP}     { POP(); RETURN( QUERY_SEP ); }
 <QUERY_EXTENSION>{EQUAL}         { POP(); RETURN( EQUAL ); }
@@ -89,11 +89,11 @@ QUERY_TOKEN ({URL_BYTE}|{QUERYCHARS})+
 <QUERY_EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
 <QUERY_EXTENSION>{DOT}           { RETURN( EXTSTR ); }
 <QUERY_EXTENSION>{QUERY_TOKEN}   { RETURN( EXTSTR ); }
-<QUERY_EXTENSION>.               { RETURN( UNRECOGNIZED ); }
+ /* <QUERY_EXTENSION>.               { RETURN( UNRECOGNIZED ); } */
 
 <FRAGSTATE>.*               { RETURN( FRAGMENT_TOKEN ); }
 
-.                           { RETURN( UNRECOGNIZED ); }
+ /* .                           { RETURN( UNRECOGNIZED ); } */
 
 %%
 

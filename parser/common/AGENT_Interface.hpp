@@ -24,6 +24,7 @@ namespace NCBI
             } AGENT_Members;
 
             virtual void set( AGENT_Members m, const t_str & );
+            virtual Category post_process( void ) { return cat_good; }
         };
 
         class AGENTParseBlock : public ParseBlockInterface

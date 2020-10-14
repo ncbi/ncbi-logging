@@ -41,30 +41,29 @@ void OPReceiver::set( OP_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
-bool OPReceiver::post_process( void )
+ReceiverInterface::Category OPReceiver::post_process( void )
 {
-    bool res;
+    ReceiverInterface::Category cat_res;
     {
         AGENTReceiver agt( m_fmt );
         AGENTParseBlock pb ( agt );
         // handle failure of parser (set cat to ugly) here and everywhere in post-process
-        agt.SetCategory( cat_good );
-        res = pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
         agent_for_postprocess.clear();
-        m_cat = agt.GetCategory();
+        cat_res = agt.GetCategory();
     }
 
-    if ( res )
-    {   //TODO: push post-processing code up the hierarchy
+    if ( cat_res == ReceiverInterface::cat_good )
+    {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
-        url.SetCategory( cat_good );
-        res = pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+        pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+
         url_for_postprocess.clear();
-        m_cat = url.GetCategory();
-        url . finalize();
+        cat_res = url.GetCategory();
+        url . finalize(); // this is special to url-parsing
     }
-    return res;
+    return cat_res;
 }
 
 namespace NCBI

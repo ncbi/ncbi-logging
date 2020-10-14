@@ -43,22 +43,24 @@ void GCPReceiver::set( GCP_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
-bool GCPReceiver::post_process( void )
+ReceiverInterface::Category GCPReceiver::post_process( void )
 {
-    bool res;
+    ReceiverInterface::Category cat_res;
     {
         AGENTReceiver agt( m_fmt );
         AGENTParseBlock pb ( agt );
-        res = pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
         agent_for_postprocess . clear();
+        cat_res = agt.GetCategory();
     }
 
-    if ( res )
+    if ( cat_res == ReceiverInterface::cat_good )
     {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
         // [object/url]_for_postprocess has been set in the .y file
-        res = pb.format_specific_parse( object_for_postprocess.c_str(), object_for_postprocess.size() );
+        bool res = pb.format_specific_parse( object_for_postprocess.c_str(), object_for_postprocess.size() );
+        // Todo : make it behave like AWS ( aka set the path in the parser.y not here )
         if ( res && ! url . m_accession . empty() )
         {
             t_str path = { object_for_postprocess.c_str(), object_for_postprocess.size(), false };
@@ -74,6 +76,7 @@ bool GCPReceiver::post_process( void )
             }
         }
 
+        cat_res = url.GetCategory();
         url . finalize();
         object_for_postprocess . clear();
         url_for_postprocess . clear();
@@ -82,7 +85,7 @@ bool GCPReceiver::post_process( void )
     // version is always empty in GCP
     t_str empty = { nullptr, 0, false };
     set( ReceiverInterface::vers, empty );
-    return res;
+    return cat_res;
 }
 
 namespace NCBI

@@ -227,12 +227,15 @@ path_element
     : ACCESSION     { $$ = $1; $$ . type = ACCESSION; $$ . accession = $$ . str; }
     | PATHSTR       { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
     | PERCENT       { $$ = $1; $$ . type = PATHSTR; $$ . filename = $$ . str; }
-    | extension     { $$ = $1; }
+    | extension     { $$ = $1; $$ . type = PATHEXT; $$ . extension = $$ . str; }
     | SLASH         { $$ = $1; $$ . type = SLASH; }
     ;
 
 path_list
-    : path_element              { $$ = $1; }
+    : path_element
+        {
+            $$ = $1;
+        }
     | path_list path_element
         {
             if ( $1 . type == PATHSTR && $2 . type == PATHSTR )

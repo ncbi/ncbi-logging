@@ -54,30 +54,34 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
-bool AWSReceiver::post_process( void )
+ReceiverInterface::Category AWSReceiver::post_process( void )
 {
-    bool res;
+    ReceiverInterface::Category cat_res;
     {
+        // Todo : this can be pushed into a common helper-function in ReceiverInterface
+        // for all 3 : AWS, GCP and OP
         AGENTReceiver agt( m_fmt );
         AGENTParseBlock pb ( agt );
         // agent_for_postprocess has been set in the .y file
-        res = pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
         agent_for_postprocess . clear();
+        cat_res = agt.GetCategory();
     }
 
-    if ( res )
+    if ( cat_res == ReceiverInterface::cat_good )
     {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
         // [key/url]_for_postprocess has been set in the .y file
-        res = pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
+        bool res = pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
         if ( res && url . m_accession.empty() ) 
-            res = pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+            pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+        cat_res = url.GetCategory();
         url . finalize();
         key_for_postprocess . clear();
         url_for_postprocess . clear();
     }
-    return res;
+    return cat_res;
 }
 
 namespace NCBI

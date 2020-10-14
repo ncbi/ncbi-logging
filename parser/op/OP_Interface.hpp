@@ -30,7 +30,7 @@ namespace NCBI
             } OP_Members; // all are t_str values
             virtual void set( OP_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
 
-            virtual bool post_process( void );
+            virtual Category post_process( void );
 
             std::string agent_for_postprocess;
             std::string url_for_postprocess;

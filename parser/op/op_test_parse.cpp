@@ -103,9 +103,11 @@ TEST_F( OPTestFixture, ErrorRecovery )
 
 TEST_F( OPTestFixture, bad_path )
 {
-    std::string res = try_to_parse_review( "13.59.252.14 - - [07/Jun/2020:01:09:44 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET ..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5Cwindows\\x5Cwin.ini HTTP/1.1\" 400 150 0.012 \"-\" \"-\" \"-\" port=80 rl=0" );
-    ASSERT_EQ( "1", extract_value( res, "_line_nr" ) );
-    ASSERT_EQ( "Invalid URL query", extract_value( res, "_error" ) );
+    std::string res = try_to_parse_good( "13.59.252.14 - - [07/Jun/2020:01:09:44 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"GET ..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5Cwindows\\x5Cwin.ini HTTP/1.1\" 400 150 0.012 \"-\" \"-\" \"-\" port=80 rl=0" );
+    ASSERT_EQ( "..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5Cwindows\\x5Cwin.ini", extract_value( res, "path" ) );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( "..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5Cwindows\\x5Cwin.ini", extract_value( res, "extension" ) );
 }
 
 TEST_F( OPTestFixture, unrecognized_char )

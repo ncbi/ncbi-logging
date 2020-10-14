@@ -21,7 +21,12 @@ namespace NCBI
         public:
             virtual ~ParseBlockInterface() = 0;
             virtual ReceiverInterface & GetReceiver() = 0;
+
+            // this function is responsible to set the category of it's receiver
+            // the return value is the success of the parser
+            // if return-value is false -> the category will be cat_ugly
             virtual bool format_specific_parse( const char * line, size_t line_size ) = 0;
+
             virtual void SetDebug( bool onOff ) = 0;
 
             void receive_one_line( const char * line, size_t line_size, size_t line_nr );

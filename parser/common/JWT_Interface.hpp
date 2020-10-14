@@ -17,6 +17,7 @@ namespace NCBI
             void closeJwt();
 
             bool seen_jwt;
+            virtual Category post_process( void ) { return cat_good; };
         };
 
         class JWTParseBlock : public ParseBlockInterface

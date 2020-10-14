@@ -18,6 +18,8 @@ namespace NCBI
             std::string m_accession;
             std::string m_filename;
             std::string m_extension;
+
+            virtual Category post_process( void ) { return cat_good; }
         };
 
         class URLParseBlock : public ParseBlockInterface

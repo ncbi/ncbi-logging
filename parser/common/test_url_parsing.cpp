@@ -27,8 +27,7 @@ class TestURLParseBlock : public URLParseBlock
 public:
     TestURLParseBlock( URLReceiver & receiver )
     :   URLParseBlock( receiver ),
-        found_accession ( false ),
-        cat_before_finalize( ReceiverInterface::cat_unknown )
+        found_accession ( false )
     {}
 
     bool format_specific_parse( const char * line, size_t line_size )
@@ -36,19 +35,13 @@ public:
         URLParseBlock::format_specific_parse( line, line_size );
         URLReceiver & receiver = static_cast< URLReceiver & > ( GetReceiver() );
         found_accession = ! receiver . m_accession . empty();
-        // because finalize() in the URLReceiver sets the category uncondionally to good
-        // we have instrumented the TestURLParseBlock to record the category befor
-        // finalize() has been called.
-        cat_before_finalize = receiver . GetCategory();
         receiver.finalize(); // this punches a cat of good unconditionally into the receiver
         return true;
     }
 
     // The URLReceiver does not call a format-setter during parsing, it instead
     // records accession/filename/extension in internal string-members.
-    // That means before finalize - the category will be unknown.
     bool found_accession;
-    ReceiverInterface::Category cat_before_finalize;
 };
 
 class TestURLParseBlockFactory : public ParseBlockFactoryInterface
@@ -245,7 +238,7 @@ TEST_F( URLTestFixture, ThereIsAEscapedQuoteInThePath )
 {
     const std::string res = try_to_parse_good( "a\\\"" );
     ASSERT_EQ( "", extract_value( res, "accession" ) );
-    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( "a\\\"", extract_value( res, "filename" ) );
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
@@ -264,6 +257,14 @@ TEST_F( URLTestFixture, Investigate )
     ASSERT_EQ( "", extract_value( res, "accession" ) );
     ASSERT_EQ( "d6rw1r5y", extract_value( res, "filename" ) );
     ASSERT_EQ( ".asp", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, FishingForWinIni )
+{
+    const std::string res = try_to_parse_good( "..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5Cwindows\\x5Cwin.ini" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( "..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5C..\\x5Cwindows\\x5Cwin.ini", extract_value( res, "extension" ) );
 }
 
 //---------------------------------------------------------------------
@@ -427,7 +428,7 @@ TEST_F( URLTestFixture, QM_ends_in_equal )
 TEST_F( URLTestFixture, QM_backticks_in_query )
 {
     const std::string res = try_to_parse_good( "/login/?user=|\\x22`id`\\x22|" );
-    // see: TestURLParseBlock::format_specific_parse() for the reason of cat_before_finalize!
-    ReceiverInterface::Category cat = get_test_url_parse_block() . cat_before_finalize;
-    ASSERT_EQ( ReceiverInterface::cat_unknown, cat );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "|\\x22`id`\\x22|", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
