@@ -17,7 +17,7 @@ namespace NCBI
 
             ReceiverInterface( FormatterRef p_fmt );
 
-            virtual ~ReceiverInterface();
+            virtual ~ReceiverInterface() = 0 ;
 
             typedef enum {
                 cat_review = 0,
@@ -46,7 +46,7 @@ namespace NCBI
             void setMember( const char * mem, const t_str & v );
             void reportField( const char * message );
 
-            virtual void post_process( void ) { }
+            virtual bool post_process( void ) { return true; }
 
             FormatterInterface & GetFormatter();
 

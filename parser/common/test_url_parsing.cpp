@@ -27,18 +27,28 @@ class TestURLParseBlock : public URLParseBlock
 public:
     TestURLParseBlock( URLReceiver & receiver )
     :   URLParseBlock( receiver ),
-        found_accession ( false )
+        found_accession ( false ),
+        cat_before_finalize( ReceiverInterface::cat_unknown )
     {}
 
     bool format_specific_parse( const char * line, size_t line_size )
     {
-        found_accession = URLParseBlock::format_specific_parse( line, line_size );
+        URLParseBlock::format_specific_parse( line, line_size );
         URLReceiver & receiver = static_cast< URLReceiver & > ( GetReceiver() );
-        receiver.finalize();
+        found_accession = ! receiver . m_accession . empty();
+        // because finalize() in the URLReceiver sets the category uncondionally to good
+        // we have instrumented the TestURLParseBlock to record the category befor
+        // finalize() has been called.
+        cat_before_finalize = receiver . GetCategory();
+        receiver.finalize(); // this punches a cat of good unconditionally into the receiver
         return true;
     }
 
+    // The URLReceiver does not call a format-setter during parsing, it instead
+    // records accession/filename/extension in internal string-members.
+    // That means before finalize - the category will be unknown.
     bool found_accession;
+    ReceiverInterface::Category cat_before_finalize;
 };
 
 class TestURLParseBlockFactory : public ParseBlockFactoryInterface
@@ -55,7 +65,11 @@ public:
 
 class URLTestFixture : public ParseTestFixture< TestURLParseBlockFactory >
 {
-
+    public :
+        const TestURLParseBlock& get_test_url_parse_block( void ) const
+        {
+            return *( static_cast<const TestURLParseBlock * >( pb . get() ) );
+        }
 };
 
 TEST_F( URLTestFixture, PathOnly )      { ASSERT_NE( "", try_to_parse_good( "path" ) ); }
@@ -75,14 +89,14 @@ TEST_F( URLTestFixture, NoAccession )
     const std::string res = try_to_parse_good( "WRR000123" );
     ASSERT_EQ( "", extract_value( res, "accession" ) );
 
-    ASSERT_FALSE( static_cast<const TestURLParseBlock * >( pb . get() ) -> found_accession );
+    ASSERT_FALSE( get_test_url_parse_block() . found_accession );
 }
 TEST_F( URLTestFixture, JustAccession )
 {
     const std::string res = try_to_parse_good( "SRR000123" );
     ASSERT_EQ( "SRR000123", extract_value( res, "accession" ) );
 
-    ASSERT_TRUE( static_cast<const TestURLParseBlock * >( pb . get() ) -> found_accession );
+    ASSERT_TRUE( get_test_url_parse_block() . found_accession );
 }
 
 TEST_F( URLTestFixture, MultipleAccessions )
@@ -402,3 +416,18 @@ TEST_F( URLTestFixture, QM_QM_in_extension )
     ASSERT_EQ( ".?1", extract_value( res, "extension" ) );
 }
 
+TEST_F( URLTestFixture, QM_ends_in_equal )
+{
+    const std::string res = try_to_parse_good( "sra-pub-run-1?tagging=" );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "sra-pub-run-1", extract_value( res, "filename" ) );
+    ASSERT_EQ( "", extract_value( res, "extension" ) );
+}
+
+TEST_F( URLTestFixture, QM_backticks_in_query )
+{
+    const std::string res = try_to_parse_good( "/login/?user=|\\x22`id`\\x22|" );
+    // see: TestURLParseBlock::format_specific_parse() for the reason of cat_before_finalize!
+    ReceiverInterface::Category cat = get_test_url_parse_block() . cat_before_finalize;
+    ASSERT_EQ( ReceiverInterface::cat_unknown, cat );
+}

@@ -46,7 +46,7 @@ using namespace NCBI::Logging;
 %%
 
 agent_line
-    : error     { YYABORT; }
+    : error         { YYABORT; }
     | %empty        {}
     | token_list    {}
     ;

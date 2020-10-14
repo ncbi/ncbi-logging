@@ -487,6 +487,12 @@ TEST_F( AWSTestFixture, quote_in_path )
     ASSERT_EQ( "a\\\"", extract_value( res, "path" ) );
 }
 
+TEST_F( AWSTestFixture, investigate )
+{
+    std::string res = try_to_parse_good( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-1 [20/Mar/2019:19:44:01 +0000] 130.14.20.103 arn:aws:iam::783971887864:user/ignatovi 92D3B218463A63EA REST.GET.TAGGING - \"GET /sra-pub-run-1?tagging= HTTP/1.1\" 404 NoSuchTagSet 293 - 59 - \"-\" \"S3Console/0.4, aws-internal/3 aws-sdk-java/1.11.509 Linux/4.9.137-0.1.ac.218.74.329.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.202-b08 java/1.8.0_202\" - AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc= SigV4 ECDHE-RSA-AES128-SHA AuthHeader s3.amazonaws.com TLSv1.2");
+    ASSERT_EQ( "130.14.20.103", extract_value( res, "ip" ) );
+}
+
 TEST_F( AWSTestFixture, two_lines_with_and_without_accessions )
 {
     std::string src1 = "- - - - - - - SRR123456.1 - - - - - - - - - - - - - - - -";

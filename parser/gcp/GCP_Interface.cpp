@@ -43,30 +43,35 @@ void GCPReceiver::set( GCP_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
-void GCPReceiver::post_process( void )
+bool GCPReceiver::post_process( void )
 {
+    bool res;
     {
         AGENTReceiver agt( m_fmt );
         AGENTParseBlock pb ( agt );
-        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
-        agent_for_postprocess . clear();        
+        res = pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        agent_for_postprocess . clear();
     }
 
+    if ( res )
     {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
         // [object/url]_for_postprocess has been set in the .y file
-        if ( pb.format_specific_parse( object_for_postprocess.c_str(), object_for_postprocess.size() ) )
+        res = pb.format_specific_parse( object_for_postprocess.c_str(), object_for_postprocess.size() );
+        if ( res && ! url . m_accession . empty() )
         {
             t_str path = { object_for_postprocess.c_str(), object_for_postprocess.size(), false };
             set( ReceiverInterface::path, path );
         }
         else
         {
-            //pb.SetDebug( true );
-            pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
-            t_str path = { url_for_postprocess.c_str(), url_for_postprocess.size(), false };
-            set( ReceiverInterface::path, path );
+            res = pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+            if ( res )
+            {
+                t_str path = { url_for_postprocess.c_str(), url_for_postprocess.size(), false };
+                set( ReceiverInterface::path, path );
+            }
         }
 
         url . finalize();
@@ -77,6 +82,7 @@ void GCPReceiver::post_process( void )
     // version is always empty in GCP
     t_str empty = { nullptr, 0, false };
     set( ReceiverInterface::vers, empty );
+    return res;
 }
 
 namespace NCBI

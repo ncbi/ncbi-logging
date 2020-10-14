@@ -41,30 +41,30 @@ void OPReceiver::set( OP_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
-void OPReceiver::post_process( void )
+bool OPReceiver::post_process( void )
 {
+    bool res;
     {
         AGENTReceiver agt( m_fmt );
         AGENTParseBlock pb ( agt );
         // handle failure of parser (set cat to ugly) here and everywhere in post-process
         agt.SetCategory( cat_good );
-        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        res = pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
         agent_for_postprocess.clear();
-
         m_cat = agt.GetCategory();
     }
-    if ( m_cat == cat_good )
+
+    if ( res )
     {   //TODO: push post-processing code up the hierarchy
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
         url.SetCategory( cat_good );
-        pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+        res = pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
         url_for_postprocess.clear();
-
         m_cat = url.GetCategory();
-
         url . finalize();
     }
+    return res;
 }
 
 namespace NCBI

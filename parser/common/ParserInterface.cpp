@@ -37,7 +37,8 @@ ParseBlockInterface :: receive_one_line( const char * line, size_t line_size, si
     }
     else if ( receiver . GetCategory() == ReceiverInterface::cat_good )
     {
-        receiver.post_process();
+        if ( !receiver.post_process() )
+            receiver . SetCategory( ReceiverInterface::cat_ugly );
     }
 
     if ( receiver . GetCategory() != ReceiverInterface::cat_good )

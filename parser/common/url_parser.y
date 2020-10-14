@@ -282,6 +282,7 @@ query_key
 
 query_entry
     : query_key EQUAL value_list  { /* ignore the key, report the value */ $$ = $3; }
+    | query_key EQUAL             {  }
     | value_list                  { $$ = $1; }
     ;
 

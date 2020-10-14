@@ -37,7 +37,7 @@ CMNCHARS    [A-Za-z0-9\-_~!*'();:@+$,\[\] ^{}]
 PATHCHARS   {CMNCHARS}|{QUERY_SEP}|{EQUAL}|{URL_BYTE}
 PATHSTR     {PATHCHARS}+
 
-QUERYCHARS  [A-Za-z0-9\-_~@:?<>]
+QUERYCHARS  [A-Za-z0-9\-_~@:?<>|\\`]
     /* %2f and %2F (/) are excluded because they are a special token (SLASH) */
 HEXCHAR     [0-9A-Fa-f]
 HEXCHAR_1   [013-9A-Fa-f]

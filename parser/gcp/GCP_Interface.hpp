@@ -32,7 +32,7 @@ namespace NCBI
             } GCP_Members; // all are t_str values
             virtual void set( GCP_Members m, const t_str & v ); // will invoke set( ReceiverInterface::Members ) if necessary
 
-            virtual void post_process( void );
+            virtual bool post_process( void );
 
             std::string agent_for_postprocess;
             std::string object_for_postprocess;

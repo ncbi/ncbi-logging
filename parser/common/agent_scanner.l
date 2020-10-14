@@ -51,7 +51,7 @@ PHIDSESS        "nos"|({PHIDCHAR}{3})
 <S_LIBC>{VERSION23}     { yy_pop_state( yyscanner ); MAKE_STR(); return T_LIBC; }
 <S_LIBC>.               { yy_pop_state( yyscanner ); unput( yytext[0] ); }
 
-.                { }
+.                       { }
 
 
 %%

@@ -51,7 +51,7 @@ using namespace NCBI::Logging;
 jwt_line
     : str_list
     | error     { YYABORT; }
-    | %empty    { }    
+    | %empty    { }
     ;
 
 str_token

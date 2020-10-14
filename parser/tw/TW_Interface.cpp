@@ -43,11 +43,14 @@ void TWReceiver::set( TW_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
-void TWReceiver::post_process( void )
+bool TWReceiver::post_process( void )
 {
+    bool res;
     JWTReceiver jwt( m_fmt );
     JWTParseBlock pb ( jwt );
-    pb.format_specific_parse( msg_for_postprocess.c_str(), msg_for_postprocess.size() );
+    res = pb.format_specific_parse( msg_for_postprocess.c_str(), msg_for_postprocess.size() );
+    msg_for_postprocess . clear();
+    return res;
 }
 
 namespace NCBI

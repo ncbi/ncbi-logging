@@ -57,9 +57,5 @@ URLParseBlock::format_specific_parse( const char * line, size_t line_size )
     int ret = url_parse( m_sc, & m_receiver );
     url__delete_buffer( bs, m_sc );
 
-    // any members that were not found should be set to empty string
-    // if they are set already, the extra call to set() will be ignored
-    t_str empty = {nullptr, 0, false };
-
-    return ret == 0 && ! m_receiver.m_accession.empty();
+    return ret == 0; //&& ! m_receiver.m_accession.empty();
 }

@@ -54,27 +54,30 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
-void AWSReceiver::post_process( void )
+bool AWSReceiver::post_process( void )
 {
+    bool res;
     {
         AGENTReceiver agt( m_fmt );
         AGENTParseBlock pb ( agt );
         // agent_for_postprocess has been set in the .y file
-        pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
+        res = pb.format_specific_parse( agent_for_postprocess.c_str(), agent_for_postprocess.size() );
         agent_for_postprocess . clear();
     }
 
+    if ( res )
     {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
         // [key/url]_for_postprocess has been set in the .y file
-        pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
-        pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
+        res = pb.format_specific_parse( key_for_postprocess.c_str(), key_for_postprocess.size() );
+        if ( res && url . m_accession.empty() ) 
+            res = pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
         url . finalize();
         key_for_postprocess . clear();
         url_for_postprocess . clear();
-
     }
+    return res;
 }
 
 namespace NCBI
