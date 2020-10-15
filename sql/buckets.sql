@@ -17,6 +17,8 @@ insert into service_accounts (service_account) values ('strides-analytics');
 insert into service_accounts (service_account) values ('opendata');
 insert into service_accounts (service_account) values ('s3_readers');
 insert into service_accounts (service_account) values ('logmon');
+insert into service_accounts (service_account) values ('nih-nlm-ncbi-sra-protected');
+insert into service_accounts (service_account) values ('nih-sra-datastore-protected');
 
 create table log_formats (
     log_format text primary key,
@@ -603,10 +605,193 @@ insert into buckets (cloud_provider, bucket_name, description,
 values ('S3', 'sra-pub-metadata-us-east-1', 'Athena metadata', 'Efremov', 'sra-pub-src-1-logs',
     's3_readers', 'false', 'metadata', 'hot');
 
+-- LOGMON-42
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('S3', 'sra-ca-crun-1', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-nlm-ncbi-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('S3', 'sra-ca-crun-2', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-nlm-ncbi-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('S3', 'sra-ca-crun-3', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-nlm-ncbi-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('S3', 'sra-ca-crun-4', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-nlm-ncbi-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('S3', 'sra-ca-crun-5', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-nlm-ncbi-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('S3', 'sra-ca-crun-6', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-nlm-ncbi-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-ca-crun-1', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-ca-crun-2', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-ca-crun-3', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-ca-crun-4', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-ca-crun-5', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-ca-crun-6', 'Cold ETL Data',
+    'efremov', 'sra-ca-run-logs', 'nih-sra-protected',
+    'false', 'ETL + BQS', 'cold', 'private');
+
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-1', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-2', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-3', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-4', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-5', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-6', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-7', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-8', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-9', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-10', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-11', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-12', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-pub-crun-13', 'Hot ETL Data',
+    'efremov', 'sra-pub-logs-1', 'nih-datastore',
+    'false', 'ETL + BQS', 'hot', 'public');
+
+
+
 update buckets set log_format='S3 log' where cloud_provider='S3';
 update buckets set log_format='GS log' where cloud_provider='GS';
 update buckets set log_format='nginx log' where cloud_provider='OP';
 update buckets set log_format='traceweb' where log_bucket like '%traceweb%';
+
+
+
 
 .headers on
 .mode column

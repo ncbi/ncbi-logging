@@ -1,4 +1,10 @@
 cloud_provider	bucket_name	description	owner	log_bucket	service_account	scope	immutable	format	log_format	storage_class
+GS	sra-ca-crun-1	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
+GS	sra-ca-crun-2	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
+GS	sra-ca-crun-3	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
+GS	sra-ca-crun-4	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
+GS	sra-ca-crun-5	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
+GS	sra-ca-crun-6	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
 GS	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
 GS	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
 GS	sra-ca-run-11		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
@@ -33,6 +39,19 @@ GS	sra-ca-zq-3		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ET
 GS	sra-ca-zq-4		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
 GS	sra-ca-zq-5		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
 GS	sra-ca-zq-6		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
+GS	sra-pub-crun-1	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-10	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-11	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-12	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-13	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-2	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-3	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-4	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-5	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-6	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-7	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-8	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-9	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
 GS	sra-pub-run-1		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL + BQS	GS log	cold
 GS	sra-pub-run-1-logs		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL + BQS	GS log	cold
 GS	sra-pub-run-10		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL + BQS	GS log	cold
@@ -122,6 +141,12 @@ OP	srafiles34	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db
 OP	srafiles35	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles35/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	srafiles36	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles36/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	sweb	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/weblog/local_archive/*/*/*/sweb*/*.gz		public	false	nginx log	nginx log	hot
+S3	sra-ca-crun-1	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
+S3	sra-ca-crun-2	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
+S3	sra-ca-crun-3	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
+S3	sra-ca-crun-4	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
+S3	sra-ca-crun-5	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
+S3	sra-ca-crun-6	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
 S3	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
 S3	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
 S3	sra-ca-run-11		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
