@@ -41,8 +41,8 @@ URL_BYTE_2  %{HEXCHAR_1}{HEXCHAR}
 URL_BYTE_3  %{HEXCHAR}{HEXCHAR_2}
 URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
 
- /* CMNCHARS    [A-Za-z0-9\-_~!*'():@+$,\[\] ^{}\\"] */
-PATHCHARS     [^/?#%.]
+    /*TODO: apply the same pattern to other scanners */
+PATHCHARS    [^/?#%.]
 PATHSTR      ({URL_BYTE}|{PATHCHARS})+
 
  /* allowing unncoded / in a query is not by the rules but real world examples use it */
@@ -69,7 +69,6 @@ QUERY_TOKEN  ({URL_BYTE}|{QUERYCHARS})+
 <EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
 <EXTENSION>{DOT}           { RETURN( EXTSTR ); }
 <EXTENSION>{PATHSTR}       { RETURN( EXTSTR ); }
- /* <EXTENSION>.               { RETURN( UNRECOGNIZED ); } */
 
 <QUERYSTATE>{QUERY_SEP}         { RETURN( QUERY_SEP ); }
 <QUERYSTATE>{EQUAL}             { RETURN( EQUAL ); }
@@ -79,7 +78,6 @@ QUERY_TOKEN  ({URL_BYTE}|{QUERYCHARS})+
 <QUERYSTATE>{DOT}               { PUSH( QUERY_EXTENSION ); RETURN( DOT ); }
 <QUERYSTATE>{QUERY_TOKEN}       { RETURN( PATHSTR ); }
 <QUERYSTATE>{HASH}              { PUSH( FRAGSTATE ); RETURN( HASH ); }
- /* <QUERYSTATE>.                   { RETURN( UNRECOGNIZED ); } */
 
 <QUERY_EXTENSION>{QUERY_SEP}     { POP(); RETURN( QUERY_SEP ); }
 <QUERY_EXTENSION>{EQUAL}         { POP(); RETURN( EQUAL ); }
@@ -88,11 +86,8 @@ QUERY_TOKEN  ({URL_BYTE}|{QUERYCHARS})+
 <QUERY_EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
 <QUERY_EXTENSION>{DOT}           { RETURN( EXTSTR ); }
 <QUERY_EXTENSION>{QUERY_TOKEN}   { RETURN( EXTSTR ); }
- /* <QUERY_EXTENSION>.               { RETURN( UNRECOGNIZED ); } */
 
 <FRAGSTATE>.*               { RETURN( FRAGMENT_TOKEN ); }
-
- /* .                           { RETURN( UNRECOGNIZED ); } */
 
 %%
 
