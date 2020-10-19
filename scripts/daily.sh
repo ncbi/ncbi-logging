@@ -32,7 +32,8 @@ date; echo "parse OP"
 ./parse_new.sh OP  | ts >> "$HOME"/logs/parse_new_op."$DATE".log 2>&1
 
 date; echo "s3_lister"
-./s3_lister.sh | ts >> "$HOME"/s3_lister.log 2>&1
+./s3_lister.sh | ts >> "$HOME"/s3_lister."$DATE".log 2>&1
+./mirror_obj.sh | ts >> "$HOME"/mirror_obj."$DATE".log 2>&1
 
 dow=$(date +%u)
 if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
