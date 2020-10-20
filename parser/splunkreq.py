@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import sys, http, urllib, xml.dom.minidom, urllib.request, time
+import sys, http, urllib, xml.dom.minidom, urllib.request, time, json
 from xml.dom.minidom import parse
 
 def file2string( filename : str ) -> str :
@@ -10,7 +10,7 @@ def file2string( filename : str ) -> str :
     except :
         return ""
 
-def extract_search_id( data : str ) -> str :
+def extract_search_id_from_xml( data : str ) -> str :
     try :
         DOM = xml.dom.minidom.parseString( data )
         coll = DOM.documentElement
@@ -22,7 +22,7 @@ def extract_search_id( data : str ) -> str :
     except Exception as ex:
         return "error"
 
-def extract_status( data : str ) -> ( str, str ) :
+def extract_status_from_xml( data : str ) -> ( str, str ) :
     status = "UNKNOWN"
     count = ""
     try :
@@ -44,6 +44,13 @@ def extract_status( data : str ) -> ( str, str ) :
         pass
     return ( status, count )
 
+def extract_raw_from_json( data : str ) :
+    res = []
+    j = json.loads( data )
+    for r in j[ 'results' ] :
+        res.append( r[ '_raw' ] )
+    return res
+
 # returns the search-id
 def create_search( bearer : str, search : str ) -> str :
     hdr = { 'Authorization' : "Bearer " + bearer }
@@ -53,7 +60,7 @@ def create_search( bearer : str, search : str ) -> str :
     conn = http.client.HTTPSConnection( domain )
     conn . request( 'POST', path, data, hdr )
     req = conn . getresponse()
-    return extract_search_id( req.read() )
+    return extract_search_id_from_xml( req.read() )
 
 def get_search_status( bearer : str, sid : str ) -> ( str, str ) :
     hdr = { 'Authorization' : "Bearer " + bearer }
@@ -62,12 +69,12 @@ def get_search_status( bearer : str, sid : str ) -> ( str, str ) :
     conn = http.client.HTTPSConnection( domain )
     conn . request( 'GET', path, None, hdr )
     req = conn . getresponse()
-    return extract_status( req.read() )
+    return extract_status_from_xml( req.read() )
 
-def get_search_results( bearer : str, sid : str ) -> str :
+def get_search_results( bearer : str, sid : str, offset : int, count : int ) -> str :
     hdr = { 'Authorization' : "Bearer " + bearer }
     domain = "splunkapi.ncbi.nlm.nih.gov"
-    data = urllib.parse.urlencode( { "count" : "5", "offset" : "7", "f" : "_raw", "output_mode" : "json" } )
+    data = urllib.parse.urlencode( { "count" : count, "offset" : offset, "output_mode" : "json" } )
     path = "/services/search/jobs/" + sid + "/results?" + data
     conn = http.client.HTTPSConnection( domain )
     conn . request( 'GET', path, None, hdr )
@@ -90,9 +97,15 @@ search="search index=unix sourcetype=syslog host=cloudian-node* S3REQ bucketOwne
 bearer = file2string( "bearer.txt" )
 
 sid = create_search( bearer, search )
-#print( "sid="+sid )
 status, count = wait_for_done( bearer, sid )
-print( "status="+status )
-print( "count="+count )
-results = get_search_results( bearer, sid )
-print( results )
+
+#print( "status="+status )
+#print( "count="+count )
+row_count = int( count )
+
+if status == 'DONE' and row_count > 0 :
+# todo loop in batches of x rows until count is reached
+    results = get_search_results( bearer, sid, 3, 20 )
+    a = extract_raw_from_json( results )
+    for line in a :
+        print( line )
