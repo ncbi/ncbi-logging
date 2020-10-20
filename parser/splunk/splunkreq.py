@@ -4,11 +4,8 @@ import sys, http, urllib, xml.dom.minidom, urllib.request, time, json
 from xml.dom.minidom import parse
 
 def file2string( filename : str ) -> str :
-    try :
-        with open( filename, "r" ) as f :
-            return f . read()
-    except :
-        return ""
+    with open( filename, "r" ) as f :
+        return f . read()
 
 def extract_search_id_from_xml( data : str ) -> str :
     try :
@@ -71,7 +68,8 @@ def get_search_status( bearer : str, sid : str ) -> ( str, str ) :
     req = conn . getresponse()
     return extract_status_from_xml( req.read() )
 
-def get_search_results( bearer : str, sid : str, offset : int, count : int ) -> str :
+# return: ( the array of _raw lines, True if reached the end of search )
+def get_search_range( bearer : str, sid : str, offset : int, count : int ) -> ( [ str ], bool ) :
     hdr = { 'Authorization' : "Bearer " + bearer }
     domain = "splunkapi.ncbi.nlm.nih.gov"
     data = urllib.parse.urlencode( { "count" : count, "offset" : offset, "output_mode" : "json" } )
@@ -79,33 +77,49 @@ def get_search_results( bearer : str, sid : str, offset : int, count : int ) -> 
     conn = http.client.HTTPSConnection( domain )
     conn . request( 'GET', path, None, hdr )
     req = conn . getresponse()
-    return req.read().decode()
+    res = extract_raw_from_json( req.read().decode() )
+    return ( res, len( res ) < count )
+
+def print_search_results( bearer : str, sid : str, page_size : int ) -> str :
+    done = False
+    offset = 0
+    while not done:
+        res, done = get_search_range( bearer, sid, offset, page_size ) 
+        for line in res :
+           print( line )
+        print( "offset="+str(offset) + " count="+str(count), file=sys.stderr )
+        offset += len( res )
 
 def wait_for_done( bearer : str, sid : str ) -> ( str, str ) :
-    x = 10
+    x = 200
     status = 'UNKNOWN'
     count = ""
     while x > 0 :
         status, count = get_search_status( bearer, sid )
         if status == 'DONE' :
             return ( status, count )
+        if x % 10 == 0:
+            print( "status="+status, file=sys.stderr )
         time.sleep( 0.5 )
         x -= 1
     return ( status, count )
 
-search="search index=unix sourcetype=syslog host=cloudian-node* S3REQ bucketOwnerUserId=trace earliest=-1m"
-bearer = file2string( "bearer.txt" )
+if __name__ == "__main__":
+    try:
+        search="search index=unix sourcetype=syslog host=cloudian-node* S3REQ bucketOwnerUserId=trace earliest=-50m"
+        bearer = file2string( "bearer.txt" )
 
-sid = create_search( bearer, search )
-status, count = wait_for_done( bearer, sid )
+        sid = create_search( bearer, search )
+        status, count = wait_for_done( bearer, sid )
 
-#print( "status="+status )
-#print( "count="+count )
-row_count = int( count )
+        print( "status="+status, file=sys.stderr )
+        print( "count="+count, file=sys.stderr )
+        row_count = int( count )
 
-if status == 'DONE' and row_count > 0 :
-# todo loop in batches of x rows until count is reached
-    results = get_search_results( bearer, sid, 3, 20 )
-    a = extract_raw_from_json( results )
-    for line in a :
-        print( line )
+        if status == 'DONE' and row_count > 0 :
+            print_search_results( bearer, sid, 100000 )
+    
+    except Exception as ex:
+        print( "Error reading bearer.txt: " + ex )
+        sys.exit( 1 )
+

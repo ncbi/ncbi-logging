@@ -14,3 +14,6 @@ rejected.txt
 
 # fuzz-testing temporaries
 fuzz
+
+bearer.txt
+__pycache__
