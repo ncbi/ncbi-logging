@@ -51,8 +51,7 @@ public:
 };
 
 TEST_F ( CL_TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan("") ); }
-TEST_F ( CL_TestFlexFixture, Space )           { ASSERT_EQ( SPACE, StartScan("   ") ); }
-TEST_F ( CL_TestFlexFixture, Tab )              { ASSERT_EQ( SPACE, StartScan("\t ") ); }
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
