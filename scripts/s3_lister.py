@@ -32,27 +32,31 @@ def main():
     now = now.strftime("%Y-%m-%d %H:%M:%S")
 
     for page in paginator.paginate(Bucket=bucket_name):
-        contents = page["Contents"]
-        for obj in contents:
-            key = obj["Key"]
-            LastModified = obj["LastModified"]
-            LastModified = LastModified.strftime("%Y-%m-%d %H:%M:%S")
-            ETag = obj["ETag"]
-            ETag = ETag.replace('"', "")
-            Size = obj["Size"]
-            StorageClass = obj["StorageClass"]
-            d = {}
-            d["now"] = now
-            d["bucket"] = bucket_name
-            d["source"] = "S3"
-            d["key"] = key
-            d["lastmodified"] = LastModified
-            d["etag"] = ETag
-            d["size"] = Size
-            d["storageclass"] = StorageClass
-            d["md5"] = ETag
-            #            print (obj)
-            print(json.dumps(d))
+        if "Contents" in page:
+            contents = page["Contents"]
+            for obj in contents:
+                key = obj["Key"]
+                LastModified = obj["LastModified"]
+                LastModified = LastModified.strftime("%Y-%m-%d %H:%M:%S")
+                ETag = obj["ETag"]
+                ETag = ETag.replace('"', "")
+                Size = obj["Size"]
+                StorageClass = obj["StorageClass"]
+                d = {}
+                d["now"] = now
+                d["bucket"] = bucket_name
+                d["source"] = "S3"
+                d["key"] = key
+                d["lastmodified"] = LastModified
+                d["etag"] = ETag
+                d["size"] = Size
+                d["storageclass"] = StorageClass
+                d["md5"] = ETag
+                #            print (obj)
+                print(json.dumps(d))
+        else:
+            print(f"Weird keys {page}", file=sys.stderr)
+
             # 'Key': 'DRR000871/DRR000871.1', 'LastModified': datetime.datetime(2019, 4, 7, 14, 42, 5, tzinfo=tzutc()), 'ETag': '"c148c3c12ff4ff3353f4d1908cf9a0d6-697"', 'Size': 5846499276, 'StorageClass': 'STANDARD'
 
     return 0

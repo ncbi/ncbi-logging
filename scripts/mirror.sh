@@ -98,8 +98,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
             files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
         elif [ "$YESTERDAY" -gt "20200706" ]; then
             files=""
+            echo "Recent, LOG_BUCKET=$LOG_BUCKET"
             for f in $LOG_BUCKET; do
-                files="$files $f"
+                if [[ $f == *"$YESTERDAY"* ]] || [[ $f == *"$YESTERDAY_DASH"* ]] || [[ $f == *"$YESTERDAY_UNDER"* ]] ; then
+                    files="$files $f"
+                fi
             done
 #            files=$(/bin/ls -1 $LOG_BUCKET)
 #            files=$(find $LOG_BUCKET -type f)
@@ -116,6 +119,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
         for x in $files; do
             newfile=$(echo "$x" | tr '/' '+')
             newfile=${newfile%".gz"}
+#            if [ -s "$newfile" ]; then
+#                continue
+#            fi
             echo "  $x -> $newfile"
             zcat "$x" > "$newfile" || true # Some files are corrupt, continue
         done
@@ -149,9 +155,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
+    ls -lh
+
     echo "rsynced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
-    find . -name "$WILDCARD" -print0 | sort -z | tar -caf "$TGZ" --null --files-from -
+    find . -name "$WILDCARD" -print0 | sort -z | tar -cavf "$TGZ" --null --files-from -
     echo "Tarred"
     ls -hl "$TGZ"
 
