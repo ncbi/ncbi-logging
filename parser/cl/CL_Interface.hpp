@@ -16,15 +16,28 @@ namespace NCBI
             CLReceiver( ReceiverInterface::FormatterRef fmt );
 
             typedef enum {
-                placeholder = LastMemberId+1,
-                CL_LastMemberId = placeholder
+                timestamp = LastMemberId+1,
+                owner,
+                bucket,
+                unknown1,
+                requestHdrSize,
+                requestBodySize,
+                responseHdrSize,
+                responseBodySize,
+                totalSize,
+                unknown2,
+                httpStatus,
+                reqId,
+                unknown3,
+                eTag,
+                errorCode,
+                CL_LastMemberId = errorCode
             } CL_Members; // all are t_str values
             virtual void set( CL_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
 
             virtual Category post_process( void );
 
-            std::string agent_for_postprocess;
-            std::string url_for_postprocess;
+            std::string obj_for_postprocess;
         };
 
         class CLParseBlockFactory : public ParseBlockFactoryInterface

@@ -5,6 +5,7 @@
 #include <ncbi/json.hpp>
 
 #include "Formatters.hpp"
+#include "URL_Interface.hpp"
 
 extern YY_BUFFER_STATE cl_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -22,6 +23,21 @@ void CLReceiver::set( CL_Members m, const t_str & v )
 #define CASE(mem) case mem: setMember( #mem, v ); break;
     switch( m )
     {
+    CASE(timestamp)
+    CASE(owner)
+    CASE(bucket)
+    CASE(unknown1)
+    CASE(requestHdrSize)
+    CASE(requestBodySize)
+    CASE(responseHdrSize)
+    CASE(responseBodySize)
+    CASE(totalSize)
+    CASE(unknown2)
+    CASE(httpStatus)
+    CASE(reqId)
+    CASE(unknown3)
+    CASE(eTag)
+    CASE(errorCode)
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
@@ -31,7 +47,15 @@ void CLReceiver::set( CL_Members m, const t_str & v )
 
 ReceiverInterface::Category CLReceiver::post_process( void )
 {
-    return GetCategory(); // same as it was before the call
+    URLReceiver url( m_fmt );
+    URLParseBlock pb ( url );
+    pb.format_specific_parse( obj_for_postprocess.c_str(), obj_for_postprocess.size() );
+
+    obj_for_postprocess.clear();
+    auto cat_res = url.GetCategory();
+    url . finalize(); // this is special to url-parsing
+
+    return cat_res;
 }
 
 namespace NCBI
