@@ -28,7 +28,8 @@ TEST_F( CLParseTestFixture, line )
 {
     std::string res = try_to_parse_good(
 "Oct 20 15:27:38 cloudian-node-120.be-md.ncbi.nlm.nih.gov 1 2020-10-20T15:27:37.592-04:00 cloudian-node-120.be-md.ncbi.nlm.nih.gov S3REQ 4738 - [mdc@18060 REQID=\"45200f16-ad2e-1945-87cb-d8c49756ebf4\"] 2020-10-20 15:27:36,999|10.10.26.17|trace|getObject|sra-pub-run-5||252|0|256|20971520|20972028|593542|ERR527068%2Ffile.1|206|45200f16-ad2e-1945-87cb-d8c49756ebf4|c89056a1918b4ea6534c912deee13f11-154|0|" );
-    ASSERT_NE( string(), res );
+
+    ASSERT_EQ( "Oct 20 15:27:38 cloudian-node-120.be-md.ncbi.nlm.nih.gov 1 2020-10-20T15:27:37.592-04:00 cloudian-node-120.be-md.ncbi.nlm.nih.gov S3REQ 4738 - [mdc@18060 REQID=\"45200f16-ad2e-1945-87cb-d8c49756ebf4\"]",   extract_value( res, "syslog_prefix" ) );
     ASSERT_EQ( "2020-10-20 15:27:36,999",   extract_value( res, "timestamp" ) );
     ASSERT_EQ( "10.10.26.17",               extract_value( res, "ip" ) );
     ASSERT_EQ( "trace",                     extract_value( res, "owner" ) );

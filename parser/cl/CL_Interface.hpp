@@ -16,7 +16,8 @@ namespace NCBI
             CLReceiver( ReceiverInterface::FormatterRef fmt );
 
             typedef enum {
-                timestamp = LastMemberId+1,
+                syslog_prefix = LastMemberId+1,
+                timestamp,
                 owner,
                 bucket,
                 unknown1,

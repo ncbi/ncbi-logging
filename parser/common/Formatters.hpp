@@ -101,6 +101,7 @@ namespace NCBI
             virtual void addArrayValue( const t_str & value ) {}
             virtual void closeArray() {}
 
+            void set_separator( char sep ) { separator = sep; }
         private:
             std::stringstream ss;
             char separator;

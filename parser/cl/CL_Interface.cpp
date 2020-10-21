@@ -23,6 +23,7 @@ void CLReceiver::set( CL_Members m, const t_str & v )
 #define CASE(mem) case mem: setMember( #mem, v ); break;
     switch( m )
     {
+    CASE(syslog_prefix)
     CASE(timestamp)
     CASE(owner)
     CASE(bucket)
@@ -158,6 +159,14 @@ CLReverseBlock::SetDebug( bool onOff )
 { // no need to do anything here
 }
 
+static void
+extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname )
+{
+    const JSONValue &entry = obj . getValue ( fieldname );
+    const String &S = entry . toString();
+    formatter . addNameValue( fieldname, S . toSTLString() );
+}
+
 bool
 CLReverseBlock::format_specific_parse( const char * line, size_t line_size )
 {
@@ -165,16 +174,34 @@ CLReverseBlock::format_specific_parse( const char * line, size_t line_size )
        we will inspect it and call setters on the formatter to produce output */
     String src( line, line_size );
     ReceiverInterface &receiver = GetReceiver();
-    FormatterInterface &formatter = receiver . GetFormatter();
+    ReverseFormatter &formatter = static_cast< ReverseFormatter & >( receiver . GetFormatter() );
     try
     {
         const JSONValueRef values = JSON::parse( src );
         const JSONObject &obj = values -> toObject();
 
-        //TODO
-
+        formatter . set_separator ( ' ' );
+        extract_and_set( obj, formatter, "syslog_prefix" );
+        extract_and_set( obj, formatter, "timestamp" );
+        formatter . set_separator ( '|' );
+        extract_and_set( obj, formatter, "ip" );
+        extract_and_set( obj, formatter, "owner" );
+        extract_and_set( obj, formatter, "method" );
+        extract_and_set( obj, formatter, "bucket" );
+        extract_and_set( obj, formatter, "unknown1" );
+        extract_and_set( obj, formatter, "requestHdrSize" );
+        extract_and_set( obj, formatter, "requestBodySize" );
+        extract_and_set( obj, formatter, "responseHdrSize" );
+        extract_and_set( obj, formatter, "responseBodySize" );
+        extract_and_set( obj, formatter, "totalSize" );
+        extract_and_set( obj, formatter, "unknown2" );
+        extract_and_set( obj, formatter, "path" );
+        extract_and_set( obj, formatter, "httpStatus" );
+        extract_and_set( obj, formatter, "reqId" );
+        extract_and_set( obj, formatter, "unknown3" );
+        extract_and_set( obj, formatter, "eTag" );
+        extract_and_set( obj, formatter, "errorCode" );
         receiver . SetCategory( ReceiverInterface::cat_good );
-
         return true;
     }
     catch ( const ncbi::Exception &e )

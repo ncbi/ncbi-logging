@@ -50,15 +50,7 @@ line
     ;
 
 cl_line
-    : DATETIME1 SPACE
-      STR SPACE
-      STR SPACE
-      DATETIME2 SPACE
-      STR SPACE
-      STR SPACE
-      STR SPACE
-      STR SPACE
-      REQID SPACE
+    : syslog_prefix SPACE
       timestamp PIPE
       ip PIPE
       owner PIPE
@@ -77,6 +69,38 @@ cl_line
       unknown3 PIPE
       eTag PIPE
       errorCode
+    ;
+
+syslog_prefix
+    : DATETIME1 SPACE
+      STR SPACE
+      STR SPACE
+      DATETIME2 SPACE
+      STR SPACE
+      STR SPACE
+      STR SPACE
+      STR SPACE
+      REQID
+      {
+          t_str prefix = $1;
+          MERGE_TSTR( prefix, $2 );
+          MERGE_TSTR( prefix, $3 );
+          MERGE_TSTR( prefix, $4 );
+          MERGE_TSTR( prefix, $5 );
+          MERGE_TSTR( prefix, $6 );
+          MERGE_TSTR( prefix, $7 );
+          MERGE_TSTR( prefix, $8 );
+          MERGE_TSTR( prefix, $9 );
+          MERGE_TSTR( prefix, $10 );
+          MERGE_TSTR( prefix, $11 );
+          MERGE_TSTR( prefix, $12 );
+          MERGE_TSTR( prefix, $13 );
+          MERGE_TSTR( prefix, $14 );
+          MERGE_TSTR( prefix, $15 );
+          MERGE_TSTR( prefix, $16 );
+          MERGE_TSTR( prefix, $17 );
+          lib -> set( CLReceiver::syslog_prefix, prefix );
+      }
     ;
 
 timestamp
