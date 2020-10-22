@@ -1,0 +1,100 @@
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:02:33 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/9/f4/0019a4a92b13d51bafaeeda76adf4f49" failed (2: No such file or directory)
+2020/10/15 00:02:33 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/8/20/73e4651e60b81602f2e47b17780dc208" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:03:10 [error] 61000#0: *643797 directory index of "/home/dbtest/data/sracloud/" is forbidden, client: 130.14.252.53, server: sra-download.ncbi.nlm.nih.gov, request: "GET /"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:03:45 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/b/c9/f556191e66f94bdaad86a226498afc9b" failed (2: No such file or directory)
+2020/10/15 00:03:45 [alert] 61030#0: ignore long locked inactive cache entry 149c39928dff5684876c27c5a84c9231, count:1
+2020/10/15 00:03:45 [alert] 61030#0: ignore long locked inactive cache entry 42bb38e7f3a62aea6116b00177d3e849, count:1
+2020/10/15 00:03:45 [alert] 61030#0: ignore long locked inactive cache entry 627fe15a817dffe0b1915216b99a9a4d, count:1
+2020/10/15 00:03:45 [alert] 61030#0: ignore long locked inactive cache entry a37a7c6466afd4ade14f23960d5c9a7f, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:04:10 [error] 60993#0: *644499 directory index of "/home/dbtest/data/sracloud/" is forbidden, client: 130.14.252.50, server: sra-download.ncbi.nlm.nih.gov, request: "GET /"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:10:02 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/6/f3/fef02640cc003f7e6090795766416f36" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:12:16 [alert] 61030#0: ignore long locked inactive cache entry 3fc39b4cff6a53a2d675e621124f3c7a, count:1
+2020/10/15 00:12:17 [error] 60987#0: *650699 open() "/netmnt/traces04//sra75/SRR/008255/SRR8453128" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: "GET /traces/sra75/SRR/008255/SRR8453128 HTTP/1.1", host: "sra-downloadb.be-md.ncbi.nlm.nih.gov"
+2020/10/15 00:12:18 [error] 61023#0: *650711 open() "/netmnt/traces04//sra75/SRR/008255/SRR8453129" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: "GET /traces/sra75/SRR/008255/SRR8453129 HTTP/1.1", host: "sra-downloadb.be-md.ncbi.nlm.nih.gov"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:13:08 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/9/a0/00b38cb510d88f1ca51238621217ca09" failed (2: No such file or directory)
+2020/10/15 00:13:08 [alert] 61030#0: ignore long locked inactive cache entry d29d2c5c42dda9e39a6628e944d106c6, count:1
+2020/10/15 00:13:10 [error] 61000#0: *651237 directory index of "/home/dbtest/data/sracloud/" is forbidden, client: 130.14.252.50, server: sra-download.ncbi.nlm.nih.gov, request: "GET /"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:13:18 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/0/95/e838707c8491f055d06ad351c87c6950" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:16:02 [alert] 61030#0: ignore long locked inactive cache entry 627fe15a817dffe0b1915216b99a9a4d, count:1
+2020/10/15 00:16:02 [alert] 61030#0: ignore long locked inactive cache entry a37a7c6466afd4ade14f23960d5c9a7f, count:1
+2020/10/15 00:16:02 [alert] 61030#0: ignore long locked inactive cache entry 3fc39b4cff6a53a2d675e621124f3c7a, count:1
+2020/10/15 00:16:10 [error] 61021#0: *653249 directory index of "/home/dbtest/data/sracloud/" is forbidden, client: 130.14.252.50, server: sra-download.ncbi.nlm.nih.gov, request: "GET /"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:17:10 [error] 60982#0: *653966 directory index of "/home/dbtest/data/sracloud/" is forbidden, client: 130.14.252.53, server: sra-download.ncbi.nlm.nih.gov, request: "GET /"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:19:51 [error] 60999#0: *648365 upstream prematurely closed connection while reading upstream, client: 112.17.92.191, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: "GET /sos2/sra-pub-run-13/ERR2239132/ERR2239132.1 HTTP/1.1", upstream: "http://10.154.190.39:80/sra-pub-run-13/ERR2239132/ERR2239132.1", host: "sra-downloadb.be-md.ncbi.nlm.nih.gov"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/5/e5/cbb42f63c955e92d54295e2ad11d3e55" failed (2: No such file or directory)
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/7/d5/1afd87ec19e7bba79f7331c9ee489d57" failed (2: No such file or directory)
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/f/19/915ee50c62f66a77472bf3cc9f8ad19f" failed (2: No such file or directory)
+2020/10/15 00:20:39 [alert] 61030#0: ignore long locked inactive cache entry 627fe15a817dffe0b1915216b99a9a4d, count:1
+2020/10/15 00:20:39 [alert] 61030#0: ignore long locked inactive cache entry a37a7c6466afd4ade14f23960d5c9a7f, count:1
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/d/20/06149e28bf3a35d4b7d82fd95b5e420d" failed (2: No such file or directory)
+2020/10/15 00:20:39 [alert] 61030#0: ignore long locked inactive cache entry 3fc39b4cff6a53a2d675e621124f3c7a, count:1
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/c/02/b8cda014f0e58cdfdce8f6430235d02c" failed (2: No such file or directory)
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/6/ef/cc7119251727d4feee7fa989c193def6" failed (2: No such file or directory)
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/0/06/e5784f3b9acf03d88a0f852ef50ca060" failed (2: No such file or directory)
+2020/10/15 00:20:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/f/00/b05a4ddda940ee55fedcf2db3d74100f" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:21:39 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/0/26/65381cc396e138cf93f492b5d4333260" failed (2: No such file or directory)
+2020/10/15 00:21:40 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/b/00/3ee6bf6f7b752774b7a7d26cdfa1900b" failed (2: No such file or directory)
+2020/10/15 00:21:41 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/e/f4/8270a6226d299ee46ce5856b27aa5f4e" failed (2: No such file or directory)
+2020/10/15 00:21:41 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/4/99/5228db16fad1c3d211326a647d61b994" failed (2: No such file or directory)
+2020/10/15 00:21:41 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/b/97/87291d484f447afc27fa899afa47597b" failed (2: No such file or directory)
+2020/10/15 00:21:41 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/4/ac/c6724c234a70817903ce3c68a1fbfac4" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:21:44 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/f/d2/c6cb70cb835b629e95bb3f3d3568dd2f" failed (2: No such file or directory)
+2020/10/15 00:21:44 [alert] 61030#0: ignore long locked inactive cache entry 27a8b97c5c6686b2978cd418ac1b3091, count:1
+2020/10/15 00:21:51 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/5/ac/3cb259b1238669223436e4c6026abac5" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:21:58 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/b/20/ddc42ce30817d88fa64b3b5d6646820b" failed (2: No such file or directory)
+2020/10/15 00:22:02 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/1/8e/381cebe2d94b84303b00625b727988e1" failed (2: No such file or directory)
+2020/10/15 00:22:03 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/c/69/c39d87b426b453bc624fba074f62069c" failed (2: No such file or directory)
+2020/10/15 00:22:05 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/6/f2/3c402ba7c1c26f5ea7cf3308e7ea3f26" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:23:11 [alert] 61030#0: ignore long locked inactive cache entry 627fe15a817dffe0b1915216b99a9a4d, count:1
+2020/10/15 00:23:11 [alert] 61030#0: ignore long locked inactive cache entry a37a7c6466afd4ade14f23960d5c9a7f, count:1
+2020/10/15 00:23:11 [alert] 61030#0: ignore long locked inactive cache entry 3fc39b4cff6a53a2d675e621124f3c7a, count:1
+2020/10/15 00:23:11 [alert] 61030#0: ignore long locked inactive cache entry 084bcfc51b9ac0d6a0d16455aaa88ec3, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:24:02 [alert] 61030#0: ignore long locked inactive cache entry d61c5ee9932073cf6193c790203a372f, count:1
+2020/10/15 00:24:02 [alert] 61030#0: ignore long locked inactive cache entry f99ff612c223f8bfca05c532df32d25b, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:25:24 [alert] 61030#0: ignore long locked inactive cache entry 6956d3c9d22c6f414d1adc7ebfcb2677, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:26:36 [alert] 61030#0: ignore long locked inactive cache entry 84ef66b79828ef114d4f3542a7731f97, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:27:17 [alert] 61030#0: ignore long locked inactive cache entry de6e5512f4c7bdf3662add5922d6a681, count:1
+2020/10/15 00:27:17 [alert] 61030#0: ignore long locked inactive cache entry ff272217ed3aba22ccd5266561b36f90, count:1
+2020/10/15 00:27:17 [alert] 61030#0: ignore long locked inactive cache entry 2c37d0661d8c113b729e4d04ad15f045, count:1
+2020/10/15 00:27:17 [alert] 61030#0: ignore long locked inactive cache entry 3ea683d5c8c1cd94d75549b98598a8cf, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:27:48 [alert] 61030#0: ignore long locked inactive cache entry 627fe15a817dffe0b1915216b99a9a4d, count:1
+2020/10/15 00:27:48 [alert] 61030#0: ignore long locked inactive cache entry a37a7c6466afd4ade14f23960d5c9a7f, count:1
+2020/10/15 00:27:48 [alert] 61030#0: ignore long locked inactive cache entry 3fc39b4cff6a53a2d675e621124f3c7a, count:1
+2020/10/15 00:27:48 [alert] 61030#0: ignore long locked inactive cache entry 06a7945f7a5fdb5413019b4f0769b37c, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:28:29 [alert] 61030#0: ignore long locked inactive cache entry d61c5ee9932073cf6193c790203a372f, count:1
+2020/10/15 00:28:29 [alert] 61030#0: ignore long locked inactive cache entry f99ff612c223f8bfca05c532df32d25b, count:1
+2020/10/15 00:28:29 [crit] 61030#0: unlink() "/export/nginx/proxy_cache/1/09/27a8b97c5c6686b2978cd418ac1b3091" failed (2: No such file or directory)
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:30:36 [error] 61008#0: *664824 open() "/netmnt/traces04//sra75/SRR/008255/SRR8453194" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: "GET /traces/sra75/SRR/008255/SRR8453194 HTTP/1.1", host: "sra-downloadb.be-md.ncbi.nlm.nih.gov"
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:33:35 [error] 61016#0: *667168 open() "/netmnt/traces04//sra75/SRR/008255/SRR8453205" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: "GET /traces/sra75/SRR/008255/SRR8453205 HTTP/1.1", host: "sra-downloadb.be-md.ncbi.nlm.nih.gov"
+2020/10/15 00:33:36 [error] 61025#0: *667175 open() "/netmnt/traces04//sra75/SRR/008255/SRR8453206" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: "GET /traces/sra75/SRR/008255/SRR8453206 HTTP/1.1", host: "sra-downloadb.be-md.ncbi.nlm.nih.gov"
+2020/10/15 00:33:36 [alert] 61030#0: ignore long locked inactive cache entry 9a8dc36fc25ef63b50331a25e3cabd2c, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:35:30 [alert] 61030#0: ignore long locked inactive cache entry de6e5512f4c7bdf3662add5922d6a681, count:1
+2020/10/15 00:35:30 [alert] 61030#0: ignore long locked inactive cache entry 592ff12512630224cea56152b6ec18b4, count:1
+file-meta ncbi_location=be-md&ncbi_role=production&applog_db_rotate_host=srafiles21
+2020/10/15 00:35:50 [alert] 61030#0: ignore long locked inactive cache entry a0a9e8d3b5a8c5194820f60d3da0d0e2, count:1
+2020/10/15 00:35:50 [alert] 61030#0: ignore long locked inactive cache entry 4e58c4a669c4327e132e56c83b70f68e, count:1
