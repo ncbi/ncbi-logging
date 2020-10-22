@@ -3,6 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <sstream>
+
+#include <ncbi/json.hpp>
+
 #include "CatWriters.hpp"
 #include "ReceiverInterface.hpp"
 #include "LineSplitters.hpp"
