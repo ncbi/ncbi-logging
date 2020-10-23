@@ -8,7 +8,7 @@
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201009.json  uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201022.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -191,13 +191,13 @@ OR IP LIKE '129.106.%';
 UPDATE RDNS
 SET DOMAIN = 'Chinamobile.com'
 WHERE IP LIKE '36.1%'
-OR IP LIKE '120.221.%'
-OR IP LIKE '223.10%'
 OR IP LIKE '111.3%'
 OR IP LIKE '111.4%'
-OR IP LIKE '120.235%'
-OR IP LIKE '183.192.%'
-OR IP LIKE '183.209.%'
+OR IP LIKE '112.%'
+OR IP like '120.2%'
+OR IP LIKE '183.19%'
+OR IP LIKE '183.2%'
+OR IP LIKE '223.10%'
 OR IP LIKE '223.64.%'
 OR IP LIKE '223.65.%'
 OR IP LIKE '223.66.%'
@@ -1101,6 +1101,22 @@ update rdns
 set domain='buffalo.edu (SUNY Buffalo)'
 where ip like '128.205.%';
 
+update rdns
+set domain='hudsonalpha.org (HIB-12)'
+where ip like '52.119.%';
+
+update rdns
+set domain='kbn.com.hk (Hong Kong Broadband)'
+where ip like '61.238.%';
+
+update rdns
+set domain='psligthwave.com (Family Tree DNA)'
+where ip like '66.249.108.%';
+
+update rdns
+set domain='rice.edu (Rice University)'
+where ip like '128.42.%';
+
 
 
 UPDATE RDNS
@@ -1112,6 +1128,7 @@ WHERE DOMAIN = 'Unknown'
        OR IP LIKE '34.7%'
        OR IP LIKE '34.8%'
        OR IP LIKE '34.9%'
+       OR IP LIKE '35.1%'
        OR IP LIKE '35.2%'
        OR IP LIKE '2600:1900:%');
 
