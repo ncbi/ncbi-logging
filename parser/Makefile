@@ -1,5 +1,5 @@
 
-SUBDIR = aws op gcp tw cl err
+SUBDIRS = aws op gcp tw cl err
 
 all: $(SUBDIRS)
 	@echo "done"
@@ -17,7 +17,7 @@ test_cmn:
 cmn_clean:
 	$(MAKE) -C common clean
 
-clean: cmn_clean $(addsuffix _clean,$(SUBDIR))
+clean: cmn_clean $(addsuffix _clean,$(SUBDIRS))
 	rm -rf *.output
 
 #################################################
@@ -142,9 +142,9 @@ acc_test: jq
 #################################################
 # valgrind
 
-vg : $(addprefix vg_,$(SUBDIR))
+vg : $(addprefix vg_,$(SUBDIRS))
 
-$(addprefix vg_,$(SUBDIR)) : vg_cmn
+$(addprefix vg_,$(SUBDIRS)) : vg_cmn
 
 vg_cmn:
 	$(MAKE) -C common vg
@@ -167,7 +167,7 @@ vg_cl :
 vg_err :
 	$(MAKE) -C err vg
 
-.PHONY: vg vg_cmn $(addprefix vg_,$(SUBDIR))
+.PHONY: vg vg_cmn $(addprefix vg_,$(SUBDIRS))
 
 #-------------------------------------------------------------------------------
 # fuzz testing
