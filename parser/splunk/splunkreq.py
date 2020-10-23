@@ -49,6 +49,7 @@ def extract_raw_from_json( data : str ) :
     return res
 
 # returns the search-id
+#TODO: refactor to have domain and path in one place
 def create_search( bearer : str, search : str ) -> str :
     hdr = { 'Authorization' : "Bearer " + bearer }
     domain = "splunkapi.ncbi.nlm.nih.gov"
@@ -84,7 +85,7 @@ def print_search_results( bearer : str, sid : str, page_size : int ) -> str :
     done = False
     offset = 0
     while not done:
-        res, done = get_search_range( bearer, sid, offset, page_size ) 
+        res, done = get_search_range( bearer, sid, offset, page_size )
         for line in res :
            print( line )
         print( "offset="+str(offset) + " count="+str(count), file=sys.stderr )
@@ -104,6 +105,13 @@ def wait_for_done( bearer : str, sid : str ) -> ( str, str ) :
         x -= 1
     return ( status, count )
 
+#TODO: take the lookback time from the command line
+#TODO: take page_size time from the command line
+#TODO: take the wait time (wait_for_done) from the command line
+#TODO: take the token file (or the token itself) from the command line
+#TODO: allow overriding the search string or its components
+#TODO: only print details in verbose mode
+
 if __name__ == "__main__":
     try:
         search="search index=unix sourcetype=syslog host=cloudian-node* S3REQ bucketOwnerUserId=trace earliest=-50m"
@@ -118,7 +126,7 @@ if __name__ == "__main__":
 
         if status == 'DONE' and row_count > 0 :
             print_search_results( bearer, sid, 100000 )
-    
+
     except Exception as ex:
         print( "Error reading bearer.txt: " + ex )
         sys.exit( 1 )
