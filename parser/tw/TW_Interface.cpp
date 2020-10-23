@@ -28,14 +28,12 @@ void TWReceiver::set( TW_Members m, const t_str & v )
     CASE( id3 )
     CASE( time )
     CASE( server )
-    CASE( ip )
     CASE( sid )
     CASE( service )
     CASE( event )
     case msg :  setMember( "msg", v );
                 msg_for_postprocess = std::string( v.p, v.n );
                 break;
-    //CASE( msg )
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE

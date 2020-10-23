@@ -19,7 +19,9 @@ $(OBJDIR)/msg_parser.dbg.o:  	$(OBJDIR)/msg_scanner.dbg.o
 $(OBJDIR)/msg_parser.rel.o:  	$(OBJDIR)/msg_scanner.rel.o
 $(OBJDIR)/msg_parser.prof.o:  	$(OBJDIR)/msg_scanner.prof.o
 
-MSG_TEST_FLEX_SRC = msg_test_flex.cpp msg_scanner.cpp
+MSG_TEST_FLEX_SRC = msg_scanner.cpp msg_test_flex.cpp
+
+msg_test_flex.cpp MSG_Interface.cpp: msg_scanner.cpp
 
 MSG_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(MSG_TEST_FLEX_SRC)))
 MSG_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(MSG_TEST_FLEX_SRC)))
@@ -35,5 +37,11 @@ flex_test: msg_flex_test
 msg_flex_test: $(BINDIR)/msg_test_flex-dbg $(BINDIR)/msg_test_flex-rel
 	$(BINDIR)/msg_test_flex-dbg
 	$(BINDIR)/msg_test_flex-rel
+
+err_clean: msg_clean
+
+msg_clean:
+	@ rm -rf $(BINDIR)/msg* $(OBJDIR)/msg*
+	@ rm -rf ./msg_parser.?pp ./msg_scanner.?pp
 
 .phony: msg_flex_test

@@ -24,7 +24,7 @@ $(OBJDIR)/%.prof.o: %.cpp
 #################################################
 # generic rules for flex and bison
 
-%scanner.cpp: %scanner.l %parser.hpp %parser.cpp
+%scanner.cpp: %scanner.l %parser.cpp
 	flex $(FLEXFLAGS) --header-file=$(subst .cpp,.hpp,$@) --outfile=$@ $<
 
 %parser.cpp : %parser.y

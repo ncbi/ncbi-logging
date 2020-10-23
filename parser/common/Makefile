@@ -52,9 +52,9 @@ $(OBJDIR)/URL_Interface.dbg.o $(OBJDIR)/URL_Interface.rel.o $(OBJDIR)/URL_Interf
 $(OBJDIR)/url_parser.dbg.o $(OBJDIR)/url_parser.rel.o $(OBJDIR)/url_parser.prof.o : url_parser.hpp
 url_parser.hpp : url_parser.cpp
 
-.precious: jwt_scanner.cpp jwt_scanner.hpp jwt_parser.cpp jwt_parser.hpp
+.precious: jwt_scanner.cpp   jwt_scanner.hpp   jwt_parser.cpp   jwt_parser.hpp
 .precious: agent_scanner.cpp agent_scanner.hpp agent_parser.cpp agent_parser.hpp
-.precious: url_scanner.cpp url_scanner.hpp url_parser.cpp url_parser.hpp
+.precious: url_scanner.cpp   url_scanner.hpp   url_parser.cpp   url_parser.hpp
 
 #################################################
 # unit tests for formatter/catwriter/etc
@@ -70,10 +70,13 @@ TEST_SUPPORT_SRC = $(COMMON_SRC) \
 	test_url_parsing.cpp \
 	test_support_main.cpp
 
+$(OBJDIR)/test_url_flex.dbg.o: url_scanner.cpp
+$(OBJDIR)/test_url_flex.rel.o: url_scanner.cpp
+
 TEST_SUPPORT_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(TEST_SUPPORT_SRC)))
 TEST_SUPPORT_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(TEST_SUPPORT_SRC)))
 
-ALL_OBJ = $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(TEST_SUPPORT_DBG_OBJ) $(TEST_SUPPORT_REL_OBJ)
+ALL_OBJ = $(COMMON_DBG_OBJ) $(COMMON_REL_OBJ) $(COMMON_PROF_OBJ) $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(CMD_PROF_OBJ) $(TEST_SUPPORT_DBG_OBJ) $(TEST_SUPPORT_REL_OBJ)  $(TEST_SUPPORT_PROF_OBJ)
 ALL_D = $(subst .o,.d,$(ALL_OBJ))
 -include $(ALL_D)
 

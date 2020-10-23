@@ -1,6 +1,10 @@
 
-all: cmn aws op gcp tw
+SUBDIR = aws op gcp tw cl err
+
+all: $(SUBDIRS)
 	@echo "done"
+
+$(SUBDIRS): cmn
 
 cmn:
 	$(MAKE) -C common
@@ -13,7 +17,7 @@ test_cmn:
 cmn_clean:
 	$(MAKE) -C common clean
 
-clean: aws_clean op_clean gcp_clean tw_clean cmn_clean
+clean: cmn_clean $(addsuffix _clean,$(SUBDIR))
 	rm -rf *.output
 
 #################################################
@@ -85,6 +89,40 @@ tw_clean:
 .PHONY: tw tw_prof tw_clean tw_test
 
 #################################################
+# stand alone CLoudian parser
+
+cl:
+	$(MAKE) -C cl
+
+cl_prof:
+	$(MAKE) -C cl prof
+
+cl_test:
+	$(MAKE) -C cl test
+
+cl_clean:
+	$(MAKE) -C cl clean
+
+.PHONY: cl cl_prof cl_clean cl_test
+
+#################################################
+# stand alone ERror parser
+
+err:
+	$(MAKE) -C err
+
+err_prof:
+	$(MAKE) -C err prof
+
+err_test:
+	$(MAKE) -C err test
+
+err_clean:
+	$(MAKE) -C err clean
+
+.PHONY: err err_prof err_clean err_test
+
+#################################################
 # acceptance
 
 jq:
@@ -95,6 +133,8 @@ acc_test: jq
 	$(MAKE) -C gcp acc_test
 	$(MAKE) -C op acc_test
 	$(MAKE) -C tw acc_test
+	$(MAKE) -C cl acc_test
+	$(MAKE) -C err acc_test
 	@ echo "done"
 
 .PHONY: test jq
@@ -102,7 +142,9 @@ acc_test: jq
 #################################################
 # valgrind
 
-vg : vg_cmn vg_op vg_gcp vg_aws vg_tw
+vg : $(addprefix vg_,$(SUBDIR))
+
+$(addprefix vg_,$(SUBDIR)) : vg_cmn
 
 vg_cmn:
 	$(MAKE) -C common vg
@@ -119,22 +161,34 @@ vg_op :
 vg_tw :
 	$(MAKE) -C tw vg
 
-.PHONY: vg_cmn vg_op vg_gcp vg_aws vg_tw vg
+vg_cl :
+	$(MAKE) -C cl vg
+
+vg_err :
+	$(MAKE) -C err vg
+
+.PHONY: vg vg_cmn $(addprefix vg_,$(SUBDIR))
 
 #-------------------------------------------------------------------------------
 # fuzz testing
+
+#TODO: implement missing fuzz-tests
 
 clean_fuzz:
 	$(MAKE) -C aws clean_fuzz
 	$(MAKE) -C gcp clean_fuzz
 	$(MAKE) -C op clean_fuzz
 	$(MAKE) -C tw clean_fuzz
+	$(MAKE) -C cl clean_fuzz
+	$(MAKE) -C err clean_fuzz
 
 run_fuzz:
 	$(MAKE) -C aws fuzz
 	$(MAKE) -C gcp fuzz
 	$(MAKE) -C op fuzz
 	$(MAKE) -C tw fuzz
+	$(MAKE) -C cl fuzz
+	$(MAKE) -C err fuzz
 
 .phony: clean_fuzz run_fuzz
 

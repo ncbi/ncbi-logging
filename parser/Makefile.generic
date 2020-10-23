@@ -16,7 +16,7 @@ cmn:
 
 test: acc_test
 
-clean: $(PREFIX)_clean
+clean: $(PREFIX)_clean clean_fuzz
 
 mkdir:
 	@ mkdir -p $(BINDIR) $(OBJDIR)
@@ -82,8 +82,10 @@ prof: mkdir common_prof $(FWD_TOOL)-prof $(REV_TOOL)-prof
 common_prof :
 	$(MAKE) -C ../common prof
 
+$(PREFIX)_test_flex.cpp: $(PREFIX)_scanner.cpp
+
 $(PREFIX)_TEST_PARSE_SRC    += $($(CPREFIX)2JSN_CMN_SRC) $(PREFIX)_test_parse.cpp
-$(PREFIX)_TEST_FLEX_SRC     += $(PREFIX)_test_flex.cpp $(PREFIX)_scanner.cpp
+$(PREFIX)_TEST_FLEX_SRC     += $(PREFIX)_scanner.cpp $(PREFIX)_test_flex.cpp
 $(PREFIX)_TEST_REVERSE_SRC  += $(PREFIX)_test_reverse.cpp $(PREFIX)_parser.cpp $(PREFIX)_scanner.cpp
 
 $(PREFIX)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX)_TEST_PARSE_SRC)))
@@ -143,20 +145,21 @@ $(PREFIX)_clean:
 	@ rm -rf $(ALL_OBJ) $(ALL_D) $(BINDIR)/$(PREFIX)* $(BINDIR)/jsn2$(PREFIX)*
 	@ rm -rf ./$(PREFIX)_parser.?pp ./$(PREFIX)_scanner.?pp
 	@ rm -rf *.output
+	@ rm -rf actual/*
 
 #################################################
 # acceptance
 
-TMP_DIR = actual/tmp
+ACCTMP_DIR = actual/acctmp
 
 acc_test: all unittest_parse unittest_reverse acctest_parse acctest_reverse
-	@ rm -rf actual/$(PREFIX)_*
+	@ rm -rf actual/*
 	@ echo "$(PREFIX) tests done"
 
 acctest_parse: all
 	#
-	@ ../runtestcase.sh ../data/$(PREFIX)_testlines.log $(FWD_TOOL)-dbg $(TMP_DIR)
-	@ ../diff_results.sh ../expected/$(PREFIX)_testlines $(TMP_DIR)
+	@ ../runtestcase.sh ../data/$(PREFIX)_testlines.log $(FWD_TOOL)-dbg $(ACCTMP_DIR)
+	@ ../diff_results.sh ../expected/$(PREFIX)_testlines $(ACCTMP_DIR)
 	#
 	@ echo "$(PREFIX) acctest_parse passed"
 
@@ -168,14 +171,16 @@ RT_ORIG1_DIR = actual/rt_orig1
 RT_JSN_DIR = actual/rt_json
 RT_ORIG2_DIR = actual/rt_orig2
 
+ACCREVTMP_DIR = actual/revtmp
+
 acctest_reverse: all
 	#
-	@ ../runtestcase.sh $(JSON1) $(REV_TOOL)-dbg $(TMP_DIR)
-	@ ../diff_results.sh ../expected/$(PREFIX)_rev_testlines $(TMP_DIR)
+	@ ../runtestcase.sh $(JSON1) $(REV_TOOL)-dbg $(ACCREVTMP_DIR)
+	@ ../diff_results.sh ../expected/$(PREFIX)_rev_testlines $(ACCREVTMP_DIR)
 	#
 	# multi-threaded
-	@ ../runtestcase.sh $(JSON1_MT) $(REV_TOOL)-dbg $(TMP_DIR)
-	@ ../diff_results.sh ../expected/$(PREFIX)_reparse_mt $(TMP_DIR)
+	@ ../runtestcase.sh $(JSON1_MT) $(REV_TOOL)-dbg $(ACCREVTMP_DIR)
+	@ ../diff_results.sh ../expected/$(PREFIX)_reparse_mt $(ACCREVTMP_DIR)
 	#
 	# round trip
 	# reparse 1
@@ -196,15 +201,16 @@ acctest_reverse: all
 VG_OPTIONS := --leak-check=full --error-exitcode=1
 VG_BUILD = dbg
 #VG_BUILD = rel
+VGTMP_DIR = actual/vgtmp
 
 vg_fwd : mkdir $(FWD_TOOL)-$(VG_BUILD) $(BINDIR)/$(PREFIX)_test_flex-$(VG_BUILD) $(BINDIR)/$(PREFIX)_test_parse-$(VG_BUILD)
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX)_test_flex-$(VG_BUILD)
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX)_test_parse-$(VG_BUILD)
-	cat ../data/$(PREFIX)_testlines.log | valgrind $(VG_OPTIONS) $(FWD_TOOL)-$(VG_BUILD) $(TMP_DIR)
+	cat ../data/$(PREFIX)_testlines.log | valgrind $(VG_OPTIONS) $(FWD_TOOL)-$(VG_BUILD) $(VGTMP_DIR)
 
 vg_rev : mkdir $(REV_TOOL)-$(VG_BUILD) $(BINDIR)/$(PREFIX)_test_reverse-$(VG_BUILD)
 	valgrind $(VG_OPTIONS) $(BINDIR)/$(PREFIX)_test_reverse-$(VG_BUILD)
-	cat ../data/$(PREFIX)_reparse_1.json | valgrind $(VG_OPTIONS) $(REV_TOOL)-$(VG_BUILD) $(TMP_DIR)
+	cat ../data/$(PREFIX)_reparse_1.json | valgrind $(VG_OPTIONS) $(REV_TOOL)-$(VG_BUILD) $(VGTMP_DIR)
 
 vg : vg_fwd vg_rev
 
@@ -214,7 +220,7 @@ vg : vg_fwd vg_rev
 # fuzz testing
 
 clean_fuzz:
-	rm -rf fuzz/
+	rm -rf fuzz $(OBJDIR)/$(CPREFIX)*.fuzz.o $(OBJDIR)/$(CPREFIX)*.fuzz.d
 
 FUZZ_SRC = \
 	$($(CPREFIX)2JSN_CMN_SRC) \
