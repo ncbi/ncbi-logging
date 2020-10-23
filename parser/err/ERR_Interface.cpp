@@ -5,7 +5,8 @@
 #include <ncbi/json.hpp>
 
 #include "Formatters.hpp"
-#include "JWT_Interface.hpp"
+#include "MSG_Interface.hpp"
+#include "URL_Interface.hpp"
 
 extern YY_BUFFER_STATE err_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -38,13 +39,20 @@ void ERRReceiver::set( ERR_Members m, const t_str & v )
 
 ReceiverInterface::Category ERRReceiver::post_process( void )
 {
-    /*
-    JWTReceiver jwt( m_fmt );
-    JWTParseBlock pb ( jwt );
+    MSGReceiver msg( m_fmt );
+    MSGParseBlock pb ( msg );
     pb.format_specific_parse( msg_for_postprocess.c_str(), msg_for_postprocess.size() );
     msg_for_postprocess . clear();
-    */
-    return GetCategory();
+
+    if ( msg.GetCategory() == ReceiverInterface::cat_good )
+    {
+        URLReceiver url( m_fmt );
+        URLParseBlock pb ( url );
+        pb.format_specific_parse( msg.path_for_url_parser.c_str(), msg.path_for_url_parser.size() );
+        url . finalize(); // this is special to url-parsing
+    }
+
+    return GetCategory(); // ignore the result category of post-processing
 }
 
 namespace NCBI
@@ -166,7 +174,9 @@ ERRReverseBlock::format_specific_parse( const char * line, size_t line_size )
         const JSONValueRef values = JSON::parse( src );
         const JSONObject &obj = values -> toObject();
 
-        extract_and_set( obj, formatter, "id1" );
+        extract_and_set( obj, formatter, "datetime" );
+        extract_and_set( obj, formatter, "severity" );
+        extract_and_set( obj, formatter, "pid" );
         extract_and_set( obj, formatter, "msg" );
 
         receiver . SetCategory( ReceiverInterface::cat_good );

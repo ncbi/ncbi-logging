@@ -32,7 +32,7 @@ REV_TOOL = $(BINDIR)/jsn2$(PREFIX)
 #################################################
 # stand alone parser
 
-$(CPREFIX)2JSN_CMN_SRC = \
+$(CPREFIX)2JSN_CMN_SRC += \
 	$(PREFIX)_parser.cpp \
 	$(PREFIX)_scanner.cpp \
 	$(CPREFIX)_Interface.cpp
@@ -82,9 +82,9 @@ prof: mkdir common_prof $(FWD_TOOL)-prof $(REV_TOOL)-prof
 common_prof :
 	$(MAKE) -C ../common prof
 
-$(PREFIX)_TEST_PARSE_SRC = $($(CPREFIX)2JSN_CMN_SRC) $(PREFIX)_test_parse.cpp
-$(PREFIX)_TEST_FLEX_SRC = $(PREFIX)_test_flex.cpp $(PREFIX)_scanner.cpp
-$(PREFIX)_TEST_REVERSE_SRC = $(PREFIX)_test_reverse.cpp $(PREFIX)_parser.cpp $(PREFIX)_scanner.cpp
+$(PREFIX)_TEST_PARSE_SRC    += $($(CPREFIX)2JSN_CMN_SRC) $(PREFIX)_test_parse.cpp
+$(PREFIX)_TEST_FLEX_SRC     += $(PREFIX)_test_flex.cpp $(PREFIX)_scanner.cpp
+$(PREFIX)_TEST_REVERSE_SRC  += $(PREFIX)_test_reverse.cpp $(PREFIX)_parser.cpp $(PREFIX)_scanner.cpp
 
 $(PREFIX)_TEST_PARSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(PREFIX)_TEST_PARSE_SRC)))
 $(PREFIX)_TEST_PARSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX)_TEST_PARSE_SRC)))

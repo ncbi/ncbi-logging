@@ -39,11 +39,11 @@ using namespace NCBI::Logging;
 
 %token<s> UNRECOGNIZED SPACE STR DATETIME SEVERITY MSG
 
-%start log_err
+%start log_line
 
 %%
 
-log_err
+log_line
     : error { YYABORT; }
     | datetime SPACE severity SPACE pid SPACE { err_start_MSG( scanner ); } msg {}
     | STR SPACE { err_start_MSG( scanner ); } MSG

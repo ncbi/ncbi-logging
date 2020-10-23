@@ -58,14 +58,13 @@ public:
     }
 };
 
-#if 0
 TEST_F( ERRReverseTestFixture, ReverseGoodJson )
 {
-    string line( "{\"accepted\":\"true\",\"event\":\"extra\",\"id1\":\"77619/000/0000/R\",\"id2\":\"CC952F33EE2FDBD1\",\"id3\":\"0008/0008\",\"ip\":\"185.151.196.174\",\"msg\":\"issued_suhit=m_1\",\"server\":\"traceweb22\",\"service\":\"sra\",\"sid\":\"CC952F33EE2FDBD1_0000SID\",\"time\":\"2020-06-11T23:59:58.079949\"}" );
+    string line( "{\"accession\":\"SRR8453128\",\"client\":\"218.219.98.126\",\"datetime\":\"2020/10/15 00:12:17\",\"extension\":\"\",\"filename\":\"SRR8453128\",\"host\":\"sra-downloadb.be-md.ncbi.nlm.nih.gov\",\"method\":\"GET\",\"msg\":\"*650699 open() \\\"/netmnt/traces04//sra75/SRR/008255/SRR8453128\\\" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \\\"GET /traces/sra75/SRR/008255/SRR8453128 HTTP/1.1\\\", host: \\\"sra-downloadb.be-md.ncbi.nlm.nih.gov\\\"\",\"path\":\"/traces/sra75/SRR/008255/SRR8453128\",\"pid\":\"60987#0:\",\"server\":\"srafiles21.be-md.ncbi.nlm.nih.gov\",\"severity\":\"[error]\",\"vers\":\"HTTP/1.1\"}" );
 
-    ASSERT_EQ( "77619/000/0000/R CC952F33EE2FDBD1 0008/0008 2020-06-11T23:59:58.079949 traceweb22 185.151.196.174 CC952F33EE2FDBD1_0000SID sra extra issued_suhit=m_1", Parse(line) );
+    ASSERT_EQ( "2020/10/15 00:12:17 [error] 60987#0: *650699 open() \"/netmnt/traces04//sra75/SRR/008255/SRR8453128\" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /traces/sra75/SRR/008255/SRR8453128 HTTP/1.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"",
+        Parse(line) );
 }
-#endif
 
 extern "C"
 {
