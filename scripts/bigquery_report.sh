@@ -188,11 +188,20 @@ bq -q query \
     --format "$FORMAT" \
     "select datetime_trunc(start_ts, day) as day, count(distinct remote_ip) as uniq_ips, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from strides_analytics.summary_export where domain not like '%nih.gov%' and source='S3' and bucket like '%cov2%' group by day order by day"
 
-
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "select datetime_trunc(start_ts, day) as day, count(distinct remote_ip) as uniq_ips_to_cloud from strides_analytics.summary_export where domain not like '%nih.gov%' and (source='S3' or source='GS') group by day order by day desc"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select bucket, source, count(distinct remote_ip) as uniq_ips from strides_analytics.summary_export where domain not like '%nih.gov%' and (source='S3' or source='GS') group by bucket, source order by uniq_ips desc"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select bucket, source, domain, count(distinct remote_ip) as crun_uniq_ips from strides_analytics.summary_export where bucket like '%crun%' and (source='S3' or source='GS') group by bucket, source, domain order by crun_uniq_ips desc"
 
 bq -q query \
     --use_legacy_sql=false \
