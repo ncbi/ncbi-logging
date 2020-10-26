@@ -22,3 +22,29 @@ ERR527068%2FERR527068.1|.......................request path
 c89056a1918b4ea6534c912deee13f11-154|..........unknown #3 <-------------------
 0|.............................................E-tag
 ...............................................error code
+
+Here is how Cloudian defines fields in each log line. Each field is separated by "|".
+"timestamp",
+"ipAddress",
+"bucketOwnerUserId",
+"operation",
+"bucketName",
+"contentAccessorUserID",
+"requestHeaderSize",
+"requestBodySize",
+"responseHeaderSize",
+"responseBodySize",
+"totalRequestResponseSize",
+"durationMsec", # Note request duration is measured in microseconds not milliseconds.
+"objectName",
+"httpStatus",
+"s3RequestID",
+"eTag",
+"errorCode",
+"copySource"
+
+unknown #1 = contentAccessorUserID
+unknown #2 = durationMsec
+unknown #3 = eTag
+eTag = errorCode
+errorCode = copySource
