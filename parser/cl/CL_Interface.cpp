@@ -27,18 +27,18 @@ void CLReceiver::set( CL_Members m, const t_str & v )
     CASE(timestamp)
     CASE(owner)
     CASE(bucket)
-    CASE(unknown1)
+    CASE(contentAccessorUserID)
     CASE(requestHdrSize)
     CASE(requestBodySize)
     CASE(responseHdrSize)
     CASE(responseBodySize)
     CASE(totalSize)
-    CASE(unknown2)
+    CASE(durationMsec)
     CASE(httpStatus)
     CASE(reqId)
-    CASE(unknown3)
     CASE(eTag)
     CASE(errorCode)
+    CASE(copySource)
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
     }
 #undef CASE
@@ -188,19 +188,19 @@ CLReverseBlock::format_specific_parse( const char * line, size_t line_size )
         extract_and_set( obj, formatter, "owner" );
         extract_and_set( obj, formatter, "method" );
         extract_and_set( obj, formatter, "bucket" );
-        extract_and_set( obj, formatter, "unknown1" );
+        extract_and_set( obj, formatter, "contentAccessorUserID" );
         extract_and_set( obj, formatter, "requestHdrSize" );
         extract_and_set( obj, formatter, "requestBodySize" );
         extract_and_set( obj, formatter, "responseHdrSize" );
         extract_and_set( obj, formatter, "responseBodySize" );
         extract_and_set( obj, formatter, "totalSize" );
-        extract_and_set( obj, formatter, "unknown2" );
+        extract_and_set( obj, formatter, "durationMsec" );
         extract_and_set( obj, formatter, "path" );
         extract_and_set( obj, formatter, "httpStatus" );
         extract_and_set( obj, formatter, "reqId" );
-        extract_and_set( obj, formatter, "unknown3" );
         extract_and_set( obj, formatter, "eTag" );
         extract_and_set( obj, formatter, "errorCode" );
+        extract_and_set( obj, formatter, "copySource" );
         receiver . SetCategory( ReceiverInterface::cat_good );
         return true;
     }

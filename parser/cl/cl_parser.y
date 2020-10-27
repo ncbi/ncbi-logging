@@ -56,19 +56,19 @@ cl_line
       owner PIPE
       method PIPE
       bucket PIPE
-      unknown1 PIPE
+      contentAccessorUserID PIPE
       requestHdrSize PIPE
       requestBodySize PIPE
       responseHdrSize PIPE
       responseBodySize PIPE
       totalSize PIPE
-      unknown2 PIPE
+      durationMsec PIPE
       path PIPE
       httpStatus PIPE
       reqId PIPE
-      unknown3 PIPE
       eTag PIPE
-      errorCode
+      errorCode PIPE
+      copySource
     ;
 
 syslog_prefix
@@ -116,13 +116,13 @@ ip:                 str_opt { lib -> set( ReceiverInterface::ip, $1 ); } ;
 owner:              str_opt { lib -> set( CLReceiver::owner, $1 ); } ;
 method:             str_opt { lib -> set( ReceiverInterface::method, $1 ); } ;
 bucket:             str_opt { lib -> set( CLReceiver::bucket, $1 ); } ;
-unknown1:           str_opt { lib -> set( CLReceiver::unknown1, $1 ); } ;
+contentAccessorUserID: str_opt { lib -> set( CLReceiver::contentAccessorUserID, $1 ); } ;
 requestHdrSize:     str_opt { lib -> set( CLReceiver::requestHdrSize, $1 ); } ;
 requestBodySize:    str_opt { lib -> set( CLReceiver::requestBodySize, $1 ); } ;
 responseHdrSize:    str_opt { lib -> set( CLReceiver::responseHdrSize, $1 ); } ;
 responseBodySize:   str_opt { lib -> set( CLReceiver::responseBodySize, $1 ); } ;
 totalSize:          str_opt { lib -> set( CLReceiver::totalSize, $1 ); } ;
-unknown2:           str_opt { lib -> set( CLReceiver::unknown2, $1 ); } ;
+durationMsec:       str_opt { lib -> set( CLReceiver::durationMsec, $1 ); } ;
 path:               str_opt
                         {
                             lib -> set( ReceiverInterface::path, $1 );
@@ -130,9 +130,9 @@ path:               str_opt
                         } ;
 httpStatus:         str_opt { lib -> set( CLReceiver::httpStatus, $1 ); } ;
 reqId:              str_opt { lib -> set( CLReceiver::reqId, $1 ); } ;
-unknown3:           str_opt { lib -> set( CLReceiver::unknown3, $1 ); } ;
 eTag:               str_opt { lib -> set( CLReceiver::eTag, $1 ); } ;
 errorCode:          str_opt { lib -> set( CLReceiver::errorCode, $1 ); } ;
+copySource:         str_opt { lib -> set( CLReceiver::copySource, $1 ); } ;
 
 /*
 datetime    Oct 20 15:27:38
@@ -155,7 +155,7 @@ operation     getObject
     |
 bucketName    sra-pub-run-5
     |
-unknown1(timestartpos?)
+contentAccessorUserID ...
     |
 requestHdrSize    252
     |
@@ -167,7 +167,7 @@ responseBodySize    20971520
     |
 totalSize    20972028
     |
-unknown2    593542
+durationMsec    593542
     |
 objectName    ERR527068%2FERR527068.1
     |
@@ -175,11 +175,11 @@ httpStatus    206
     |
 S3reqId    45200f16-ad2e-1945-87cb-d8c49756ebf4
     |
-unknown3    c89056a1918b4ea6534c912deee13f11-154
+eTag    c89056a1918b4ea6534c912deee13f11-154
     |
-eTag    0
+errorCode    0
     |
-errorCode
+copySource.....
 */
 
 %%

@@ -20,19 +20,19 @@ namespace NCBI
                 timestamp,
                 owner,
                 bucket,
-                unknown1,
+                contentAccessorUserID,
                 requestHdrSize,
                 requestBodySize,
                 responseHdrSize,
                 responseBodySize,
                 totalSize,
-                unknown2,
+                durationMsec,
                 httpStatus,
                 reqId,
-                unknown3,
                 eTag,
                 errorCode,
-                CL_LastMemberId = errorCode
+                copySource,
+                CL_LastMemberId = copySource
             } CL_Members; // all are t_str values
             virtual void set( CL_Members m, const t_str & ); // will invoke set( ReceiverInterface::Members ) if necessary
 

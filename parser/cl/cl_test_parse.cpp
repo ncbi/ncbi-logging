@@ -35,21 +35,21 @@ TEST_F( CLParseTestFixture, line )
     ASSERT_EQ( "trace",                     extract_value( res, "owner" ) );
     ASSERT_EQ( "getObject",                 extract_value( res, "method" ) );
     ASSERT_EQ( "sra-pub-run-5",             extract_value( res, "bucket" ) );
-    ASSERT_EQ( "",                          extract_value( res, "unknown1" ) );
+    ASSERT_EQ( "",                          extract_value( res, "contentAccessorUserID" ) );
     ASSERT_EQ( "252",                       extract_value( res, "requestHdrSize" ) );
     ASSERT_EQ( "0",                         extract_value( res, "requestBodySize" ) );
     ASSERT_EQ( "256",                       extract_value( res, "responseHdrSize" ) );
     ASSERT_EQ( "20971520",                  extract_value( res, "responseBodySize" ) );
     ASSERT_EQ( "20972028",                  extract_value( res, "totalSize" ) );
-    ASSERT_EQ( "593542",                    extract_value( res, "unknown2" ) );
+    ASSERT_EQ( "593542",                    extract_value( res, "durationMsec" ) );
     ASSERT_EQ( "ERR527068%2Ffile.1",        extract_value( res, "path" ) );
     ASSERT_EQ( "206",                       extract_value( res, "httpStatus" ) );
     ASSERT_EQ( "45200f16-ad2e-1945-87cb-d8c49756ebf4",
                                             extract_value( res, "reqId" ) );
     ASSERT_EQ( "c89056a1918b4ea6534c912deee13f11-154",
-                                            extract_value( res, "unknown3" ) );
-    ASSERT_EQ( "0",                         extract_value( res, "eTag" ) );
-    ASSERT_EQ( "",                          extract_value( res, "errorCode" ) );
+                                            extract_value( res, "eTag" ) );
+    ASSERT_EQ( "0",                         extract_value( res, "errorCode" ) );
+    ASSERT_EQ( "",                          extract_value( res, "copySource" ) );
 
     // verify URL post-processing
     ASSERT_EQ( "ERR527068", extract_value( res, "accession" ) );
