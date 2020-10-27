@@ -27,6 +27,7 @@ void ERRReceiver::set( ERR_Members m, const t_str & v )
     CASE( datetime )
     CASE( severity )
     CASE( pid )
+    CASE( cat )
     case msg :  setMember( "msg", v );
                 msg_for_postprocess = std::string( v.p, v.n );
                 break;
@@ -37,13 +38,45 @@ void ERRReceiver::set( ERR_Members m, const t_str & v )
         m_cat = cat_good;
 }
 
+bool
+ERRReceiver::SetErrorCategory( const char * toFind, const char * catName )
+{
+    if ( msg_for_postprocess.find( toFind ) != string::npos )
+    {
+        t_str cat_value = { catName, strlen( catName ) };
+        set( cat, cat_value );
+        return true;
+    }
+    return false;
+}
+
+
 ReceiverInterface::Category ERRReceiver::post_process( void )
 {
     MSGReceiver msg( m_fmt );
     MSGParseBlock pb ( msg );
+
+    // extract client/server/host/request/etc from the free-form message
     pb.format_specific_parse( msg_for_postprocess.c_str(), msg_for_postprocess.size() );
+
+    // categorize on error message
+    if ( msg.GetCategory() == ReceiverInterface::cat_good )
+    {
+        if      ( SetErrorCategory( "open()",  "openFailed" ) ) {}
+        else if ( SetErrorCategory( "unlink()", "unlinkFailed" ) ) {}
+        else if ( SetErrorCategory( "forbidden", "forbidden" ) ) {}
+        else if ( SetErrorCategory( "ignore long locked inactive cache entry", "inactive" ) ) {}
+        else if ( SetErrorCategory( "upstream prematurely closed connection while reading upstream", "upstream" ) ) {}
+        else
+        {
+            t_str cat_value = { "unknown", 7 };
+            set( cat, cat_value );
+        }
+        ;
+    }
     msg_for_postprocess . clear();
 
+    // extract accession/filename/extension
     if ( msg.GetCategory() == ReceiverInterface::cat_good )
     {
         URLReceiver url( m_fmt );

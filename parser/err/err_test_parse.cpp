@@ -59,12 +59,25 @@ TEST_F( MSGParseTestFixture, request )
     ASSERT_EQ( "HTTP/1.1", extract_value( res, "vers" ) );
 }
 
+TEST_F( MSGParseTestFixture, request_vers_missing_1 )
+{
+    std::string res = try_to_parse_good( "\"/netmnt/traces04//sra75/SRR/008255/SRR8453128\" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /traces/sra75/SRR/008255/SRR8453128 \", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"\n" );
+    ASSERT_EQ( "GET", extract_value( res, "method" ) );
+    ASSERT_EQ( "/traces/sra75/SRR/008255/SRR8453128", extract_value( res, "path" ) );
+}
+
+TEST_F( MSGParseTestFixture, request_vers_missing_2 )
+{
+    std::string res = try_to_parse_good( "\"/netmnt/traces04//sra75/SRR/008255/SRR8453128\" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /traces/sra75/SRR/008255/SRR8453128\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"\n" );
+    ASSERT_EQ( "GET", extract_value( res, "method" ) );
+    ASSERT_EQ( "/traces/sra75/SRR/008255/SRR8453128", extract_value( res, "path" ) );
+}
+
 TEST_F( MSGParseTestFixture, host )
 {
     std::string res = try_to_parse_good( "\"/netmnt/traces04//sra75/SRR/008255/SRR8453128\" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /traces/sra75/SRR/008255/SRR8453128 HTTP/1.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"\n" );
     ASSERT_EQ( "sra-downloadb.be-md.ncbi.nlm.nih.gov", extract_value( res, "host" ) );
 }
-
 
 // ERR parsing
 TEST( LogERREventTest, Create )
@@ -122,6 +135,44 @@ TEST_F( ERRParseTestFixture, PostProcessing )
     ASSERT_EQ( ".ext", extract_value( res, "extension" ) );
 }
 
+TEST_F( ERRParseTestFixture, Error_Open )
+{
+    std::string res = try_to_parse_good( "2020/10/01 20:15:27 [alert] 61030#0: *650699 open() \"/netmnt/traces04//sra75/SRR/008255/SRR8453128\" failed (2: No such file or directory), client: 218.219.98.126, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /traces/sra75/SRR/008255/SRR8453128/file.ext HTTP/1.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"" );
+
+    ASSERT_EQ( "openFailed", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_Unlink )
+{
+    std::string res = try_to_parse_good( "2020/10/01 20:15:27 [alert] 61030#0: *650699 unlink() \"/export/nginx/proxy_cache/9/f4/0019a4a92b13d51bafaeeda76adf4f49\" failed (2: No such file or directory)" );
+    ASSERT_EQ( "unlinkFailed", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_Forbidden )
+{
+    std::string res = try_to_parse_good( "2020/10/15 00:03:10 [error] 61000#0: *643797 directory index of \"/home/dbtest/data/sracloud/\" is forbidden, client: 130.14.252.53, server: sra-download.ncbi.nlm.nih.gov, request: \"GET /\"" );
+    ASSERT_EQ( "forbidden", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_InactiveCache )
+{
+    std::string res = try_to_parse_good( "2020/10/15 00:12:16 [alert] 61030#0: ignore long locked inactive cache entry 3fc39b4cff6a53a2d675e621124f3c7a, count:1" );
+    ASSERT_EQ( "inactive", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_UpstreamClosed )
+{
+    std::string res = try_to_parse_good( "2020/10/15 00:19:51 [error] 60999#0: *648365 upstream prematurely closed connection while reading upstream, client: 112.17.92.191, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /sos2/sra-pub-run-13/ERR2239132/ERR2239132.1 HTTP/1.1\", upstream: \"http://10.154.190.39:80/sra-pub-run-13/ERR2239132/ERR2239132.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "upstream", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_Unknown )
+{
+    std::string res = try_to_parse_good( "2020/10/15 00:19:51 [error] 60999#0: *648365 client: 112.17.92.191, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /sos2/sra-pub-run-13/ERR2239132/ERR2239132.1 HTTP/1.1\", upstream: \"http://10.154.190.39:80/sra-pub-run-13/ERR2239132/ERR2239132.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "unknown", extract_value( res, "cat" ) );
+}
+
+//Error_unknown
 
 extern "C"
 {

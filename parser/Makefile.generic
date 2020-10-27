@@ -220,7 +220,7 @@ vg : vg_fwd vg_rev
 # fuzz testing
 
 clean_fuzz:
-	rm -rf fuzz $(OBJDIR)/$(CPREFIX)*.fuzz.o $(OBJDIR)/$(CPREFIX)*.fuzz.d
+	@ rm -rf fuzz $(OBJDIR)/$(CPREFIX)*.fuzz.o $(OBJDIR)/$(CPREFIX)*.fuzz.d
 
 FUZZ_SRC = \
 	$($(CPREFIX)2JSN_CMN_SRC) \

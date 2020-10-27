@@ -59,6 +59,12 @@ url:    STR
             } ;
 vers:   STR { lib -> ReceiverInterface::set( ReceiverInterface::vers, $1 ); } ;
 
+request
+    : method SPACE url SPACE vers
+    | method SPACE url SPACE
+    | method SPACE url
+    ;
+
 value_str
     : QUOTE STR QUOTE { $$ = $2; }
     | STR  { $$ = $1; }
@@ -72,7 +78,7 @@ str_elem
         { lib -> set( MSGReceiver::server, $4 ); msg_pop_state( scanner ); }
     | HOST SPACE { msg_start_VALUE( scanner ); } value_str
         { lib -> set( MSGReceiver::host, $4 ); msg_pop_state( scanner ); }
-    | REQUEST SPACE { msg_start_REQUEST( scanner ); } QUOTE method SPACE url SPACE vers QUOTE
+    | REQUEST SPACE { msg_start_REQUEST( scanner ); } QUOTE request QUOTE
         { msg_pop_state( scanner ); }
     ;
 
