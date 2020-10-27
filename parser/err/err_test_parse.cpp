@@ -209,6 +209,18 @@ TEST_F( ERRParseTestFixture, pread_failed )
     ASSERT_EQ( "preadFailed", extract_value( res, "cat" ) );
 }
 
+TEST_F( ERRParseTestFixture, readv_failed )
+{
+    std::string res = try_to_parse_good( "2020/10/26 15:23:35 [error] 60986#0: *15481986 readv() failed (104: Connection reset by peer) while reading upstream, client: 162.105.250.222, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /sos2/sra-pub-run-11/SRR6178394/SRR6178394.1 HTTP/1.1\", upstream: \"http://10.154.190.33:80/sra-pub-run-11/SRR6178394/SRR6178394.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "readvFailed", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, timed_out )
+{
+    std::string res = try_to_parse_good( "2020/10/26 14:28:32 [error] 60999#0: *15390740 upstream timed out (110: Connection timed out) while connecting to upstream, client: 34.203.236.120, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /sos2/sra-pub-run-11/SRR6191655/SRR6191655.1 HTTP/1.1\", upstream: \"http://10.154.190.39:80/sra-pub-run-11/SRR6191655/SRR6191655.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "timedOut", extract_value( res, "cat" ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
