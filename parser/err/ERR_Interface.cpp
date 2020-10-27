@@ -70,6 +70,8 @@ ReceiverInterface::Category ERRReceiver::post_process( void )
         else if ( SetErrorCategory( "is not found", "not-found" ) ) {}
         else if ( SetErrorCategory( "could not find named location", "not-found" ) ) {}
         else if ( SetErrorCategory( "while SSL handshaking", "failedSSL" ) ) {}
+        else if ( SetErrorCategory( "stat()", "statFailed" ) ) {}
+        else if ( SetErrorCategory( "pread()", "preadFailed" ) ) {}
         else
         {
             t_str cat_value = { "unknown", 7 };

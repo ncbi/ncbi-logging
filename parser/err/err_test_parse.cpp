@@ -197,7 +197,17 @@ TEST_F( ERRParseTestFixture, Error_Unknown )
     ASSERT_EQ( "unknown", extract_value( res, "cat" ) );
 }
 
-//Error_unknown
+TEST_F( ERRParseTestFixture, stat_failed )
+{
+    std::string res = try_to_parse_good( "2020/10/26 19:12:09 [error] 43057#0: *14944557 stat() \"/home/dbtest/data/sracloud/admin/login.jsp\" failed (2: No such file or directory), client: 10.154.26.23, server: srafiles11.be-md.ncbi.nlm.nih.gov, request: \"GET /admin/login.jsp HTTP/1.1\", host: \"srafiles11.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "statFailed", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, pread_failed )
+{
+    std::string res = try_to_parse_good( "2020/10/26 18:58:27 [crit] 43038#0: *14926361 pread() \"/netmnt/traces04//sra13/SRR/012583/SRR12885188\" failed (5: Input/output error) while sending response to client, client: 3.236.230.138, server: sra-download.ncbi.nlm.nih.gov, request: \"GET /traces/sra13/SRR/012583/SRR12885188 HTTP/1.1\", host: \"sra-download.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "preadFailed", extract_value( res, "cat" ) );
+}
 
 extern "C"
 {
