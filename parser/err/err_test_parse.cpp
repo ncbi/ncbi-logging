@@ -79,6 +79,12 @@ TEST_F( MSGParseTestFixture, host )
     ASSERT_EQ( "sra-downloadb.be-md.ncbi.nlm.nih.gov", extract_value( res, "host" ) );
 }
 
+TEST_F( MSGParseTestFixture, investigate )
+{
+    std::string res = try_to_parse_good( "*14944615 could not find named location \"@405\", client: 10.154.26.23, server: srafiles11.be-md.ncbi.nlm.nih.gov, request: \"GBSTTN / HTTP/1.1\", host: \"srafiles11.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "srafiles11.be-md.ncbi.nlm.nih.gov", extract_value( res, "host" ) );
+}
+
 // ERR parsing
 TEST( LogERREventTest, Create )
 {
@@ -164,6 +170,25 @@ TEST_F( ERRParseTestFixture, Error_UpstreamClosed )
 {
     std::string res = try_to_parse_good( "2020/10/15 00:19:51 [error] 60999#0: *648365 upstream prematurely closed connection while reading upstream, client: 112.17.92.191, server: srafiles21.be-md.ncbi.nlm.nih.gov, request: \"GET /sos2/sra-pub-run-13/ERR2239132/ERR2239132.1 HTTP/1.1\", upstream: \"http://10.154.190.39:80/sra-pub-run-13/ERR2239132/ERR2239132.1\", host: \"sra-downloadb.be-md.ncbi.nlm.nih.gov\"" );
     ASSERT_EQ( "upstream", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_IsNotFound )
+{
+    std::string res = try_to_parse_good( "2020/10/26 04:47:45 [error] 43034#0: *14195760 \"/home/dbtest/data/sracloud/ref/index.html\" is not found (2: No such file or directory), client: 34.201.223.237, server: sra-download.ncbi.nlm.nih.gov, request: \"GET /ref/ HTTP/1.1\", host: \"srafiles11-1.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "not-found", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_couldNotFindLocation )
+{
+    std::string res = try_to_parse_good( "2020/10/26 19:12:10 [error] 43071#0: *14944615 could not find named location \"@405\", client: 10.154.26.23, server: srafiles11.be-md.ncbi.nlm.nih.gov, request: \"GBSTTN / HTTP/1.1\", host: \"srafiles11.be-md.ncbi.nlm.nih.gov\"" );
+    ASSERT_EQ( "not-found", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, Error_failedSSLHandshake )
+{
+
+    std::string res = try_to_parse_good( "2020/10/26 19:22:53 [crit] 43025#0: *14959785 SSL_do_handshake() failed (SSL: error:1408A0D7:SSL routines:ssl3_get_client_hello:required cipher missing) while SSL handshaking, client: 10.154.26.23, server: 0.0.0.0:443" );
+    ASSERT_EQ( "failedSSL", extract_value( res, "cat" ) );
 }
 
 TEST_F( ERRParseTestFixture, Error_Unknown )

@@ -67,12 +67,14 @@ ReceiverInterface::Category ERRReceiver::post_process( void )
         else if ( SetErrorCategory( "forbidden", "forbidden" ) ) {}
         else if ( SetErrorCategory( "ignore long locked inactive cache entry", "inactive" ) ) {}
         else if ( SetErrorCategory( "upstream prematurely closed connection while reading upstream", "upstream" ) ) {}
+        else if ( SetErrorCategory( "is not found", "not-found" ) ) {}
+        else if ( SetErrorCategory( "could not find named location", "not-found" ) ) {}
+        else if ( SetErrorCategory( "while SSL handshaking", "failedSSL" ) ) {}
         else
         {
             t_str cat_value = { "unknown", 7 };
             set( cat, cat_value );
         }
-        ;
     }
     msg_for_postprocess . clear();
 
