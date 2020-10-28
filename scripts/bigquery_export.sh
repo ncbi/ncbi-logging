@@ -218,8 +218,11 @@ AS
             regexp_contains(path, r'run') THEN bucket || ' (ETL + BQS)'
         WHEN regexp_contains(bucket, r'sra-pub-assembly-1') THEN bucket || ' (ETL - BQS)'
         WHEN regexp_contains(bucket, r'-zq-') THEN bucket || ' (ETL - BQS)'
+        WHEN regexp_contains(bucket, r'-pub-crun-') THEN bucket || ' (ETL + BQS Cold)'
         WHEN regexp_contains(bucket, r'-run-') THEN bucket || ' (ETL + BQS)'
-        WHEN regexp_contains(bucket, r'-src-') THEN bucket || ' (Original)'
+        WHEN ends_with(bucket, 'sra-pub-src-1') THEN bucket || ' (Original)'
+        WHEN ends_with(bucket, 'sra-pub-src-2') THEN bucket || ' (Original)'
+        WHEN regexp_contains(bucket, r'sra-pub-src-') THEN bucket || ' (Original Cold)'
         WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
     ELSE bucket || ' (Unknown)'
     END)

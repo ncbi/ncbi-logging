@@ -1,4 +1,5 @@
 -- Update uniq_ips below first
+-- Run cloud_ips.py
 -- sqlite3 rdns.db < rdns.sql
 
 .headers on
@@ -8,7 +9,7 @@
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201022.json  uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201027.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -121,6 +122,8 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '219.139.%'
   OR IP LIKE '219.140.%'
   OR IP LIKE '119.79.%'
+  OR IP LIKE '180.96.%'
+  OR IP LIKE '180.126%'
   OR IP LIKE '180.160.%'
   OR IP LIKE '180.161.%'
   OR IP LIKE '101.81.%'
@@ -201,6 +204,9 @@ OR IP LIKE '223.10%'
 OR IP LIKE '223.64.%'
 OR IP LIKE '223.65.%'
 OR IP LIKE '223.66.%'
+OR IP LIKE '223.7%'
+OR IP LIKE '223.8%'
+OR IP LIKE '223.9%'
 OR IP LIKE '223.67.%'
 OR IP LIKE '111.5%';
 
@@ -1118,6 +1124,17 @@ update rdns
 set domain='rice.edu (Rice University)'
 where ip like '128.42.%';
 
+update rdns
+set domain='dtu.dk (Danmarks Tekniske Universitet)'
+where ip like '192.38.%';
+
+update rdns
+set domain='fda.gov (U.S. Food & Drug Administration)'
+where ip like '150.148.%';
+
+update rdns
+set domain='rci.rogers.com (Roger Communications Canada)'
+where ip like '72.138.%';
 
 
 UPDATE RDNS
