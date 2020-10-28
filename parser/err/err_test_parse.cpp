@@ -221,6 +221,18 @@ TEST_F( ERRParseTestFixture, timed_out )
     ASSERT_EQ( "timedOut", extract_value( res, "cat" ) );
 }
 
+TEST_F( ERRParseTestFixture, open_socket )
+{
+    std::string res = try_to_parse_good("2020/10/26 03:41:05 [alert] 10439#0: *3856127 open socket #64 left in connection 35" );
+    ASSERT_EQ( "openSocket", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, host_not_found )
+{
+    std::string res = try_to_parse_good("2020/10/26 03:44:56 [emerg] 3476#0: host not found in upstream \"s3-stor31-dc1.st-va.ncbi.nlm.nih.gov\" in /etc/nginx/conf.d/cloudian_dc1-upstream.conf:6" );
+    ASSERT_EQ( "hostNotFound", extract_value( res, "cat" ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )

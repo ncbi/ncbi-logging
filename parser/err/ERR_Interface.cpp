@@ -74,6 +74,8 @@ ReceiverInterface::Category ERRReceiver::post_process( void )
         else if ( SetErrorCategory( "pread()", "preadFailed" ) ) {}
         else if ( SetErrorCategory( "readv()", "readvFailed" ) ) {}
         else if ( SetErrorCategory( "timed out", "timedOut" ) ) {}
+        else if ( SetErrorCategory( "open socket", "openSocket" ) ) {}
+        else if ( SetErrorCategory( "host not found", "hostNotFound" ) ) {}
         else
         {
             t_str cat_value = { "unknown", 7 };
