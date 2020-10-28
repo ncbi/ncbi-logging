@@ -46,7 +46,6 @@ namespace NCBI
                     ss << line;
                     ParseBlockFactory pbFact;
                     StdLineSplitter input( ss );
-                    //pbFact.setFast(false);
                     SingleThreadedDriver p( input, s_outputs, pbFact.MakeParseBlock() );
                     p . setDebug( debug );
                     p . parse_all_lines(); // does the parsing and generates the report

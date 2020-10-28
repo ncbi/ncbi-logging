@@ -70,7 +70,6 @@ namespace NCBI
             virtual ~CLParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
             CLReceiver m_receiver;
@@ -83,7 +82,6 @@ namespace NCBI
             virtual ~CLReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             CLReceiver m_receiver;
         };
@@ -128,16 +126,12 @@ CLParseBlock::~CLParseBlock()
     cl_lex_destroy( m_sc );
 }
 
-void
-CLParseBlock::SetDebug( bool onOff )
-{
-    cl_debug = onOff ? 1 : 0;            // bison (cl_debug is global)
-    cl_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
 bool
 CLParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
+    cl_debug = m_debug ? 1 : 0;            // bison (is global)
+    cl_set_debug( m_debug ? 1 : 0, m_sc );   // flex
+
     YY_BUFFER_STATE bs = cl_scan_bytes( line, line_size, m_sc );
     int ret = cl_parse( m_sc, & m_receiver );
     cl__delete_buffer( bs, m_sc );
@@ -151,11 +145,6 @@ CLReverseBlock::CLReverseBlock( ReceiverInterface::FormatterRef fmt )
 }
 
 CLReverseBlock::~CLReverseBlock()
-{ // no need to do anything here
-}
-
-void
-CLReverseBlock::SetDebug( bool onOff )
 { // no need to do anything here
 }
 

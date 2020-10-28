@@ -60,7 +60,7 @@ ReceiverInterface::Category ERRReceiver::post_process( void )
     pb.format_specific_parse( msg_for_postprocess.c_str(), msg_for_postprocess.size() );
 
     // categorize on error message
-    if ( msg.GetCategory() == ReceiverInterface::cat_good )
+    if ( msg.GetCategory() != ReceiverInterface::cat_ugly )
     {
         if      ( SetErrorCategory( "open()",  "openFailed" ) ) {}
         else if ( SetErrorCategory( "unlink()", "unlinkFailed" ) ) {}
@@ -76,6 +76,10 @@ ReceiverInterface::Category ERRReceiver::post_process( void )
         else if ( SetErrorCategory( "timed out", "timedOut" ) ) {}
         else if ( SetErrorCategory( "open socket", "openSocket" ) ) {}
         else if ( SetErrorCategory( "host not found", "hostNotFound" ) ) {}
+        else if ( SetErrorCategory( "aborting", "aborting" ) ) {}
+        else if ( SetErrorCategory( "exited on signal", "exiting" ) ) {}
+        else if ( SetErrorCategory( "ModSecurity", "ModSecurity" ) ) {}
+        else if ( SetErrorCategory( "directive is deprecated", "directiveDeprecated" ) ) {}
         else
         {
             t_str cat_value = { "unknown", 7 };
@@ -144,6 +148,7 @@ ERRParseBlock::ERRParseBlock( ReceiverInterface::FormatterRef fmt )
 : m_receiver ( fmt )
 {
     err_lex_init( &m_sc );
+    SetDebug( false );
 }
 
 ERRParseBlock::~ERRParseBlock()

@@ -82,7 +82,6 @@ void
 SingleThreadedDriver::parse_all_lines()
 {
     m_pb -> SetDebug( m_debug );
-
     auto & receiver = m_pb -> GetReceiver();
     FormatterInterface & fmt = receiver . GetFormatter();
     unsigned long int line_nr = 0;

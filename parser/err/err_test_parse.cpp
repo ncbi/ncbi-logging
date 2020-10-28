@@ -79,10 +79,10 @@ TEST_F( MSGParseTestFixture, host )
     ASSERT_EQ( "sra-downloadb.be-md.ncbi.nlm.nih.gov", extract_value( res, "host" ) );
 }
 
-TEST_F( MSGParseTestFixture, investigate )
+TEST_F( MSGParseTestFixture, trailing_space )
 {
-    std::string res = try_to_parse_good( "*14944615 could not find named location \"@405\", client: 10.154.26.23, server: srafiles11.be-md.ncbi.nlm.nih.gov, request: \"GBSTTN / HTTP/1.1\", host: \"srafiles11.be-md.ncbi.nlm.nih.gov\"" );
-    ASSERT_EQ( "srafiles11.be-md.ncbi.nlm.nih.gov", extract_value( res, "host" ) );
+    std::string res = try_to_parse_good( "ModSecurity for nginx (STABLE)/2.9.3 (http://www.modsecurity.org/) configured.: ", true );
+    ASSERT_NE( "", res );
 }
 
 // ERR parsing
@@ -231,6 +231,30 @@ TEST_F( ERRParseTestFixture, host_not_found )
 {
     std::string res = try_to_parse_good("2020/10/26 03:44:56 [emerg] 3476#0: host not found in upstream \"s3-stor31-dc1.st-va.ncbi.nlm.nih.gov\" in /etc/nginx/conf.d/cloudian_dc1-upstream.conf:6" );
     ASSERT_EQ( "hostNotFound", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, aborting )
+{
+    std::string res = try_to_parse_good( "2020/10/26 03:41:05 [alert] 10439#0: aborting" );
+    ASSERT_EQ( "aborting", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, exiting )
+{
+    std::string res = try_to_parse_good( "2020/10/26 03:41:09 [alert] 10426#0: worker process 10445 exited on signal 9" );
+    ASSERT_EQ( "exiting", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, ModSecurity )
+{
+    std::string res = try_to_parse_good( "2020/10/26 03:57:34 [notice] 10839#0: ModSecurity for nginx (STABLE)/2.9.3 (http://www.modsecurity.org/) configured.: " );
+    ASSERT_EQ( "ModSecurity", extract_value( res, "cat" ) );
+}
+
+TEST_F( ERRParseTestFixture, ssl_deprecated )
+{
+    std::string res = try_to_parse_good( "2020/10/26 03:57:34 [warn] 10839#0: the \"ssl\" directive is deprecated, use the \"listen ... ssl\" directive instead in /etc/nginx/sites-enabled/sra-download.       ncbi.nlm.nih.gov.conf:57" );
+    ASSERT_EQ( "directiveDeprecated", extract_value( res, "cat" ) );
 }
 
 extern "C"

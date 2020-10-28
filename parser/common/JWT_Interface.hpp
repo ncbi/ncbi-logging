@@ -29,8 +29,6 @@ namespace NCBI
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
 
-            virtual void SetDebug( bool onOff );
-
             void * m_sc;
             JWTReceiver & m_receiver;
         };

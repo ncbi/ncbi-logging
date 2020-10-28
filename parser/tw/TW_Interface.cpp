@@ -61,7 +61,6 @@ namespace NCBI
             virtual ~TWParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
             TWReceiver m_receiver;
@@ -74,7 +73,6 @@ namespace NCBI
             virtual ~TWReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             TWReceiver m_receiver;
         };
@@ -105,16 +103,12 @@ TWParseBlock::~TWParseBlock()
     tw_lex_destroy( m_sc );
 }
 
-void
-TWParseBlock::SetDebug( bool onOff )
-{
-    tw_debug = onOff ? 1 : 0;            // bison (op_debug is global)
-    tw_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
 bool
 TWParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
+    tw_debug = m_debug ? 1 : 0;            // bison (debug is global)
+    tw_set_debug( m_debug ? 1 : 0, m_sc );   // flex
+
     YY_BUFFER_STATE bs = tw_scan_bytes( line, line_size, m_sc );
     int ret = tw_parse( m_sc, & m_receiver );
     tw__delete_buffer( bs, m_sc );
@@ -139,11 +133,6 @@ TWReverseBlock::TWReverseBlock( ReceiverInterface::FormatterRef fmt )
 }
 
 TWReverseBlock::~TWReverseBlock()
-{ // no need to do anything here
-}
-
-void
-TWReverseBlock::SetDebug( bool onOff )
 { // no need to do anything here
 }
 

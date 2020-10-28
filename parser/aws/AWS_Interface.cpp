@@ -85,7 +85,6 @@ namespace NCBI
             virtual ~AWSParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
             AWSReceiver m_receiver;
@@ -98,7 +97,6 @@ namespace NCBI
             virtual ~AWSReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             AWSReceiver m_receiver;
         };
@@ -143,16 +141,12 @@ AWSParseBlock::~AWSParseBlock()
     aws_lex_destroy( m_sc );
 }
 
-void
-AWSParseBlock::SetDebug( bool onOff )
-{
-    aws_debug = onOff ? 1 : 0;            // bison (aws_debug is global)
-    aws_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
 bool
 AWSParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
+    aws_debug = m_debug ? 1 : 0;                // bison (is global)
+    aws_set_debug( m_debug ? 1 : 0, m_sc );   // flex
+
     YY_BUFFER_STATE bs = aws_scan_bytes( line, line_size, m_sc );
     int ret = aws_parse( m_sc, & m_receiver );
     aws__delete_buffer( bs, m_sc );
@@ -166,11 +160,6 @@ AWSReverseBlock::AWSReverseBlock( ReceiverInterface::FormatterRef fmt )
 }
 
 AWSReverseBlock::~AWSReverseBlock()
-{ // no need to do anything here
-}
-
-void
-AWSReverseBlock::SetDebug( bool onOff )
 { // no need to do anything here
 }
 

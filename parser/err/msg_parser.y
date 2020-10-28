@@ -49,6 +49,7 @@ using namespace NCBI::Logging;
 msg_line
     : error     { YYABORT; }
     | str_list  { YYACCEPT; }
+    | str_list SPACE { YYACCEPT; }
     ;
 
 method: STR { lib -> ReceiverInterface::set( ReceiverInterface::method, $1 ); } ;

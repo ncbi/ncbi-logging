@@ -19,6 +19,7 @@ namespace NCBI
         class ParseBlockInterface
         {
         public:
+            ParseBlockInterface() : m_debug( false ) {}
             virtual ~ParseBlockInterface() = 0;
             virtual ReceiverInterface & GetReceiver() = 0;
 
@@ -27,9 +28,10 @@ namespace NCBI
             // if return-value is false -> the category will be cat_ugly
             virtual bool format_specific_parse( const char * line, size_t line_size ) = 0;
 
-            virtual void SetDebug( bool onOff ) = 0;
+            void SetDebug( bool onOff ) { m_debug = onOff; }
 
             void receive_one_line( const char * line, size_t line_size, size_t line_nr );
+            bool m_debug;
         };
 
         class ParseBlockFactoryInterface

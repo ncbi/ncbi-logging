@@ -92,7 +92,6 @@ namespace NCBI
             virtual ~GCPParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
             GCPReceiver m_receiver;
@@ -105,7 +104,6 @@ namespace NCBI
             virtual ~GCPReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             GCPReceiver m_receiver;
         };
@@ -141,18 +139,14 @@ GCPParseBlock::~GCPParseBlock()
     gcp_lex_destroy( m_sc );
 }
 
-void
-GCPParseBlock::SetDebug( bool onOff )
-{
-    gcp_debug = onOff ? 1 : 0;            // bison (gcp_debug is global)
-    gcp_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
 static string DefaultHeader = "\"time_micros\",\"c_ip\",\"c_ip_type\",\"c_ip_region\",\"cs_method\",\"cs_uri\",\"sc_status\",\"cs_bytes\",\"sc_bytes\",\"time_taken_micros\",\"cs_host\",\"cs_referer\",\"cs_user_agent\",\"s_request_id\",\"cs_operation\",\"cs_bucket\",\"cs_object\"";
 
 bool
 GCPParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
+    gcp_debug = m_debug ? 1 : 0;            // bison (gcp_debug is global)
+    gcp_set_debug( m_debug ? 1 : 0, m_sc );   // flex
+
     YY_BUFFER_STATE bs = gcp_scan_bytes( line, line_size, m_sc );
     int ret = gcp_parse( m_sc, & m_receiver );
     if ( m_receiver.GetCategory() == ReceiverInterface::cat_ignored )
@@ -184,11 +178,6 @@ GCPReverseBlock::GCPReverseBlock( ReceiverInterface::FormatterRef fmt )
 }
 
 GCPReverseBlock::~GCPReverseBlock()
-{ // no need to do anything here
-}
-
-void
-GCPReverseBlock::SetDebug( bool onOff )
 { // no need to do anything here
 }
 

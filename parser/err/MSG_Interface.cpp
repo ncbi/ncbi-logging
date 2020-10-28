@@ -37,6 +37,7 @@ MSGParseBlock::MSGParseBlock( MSGReceiver & receiver )
 : m_receiver ( receiver )
 {
     msg_lex_init( &m_sc );
+    SetDebug( false );
 }
 
 MSGParseBlock::~MSGParseBlock()

@@ -44,6 +44,7 @@ JWTParseBlock::JWTParseBlock( JWTReceiver & receiver )
 : m_receiver ( receiver )
 {
     jwt_lex_init( &m_sc );
+    SetDebug( false );
 }
 
 JWTParseBlock::~JWTParseBlock()
@@ -51,16 +52,12 @@ JWTParseBlock::~JWTParseBlock()
     jwt_lex_destroy( m_sc );
 }
 
-void
-JWTParseBlock::SetDebug( bool onOff )
-{
-    jwt_debug = onOff ? 1 : 0;            // bison (op_debug is global)
-    jwt_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
 bool
 JWTParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
+    jwt_debug = m_debug ? 1 : 0;                // bison (is global)
+    jwt_set_debug( m_debug ? 1 : 0, m_sc );   // flex
+
     YY_BUFFER_STATE bs = jwt_scan_bytes( line, line_size, m_sc );
     int ret = jwt_parse( m_sc, & m_receiver );
     jwt__delete_buffer( bs, m_sc );
