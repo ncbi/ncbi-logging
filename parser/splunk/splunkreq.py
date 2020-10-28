@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
 
+import argparse
+
 import sys, http, urllib, xml.dom.minidom, urllib.request, time, json
 from xml.dom.minidom import parse
 
@@ -49,83 +51,98 @@ def extract_raw_from_json( data : str ) :
     return res
 
 # returns the search-id
+
+    # domain = "splunkapi.ncbi.nlm.nih.gov"
+
 #TODO: refactor to have domain and path in one place
-def create_search( bearer : str, search : str ) -> str :
-    hdr = { 'Authorization' : "Bearer " + bearer }
-    domain = "splunkapi.ncbi.nlm.nih.gov"
-    path = "/services/search/jobs/"
-    data = urllib.parse.urlencode( { 'search' : search } )
-    conn = http.client.HTTPSConnection( domain )
-    conn . request( 'POST', path, data, hdr )
-    req = conn . getresponse()
-    return extract_search_id_from_xml( req.read() )
+class Searcher:
 
-def get_search_status( bearer : str, sid : str ) -> ( str, str ) :
-    hdr = { 'Authorization' : "Bearer " + bearer }
-    domain = "splunkapi.ncbi.nlm.nih.gov"
-    path = "/services/search/jobs/" + sid
-    conn = http.client.HTTPSConnection( domain )
-    conn . request( 'GET', path, None, hdr )
-    req = conn . getresponse()
-    return extract_status_from_xml( req.read() )
+    def __init__(self, connectionFactory, bearer ):
+        self.connFact = connectionFactory
+        self.hdr = { 'Authorization' : "Bearer " + bearer }
+        self.domain = "splunkapi.ncbi.nlm.nih.gov"
 
-# return: ( the array of _raw lines, True if reached the end of search )
-def get_search_range( bearer : str, sid : str, offset : int, count : int ) -> ( [ str ], bool ) :
-    hdr = { 'Authorization' : "Bearer " + bearer }
-    domain = "splunkapi.ncbi.nlm.nih.gov"
-    data = urllib.parse.urlencode( { "count" : count, "offset" : offset, "output_mode" : "json" } )
-    path = "/services/search/jobs/" + sid + "/results?" + data
-    conn = http.client.HTTPSConnection( domain )
-    conn . request( 'GET', path, None, hdr )
-    req = conn . getresponse()
-    res = extract_raw_from_json( req.read().decode() )
-    return ( res, len( res ) < count )
 
-def print_search_results( bearer : str, sid : str, page_size : int ) -> str :
-    done = False
-    offset = 0
-    while not done:
-        res, done = get_search_range( bearer, sid, offset, page_size )
-        for line in res :
-           print( line )
-        print( "offset="+str(offset) + " count="+str(count), file=sys.stderr )
-        offset += len( res )
+    def create_search( self, search : str ) -> str :
+        conn = connFact . HTTPSConnection( self.domain )
+        data = urllib.parse.urlencode( { 'search' : search } )
+        conn . request( 'POST', "/services/search/jobs/", data, self.hdr )
+        req = conn . getresponse()
+        return extract_search_id_from_xml( req.read() )
 
-def wait_for_done( bearer : str, sid : str ) -> ( str, str ) :
-    x = 200
-    status = 'UNKNOWN'
-    count = ""
-    while x > 0 :
-        status, count = get_search_status( bearer, sid )
-        if status == 'DONE' :
-            return ( status, count )
-        if x % 10 == 0:
-            print( "status="+status, file=sys.stderr )
-        time.sleep( 0.5 )
-        x -= 1
-    return ( status, count )
+    def get_search_status( self, sid : str ) -> ( str, str ) :
+        conn = http.client.HTTPSConnection( self.domain )
+        conn . request( 'GET', "/services/search/jobs/" + sid, None, self.hdr )
+        req = conn . getresponse()
+        return extract_status_from_xml( req.read() )
 
-#TODO: take the lookback time from the command line
-#TODO: take page_size time from the command line
-#TODO: take the wait time (wait_for_done) from the command line
-#TODO: take the token file (or the token itself) from the command line
+    # return: ( the array of _raw lines, True if reached the end of search )
+    def get_search_range( self, sid : str, offset : int, count : int ) -> ( [ str ], bool ) :
+        conn = http.client.HTTPSConnection( self.domain )
+        data = urllib.parse.urlencode( { "count" : count, "offset" : offset, "output_mode" : "json" } )
+        path = "/services/search/jobs/" + sid + "/results?" + data
+        conn . request( 'GET', path, None, self.hdr )
+        req = conn . getresponse()
+        res = extract_raw_from_json( req.read().decode() )
+        return ( res, len( res ) < count )
+
+    def print_search_results( self, sid : str, page_size : int ) -> str :
+        done = False
+        offset = 0
+        while not done:
+            res, done = self . get_search_range( sid, offset, page_size )
+            for line in res :
+                print( line )
+            print( "offset="+str(offset) + " count="+str(count), file=sys.stderr )
+            offset += len( res )
+
+    def wait_for_done( self, sid : str ) -> ( str, str ) :
+        x = 200
+        status = 'UNKNOWN'
+        count = ""
+        while x > 0 :
+            status, count = self . get_search_status( sid )
+            if status == 'DONE' :
+                return ( status, count )
+            if x % 10 == 0:
+                print( "status="+status, file=sys.stderr )
+            time.sleep( 0.5 )
+            x -= 1
+        return ( status, count )
+
+def parseArgs( args : list ) -> argparse.Namespace :
+    parser = argparse.ArgumentParser( description = "SPLUNK data retrieval tool" )
+    parser.add_argument("--bearer", "-b", metavar="filename", type=str, dest="bearer", default="", help="name of the file with bearer token for Splunk access inside")
+    return parser.parse_args( args )
+
+#TODO: take --earliest and --latest from the command line
+
+#TODO: take --page from the command line
+
+#TODO: take --wait (for wait_for_done) from the command line
+
+#TODO: take --bearer (the token file) from the command line
+
 #TODO: allow overriding the search string or its components
 #TODO: only print details in verbose mode
 
 if __name__ == "__main__":
     try:
-        search="search index=unix sourcetype=syslog host=cloudian-node* S3REQ bucketOwnerUserId=trace earliest=-50m"
-        bearer = file2string( "bearer.txt" )
+        args = parseArgs( sys.argv[1:] )
+        bearer = file2string( args.bearer )
+        searcher = Searcher( http.client, bearer )
 
-        sid = create_search( bearer, search )
-        status, count = wait_for_done( bearer, sid )
+        search="search index=unix sourcetype=syslog host=cloudian-node* S3REQ bucketOwnerUserId=trace earliest=-1m"
+
+        sid = search . create_search( search )
+        status, count = search . wait_for_done( sid )
 
         print( "status="+status, file=sys.stderr )
         print( "count="+count, file=sys.stderr )
         row_count = int( count )
 
         if status == 'DONE' and row_count > 0 :
-            print_search_results( bearer, sid, 100000 )
+            search . print_search_results( sid, 100000 )
 
     except Exception as ex:
         print( "Error reading bearer.txt: " + ex )

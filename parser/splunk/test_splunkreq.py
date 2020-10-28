@@ -23,11 +23,30 @@ class Test_file2string(unittest.TestCase):
         except:
             return
         self.fail ("no exception")
-   
+
     def testDoesExist(self):
         res = splunkreq.file2string( "test_data.txt" )
         assert res == "data\n"
 
+
+class Test_argsParse(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testBearerDefault(self):
+        args = splunkreq.parseArgs( [] )
+        assert args.bearer == ""
+
+    def testBearerLong(self):
+        args = splunkreq.parseArgs( ['--bearer', 'bearer.txt'] )
+        assert args.bearer == "bearer.txt"
+
+    def testBearerShort(self):
+        args = splunkreq.parseArgs( ['-b', 'bearer.txt'] )
+        assert args.bearer == "bearer.txt"
 
 
 if __name__ == "__main__":
