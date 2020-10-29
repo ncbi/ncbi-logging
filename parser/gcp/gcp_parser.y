@@ -169,6 +169,11 @@ bucket
     | QUOTE QUOTE           { lib->set( GCPReceiver::bucket, EmptyTSTR ); }
     ;
 
+ /*
+    'object' is saved in ReceiverInterface::path which is not the obvious choice.
+    It be more logical to save 'object' in GCPReceiver::uri and 'url' in ReceiverInterface::path (the way AWS does it).
+    However, changing it would invalidate already saved data in the database in case we want to reprocess them.
+ */
 url
     :  QUOTE PATHSTR QUOTE
     {
@@ -182,9 +187,13 @@ url
 object
     : QUOTE PATHSTR QUOTE
         {
+            lib->set( ReceiverInterface::path, $2 );
             lib -> object_for_postprocess = string( $2.p, $2.n );
         }
-    |  QUOTE QUOTE {}
+    |  QUOTE QUOTE
+        {
+            lib->set( GCPReceiver::path, EmptyTSTR );
+        }
     ;
 
 q_i64

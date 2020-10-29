@@ -270,7 +270,8 @@ TEST_F( GCPTestFixture, accession_from_url )
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/SRR002994/qwe.2\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
-    ASSERT_EQ( "/storage/SRR002994/qwe.2", extract_value( res, "path" ) );
+    ASSERT_EQ( "/storage/SRR002994/qwe.2", extract_value( res, "uri" ) );
+    ASSERT_EQ( "qwe.2222222", extract_value( res, "path" ) );
     ASSERT_EQ( "SRR002994", extract_value( res, "accession" ) );
     ASSERT_EQ( "qwe", extract_value( res, "filename" ) );
     ASSERT_EQ( ".2", extract_value( res, "extension" ) );
@@ -281,56 +282,11 @@ TEST_F( GCPTestFixture, accession_from_url_in_params )
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&anothrPrefix=SRR77777777&maxResults=1000&delimiter=%2F&alt=json\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
     ASSERT_EQ( "GET", extract_value( res, "method" ) );
-    ASSERT_EQ( "/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&anothrPrefix=SRR77777777&maxResults=1000&delimiter=%2F&alt=json", extract_value( res, "path" ) );
+    ASSERT_EQ( "/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353%2FMetazome_Annelida_timecourse_sample_0097.fastq.gz&anothrPrefix=SRR77777777&maxResults=1000&delimiter=%2F&alt=json", extract_value( res, "uri" ) );
+    ASSERT_EQ( "qwe.2222222", extract_value( res, "path" ) );
     ASSERT_EQ( "SRR1755353", extract_value( res, "accession" ) );
     ASSERT_EQ( "Metazome_Annelida_timecourse_sample_0097", extract_value( res, "filename" ) );
     ASSERT_EQ( ".fastq.gz", extract_value( res, "extension" ) );
-}
-#if 0
-TEST_F( GCPTestFixture, accession_from_url_in_params_no_file )
-{
-    string res = try_to_parse_good(
-        "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"qwe.2222222\"\n");
-    ASSERT_EQ( "/storage/v1/b/sra-pub-src-8/o?projection=noAcl&versions=False&fields=prefixes%2CnextPageToken%2Citems%2Fname&userProject=nih-sra-datastore&prefix=SRR1755353", extract_value( res, "path" ) );
-    ASSERT_EQ( "SRR1755353", extract_value( res, "accession" ) );
-    ASSERT_EQ( "SRR1755353", extract_value( res, "filename" ) );
-    ASSERT_EQ( "", extract_value( res, "extension" ) );
-}
-
-TEST_F( GCPTestFixture, accession_from_object_with_equal_sign )
-{
-    string res = try_to_parse_good(
-        "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11453435/run1912_lane2_read1_indexN705-S506=122016_Cell94-F12.fastq.gz.1\"\n");
-    ASSERT_EQ( "SRR11453435", extract_value( res, "accession" ) );
-    ASSERT_EQ( "run1912_lane2_read1_indexN705-S506=122016_Cell94-F12", extract_value( res, "filename" ) );
-    ASSERT_EQ( ".fastq.gz.1", extract_value( res, "extension" ) );
-}
-
-TEST_F( GCPTestFixture, accession_from_object_with_equal_sign_in_extension )
-{
-    string res = try_to_parse_good(
-        "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11453435/run1912_lane2_read1_indexN705-S506_122016_Cell94-F12.fastq.gz=1\"\n");
-    ASSERT_EQ( "SRR11453435", extract_value( res, "accession" ) );
-    ASSERT_EQ( "run1912_lane2_read1_indexN705-S506_122016_Cell94-F12", extract_value( res, "filename" ) );
-    ASSERT_EQ( ".fastq.gz=1", extract_value( res, "extension" ) );
-}
-
-TEST_F( GCPTestFixture, accession_from_object_spaces_ampersands )
-{
-    string res = try_to_parse_good(
-        "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR11509941/LZ017&LZ018&LZ019_2 sample taq.fast&q.gz.1\"\n");
-    ASSERT_EQ( "SRR11509941", extract_value( res, "accession" ) );
-    ASSERT_EQ( "LZ017&LZ018&LZ019_2 sample taq", extract_value( res, "filename" ) );
-    ASSERT_EQ( ".fast&q.gz.1", extract_value( res, "extension" ) );
-}
-
-TEST_F( GCPTestFixture, accession_from_url_double_accession )
-{
-    string res = try_to_parse_good(
-        "\"1\",\"\",\"\",\"\",\"GET\",\"/storage/v1/b/sra-pub-sars-cov2/o/sra-src%SRR123456%2FSRR004257?fields=updated%2Cname%2CtimeCreated%2Csize&alt=json&userProject=nih-sra-datastore&projection=noAcl\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n" );
-    ASSERT_EQ( "SRR123456", extract_value( res, "accession" ) );
-    ASSERT_EQ( "SRR004257", extract_value( res, "filename" ) );
-    ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
 TEST_F( GCPTestFixture, bad_object )
@@ -338,37 +294,10 @@ TEST_F( GCPTestFixture, bad_object )
     /* TODO put unrecognizable objects into an new object-field to preserve this information */
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR004257&\"\n" );
+    ASSERT_EQ( "SRR004257&", extract_value( res, "path" ) );
     ASSERT_EQ( "", extract_value( res, "accession" ) );
-    ASSERT_EQ( "", extract_value( res, "filename" ) );
+    ASSERT_EQ( "SRR004257&", extract_value( res, "filename" ) );
     ASSERT_EQ( "", extract_value( res, "extension" ) );
-}
-
-TEST_F( GCPTestFixture, agent )
-{
-    string res = try_to_parse_good(
-        "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\",\"\",\"\",\"\",\"\"" );
-    ASSERT_EQ( "linux64 sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
-    ASSERT_EQ( "linux64", extract_value( res, "vdb_os" ) );
-    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
-    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
-    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
-    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
-    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
-    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
-}
-
-TEST_F( GCPTestFixture, agent_no_os )
-{
-    string res = try_to_parse_good(
-        "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)\",\"\",\"\",\"\",\"\"" );
-    ASSERT_EQ( "sra-toolkit test-sra.2.8.2 (phid=noc7737000,libc=2.17)", extract_value( res, "agent" ) );
-    ASSERT_EQ( "", extract_value( res, "vdb_os" ) );
-    ASSERT_EQ( "test-sra", extract_value( res, "vdb_tool" ) );
-    ASSERT_EQ( "2.8.2", extract_value( res, "vdb_release" ) );
-    ASSERT_EQ( "noc", extract_value( res, "vdb_phid_compute_env" ) );
-    ASSERT_EQ( "7737", extract_value( res, "vdb_phid_guid" ) );
-    ASSERT_EQ( "000", extract_value( res, "vdb_phid_session_id" ) );
-    ASSERT_EQ( "2.17", extract_value( res, "vdb_libc" ) );
 }
 
 TEST_F( GCPTestFixture, header )
@@ -378,7 +307,7 @@ TEST_F( GCPTestFixture, header )
     );
     ASSERT_NE( "", s );
 }
-#endif
+
 TEST_F( GCPTestFixture, header_bad )
 {
     string s = try_to_parse_review( "\"blah\"" );
