@@ -2,8 +2,8 @@
 #include "aws_parser.hpp"
 #include "stdint.h"
 
-#define MAKE_STR()          do { yylval -> s . p = yytext; yylval -> s . n = yyleng; /*printf("\nSTR %s\n", yytext );*/ } while(false)
-#define MAKE_STR1()         do { yylval -> s . p = yytext; yylval -> s . n = yyleng; /*printf("\nSTR1 %s\n", yytext );*/ } while(false)
+#define MAKE_STR()          do { yylval -> p = yytext; yylval -> n = yyleng; /*printf("\nSTR %s\n", yytext );*/ } while(false)
+#define MAKE_STR1()         do { yylval -> p = yytext; yylval -> n = yyleng; /*printf("\nSTR1 %s\n", yytext );*/ } while(false)
 
 %}
 

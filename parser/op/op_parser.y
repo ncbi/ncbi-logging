@@ -40,21 +40,11 @@ extern void op_pop_state( void * yyscanner );
 using namespace NCBI::Logging;
 }
 
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
-%token<s> STR IPV4 IPV6 FLOAT I64 METHOD VERS QSTR QSTR_ESC SPACE
-%token<s> DASH QUOTE PORT RL UNRECOGNIZED
-%token<s> PATHSTR AGENTSTR TIME_FMT
-
-%type<s> time server_and_request request space_and_url
-%type<s> request_tail_elem request_tail
-%type<s> ip user req_time referer forwarded method server
-%type<s> quoted_list quoted_list_body quoted_list_elem
-%type<s> agent vdb_agent
-%type<s> result_code result_len port req_len referer_token referer_list
+%token STR IPV4 IPV6 FLOAT I64 METHOD VERS QSTR QSTR_ESC SPACE
+%token DASH QUOTE PORT RL UNRECOGNIZED
+%token PATHSTR AGENTSTR TIME_FMT
 
 %start line
 

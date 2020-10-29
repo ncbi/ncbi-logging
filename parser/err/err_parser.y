@@ -32,12 +32,9 @@ const t_str EmptyTSTR = { "", 0 };
 using namespace NCBI::Logging;
 }
 
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
-%token<s> UNRECOGNIZED SPACE STR DATETIME SEVERITY MSG
+%token UNRECOGNIZED SPACE STR DATETIME SEVERITY MSG
 
 %start log_line
 

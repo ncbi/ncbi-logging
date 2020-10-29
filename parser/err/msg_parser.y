@@ -34,13 +34,9 @@ const t_str EmptyTSTR = { "", 0 };
 using namespace NCBI::Logging;
 }
 
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
-%token<s> UNRECOGNIZED SPACE STR CLIENT SERVER QUOTE REQUEST HOST
-%type<s> value_str
+%token UNRECOGNIZED SPACE STR CLIENT SERVER QUOTE REQUEST HOST
 
 %start msg_line
 

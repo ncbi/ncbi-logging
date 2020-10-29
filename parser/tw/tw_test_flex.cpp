@@ -52,7 +52,7 @@ public:
         return tw_lex( & token, sc );
     }
 
-    string TokenValue() const { return string( token . s . p, token . s . n ); }
+    string TokenValue() const { return string( token . p, token . n ); }
 
     void token_test( int tt, const char * txt, size_t size, std::function< void( yyscan_t ) > f )
     {
@@ -131,7 +131,7 @@ TEST_F ( TW_TestFlexFixture, CtrlChars )
 {
     const char * txt = "\x01\x06\x10\x1e\x1f";
     token_test( MSG, txt, tw_start_MSG );
-    ASSERT_EQ( 5, token . s . n );
+    ASSERT_EQ( 5, token . n );
 }
 
 extern "C"

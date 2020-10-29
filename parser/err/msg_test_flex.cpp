@@ -55,7 +55,7 @@ public:
         return msg_lex( & token, sc );
     }
 
-    string TokenValue() const { return string( token . s . p, token . s . n ); }
+    string TokenValue() const { return string( token . p, token . n ); }
 
     void token_test( int tt, const char * txt, size_t size, std::function< void( yyscan_t ) > f )
     {

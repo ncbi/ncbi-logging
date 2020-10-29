@@ -45,7 +45,7 @@ public:
         return cl_lex( & token, sc );
     }
 
-    string TokenValue() const { return string( token . s . p, token . s . n ); }
+    string TokenValue() const { return string( token . p, token . n ); }
 
     yyscan_t sc;
     YYSTYPE token;

@@ -46,15 +46,10 @@ extern void tw_pop_state( void * yyscanner );
 using namespace NCBI::Logging;
 }
 
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
-%token<s> ID1 ID2 ID3 TIME SERVER IPADDR SID SERVICE EVENT MSG
+%token ID1 ID2 ID3 TIME SERVER IPADDR SID SERVICE EVENT MSG
 %token SEP UNRECOGNIZED
-
-%type<s> id1 id2 id3 time server ipaddr sid service event msg
 
 %start log_tw
 

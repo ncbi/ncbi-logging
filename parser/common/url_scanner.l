@@ -1,14 +1,13 @@
 %{
 #include "url_parser.hpp"
 
-//TODO: convert into a function
 #define MAKE_STR() \
     do { \
-        yylval -> s . str . p = yytext; \
-        yylval -> s . str . n = yyleng; \
-        EMPTY_TSTR( yylval -> s . accession ); \
-        EMPTY_TSTR( yylval -> s . filename ); \
-        EMPTY_TSTR( yylval -> s . extension ); \
+        yylval -> str . p = yytext; \
+        yylval -> str . n = yyleng; \
+        EMPTY_TSTR( yylval -> accession ); \
+        EMPTY_TSTR( yylval -> filename ); \
+        EMPTY_TSTR( yylval -> extension ); \
     } while(false)
 
 #define RETURN( token ) do { MAKE_STR(); return token; } while ( false )
@@ -41,7 +40,6 @@ URL_BYTE_2  %{HEXCHAR_1}{HEXCHAR}
 URL_BYTE_3  %{HEXCHAR}{HEXCHAR_2}
 URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
 
-    /*TODO: apply the same pattern to other scanners */
 PATHCHARS    [^/?#%.]
 PATHSTR      ({URL_BYTE}|{PATHCHARS})+
 
@@ -53,7 +51,7 @@ QUERY_TOKEN  ({URL_BYTE}|{QUERYCHARS})+
 
 %%
 
-[ \t]+          { /*TODO: has to be URL-encodeed, so an error? */ }
+[ \t]+          { }
 
 {ACCESSION}     { RETURN(  ACCESSION ); }
 {SLASH}         { RETURN(  SLASH ); }

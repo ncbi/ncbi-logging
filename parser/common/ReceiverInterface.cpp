@@ -82,14 +82,14 @@ void ReceiverInterface::reportField( const char * message )
 {
     if ( m_cat == cat_unknown || m_cat == cat_good )
         m_cat = cat_review;
+    t_str msg { message, strlen( message ) };
     try
     {
-        t_str msg { message, strlen( message ) };
         m_fmt -> addNameValue( "_error", msg );
     }
     catch ( const ncbi::InvalidUTF8String & ex )
     {   // msg has an invalid UTF8 caharacter
-        //TODO: m_fmt -> addNameValue( "_error", sanitize(msg) );
+        m_fmt -> addNameValue( "_error", sanitize(msg) );
     }
     catch( const ncbi::JSONUniqueConstraintViolation & e )
     {

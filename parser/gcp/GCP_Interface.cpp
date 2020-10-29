@@ -53,7 +53,8 @@ ReceiverInterface::Category GCPReceiver::post_process( void )
         URLParseBlock pb ( url );
         // [object/url]_for_postprocess has been set in the .y file
         bool res = pb.format_specific_parse( object_for_postprocess.c_str(), object_for_postprocess.size() );
-        // Todo : make it behave like AWS ( aka set the path in the parser.y not here )
+        // 'path' reflects the eventual source of the accession/filename/extension
+        // the path portion of the original request is saved in 'uri'
         if ( res && ! url . m_accession . empty() )
         {
             t_str path = { object_for_postprocess.c_str(), object_for_postprocess.size() };

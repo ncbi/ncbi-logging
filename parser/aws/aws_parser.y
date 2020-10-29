@@ -49,24 +49,12 @@ extern void aws_pop_state( void * yyscanner );
 using namespace NCBI::Logging;
 }
 
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
-%token<s> STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
-%token<s> PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID TIME_FMT RESULTCODE
+%token STR STR1 MONTH IPV4 IPV6 METHOD VERS QSTR DASH I64 AMPERSAND EQUAL PERCENT SLASH QMARK
+%token PATHSTR PATHEXT ACCESSION SPACE TLS_VERSION X_AMZ_ID_2 S3_EXT_REQ_ID TIME_FMT RESULTCODE
 %token COLON QUOTE OB CB
 %token UNRECOGNIZED
-
-%type<s> time
-%type<s> ip referer method qstr_list dash string_or_dash
-%type<s> aws_owner aws_bucket aws_requester aws_request_id aws_operation aws_error
-%type<s> aws_version_id aws_host_id aws_sig aws_cipher aws_auth aws_host_hdr aws_tls_vers
-%type<s> result_code aws_bytes_sent aws_obj_size aws_total_time aws_turnaround_time
-%type<s> x_amz_id_2
-%type<s> request aws_key url
-%type<s> agent vdb_agent
 
 %start line
 

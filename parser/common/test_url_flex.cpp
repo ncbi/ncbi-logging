@@ -43,7 +43,7 @@ public:
         return url_lex( & token, sc );
     }
 
-    string TokenValue() const { return string( token . s . str . p, token . s . str . n ); }
+    string TokenValue() const { return string( token . str . p, token . str . n ); }
 
     yyscan_t sc;
     YYSTYPE token;

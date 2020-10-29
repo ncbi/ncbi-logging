@@ -51,7 +51,7 @@ public:
         return aws_lex( & token, sc );
     }
 
-    string TokenValue() const { return string( token . s . p, token . s . n ); }
+    string TokenValue() const { return string( token . p, token . n ); }
 
     void TestIPV6 ( const char * addr )
     {
@@ -113,8 +113,8 @@ TEST_F ( AWS_TestFlexFixture, Embedded_CtlChars )
     #define str "abc\x00\x01\x02...\x1f-def"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"", 16) );
     ASSERT_EQ( QSTR, NextTokenType() );
-    ASSERT_EQ( 14, token . s . n );
-    ASSERT_EQ( 0, memcmp( str, token . s . p, token . s . n ) );
+    ASSERT_EQ( 14, token . n );
+    ASSERT_EQ( 0, memcmp( str, token . p, token . n ) );
     #undef str
 }
 

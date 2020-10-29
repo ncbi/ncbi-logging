@@ -31,14 +31,9 @@ const t_str EmptyTSTR = { "", 0 };
 using namespace NCBI::Logging;
 }
 
-%token<s> UNRECOGNIZED DATETIME1 DATETIME2 DATETIME3 STR REQID SPACE PIPE
+%token UNRECOGNIZED DATETIME1 DATETIME2 DATETIME3 STR REQID SPACE PIPE
 
-%type<s> str_opt
-
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
 %start line
 

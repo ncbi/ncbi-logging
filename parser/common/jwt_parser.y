@@ -35,14 +35,9 @@ extern void jwt_get_scanner_input( void * yyscanner, t_str & str );
 using namespace NCBI::Logging;
 }
 
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
-%token<s> JWT STR
-
-%type<s> str_list str_token
+%token JWT STR
 
 %start jwt_line
 

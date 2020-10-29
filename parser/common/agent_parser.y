@@ -33,13 +33,9 @@ extern void agent_get_scanner_input( void * yyscanner, t_str & str );
 using namespace NCBI::Logging;
 }
 
-%union
-{
-    t_str s;
-}
+%define api.value.type {t_str}
 
-%token<s> OS T_PHIDCE T_PHIDGUID T_PHIDSESS T_TOOL T_TOOLVERS T_LIBC
-%type<s> agent_token token_list
+%token OS T_PHIDCE T_PHIDGUID T_PHIDSESS T_TOOL T_TOOLVERS T_LIBC
 
 %start agent_line
 

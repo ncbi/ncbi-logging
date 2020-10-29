@@ -37,21 +37,12 @@ using namespace NCBI::Logging;
 
 }
 
-%union
-{
-    t_str s; //TODO: get rid of the union
-}
+%define api.value.type {t_str}
 
-%token<s> IPV4 IPV6 QSTR I64 PATHSTR PATHEXT SLASH
-%token<s> EQUAL AMPERSAND QMARK PERCENT
+%token IPV4 IPV6 QSTR I64 PATHSTR PATHEXT SLASH
+%token EQUAL AMPERSAND QMARK PERCENT
 %token QUOTE COMMA UNRECOGNIZED
-%token<s> OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
-
-%type<s> ip ip_region method host referrer
-%type<s> req_id operation bucket hdr_item hdr_item_text
-%type<s> q_i64 time ip_type status req_bytes res_bytes time_taken
-%type<s> object url
-%type<s> agent vdb_agent
+%token OS SRA_TOOLKIT LIBCVERSION AGENTSTR SRATOOLVERS PHIDVALUE
 
 %start line
 

@@ -95,17 +95,11 @@
 
 }
 
-%union
-{
-    Node s;
-}
+%define api.value.type {Node}
 
-%token<s> ACCESSION PATHSTR DOT SLASH PERCENT PATHEXT EXTSTR EXTPERCENT
-%token<s> QMARK QUERY_SEP EQUAL QUERY_TOKEN
-%token<s> HASH FRAGMENT_TOKEN UNRECOGNIZED
-
-%type<s> path path_list extension ext_list ext_element path_element
-%type<s> query query_list query_key query_entry fragment value_list value_element
+%token ACCESSION PATHSTR DOT SLASH PERCENT PATHEXT EXTSTR EXTPERCENT
+%token QMARK QUERY_SEP EQUAL QUERY_TOKEN
+%token HASH FRAGMENT_TOKEN UNRECOGNIZED
 
 %start url_line
 
