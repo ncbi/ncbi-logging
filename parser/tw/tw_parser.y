@@ -83,7 +83,6 @@ id2
     | UNRECOGNIZED          { lib -> reportField( "invalid ID1" ); YYACCEPT; }
     ;
 
- /*TODO: Update error handling of all fields, a la id2 */
 id3
     : SEP { tw_start_ID3( scanner ); } ID3 { SET_VALUE( TWReceiver::id3, $3 ); }
     | UNRECOGNIZED  { lib -> reportField( "invalid ID3" ); YYACCEPT; }

@@ -291,7 +291,6 @@ TEST_F( GCPTestFixture, accession_from_url_in_params )
 
 TEST_F( GCPTestFixture, bad_object )
 {
-    /* TODO put unrecognizable objects into an new object-field to preserve this information */
     string res = try_to_parse_good(
         "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"SRR004257&\"\n" );
     ASSERT_EQ( "SRR004257&", extract_value( res, "path" ) );

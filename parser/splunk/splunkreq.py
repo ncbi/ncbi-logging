@@ -50,11 +50,6 @@ def extract_raw_from_json( data : str ) :
         res.append( r[ '_raw' ] )
     return res
 
-# returns the search-id
-
-    # domain = "splunkapi.ncbi.nlm.nih.gov"
-
-#TODO: refactor to have domain and path in one place
 class Searcher:
 
     def __init__(self, connectionFactory, bearer ):
@@ -62,7 +57,7 @@ class Searcher:
         self.hdr = { 'Authorization' : "Bearer " + bearer }
         self.domain = "splunkapi.ncbi.nlm.nih.gov"
 
-
+    # returns the search-id
     def create_search( self, search : str ) -> str :
         conn = self . connFact . HTTPSConnection( self.domain )
         data = urllib.parse.urlencode( { 'search' : search } )
@@ -118,10 +113,7 @@ def parseArgs( args : list ) -> argparse.Namespace :
     parser.add_argument("--timeout", "-t", metavar="timeout in seconds", type=int, dest="timeout", default="100", help="maximum wait time for the request, in secoinds")
     return parser.parse_args( args )
 
-#TODO: take --page from the command line
-#TODO: take --wait (for wait_for_done) from the command line
 #TODO: allow overriding the search string or its components
-#TODO: only print details in verbose mode
 
 if __name__ == "__main__":
     try:
