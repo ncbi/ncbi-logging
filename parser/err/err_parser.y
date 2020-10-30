@@ -62,7 +62,14 @@ datetime
     ;
 
 severity
-    : SEVERITY { lib -> set( ERRReceiver::severity, $1 ); }
+    : SEVERITY 
+    {
+        lib -> set( ERRReceiver::severity, $1 );
+        if ( 0 == strncmp( $1.p, "[notice]", $1.n ) )
+        {
+            lib -> SetCategory( ReceiverInterface::cat_ignored );
+        }
+    }
     ;
 
 pid

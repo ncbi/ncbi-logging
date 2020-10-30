@@ -78,7 +78,6 @@ ReceiverInterface::Category ERRReceiver::post_process( void )
         else if ( SetErrorCategory( "host not found", "hostNotFound" ) ) {}
         else if ( SetErrorCategory( "aborting", "aborting" ) ) {}
         else if ( SetErrorCategory( "exited on signal", "exiting" ) ) {}
-        else if ( SetErrorCategory( "ModSecurity", "ModSecurity" ) ) {}
         else if ( SetErrorCategory( "directive is deprecated", "directiveDeprecated" ) ) {}
         else
         {

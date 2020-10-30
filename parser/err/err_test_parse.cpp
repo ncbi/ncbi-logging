@@ -247,7 +247,7 @@ TEST_F( ERRParseTestFixture, exiting )
 
 TEST_F( ERRParseTestFixture, ModSecurity )
 {
-    std::string res = try_to_parse_good( "2020/10/26 03:57:34 [notice] 10839#0: ModSecurity for nginx (STABLE)/2.9.3 (http://www.modsecurity.org/) configured.: " );
+    std::string res = try_to_parse_ignored( "2020/10/26 03:57:34 [notice] 10839#0: ModSecurity for nginx (STABLE)/2.9.3 (http://www.modsecurity.org/) configured.: " );
     ASSERT_EQ( "ModSecurity", extract_value( res, "cat" ) );
 }
 
