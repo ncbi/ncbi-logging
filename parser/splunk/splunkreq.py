@@ -110,7 +110,7 @@ def parseArgs( args : list ) -> argparse.Namespace :
     parser.add_argument("--bearer", "-b", metavar="filename", type=str, dest="bearer", default="", help="name of the file with bearer token for Splunk access inside")
     parser.add_argument("--earliest", "-e", metavar="time", type=str, dest="earliest", default="-1m", help="start time")
     parser.add_argument("--latest", "-l", metavar="time", type=str, dest="latest", default="", help="end time")
-    parser.add_argument("--timeout", "-t", metavar="timeout in seconds", type=int, dest="timeout", default="100", help="maximum wait time for the request, in secoinds")
+    parser.add_argument("--timeout", "-t", metavar="timeout in seconds", type=int, dest="timeout", default="100", help="maximum wait time for the request, in seconds (default 100 seconds)")
     return parser.parse_args( args )
 
 #TODO: allow overriding the search string or its components
