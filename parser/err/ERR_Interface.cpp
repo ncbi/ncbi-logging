@@ -110,7 +110,6 @@ namespace NCBI
             virtual ~ERRParseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             yyscan_t m_sc;
             ERRReceiver m_receiver;
@@ -123,7 +122,6 @@ namespace NCBI
             virtual ~ERRReverseBlock();
             virtual ReceiverInterface & GetReceiver() { return m_receiver; }
             virtual bool format_specific_parse( const char * line, size_t line_size );
-            virtual void SetDebug( bool onOff );
 
             ERRReceiver m_receiver;
         };
@@ -155,16 +153,12 @@ ERRParseBlock::~ERRParseBlock()
     err_lex_destroy( m_sc );
 }
 
-void
-ERRParseBlock::SetDebug( bool onOff )
-{
-    err_debug = onOff ? 1 : 0;            // bison (op_debug is global)
-    err_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
 bool
 ERRParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
+    err_debug = m_debug ? 1 : 0;                // bison (is global)
+    err_set_debug( m_debug ? 1 : 0, m_sc );   // flex
+
     YY_BUFFER_STATE bs = err_scan_bytes( line, line_size, m_sc );
     int ret = err_parse( m_sc, & m_receiver );
     err__delete_buffer( bs, m_sc );
@@ -189,11 +183,6 @@ ERRReverseBlock::ERRReverseBlock( ReceiverInterface::FormatterRef fmt )
 }
 
 ERRReverseBlock::~ERRReverseBlock()
-{ // no need to do anything here
-}
-
-void
-ERRReverseBlock::SetDebug( bool onOff )
 { // no need to do anything here
 }
 
