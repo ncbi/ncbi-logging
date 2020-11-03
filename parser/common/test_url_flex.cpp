@@ -50,8 +50,24 @@ public:
 };
 
 TEST_F ( URL_TestFlexFixture, EndOfFile )       { ASSERT_EQ( 0,     StartScan( "" ) ); }
+
+/* SRA accession names */
 TEST_F ( URL_TestFlexFixture, Accession6 )      { ASSERT_EQ( ACCESSION, StartScan( "SRR123456" ) ); ASSERT_EQ( "SRR123456", TokenValue() ); }
 TEST_F ( URL_TestFlexFixture, Accession7 )      { ASSERT_EQ( ACCESSION, StartScan( "DRR1234567" ) ); ASSERT_EQ( "DRR1234567", TokenValue() ); }
+
+/* WGS accession names*/
+TEST_F ( URL_TestFlexFixture, WGS_noPrefix_4letters_2digits ) { ASSERT_EQ( ACCESSION, StartScan( "AAAB01" ) ); ASSERT_EQ( "AAAB01", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, WGS_noPrefix_4letters_10digits ) { ASSERT_EQ( ACCESSION, StartScan( "ABCDEF0123456789" ) ); ASSERT_EQ( "ABCDEF0123456789", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, WGS_Prefix_4letters_2digits ) { ASSERT_EQ( ACCESSION, StartScan( "NZ_AAAB01" ) ); ASSERT_EQ( "NZ_AAAB01", TokenValue() ); }
+
+
+/* Refseq and similar names */
+TEST_F ( URL_TestFlexFixture, RefSeq_1letter_5digits )              { ASSERT_EQ( ACCESSION, StartScan( "J01415" ) ); ASSERT_EQ( "J01415", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, RefSeq_2letters_6digits )             { ASSERT_EQ( ACCESSION, StartScan( "CM000071" ) ); ASSERT_EQ( "CM000071", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, RefSeq_Prefix_2letters_6digits )      { ASSERT_EQ( ACCESSION, StartScan( "NZ_CM000071" ) ); ASSERT_EQ( "NZ_CM000071", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, RefSeq_Prefix_0letters_9digits )      { ASSERT_EQ( ACCESSION, StartScan( "NW_003315935" ) ); ASSERT_EQ( "NW_003315935", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, RefSeq_2letters_9digits )      { ASSERT_EQ( ACCESSION, StartScan( "NA000008777" ) ); ASSERT_EQ( "NA000008777", TokenValue() ); }
+TEST_F ( URL_TestFlexFixture, RefSeq_hs37d5 )                       { ASSERT_EQ( ACCESSION, StartScan( "hs37d5" ) ); ASSERT_EQ( "hs37d5", TokenValue() ); }
 
 TEST_F ( URL_TestFlexFixture, Slash1 )          { ASSERT_EQ( SLASH,     StartScan( "/" ) ); }
 TEST_F ( URL_TestFlexFixture, Slash2 )          { ASSERT_EQ( SLASH,     StartScan( "%2F" ) ); }

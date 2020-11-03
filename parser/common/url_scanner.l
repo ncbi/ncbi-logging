@@ -22,7 +22,15 @@
 %option stack
 %option debug
 
-ACCESSION   [DES]R[RZ][0-9]{6,9}
+ /* accession names */
+ALPHA       [A-Za-z]
+DIGIT       [0-9]
+SRA         [DES]R[RZ]{DIGIT}{6,9}
+REFSEQ1     ({ALPHA}+_){0,1}{ALPHA}{1,2}{DIGIT}{5,9}
+REFSEQ2     {ALPHA}+_{DIGIT}{5,9}
+WGS         ({ALPHA}+_){0,1}{ALPHA}{4,6}{DIGIT}{2,10}
+ACCESSION   {SRA}|{REFSEQ1}|{REFSEQ2}|{WGS}|"hs37d5"
+
 SLASH       (\/|%2F|%2f)
 QMARK       "?"
 QUERY_SEP   [&;]
