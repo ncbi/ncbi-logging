@@ -12,6 +12,8 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 
+/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
+
 #bq -q query \
 #    --format "$FORMAT" \
 #    --use_legacy_sql=false \
