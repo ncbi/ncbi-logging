@@ -25,7 +25,7 @@ class my_request_handler( http.server.SimpleHTTPRequestHandler ) :
         table = 'strides_analytics.application_logging'
         proc = subprocess.Popen( [ '/usr/bin/bq', 'insert', table ],
             stdin=subprocess.PIPE )
-        proc.communicate( input=message.encode( 'utf-8' ), timeout=5 )
+        proc.communicate( input=message.encode( 'utf-8' ), timeout=10 )
 
 
 def run( args ) :
