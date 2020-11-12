@@ -9,3 +9,4 @@ postgresql-*tar.gz
 core
 1Mlines.txt.gz
 default.profraw
+__pycache__
