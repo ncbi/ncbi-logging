@@ -8,3 +8,6 @@ def setup_http_log( host, port ) :
         secure = False )
     logging.getLogger().addHandler( handler )
 
+def setup_buffer_file_log( location : str ):
+    # use TimedRotatingFileHandler
+    pass

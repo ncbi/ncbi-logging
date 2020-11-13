@@ -1,15 +1,11 @@
 #! /usr/bin/env python3
 
 import argparse, logging, logging.handlers
-
-def setup_http_log( host, port ) :
-    host_str = '{0}:{1}'.format( host, port )
-    handler = logging.handlers.HTTPHandler( host_str, '/', method='GET',
-        secure = False )
-    logging.getLogger().addHandler( handler )
+import ncbi_logging_api
 
 def run( args ) :
-    setup_http_log( args.host, args.port )
+    ncbi_logging_api.setup_http_log( args.host, args.port )
+    #ncbi_logging_api.setup_buffer_file_log( "./logs" )
     logging.error( args.msg )
 
 if __name__ == "__main__" :
