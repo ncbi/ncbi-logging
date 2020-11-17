@@ -10,3 +10,4 @@ core
 1Mlines.txt.gz
 default.profraw
 __pycache__
+tmp
