@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import argparse, sys, os, glob, logging
+import argparse, sys, os, glob, logging, http.client
 from urllib.parse import urlparse, urlunparse
 
 # False if there was at least one error opening or transmitting
@@ -25,7 +25,7 @@ def perform_file_watching( basename : str, concentrator_url : str, client ) -> b
         if fn != basename :
             try:
                 if conn == None :
-                    conn = client.HTTPConnection( urlunparse( (o.scheme, o.netloc, "", "", "", "" ) ) )
+                    conn = client.HTTPConnection( o.hostname, o.port )
             except Exception as e:
                 # where this log message goes is up to the environment
                 logging.error( "perform_file_watching client.HTTPConnection failed (%s)", str(e) )
@@ -34,20 +34,29 @@ def perform_file_watching( basename : str, concentrator_url : str, client ) -> b
             try:
 
                 with open( fn ) as f:
+                    good = True
                     try:
-                        conn.request('POST', o.path, f.readlines() )
+                        conn.request('POST', o.path, "".join(f.readlines()) )
                     except Exception as e:
-                        logging.error( "perform_file_watching conn.request failed (%s)", str(e) )
+                        logging.error( "perform_file_watching conn.request(%s %s %s) failed (%s)", o.hostname, o.port, o.path, str(e) )
+                        good = False
+
+                    if good :
+                        try:
+                            if conn != None :
+                                resp = conn.getresponse()
+                                if 200 == resp.status:
+                                    os.remove( fn )
+                                else:
+                                    success = False
+                        except Exception as e:
+                            logging.error( "perform_file_watching conn.getresponse() failed (%s)", str(e) )
+                            good = False
+
+                    if not good :
                         conn.close()
                         conn = None # will reopen on the next iteration
                         success = False
-
-                    if conn != None :
-                        resp = conn.getresponse()
-                        if 200 == resp.status:
-                            os.remove( fn )
-                        else:
-                            success = False
 
             except Exception as e:
                 logging.error( "perform_file_watching open(%s) failed (%s)", fn, str(e) )
@@ -66,6 +75,6 @@ if __name__ == "__main__":
         dest='url', default = None, help='url to send logs to' )
     args = parser.parse_args()
 
-    res = perform_file_watching( args.location, arg.url, http.client )
+    res = perform_file_watching( args.location, args.url, http.client )
     if not res :
         sys.exit( 1 )
