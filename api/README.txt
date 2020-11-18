@@ -49,3 +49,27 @@ $./test.py
 Ran 1 test in 3.604s
 
 OK
+
+======================================================================
+the logging-api has 3 modules:
+
+1) setup the python-logger in the application which wants to log:
+    the code is in: ncbi_logging_api.py
+    usage:
+        import ncbi_logging_api
+
+        setup_buffer_file_log( '/my-location/my-file.log' )
+        #this will rotate the logs in my-location every minute
+
+        #there are 2 more arguments: when and interval
+        #when defaults to 'M' ... minutes
+        #interval defaults to 1
+
+        documentation at:
+        https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler
+
+2) the file-watcher:
+    file_watcher.py
+    this python3-application has to be run controlled by a cron-job
+    example crontab-line running the app every minute:
+    * * * * * /usr/bin/env python3 file_watcher.py -p /my-location/my-file.log -u http://concentrator-url:port

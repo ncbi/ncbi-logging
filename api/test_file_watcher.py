@@ -100,14 +100,6 @@ class Test_file_watching( unittest.TestCase ) :
 
         self.assertFalse( os.path.exists(filename) )
 
-    def test_HTTPConnection_fails( self ) :
-        createFile( self.log + ".suffix", "blah" )
-
-        # temporarily block ERROR messages from going to stderr
-        self.logger.setLevel( logging.CRITICAL )
-
-        self.assertFalse( file_watcher.perform_file_watching( self.log, 'http://a.b.c:8899', http.client ) )
-
     def test_file_open_fails( self ) :
         filename = createFile( self.log + ".suffix", "blah" )
         os.chmod(filename, 2)
@@ -137,6 +129,12 @@ class Test_file_watching( unittest.TestCase ) :
         self.assertFalse( os.path.exists( filename1 ) )
         self.assertTrue(  os.path.exists( filename2 ) )
         self.assertFalse( os.path.exists( filename3 ) )
+
+    def test_http_connections_fails( self ) :
+        filename = createFile( self.log + ".suffix", "blah" )
+        self.logger.setLevel( logging.CRITICAL )
+        self.assertFalse( file_watcher.perform_file_watching( self.log, 'http://a.b.c:port', http.client ) )
+        self.assertTrue( os.path.exists(filename) )
 
     def test_request_fails( self ) :
         filename = createFile( self.log + ".suffix", "blah" )
@@ -188,7 +186,6 @@ class Test_file_watching( unittest.TestCase ) :
         if newpid == 0:
             my_request_handler.datafile = datafile
             with socketserver.TCPServer( ("", port ), my_request_handler ) as httpd:
-                #print( 'listening on port {}'.format( port) )
                 try :
                     httpd.serve_forever()
                 except :

@@ -1,0 +1,2 @@
+* * * * * /usr/bin/env python3 /home/user/devel/ncbi-logging/api/file_watcher.py -p /home/user/log/logs -u http://concentrator-url:10001 1>>/home/user/log/stdout.txt 2>>/home/user/log/stderr.txt
+#* * * * * /usr/bin/env python3 /home/user/devel/ncbi-logging/api/file_watcher.py -h 1>>/home/user/log/stdout.txt 2>>/home/user/log/stderr.txt

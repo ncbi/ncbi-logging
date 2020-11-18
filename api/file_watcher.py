@@ -6,6 +6,9 @@ from urllib.parse import urlparse, urlunparse
 # False if there was at least one error opening or transmitting
 #   (some files may have been processed)
 # True if all files have been processed or there are none
+
+#Todo: add a batch-size to make multiple POST-requests to the server for
+#each file if the file is bigger than batch-size
 def perform_file_watching( basename : str, concentrator_url : str, client ) -> bool :
     if None == basename :
         return False
@@ -21,6 +24,7 @@ def perform_file_watching( basename : str, concentrator_url : str, client ) -> b
     success = True
     conn = None
     files = glob.glob( basename + "*" )
+    files.sort()
     for fn in files :
         if fn != basename :
             try:
