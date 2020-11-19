@@ -155,7 +155,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
-    ls -lh
+    # ls -lh
 
     echo "rsynced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
