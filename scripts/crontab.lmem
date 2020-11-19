@@ -1,0 +1,18 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=""
+
+# For details see man 5 crontab
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * command to be executed
+
+ 16  8 * * * cd $HOME/ncbi-logging/scripts && ./mirror.sh OP  | ts 2>&1 >> $HOME/mirror_op.log
+  5 11 * * * cd $HOME/ncbi-logging/scripts && ./parse.sh OP  | ts >> $HOME/logs/parse_op.log
+  5 15 * * * cd $HOME/ncbi-logging/scripts && ./parse_new.sh OP  | ts >> $HOME/logs/parse_new_op.log

@@ -1,0 +1,38 @@
+Debian
+------
+sudo apt-get install git sqlite3 g++ awscli bison flex make # python3-pip
+
+Ubuntu
+------
+sudo apt-get update
+sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+sudo usermod -aG docker $USER
+sudo systemctl status docker
+
+CentOS
+------
+sudo amazon-linux-extras install epel
+sudo yum -y --enablerepo epel install moreutils
+sudo tee -a /etc/yum.repos.d/google-cloud-sdk.repo << EOM
+[google-cloud-sdk]
+name=Google Cloud SDK
+baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOM
+sudo yum -y install git python-pip python3 google-cloud-sdk jq
+
+
+sudo pip3 -q install pre-commit influxdb gsutil gcloud
+
+git clone https://github.com/ncbi/ncbi-logging
+cd ncbi-logging
+
+pre-commit run --all-files
