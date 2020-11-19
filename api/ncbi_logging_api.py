@@ -22,7 +22,7 @@ def setup_http_log( host, port ) :
 
 def setup_buffer_file_log( filename : str, arg_when = 'M', arg_interval = 1 ):
     fmt = logging.Formatter( 
-        '{ "t":"%(asctime)-15s", "l":"%(levelname)s", "m":"%(message)s", "a":"%(args)s" }' )
+        '{ "t":"%(asctime)-15s", "l":"%(levelname)s", "m":"%(message)s", "x":"%(extra)s" }' )
     handler = logging.handlers.TimedRotatingFileHandler( filename,
         when=arg_when, interval=arg_interval )
     handler.setFormatter( fmt )
