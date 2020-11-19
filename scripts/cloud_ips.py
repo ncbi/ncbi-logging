@@ -99,7 +99,7 @@ already = set()
 
 # {"remote_ip":"18.212.9.218","ipint":"315886042"}
 ips = open(
-    "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201026.json"
+    "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201119.json"
 )
 for line in ips:
     j = json.loads(line)
