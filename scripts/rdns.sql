@@ -106,6 +106,8 @@ WHERE IP LIKE '134.192.%';
 UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
+  OR IP LIKE '114.23%'
+  OR IP LIKE '115.221.%'
   OR IP LIKE '116.16.%'
   OR IP LIKE '116.17.%'
   OR IP LIKE '116.17.%'
@@ -128,6 +130,7 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '180.161.%'
   OR IP LIKE '101.81.%'
   OR IP LIKE '220.243.135.%'
+  OR IP LIKE '60.162.%'
   OR IP LIKE '61.146.%'
   OR IP LIKE '115.218.%'
   OR IP LIKE '115.219.%'
@@ -194,6 +197,17 @@ OR IP LIKE '129.106.%';
 UPDATE RDNS
 SET DOMAIN = 'Chinamobile.com'
 WHERE IP LIKE '36.1%'
+OR IP LIKE '39.181.%'
+OR IP LIKE '39.182.%'
+OR IP LIKE '39.183.%'
+OR IP LIKE '39.184.%'
+OR IP LIKE '39.185.%'
+OR IP LIKE '39.186.%'
+OR IP LIKE '39.187.%'
+OR IP LIKE '39.188.%'
+OR IP LIKE '39.189.%'
+OR IP LIKE '39.190.%'
+OR IP LIKE '39.191.%'
 OR IP LIKE '111.3%'
 OR IP LIKE '111.4%'
 OR IP LIKE '112.%'
@@ -1322,10 +1336,10 @@ group by unknown_sub
 order by count(*) desc
 limit 10;
 
-.width 200
+.width 100
 -- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
 select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
-select "bq rm strides_analytics.rdns" as hint2;
+select "bq rm -f strides_analytics.rdns" as hint2;
 select "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl" as hint3;
 
 .headers off

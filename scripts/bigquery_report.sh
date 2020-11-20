@@ -35,6 +35,10 @@ bq -q query \
     --use_legacy_sql=false \
     "select max(datetime_trunc(start_ts, day)) as s3_max_day from strides_analytics.s3_fixed"
 
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
+    "select source, count(*) as bad_dates from strides_analytics.detail_export where start_ts < '2011-01-01' group by source"
 
 bq -q query \
     --format "$FORMAT" \

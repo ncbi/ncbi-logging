@@ -354,13 +354,24 @@ echo " #### op_fixed"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
     ip as remote_ip,
-    safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time) as start_ts,
-    datetime_add(
-        safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time),
-        interval
-            cast(1000*cast (req_time as float64) as int64)
-        millisecond
-        ) as end_ts,
+    case
+        WHEN ends_with(time, '-0400]') THEN
+            safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time)
+        ELSE
+            safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0500]', time)
+        END as start_ts,
+    case
+        WHEN ends_with(time, '-0400]') THEN
+            datetime_add(
+                safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time),
+                interval cast(1000*cast (req_time as float64) as int64)
+                millisecond)
+        ELSE
+            datetime_add(
+                safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0500]', time),
+                interval cast(1000*cast (req_time as float64) as int64)
+                millisecond)
+        END as end_ts,
     accession,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
     case

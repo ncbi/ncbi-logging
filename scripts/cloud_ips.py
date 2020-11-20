@@ -3,9 +3,10 @@
 # Usage:
 # 1) update uniq_ips below
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519
-#    https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20201026.json
+SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20201116.json"
 # 3) cloud_ips.py > $PANFS/cloud_ips.jsonl
 # 4) run rdns.sql
+
 
 # TODO: Rewrite to check uniq_ips against CIDR ranges, rather than extensively
 # listing
@@ -89,9 +90,7 @@ with urllib.request.urlopen(
 ) as response:
     AWS_JSON = response.read()
 
-with urllib.request.urlopen(
-    "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20201026.json"
-) as response:
+with urllib.request.urlopen(SERVICE_TAGS) as response:
     AZURE_JSON = json.load(response)
 
 uniq_ips = set()
