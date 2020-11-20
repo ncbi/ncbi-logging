@@ -26,7 +26,6 @@ class FormatterWithDictionary(logging.Formatter):
             '{ "t":"%(asctime)-15s", "l":"%(levelname)s", "m":"%(message)s", "a":"%(args)s"')
 
     def format(self, record):
-        print( record . extra )
         ret = super().format(record)
         if record.extra:
             ret += ', "extra":"' + str ( record.extra ) + '" }'
@@ -36,8 +35,7 @@ class FormatterWithDictionary(logging.Formatter):
 
 class myLogger(logging.Logger):
     def __init__( self, root, filename, arg_when, arg_interval ):
-        print("myLogger")
-        logging.Logger.__init__(self, "")
+        logging.Logger.__init__(self, "_")
         self.orig_root = root
 
         fmt = FormatterWithDictionary()
@@ -54,12 +52,10 @@ class myLogger(logging.Logger):
         # self.handlers = []
         # self.disabled = False
 
-    def _makeRecord(self, name, level, fn, lno, msg, args, exc_info,
-                   func=None, extra=None, sinfo=None):
-        print("makeRecord")
-        rv = logging.LogRecord(name, level, fn, lno, msg, args, exc_info, func, sinfo)
-        rv . extra = extra
-        return rv
+    def uninstall(self):
+        for h in self.handlers:
+            h.close()
+        logging.root = self.root
 
     def _log(self, level, msg, args, exc_info=None, extra=None, stack_info=False):
         """
@@ -83,9 +79,10 @@ class myLogger(logging.Logger):
                 exc_info = (type(exc_info), exc_info, exc_info.__traceback__)
             elif not isinstance(exc_info, tuple):
                 exc_info = sys.exc_info()
-        record = self._makeRecord(self.name, level, fn, lno, msg, args,
-                                 exc_info, func, extra, sinfo)
-        super().handle(record)
+        record = logging.LogRecord(self.name, level, fn, lno, msg, args, exc_info, func, sinfo)
+        record . extra = extra
+        if (not self.disabled) and self.filter(record):
+            super().callHandlers(record)
 
     # the Facade on the root logger
 
@@ -96,6 +93,7 @@ class myLogger(logging.Logger):
 
     def setLevel(self, level):
         self.orig_root.setLevel(level)
+        super().setLevel(level)
 
     def debug(self, msg, *args, **kwargs):
         self.orig_root.debug(msg, *args, **kwargs)
@@ -104,8 +102,8 @@ class myLogger(logging.Logger):
 
     def info(self, msg, *args, **kwargs):
         self.orig_root.info(msg, *args, **kwargs)
-        if self.isEnabledFor(logging.DEBUG):
-            self._log(logging.DEBUG, msg, args, **kwargs)
+        if self.isEnabledFor(logging.INFO):
+            self._log(logging.INFO, msg, args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
         self.orig_root.warning(msg, *args, **kwargs)
