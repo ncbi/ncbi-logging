@@ -19,15 +19,15 @@ def send_msg_with_dict( i, args, d ) :
     print( d )
     msg = "message #{}".format( i + 1 )
     if "error" == args.severity :
-        logging.error( msg, extra = d )
+        logging.error( msg, d )
     elif "debug" == args.severity :
-        logging.debug( msg, extra = d )
+        logging.debug( msg,  d )
     elif "info" == args.severity :
-        logging.info( msg, extra = d )
+        logging.info( msg, d )
     elif "warn" == args.severity :
-        logging.warning( msg, extra = d )
+        logging.warning( msg, d )
     else :
-        logging.critical( msg, extra = d )
+        logging.critical( msg, d )
 
 def logloop( args ) :
     d = None

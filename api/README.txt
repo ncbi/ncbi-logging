@@ -68,6 +68,14 @@ the logging-api has 3 modules:
         documentation at:
         https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler
 
+    To generate formatted log messages from Python code, use logging.error() and its siblings, e.g.:
+        logging.error("message %s %d", "value", 42 )
+
+    To pass extra data to be loaded into BigQuery columns directly, use this form:
+        logging.error("message", extra = { 'bqCol1' : 'bqValue1' } )
+
+        Make sure the keys in the 'extra' correspond to names of columns in the BigQuery table (the details are TBD)
+
 2) the file-watcher:
     file_watcher.py
     this python3-application has to be run controlled by a cron-job
