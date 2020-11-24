@@ -7,6 +7,7 @@ create table cloud_providers (
 insert into cloud_providers values ('S3');
 insert into cloud_providers values ('GS');
 insert into cloud_providers values ('OP');
+insert into cloud_providers values ('Splunk');
 
 create table service_accounts (
     service_account text primary key,
@@ -31,6 +32,7 @@ insert into log_formats values ('S3 log', 'aws2jsn-rel', '');
 insert into log_formats values ('nginx log', 'op2jsn-rel', '');
 insert into log_formats values ('apache log', 'op2jsn-rel', '');
 insert into log_formats values ('traceweb', 'tw2jsn-rel', '');
+insert into log_formats values ('Cloudian', 'cl2jsn', '');
 
 create table formats (
     format text primary key
@@ -790,7 +792,15 @@ update buckets set log_format='GS log' where cloud_provider='GS';
 update buckets set log_format='nginx log' where cloud_provider='OP';
 update buckets set log_format='traceweb' where log_bucket like '%traceweb%';
 
-
+-- LOGMON-31
+insert into buckets (
+    cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    scope, immutable, format, log_format, storage_class)
+values (
+    'Splunk', 'Cloudian', 'Cloudian',
+    'Splunk', '', '',
+    'public', 'false', 'Cloudian log', 'Cloudian log', 'hot');
 
 
 .headers on
