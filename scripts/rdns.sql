@@ -7,6 +7,13 @@
 .mode column
 .width 40 20
 
+-- Speed inserts and updates at risk of corruption if system crashes
+-- Since DB is temporary, we don't care
+pragma journal_mode=off;
+pragma synchronous=off;
+pragma locking_mode=exclusive;
+
+
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201119.json  uniq_ips
