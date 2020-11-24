@@ -113,7 +113,10 @@ WHERE IP LIKE '134.192.%';
 UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
+  OR IP LIKE '101.81.%'
   OR IP LIKE '114.23%'
+  OR IP LIKE '115.218.%'
+  OR IP LIKE '115.219.%'
   OR IP LIKE '115.221.%'
   OR IP LIKE '116.16.%'
   OR IP LIKE '116.17.%'
@@ -124,23 +127,15 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '116.30.%'
   OR IP LIKE '116.31.%'
   OR IP LIKE '116.6.%'
-  OR IP LIKE '218.9%'
-  OR IP LIKE '59.50.85.%'
   OR IP LIKE '119.78.%'
-  OR IP LIKE '219.138.%'
-  OR IP LIKE '219.139.%'
-  OR IP LIKE '219.140.%'
   OR IP LIKE '119.79.%'
-  OR IP LIKE '180.96.%'
+  OR IP LIKE '122.22%'
+  OR IP LIKE '122.23%'
+  OR IP LIKE '140.237.%'
   OR IP LIKE '180.126%'
   OR IP LIKE '180.160.%'
   OR IP LIKE '180.161.%'
-  OR IP LIKE '101.81.%'
-  OR IP LIKE '220.243.135.%'
-  OR IP LIKE '60.162.%'
-  OR IP LIKE '61.146.%'
-  OR IP LIKE '115.218.%'
-  OR IP LIKE '115.219.%'
+  OR IP LIKE '180.96.%'
   OR IP LIKE '182.144.%'
   OR IP LIKE '182.145.%'
   OR IP LIKE '182.146.%'
@@ -152,7 +147,16 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '183.20.%'
   OR IP LIKE '183.4%'
   OR IP LIKE '183.5%'
+  OR IP LIKE '218.9%'
   OR IP LIKE '219.129.%'
+  OR IP LIKE '219.138.%'
+  OR IP LIKE '219.139.%'
+  OR IP LIKE '219.140.%'
+  OR IP LIKE '220.243.135.%'
+  OR IP LIKE '59.50.85.%'
+  OR IP LIKE '60.162.%'
+  OR IP LIKE '60.184.%'
+  OR IP LIKE '61.146.%'
   OR IP LIKE '14.23.%';
 
 UPDATE RDNS
@@ -215,8 +219,13 @@ OR IP LIKE '39.188.%'
 OR IP LIKE '39.189.%'
 OR IP LIKE '39.190.%'
 OR IP LIKE '39.191.%'
+OR IP LIKE '111._.%'
+OR IP LIKE '111.1_.%'
+OR IP LIKE '111.2_.%'
 OR IP LIKE '111.3%'
 OR IP LIKE '111.4%'
+OR IP LIKE '111.5%'
+OR IP LIKE '111.6%'
 OR IP LIKE '112.%'
 OR IP like '120.2%'
 OR IP LIKE '183.19%'
@@ -1156,6 +1165,12 @@ where ip like '150.148.%';
 update rdns
 set domain='rci.rogers.com (Roger Communications Canada)'
 where ip like '72.138.%';
+
+update rdns
+set domain='cernet.edu.cn (Zhejiang University)'
+where ip like '210.32.%';
+
+
 
 
 UPDATE RDNS
