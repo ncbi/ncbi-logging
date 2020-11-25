@@ -799,7 +799,7 @@ insert into buckets (
     scope, immutable, format, log_format, storage_class)
 values (
     'Splunk', 'Cloudian', 'Cloudian',
-    'Splunk', '', '',
+    'Splunk', 'splunk', 'bearer.txt',
     'public', 'false', 'Cloudian log', 'Cloudian log', 'hot');
 
 

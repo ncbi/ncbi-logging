@@ -22,6 +22,9 @@ date; echo "mirror.sh GS"
 date; echo "mirror.sh S3"
 ./mirror.sh S3 | ts >> "$HOME"/mirror_s3.log 2>&1
 
+date; echo "mirror.sh Splunk"
+./mirror.sh Splunk | ts >> "$HOME"/mirror_splunk.log 2>&1
+
 
 date; echo "parse S3"
 ./parse.sh S3      | ts >> "$HOME"/parse_s3.log 2>&1

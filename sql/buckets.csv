@@ -224,4 +224,4 @@ S3,sra-pub-zq-6,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,tr
 S3,sra-pub-zq-7,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
 S3,sra-pub-zq-8,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
 S3,sra-pub-zq-9,,nih-nlm-ncbi-sra,sra-pub-run-1-logs,strides-analytics,public,true,"ETL - BQS","S3 log",cold
-Splunk,Cloudian,Cloudian,Splunk,"","",public,false,"Cloudian log","Cloudian log",hot
+Splunk,Cloudian,Cloudian,Splunk,splunk,bearer.txt,public,false,"Cloudian log","Cloudian log",hot

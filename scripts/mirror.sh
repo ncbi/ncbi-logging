@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USAGE="Usage: $0 {S3,GS,OP} [YYYY_MM_DD [bucket]]"
+USAGE="Usage: $0 {S3,GS,OP,Splunk} [YYYY_MM_DD [bucket]]"
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
@@ -45,13 +45,16 @@ fi
 
 case "$PROVIDER" in
     S3)
-        export PARSER="aws"
+#        export PARSER="aws"
         ;;
     GS)
-        export PARSER="gcp"
+#        export PARSER="gcp"
         ;;
     OP)
-        export PARSER="op"
+#        export PARSER="op"
+        ;;
+    Splunk)
+#        export PARSER="splunk"
         ;;
     *)
         echo "Invalid provider $PROVIDER"
@@ -151,6 +154,37 @@ for LOG_BUCKET in "${buckets[@]}"; do
         wait
 
         #aws s3 sync "s3://$LOG_BUCKET" . --exclude "*" --include "$WILDCARD" --quiet
+    fi
+
+    if [ "$PROVIDER" = "Splunk" ]; then
+        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/"
+        mkdir -p "$MIRROR"
+        cd "$MIRROR" || exit
+
+        echo "Profile is $PROFILE, $PROVIDER concatenating to $MIRROR ..."
+        WILDCARD="${YESTERDAY_DASH}:*"
+
+        # 2020_11_24 -> 11/1/2020:HH:MM:SS
+        YYYY=$(echo "$YESTERDAY_DASH" | cut -d'-' -f 1)
+        MM=$(echo "$YESTERDAY_DASH" | cut -d'-' -f 2)
+        DD=$(echo "$YESTERDAY_DASH" | cut -d'-' -f 3)
+        YESTERDAY_SLASH="$MM/$DD/$YYYY"
+
+        for HH in $(seq -f "%02.0f" 0 1 23); do
+            #for MM in $(seq -f "%02.0f" 0 10 59); do
+            for MM in $(seq 0 1 5); do
+                HH_MM_FROM="$HH:${MM}0:00"
+                HH_MM_TO="$HH:${MM}9:59"
+                echo "From $HH_MM_FROM to $HH_MM_TO"
+                # $(printf "%02d:%02d" "$HH" "$MM")
+                "$HOME/ncbi-logging/parser/splunk/splunkreq.py" \
+                    --bearer "$HOME/splunk_bearer.txt" \
+                    --timeout 600 \
+                    --earliest "$YESTERDAY_SLASH:$HH_MM_FROM" \
+                    --latest   "$YESTERDAY_SLASH:$HH_MM_TO" \
+                    > "$YESTERDAY_DASH:$HH_MM_FROM"
+            done
+        done
     fi
 
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
