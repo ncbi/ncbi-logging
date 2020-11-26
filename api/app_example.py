@@ -16,18 +16,18 @@ def str_2_level( s : str ) :
         return logging.NOTSET
 
 def send_msg_with_dict( i, args, d ) :
-    print( d )
+    #print( d )
     msg = "message #{}".format( i + 1 )
     if "error" == args.severity :
-        logging.error( msg, d )
+        logging.error( msg, extra = d )
     elif "debug" == args.severity :
-        logging.debug( msg,  d )
+        logging.debug( msg, extra = d )
     elif "info" == args.severity :
-        logging.info( msg, d )
+        logging.info( msg, extra = d )
     elif "warn" == args.severity :
-        logging.warning( msg, d )
+        logging.warning( msg, extra = d )
     else :
-        logging.critical( msg, d )
+        logging.critical( msg, extra = d )
 
 def logloop( args ) :
     d = None

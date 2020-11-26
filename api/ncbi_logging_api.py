@@ -3,6 +3,8 @@
 import logging, logging.handlers
 import os, sys
 
+import logmon_pb2
+
 prev_handler = None
 
 def helper_set_handler( handler ) :
@@ -20,9 +22,9 @@ def setup_http_log( host, port ) :
         secure = False )
     helper_set_handler( handler )
 
-class FormatterWithDictionary(logging.Formatter):
+class JsonFormatterWithDictionary(logging.Formatter):
     def __init__(self):
-        super(FormatterWithDictionary, self).__init__(
+        super(JsonFormatterWithDictionary, self).__init__(
             '{ "t":"%(asctime)-15s", "l":"%(levelname)s", "m":"%(message)s", "a":"%(args)s"')
 
     def format(self, record):
@@ -33,12 +35,39 @@ class FormatterWithDictionary(logging.Formatter):
             ret += "}"
         return ret
 
+class ProtobufFormatterWithDictionary(logging.Formatter):
+    def format(self, record):
+        #  convert to protobuf
+        super().format(record) # to populate record.message
+
+        message = logmon_pb2.LogMessage()
+        message.created = record.created
+        message.filename = record.filename
+        message.funcName = record.funcName
+        message.levelno = record.levelno
+        message.lineno = record.lineno
+        message.message = record.message
+        message.module = record.module
+        message.name = record.name
+        message.pathname = record.pathname
+        message.process = record.process
+        message.processName = record.processName
+        message.relativeCreated = record.relativeCreated
+        message.thread = record.thread
+        message.threadName = record.threadName
+        if record.extra :
+            for key, value in record.extra.items():
+                e = message.extra.add()
+                e.key = key
+                e.value = str( value )
+        return message.SerializeToString().hex()
+
 class myLogger(logging.Logger):
     def __init__( self, root, filename, arg_when, arg_interval ):
         logging.Logger.__init__(self, "_")
         self.orig_root = root
 
-        fmt = FormatterWithDictionary()
+        fmt = ProtobufFormatterWithDictionary()
         handler = logging.handlers.TimedRotatingFileHandler( filename, when=arg_when, interval=arg_interval )
         handler.setFormatter( fmt )
 
@@ -80,6 +109,7 @@ class myLogger(logging.Logger):
             elif not isinstance(exc_info, tuple):
                 exc_info = sys.exc_info()
         record = logging.LogRecord(self.name, level, fn, lno, msg, args, exc_info, func, sinfo)
+
         record . extra = extra
         if (not self.disabled) and self.filter(record):
             super().callHandlers(record)
@@ -88,8 +118,10 @@ class myLogger(logging.Logger):
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info,
                    func=None, extra=None, sinfo=None):
-        return self.orig_root.makeRecord(name, level, fn, lno, msg, args, exc_info,
+        ret = self.orig_root.makeRecord(name, level, fn, lno, msg, args, exc_info,
                    func, extra, sinfo)
+        print("makeRecord:" + str( ret ) )
+        return ret
 
     def setLevel(self, level):
         self.orig_root.setLevel(level)

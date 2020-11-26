@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package logmon;
+
+message LogMessage {
+    message KeyValue {
+        string key = 1;
+        string value = 2;
+    }
+
+    float  created = 1;
+    string filename = 2;
+    string funcName = 3;
+    uint32 levelno = 4;
+    uint32 lineno = 5;
+    string message = 6;
+    string module = 7;
+    string name = 8;
+    string pathname = 9;
+    uint32 process = 10;
+    string processName = 11;
+    float  relativeCreated = 12;
+    uint64 thread = 13;
+    string threadName = 14;
+
+    repeated KeyValue extra = 15;
+}
