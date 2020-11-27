@@ -1,9 +1,11 @@
 syntax = "proto3";
 
-package logmon;
+package experiment;
 
 service MessageTransport {
     rpc SendLogMessage( LogMessage ) returns ( TransportResult ) {}
+    rpc SendLogMessageStream( stream LogMessage ) returns( TransportResult ) {}
+    rpc SendStopMessage( StopMessage ) returns ( TransportResult ) {}
 }
 
 message LogMessage {
@@ -32,4 +34,8 @@ message LogMessage {
 
 message TransportResult {
     uint32 status = 1;
+}
+
+message StopMessage{
+    string txt = 1;
 }

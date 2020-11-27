@@ -10,6 +10,6 @@ phony: test
 
 # create ./logmon_pb2.py
 pb: logmon.proto
-	protoc logmon.proto  --python_out=.
+	python -m grpc_tools.protoc --python_out=. -I=. --grpc_python_out=. logmon.proto
 
 phony: pb

@@ -1,0 +1,33 @@
+
+in the application:
+    log a message:
+        - create a protobuf-message from it
+        - serialize it to hex-string
+        - write it out ( using TimedRotatingFileHandler )
+
+in the watcher:
+    driven by cron-job
+    pick up files with time-stamps
+    iterate over lines in each file:
+        - strip the line from whitespace
+        - call fromhex to re-create the protobuf-message
+        - send each message seperately to concentrator
+        - if send fails, write back unsent lines to file and exit
+        - if first line fails, keep file as is and exit
+
+in the concentrator:
+    batch the messages to not exeed 1000 big-query insert-batches per day
+    server receives messages and writes them to disk
+    the grpc-handlers are bound to multiple workers in parallel
+    we have to synchronize writes to disk
+    translates protbuf-messages into json
+    has a writer-thread - exposing a queue to the handlers
+    the queue is by default already thread-safe
+    the writer-thread closes it's file periodically and renames it
+        to a extension, the loader is looking from
+    we could re-use the TimedRotatingFileHandler...
+
+in the loader:
+    could be written by Mike...
+    takes a file-pattern and sends it to big-table
+
