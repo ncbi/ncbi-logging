@@ -179,7 +179,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
                 # $(printf "%02d:%02d" "$HH" "$MM")
                 "$HOME/ncbi-logging/parser/splunk/splunkreq.py" \
                     --bearer "$HOME/splunk_bearer.txt" \
-                    --timeout 600 \
+                    --timeout 900 \
                     --earliest "$YESTERDAY_SLASH:$HH_MM_FROM" \
                     --latest   "$YESTERDAY_SLASH:$HH_MM_TO" \
                     > "$YESTERDAY_DASH:$HH_MM_FROM"
@@ -205,7 +205,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "Copying $TGZ to $DEST_BUCKET"
     gsutil cp "$TGZ" "$DEST_BUCKET"
 
-    if [ "$PROVIDER" != "GS" ]; then
+    if [ "$PROVIDER" != "GS" ] && [ "$PROVIDER" != "Splunk" ]; then
         cd ..
         rm -rf "$MIRROR"
     fi
