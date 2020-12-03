@@ -171,10 +171,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
         YESTERDAY_SLASH="$MM/$DD/$YYYY"
 
         for HH in $(seq -f "%02.0f" 0 1 23); do
-            #for MM in $(seq -f "%02.0f" 0 10 59); do
-            for MM in $(seq 0 1 5); do
-                HH_MM_FROM="$HH:${MM}0:00"
-                HH_MM_TO="$HH:${MM}9:59"
+            for MM in $(seq -f "%02.0f" 0 5 59); do
+                HH_MM_FROM="$HH:${MM}:00"
+                MM_END=$(( MM + 4 ))
+                MM_END=$(printf "%02.0f" $MM_END)
+                HH_MM_TO="$HH:${MM_END}:59"
                 echo "From $HH_MM_FROM to $HH_MM_TO"
                 # $(printf "%02d:%02d" "$HH" "$MM")
                 "$HOME/ncbi-logging/parser/splunk/splunkreq.py" \
