@@ -51,6 +51,9 @@ case "$PROVIDER" in
     OP)
         export PARSER="op"
         ;;
+    Splunk)
+        export PARSER=""
+        ;;
     *)
         echo "Invalid provider $PROVIDER"
         echo "$USAGE"
