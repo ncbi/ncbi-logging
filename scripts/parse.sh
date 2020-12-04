@@ -52,7 +52,7 @@ case "$PROVIDER" in
         export PARSER="op"
         ;;
     Splunk)
-        export PARSER=""
+        export PARSER="cl"
         ;;
     *)
         echo "Invalid provider $PROVIDER"
@@ -104,88 +104,98 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "  Parsing $TGZ (pattern=$wildcard), $totalwc lines ..."
     touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
-    VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel --version)
 
     echo "  Parsing $LOG_BUCKET..."
-    tar -xaOf "$TGZ" "$wildcard" | \
-        time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
-        "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
-        2> "$TGZ.err"
+    if [ "$PARSER" = "cl" ]; then
+        VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/cl2jsn-rel --version)
+
+        tar -xaOf "$TGZ" "$wildcard" | \
+            tr -s ' ' | \ # Remove when LOGMON-107 fixed
+            time "$HOME/devel/ncbi-logging/parser/bin/cl2jsn-rel" -f "$PARSER" > \
+            "$YESTERDAY_DASH.${LOG_BUCKET}.out" \
+            2> "$TGZ.err"
+
+            echo "  Record format is:"
+            head -1 "cl.good.jsonl" | jq -SM .
+
+            set +e
+            cat cl.unrecog.jsonl cl.review.jsonl cl.bad.jsonl > \
+                "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+            mv cl.good.jsonl \
+                "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+            set -e
+
+    else
+        VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel --version)
+
+        tar -xaOf "$TGZ" "$wildcard" | \
+            time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
+            "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
+            2> "$TGZ.err"
+
+        echo "  Record format is:"
+        head -1 "$YESTERDAY_DASH.${LOG_BUCKET}.json" | jq -SM .
+
+        set +e
+        grep "\"accepted\":false," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
+            "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+        grep "\"accepted\":true," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
+            "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+        rm -f "$YESTERDAY_DASH.${LOG_BUCKET}.json"
+        set -e
+    fi
     head "$TGZ.err"
     rm -f "$TGZ"
 
-    echo
-
-    echo "  Record format is:"
-    head -1 "$YESTERDAY_DASH.${LOG_BUCKET}.json" | jq -SM .
-
-    set +e
-    grep "\"accepted\":false," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
-        "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-    grep "\"accepted\":true," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
-        "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-    rm -f "$YESTERDAY_DASH.${LOG_BUCKET}.json"
-    set -e
-
-    # "accepted": true,
     unrecwc=$(wc -l "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
     recwc=$(wc -l "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" | cut -f1 -d' ')
+
+    echo
 
     printf "Recognized lines:   %8d\n" "$recwc"
     printf "Unrecognized lines: %8d\n" "$unrecwc"
 
-#    echo "Verifying JSON..."
-#    jq -e -c . < "recognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
-#    jq -e -c . < "unrecognized.$YESTERDAY.${LOG_BUCKET}.jsonl" > /dev/null
+    echo "  splitting"
+    split -a 3 -d -e -l 20000000 --additional-suffix=.jsonl \
+        - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
+        < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
-#    if [ "$unrecwc" -eq "0" ]; then
-        #find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
+    rm -f "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
-#        if [ "$recwc" -gt 1000000 ]; then
-#            echo "jsonl too large, splitting"
-            echo "  splitting"
-            split -a 3 -d -e -l 20000000 --additional-suffix=.jsonl \
-                - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
-                < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+    if [ ! -s "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" ]; then
+        rm -f "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+    fi
 
-            rm -f "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-#        fi
+    echo "  Gzipping..."
+    gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl &
+    wait
 
-        if [ ! -s "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl" ]; then
-            rm -f "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-        fi
+    echo "  Summarizing..."
+    {
+        printf "{"
+        printf '"log_bucket": "%s",' "$LOG_BUCKET"
+        printf '"provider": "%s",' "$PROVIDER"
+        printf '"log_date": "%s",' "$YESTERDAY"
+        printf '"parse_date": "%s",' "$DATE"
+        printf '"parser_version" : "%s",' "$VERSION"
+        printf '"total_lines" : %d,' "$totalwc"
+        printf '"recognized_lines" : %d,' "$recwc"
+        printf '"unrecognized_lines" : %d'  "$unrecwc"
+        printf "}"
+    } > "$TGZ.json"
+    jq -S -c . < "$TGZ.json" > "summary.$TGZ.jsonl"
+    cat "summary.$TGZ.jsonl"
 
-        echo "  Gzipping..."
-        gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl &
-        wait
+    echo "  Uploading to gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/ ..."
 
-        echo "  Summarizing..."
-        {
-            printf "{"
-            printf '"log_bucket": "%s",' "$LOG_BUCKET"
-            printf '"provider": "%s",' "$PROVIDER"
-            printf '"log_date": "%s",' "$YESTERDAY"
-            printf '"parse_date": "%s",' "$DATE"
-            printf '"parser_version" : "%s",' "$VERSION"
-            printf '"total_lines" : %d,' "$totalwc"
-            printf '"recognized_lines" : %d,' "$recwc"
-            printf '"unrecognized_lines" : %d'  "$unrecwc"
-            printf "}"
-        } > "$TGZ.json"
-        jq -S -c . < "$TGZ.json" > "summary.$TGZ.jsonl"
-        cat "summary.$TGZ.jsonl"
+    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
+    export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+    gcloud config set account 253716305623-compute@developer.gserviceaccount.com
+    gsutil cp ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
+    gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
+    gsutil cp ./"summary.$TGZ.jsonl" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
+    cd ..
+    rm -rf "$PARSE_DEST"
 
-        echo "  Uploading..."
-
-        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
-        export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
-        gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-        gsutil cp ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-        gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-        gsutil cp ./"summary.$TGZ.jsonl" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-        cd ..
-        rm -rf "$PARSE_DEST"
-#    fi
-echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
-echo
+    echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
 done
