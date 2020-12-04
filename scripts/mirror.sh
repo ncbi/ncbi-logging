@@ -176,8 +176,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
                 MM_END=$(( MM + 4 ))
                 MM_END=$(printf "%02.0f" $MM_END)
                 HH_MM_TO="$HH:${MM_END}:59"
-                echo "From $HH_MM_FROM to $HH_MM_TO"
-                # $(printf "%02d:%02d" "$HH" "$MM")
+                echo "From   $YESTERDAY_SLASH $HH_MM_FROM to $HH_MM_TO"
                 "$HOME/ncbi-logging/parser/splunk/splunkreq.py" \
                     --bearer "$HOME/splunk_bearer.txt" \
                     --timeout 900 \
