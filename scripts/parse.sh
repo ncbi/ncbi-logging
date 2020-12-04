@@ -8,7 +8,7 @@
 # done
 # cat days | xargs -P 10 -I % ./parse.sh GS %
 
-USAGE="Usage: $0 {S3,GS,OP} YYYY_MM_DD"
+USAGE="Usage: $0 {S3,GS,OP,Splunk} YYYY_MM_DD"
 
 sleep $((RANDOM / 500))
 

@@ -8,7 +8,7 @@
 # done
 # cat days | xargs -P 10 -I % ./parse.sh GS %
 
-USAGE="Usage: $0 {S3,GS,OP} [YYYY_MM_DD [bucket]]"
+USAGE="Usage: $0 {S3,GS,OP,Splunk} [YYYY_MM_DD [bucket]]"
 
 #sleep $((RANDOM / 500))
 
@@ -72,6 +72,9 @@ case "$PROVIDER" in
 #        PARSER_BIN="aws2jsn-rel"
         WILDCARD='*'
         ;;
+    Splunk)
+        WILDCARD='*'
+        ;;
     *)
         echo "Invalid provider $PROVIDER"
         echo "$USAGE"
@@ -126,11 +129,22 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     BASE="$LOG_BUCKET.$YESTERDAY_DASH"
     echo "BASE is $BASE"
+
     set +e
-    tar -xaOf "$TGZ" "$WILDCARD" | \
-        time "$PARSER_BIN" -f -t 4 "$BASE" \
-        > "$BASE.stdout" \
-        2> "$BASE.stderr"
+    if [ "$PROVIDER" = "Splunk" ]; then
+        # Remove when LOGMON-107 fixed
+        tar -xaOf "$TGZ" "$WILDCARD" | \
+            tr -s ' ' | \
+            time "$PARSER_BIN" -f -t 4 "$BASE" \
+            > "$BASE.stdout" \
+            2> "$BASE.stderr"
+    else
+        tar -xaOf "$TGZ" "$WILDCARD" | \
+            time "$PARSER_BIN" -f -t 4 "$BASE" \
+            > "$BASE.stdout" \
+            2> "$BASE.stderr"
+    fi
+
     echo "Returned $?"
     rm -f "$TGZ"
     head -v "$BASE.stderr"

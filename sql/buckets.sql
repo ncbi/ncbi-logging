@@ -32,7 +32,7 @@ insert into log_formats values ('S3 log', 'aws2jsn-rel', '');
 insert into log_formats values ('nginx log', 'op2jsn-rel', '');
 insert into log_formats values ('apache log', 'op2jsn-rel', '');
 insert into log_formats values ('traceweb', 'tw2jsn-rel', '');
-insert into log_formats values ('Cloudian', 'cl2jsn', '');
+insert into log_formats values ('Cloudian log', 'cl2jsn-rel', '');
 
 create table formats (
     format text primary key
