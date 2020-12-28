@@ -10,7 +10,7 @@
 
 USAGE="Usage: $0 {S3,GS,OP,Splunk} [YYYY_MM_DD [bucket]]"
 
-#sleep $((RANDOM / 500))
+sleep $((RANDOM / 500))
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
@@ -136,18 +136,18 @@ for LOG_BUCKET in "${buckets[@]}"; do
         tar -xaOf "$TGZ" "$WILDCARD" | \
             tr -s ' ' | \
             time "$PARSER_BIN" -f -t 4 "$BASE" \
-            > "$BASE.stdout" \
-            2> "$BASE.stderr"
+            > stdout."$BASE" \
+            2> stderr."$BASE"
     else
         tar -xaOf "$TGZ" "$WILDCARD" | \
             time "$PARSER_BIN" -f -t 4 "$BASE" \
-            > "$BASE.stdout" \
-            2> "$BASE.stderr"
+            > stdout."$BASE" \
+            2> stderr."$BASE"
     fi
 
     echo "Returned $?"
     rm -f "$TGZ"
-    head -v "$BASE.stderr"
+    head -v stderr."$BASE"
     echo "==="
 
     ls -l
@@ -163,34 +163,42 @@ for LOG_BUCKET in "${buckets[@]}"; do
     touch "$BASE.review.jsonl"
     touch "$BASE.ugly.jsonl"
     touch "$BASE.unrecog.jsonl"
-    cat "$BASE.unrecog.jsonl" "$BASE.bad.jsonl" "$BASE.review.jsonl" "$BASE.ugly.jsonl" > "$BASE.unrecognized.jsonl"
+
+    cat "$BASE.unrecog.jsonl" \
+        "$BASE.bad.jsonl" \
+        "$BASE.review.jsonl" \
+        "$BASE.ugly.jsonl" \
+        > "unrecognized.$BASE.jsonl"
     rm -f "$BASE.unrecog.jsonl" "$BASE.bad.jsonl" "$BASE.review.jsonl" "$BASE.ugly.jsonl"
-    mv "$BASE.good.jsonl" "$BASE.recognized.jsonl"
-    recwc=$(wc -l "$BASE.recognized.jsonl" | cut -f1 -d' ')
+    mv "$BASE.good.jsonl" "recognized.$BASE.jsonl"
+    mv "$BASE.stats.jsonl" "stats.$BASE.jsonl"
+
+    recwc=$(wc -l "recognized.$BASE.jsonl" | cut -f1 -d' ')
     printf "Recognized lines:   %8d\n" "$recwc"
-    unrecwc=$(wc -l "$BASE.unrecognized.jsonl" | cut -f1 -d' ')
+    unrecwc=$(wc -l "unrecognized.$BASE.jsonl" | cut -f1 -d' ')
     printf "Unrecognized lines: %8d\n" "$unrecwc"
 
-    if [ ! -s "$BASE.recognized.jsonl" ]; then
-        echo "ERROR: Empty $BASE.recognized.jsonl"
+    if [ ! -s "recognized.$BASE.jsonl" ]; then
+        echo "ERROR: Empty recognized.$BASE.jsonl"
         #continue
     fi
 
-    if [ ! -s "$BASE.unrecognized.jsonl" ]; then
-        rm -f "$BASE.unrecognized.jsonl"
-    fi
+    #if [ ! -s "unrecognized.$BASE.jsonl" ]; then
+    #    rm -f "unrecognized.$BASE.jsonl"
+    #fi
 
     echo
     echo "  Splitting ..."
     # -e no empty
     split -a 3 -d -l 10000000 --additional-suffix=.jsonl \
-        - "$BASE.recognized." \
-        < "$BASE.recognized.jsonl"
+        - "recognized.$BASE." \
+        < "recognized.$BASE.jsonl"
 
-    rm -f "$BASE.recognized.jsonl"
+    rm -f "recognized.$BASE.jsonl"
 
     echo "  Gzipping ..."
-    gzip -f -v ./"$BASE."*recognized.*.jsonl
+    gzip -f -v ./*recognized."$BASE"*jsonl
+    find ./ -name "*$BASE*" -size 0c -exec rm -f {} \;
 
     echo -n "  Summarizing... "
     {
@@ -204,7 +212,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         printf '"recognized_lines" : %d,' "$recwc"
         printf '"unrecognized_lines" : %d'  "$unrecwc"
         printf "}"
-    } | jq -S -c . | tee "$BASE.summary.jsonl"
+    } | jq -S -c . | tee "summary.$BASE.jsonl"
 
     ls -l
     echo "  Uploading..."
@@ -212,12 +220,12 @@ for LOG_BUCKET in "${buckets[@]}"; do
     export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil cp ./"$BASE"*ecognized* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
-    gsutil cp ./"$BASE".stderr "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
-    gsutil cp ./"$BASE".stats.jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
-    gsutil cp ./"$BASE".summary.jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/"
+    gsutil cp ./*ecognized."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+    gsutil cp ./std*."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+    gsutil cp ./stats."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+    gsutil cp ./summary."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
 
-    gsutil ls -lh "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v2/$BASE*"
+    gsutil ls -lh "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/*$BASE*"
 
     cd ..
     rm -rf "$PARSE_DEST"

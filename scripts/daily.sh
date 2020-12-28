@@ -49,6 +49,7 @@ date; echo "s3_lister"
 dow=$(date +%u)
 if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
     date; echo "bigquery_export"
+    ./bigquery_cloudian.sh  | ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log 2>&1
     ./bigquery_export.sh  | ts >> "$HOME"/logs/bigquery_export."$DATE".log 2>&1
     ./bigquery_report.sh  | ts >> "$HOME"/logs/bigquery_report."$DATE".log 2>&1
     ./bigquery_summary.sh | ts >> "$HOME"/logs/bigquery_summary."$DATE".log 2>&1
