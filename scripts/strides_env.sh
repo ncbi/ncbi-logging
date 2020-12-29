@@ -29,7 +29,7 @@ export YESTERDAY_UNDER
 
 
 # GCP VM shouldn't have any other competing load, helps on iebdev
-renice +19 -p $$ > /dev/null 2>&1
+renice +19 -p $$ &> /dev/null
 
 SQLCACHE="$RAMDISK/${USER}_${DATE}"
 #SQLCACHE="$RAMDISK/${USER}"
