@@ -40,7 +40,7 @@ bq -q query \
 --use_legacy_sql=false \
 "select count(*) as summary_count from strides_analytics.cloudian_summary"
 
-bq -q query --use_legacy_sql=false "SELECT log_date, parser_version, unrecognized_lines FROM \`ncbi-logmon.strides_analytics.cloudian_summary\` where unrecognized_lines > 0"
+bq -q query --use_legacy_sql=false "SELECT log_date, parser_version, recognized_lines, unrecognized_lines FROM \`ncbi-logmon.strides_analytics.cloudian_summary\` where unrecognized_lines > 0 order by log_date"
 
 
 
