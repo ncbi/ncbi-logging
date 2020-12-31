@@ -13,4 +13,6 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 gsutil -m cp -n ./*.gz gs://logmon_objects/gs/
 #gsutil -m rsync . gs://logmon_objects/gs/
 
+echo "Done"
+
 exit 0
