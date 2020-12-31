@@ -31,6 +31,7 @@ def main():
     now = datetime.datetime.now()
     now = now.strftime("%Y-%m-%d %H:%M:%S")
 
+    count = 0
     for page in paginator.paginate(Bucket=bucket_name):
         if "Contents" in page:
             contents = page["Contents"]
@@ -54,11 +55,13 @@ def main():
                 d["md5"] = ETag
                 #            print (obj)
                 print(json.dumps(d))
+                count += 1
         else:
             print(f"Weird keys {page}", file=sys.stderr)
 
             # 'Key': 'DRR000871/DRR000871.1', 'LastModified': datetime.datetime(2019, 4, 7, 14, 42, 5, tzinfo=tzutc()), 'ETag': '"c148c3c12ff4ff3353f4d1908cf9a0d6-697"', 'Size': 5846499276, 'StorageClass': 'STANDARD'
 
+    print(f"Listed {count} objects from {bucket_name}", file=sys.stderr)
     return 0
 
 
