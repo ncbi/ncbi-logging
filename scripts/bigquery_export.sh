@@ -426,7 +426,18 @@ SELECT
     source as source,
     start_ts,
     user_agent as user_agent,
-    version as version
+    version as version,
+    case
+        WHEN http_operation in ('GET', 'HEAD') THEN 0
+        WHEN http_operation='POST' THEN 1
+        WHEN http_operation='PUT' THEN 2
+        WHEN http_operation='DELETE' THEN 3
+        WHEN http_operation='PATCH' THEN 4
+        WHEN http_operation='OPTIONS' THEN 5
+        WHEN http_operation='TRACE' THEN 6
+        WHEN http_operation='CONNECT' THEN 7
+    ELSE 99
+    END as http_operation_combined
     FROM \\\`strides_analytics.gs_fixed\\\`
 UNION ALL SELECT
     accession as accession,
@@ -445,7 +456,18 @@ UNION ALL SELECT
     source as source,
     start_ts,
     user_agent as user_agent,
-    version as version
+    version as version,
+    case
+        WHEN http_operation in ('GET', 'HEAD') THEN 0
+        WHEN http_operation='POST' THEN 1
+        WHEN http_operation='PUT' THEN 2
+        WHEN http_operation='DELETE' THEN 3
+        WHEN http_operation='PATCH' THEN 4
+        WHEN http_operation='OPTIONS' THEN 5
+        WHEN http_operation='TRACE' THEN 6
+        WHEN http_operation='CONNECT' THEN 7
+    ELSE 99
+    END as http_operation_combined
     FROM \\\`strides_analytics.s3_fixed\\\`
 UNION ALL SELECT
     accession as accession,
@@ -464,7 +486,18 @@ UNION ALL SELECT
     source as source,
     start_ts,
     user_agent as user_agent,
-    version as version
+    version as version,
+    case
+        WHEN http_operation in ('GET', 'HEAD') THEN 0
+        WHEN http_operation='POST' THEN 1
+        WHEN http_operation='PUT' THEN 2
+        WHEN http_operation='DELETE' THEN 3
+        WHEN http_operation='PATCH' THEN 4
+        WHEN http_operation='OPTIONS' THEN 5
+        WHEN http_operation='TRACE' THEN 6
+        WHEN http_operation='CONNECT' THEN 7
+    ELSE 99
+    END as http_operation_combined
     FROM \\\`strides_analytics.op_fixed\\\`
 
 ENDOFQUERY
@@ -480,43 +513,42 @@ ENDOFQUERY
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
+    --time_partitioning_field=start_ts \
     "$QUERY"
 
     bq show --schema strides_analytics.detail_export
 
+bq -q query \
+    --use_legacy_sql=false \
+    "delete from strides_analytics.detail_export where start_ts < '2000-01-01'"
+
+#WHERE start_ts > '2000-01-01'
+
 echo " ###  summary_grouped"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
-    accession,
-    user_agent,
-    remote_ip,
-    host,
-    bucket,
-    source,
-    count(*) as num_requests,
-    min(start_ts) as start_ts,
-    max(end_ts) as end_ts,
-    string_agg(distinct http_operation order by http_operation) as http_operations,
-    string_agg(distinct http_status order by http_status) as http_statuses,
-    string_agg(distinct referer) as referers,
-    string_agg(distinct extension order by extension) as file_exts,
-    sum(bytes_sent) as bytes_sent,
-    current_datetime() as export_time
-    FROM \\\`strides_analytics.detail_export\\\`
-    WHERE start_ts > '2000-01-01'
-    GROUP BY accession, user_agent, remote_ip, host, bucket, source, datetime_trunc(start_ts, day),
-    case
-        WHEN http_operation in ('GET', 'HEAD') THEN 0
-        WHEN http_operation='POST' THEN 1
-        WHEN http_operation='PUT' THEN 2
-        WHEN http_operation='DELETE' THEN 3
-        WHEN http_operation='PATCH' THEN 4
-        WHEN http_operation='OPTIONS' THEN 5
-        WHEN http_operation='TRACE' THEN 6
-        WHEN http_operation='CONNECT' THEN 7
-    ELSE 99
-    END
-    HAVING bytes_sent > 0
+        accession,
+        user_agent,
+        remote_ip,
+        host,
+        bucket,
+        source,
+        count(*) as num_requests,
+        min(start_ts) as start_ts,
+        max(end_ts) as end_ts,
+        string_agg(distinct http_operation order by http_operation) as http_operations,
+        string_agg(distinct http_status order by http_status) as http_statuses,
+        string_agg(distinct referer) as referers,
+        string_agg(distinct extension order by extension) as file_exts,
+        sum(bytes_sent) as bytes_sent,
+        current_datetime() as export_time
+    FROM
+        \\\`strides_analytics.detail_export\\\`
+    GROUP BY
+        datetime_trunc(start_ts, day), accession, user_agent,
+        remote_ip, host, bucket, source, http_operation_combined
+    HAVING
+        bytes_sent > 0
 ENDOFQUERY
     )
 

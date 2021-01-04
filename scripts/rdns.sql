@@ -16,7 +16,7 @@ pragma locking_mode=exclusive;
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20201119.json  uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210104.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
