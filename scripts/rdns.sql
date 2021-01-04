@@ -5,7 +5,7 @@
 .headers on
 .bail on
 .mode column
-.width 120 120
+.width 60 60
 
 -- Speed inserts and updates at risk of corruption if system crashes
 -- Since DB is temporary, we don't care
@@ -1361,6 +1361,7 @@ group by unknown_sub
 order by count(*) desc
 limit 10;
 
+.width 120 120
 -- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
 select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
 select "bq rm -f strides_analytics.rdns" as hint2;
