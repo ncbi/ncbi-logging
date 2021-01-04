@@ -54,6 +54,13 @@ if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
     exit 2
 fi
 
+DONEFILE="${HOME}/done/${PROVIDER}_${YESTERDAY}.done"
+if [ -e "$DONEFILE" ]; then
+    exit 0
+else
+    touch "$DONEFILE"
+fi
+
 buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='public' order by log_bucket")
 readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
