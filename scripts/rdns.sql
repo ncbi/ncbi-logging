@@ -5,13 +5,16 @@
 .headers on
 .bail on
 .mode column
-.width 40 20
+.width 120 120
 
 -- Speed inserts and updates at risk of corruption if system crashes
 -- Since DB is temporary, we don't care
-pragma journal_mode=off;
-pragma synchronous=off;
-pragma locking_mode=exclusive;
+pragma journal_mode = off;
+pragma synchronous = off;
+pragma locking_mode = exclusive;
+pragma temp_store = memory;
+pragma mmap_size = 100000000000;
+pragma page_size = 32768;
 
 
 drop table if exists uniq_ips;
@@ -1358,7 +1361,6 @@ group by unknown_sub
 order by count(*) desc
 limit 10;
 
-.width 100
 -- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
 select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
 select "bq rm -f strides_analytics.rdns" as hint2;

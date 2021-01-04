@@ -56,6 +56,7 @@ fi
 
 DONEFILE="${HOME}/done/${PROVIDER}_${YESTERDAY}.done"
 if [ -e "$DONEFILE" ]; then
+    echo "$DONEFILE done"
     exit 0
 else
     touch "$DONEFILE"
