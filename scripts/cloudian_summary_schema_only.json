@@ -1,0 +1,1 @@
+[{"name":"log_bucket","type":"STRING"},{"name":"log_date","type":"STRING"},{"name":"parse_date","type":"STRING"},{"name":"parser_version","type":"STRING"},{"name":"provider","type":"STRING"},{"name":"recognized_lines","type":"INT64"},{"name":"total_lines","type":"INT64"},{"name":"unrecognized_lines","type":"INT64"}]

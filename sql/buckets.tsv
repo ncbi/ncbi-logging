@@ -93,6 +93,7 @@ GS	sra-pub-zq-6		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	
 GS	sra-pub-zq-7		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL - BQS	GS log	cold
 GS	sra-pub-zq-8		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL - BQS	GS log	cold
 GS	sra-pub-zq-9		nih-sra-datastore	sra-pub-logs-1	strides-analytics	public	true	ETL - BQS	GS log	cold
+OP	OP	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles11/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	faspgap	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fasp*/access_*.gz		public	false	nginx log	nginx log	hot
 OP	faspgap1	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap1/access.log_??????*gz		public	false	nginx log	nginx log	hot
 OP	faspgap11	applog rotated	Applog	/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap11/access.log_??????*gz		public	false	nginx log	nginx log	hot

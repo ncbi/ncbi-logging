@@ -1,0 +1,29 @@
+    { "schema": { "fields": [
+    { "name" : "accession", "type": "STRING" },
+    { "name" : "bucket", "type": "STRING" },
+    { "name" : "contentAccessorUserID", "type": "STRING" },
+    { "name" : "copySource", "type": "STRING" },
+    { "name" : "durationMsec", "type": "STRING" },
+    { "name" : "eTag", "type": "STRING" },
+    { "name" : "errorCode", "type": "STRING" },
+    { "name" : "extension", "type": "STRING" },
+    { "name" : "filename", "type": "STRING" },
+    { "name" : "httpStatus", "type": "STRING" },
+    { "name" : "ip", "type": "STRING" },
+    { "name" : "method", "type": "STRING" },
+    { "name" : "owner", "type": "STRING" },
+    { "name" : "path", "type": "STRING" },
+    { "name" : "reqId", "type": "STRING" },
+    { "name" : "requestBodySize", "type": "STRING" },
+    { "name" : "requestHdrSize", "type": "STRING" },
+    { "name" : "responseBodySize", "type": "STRING" },
+    { "name" : "responseHdrSize", "type": "STRING" },
+    { "name" : "syslog_prefix", "type": "STRING" },
+    { "name" : "timestamp", "type": "STRING" },
+    { "name" : "totalSize", "type": "STRING" }
+    ]
+  },
+  "sourceFormat": "NEWLINE_DELIMITED_JSON",
+  "sourceUris": [
+  "gs://logmon_logs_parsed_us/logs_splunk_public/v3/recognized*" ]
+}

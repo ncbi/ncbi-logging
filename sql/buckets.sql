@@ -265,6 +265,13 @@ values ('S3', 'sra-pub-sars-cov2-metadata-us-east-1', 'CoViD-19', 'Efremov', 'sr
 
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)
+values ('OP', 'OP',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles11/access.log_??????*gz',
+    '', 'false', 'nginx log', 'hot');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class)
 values ('OP', 'srafiles11',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/srafiles11/access.log_??????*gz',

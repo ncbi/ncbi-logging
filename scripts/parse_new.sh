@@ -112,6 +112,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
 #            BUCKET_NAME="srafiles"
 #        fi
         LOG_BUCKET="OP-${BUCKET_NAME}"
+        if [ "$LOG_BUCKET" == "OP-OP" ]; then
+            LOG_BUCKET="OP"
+        fi
     fi
 
     PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
@@ -125,7 +128,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" .
+    gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" . || true
+    if [ ! -e "$TGZ" ]; then
+        echo "${SRC_BUCKET}${TGZ} not found, skipping"
+        continue
+    fi
     ls -hl "$TGZ"
 
     echo "  Counting $TGZ ..."
