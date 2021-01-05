@@ -17,7 +17,7 @@
 
 MONTH       "Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 DIGITS1_2   [0-9]{1,2}
-SPACE       " "
+SPACE       " "+
 DATETIME1   {MONTH}{SPACE}{DIGITS1_2}{SPACE}{DIGITS1_2}:{DIGITS1_2}:{DIGITS1_2}
 
 INT4            [0-9]{4}

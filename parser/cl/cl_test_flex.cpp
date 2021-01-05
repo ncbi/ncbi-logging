@@ -61,15 +61,21 @@ TEST_F ( CL_TestFlexFixture, Space )
     ASSERT_EQ( input, TokenValue() );
 }
 
+TEST_F ( CL_TestFlexFixture, DateTime1_1 )
+{
+    const char * input = "Oct 1 2:3:4";
+    ASSERT_EQ( DATETIME1, StartScan(input) );
+    ASSERT_EQ( input, TokenValue() );
+}
 TEST_F ( CL_TestFlexFixture, DateTime1_2 )
 {
     const char * input = "Oct 20 15:27:38";
     ASSERT_EQ( DATETIME1, StartScan(input) );
     ASSERT_EQ( input, TokenValue() );
 }
-TEST_F ( CL_TestFlexFixture, DateTime1_1 )
-{
-    const char * input = "Oct 1 2:3:4";
+TEST_F ( CL_TestFlexFixture, DateTime1_3 )
+{   // multiple spaces
+    const char * input = "Oct  1 2:3:4";
     ASSERT_EQ( DATETIME1, StartScan(input) );
     ASSERT_EQ( input, TokenValue() );
 }
