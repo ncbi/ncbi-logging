@@ -1,5 +1,5 @@
 %{
-#include "url_parser.hpp"
+#include "cl_path_parser.hpp"
 
 #define MAKE_STR() \
     do { \
@@ -18,7 +18,7 @@
 
 %option noyywrap yylineno
 %option reentrant bison-bridge
-%option prefix="url_"
+%option prefix="cl_path_"
 %option stack
 %option debug
 
@@ -33,8 +33,6 @@ ACCESSION   {SRA}|{REFSEQ1}|{REFSEQ2}|{WGS}|"hs37d5"
 
 SLASH       (\/|%2F|%2f)
 QMARK       "?"
-QUERY_SEP   [&;]
-EQUAL       "="
 HASH        "#"
 PERCENT     "%"
 DOT         \.
@@ -51,11 +49,7 @@ URL_BYTE    {URL_BYTE_1}|{URL_BYTE_2}|{URL_BYTE_3}
 PATHCHARS    [^/?#%.]
 PATHSTR      ({URL_BYTE}|{PATHCHARS})+
 
- /* allowing unncoded / in a query is not by the rules but real world examples use it */
-QUERYCHARS   [^/&;=#%.]
-QUERY_TOKEN  ({URL_BYTE}|{QUERYCHARS})+
-
-%x EXTENSION QUERYSTATE QUERY_EXTENSION FRAGSTATE
+%x EXTENSION
 
 %%
 
@@ -66,40 +60,21 @@ QUERY_TOKEN  ({URL_BYTE}|{QUERYCHARS})+
 {PERCENT}       { RETURN(  PERCENT ); }
 {DOT}           { PUSH( EXTENSION ); RETURN( DOT ); }
 {PATHSTR}       { RETURN( PATHSTR ); }
-{QMARK}         { PUSH( QUERYSTATE ); RETURN( QMARK ); }
-{HASH}          { PUSH( FRAGSTATE ); RETURN( HASH ); }
+{QMARK}.*       { RETURN( 0 ); }
+{HASH}.*        { RETURN( 0 ); }
 
 <EXTENSION>{SLASH}         { POP(); RETURN( SLASH ); }
-<EXTENSION>{QMARK}         { POP(); PUSH( QUERYSTATE ); RETURN( QMARK ); }
-<EXTENSION>{HASH}          { POP(); PUSH( FRAGSTATE ); RETURN( HASH ); }
+<EXTENSION>{QMARK}.*       { POP(); RETURN( 0 ); }
+<EXTENSION>{HASH}.*        { POP(); RETURN( 0 ); }
 <EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
 <EXTENSION>{DOT}           { RETURN( EXTSTR ); }
 <EXTENSION>{PATHSTR}       { RETURN( EXTSTR ); }
 
-<QUERYSTATE>{QUERY_SEP}         { RETURN( QUERY_SEP ); }
-<QUERYSTATE>{EQUAL}             { RETURN( EQUAL ); }
-<QUERYSTATE>{ACCESSION}         { RETURN( ACCESSION ); }
-<QUERYSTATE>{SLASH}             { RETURN( SLASH ); }
-<QUERYSTATE>{PERCENT}           { RETURN( PERCENT ); }
-<QUERYSTATE>{DOT}               { PUSH( QUERY_EXTENSION ); RETURN( DOT ); }
-<QUERYSTATE>{QUERY_TOKEN}       { RETURN( PATHSTR ); }
-<QUERYSTATE>{HASH}              { PUSH( FRAGSTATE ); RETURN( HASH ); }
-
-<QUERY_EXTENSION>{QUERY_SEP}     { POP(); RETURN( QUERY_SEP ); }
-<QUERY_EXTENSION>{EQUAL}         { POP(); RETURN( EQUAL ); }
-<QUERY_EXTENSION>{SLASH}         { POP(); RETURN( SLASH ); }
-<QUERY_EXTENSION>{HASH}          { POP(); POP(); PUSH( FRAGSTATE ); RETURN( HASH ); }
-<QUERY_EXTENSION>{PERCENT}       { RETURN( EXTPERCENT ); }
-<QUERY_EXTENSION>{DOT}           { RETURN( EXTSTR ); }
-<QUERY_EXTENSION>{QUERY_TOKEN}   { RETURN( EXTSTR ); }
-
-<FRAGSTATE>.*               { RETURN( FRAGMENT_TOKEN ); }
-
 %%
 
-YY_BUFFER_STATE url_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
+YY_BUFFER_STATE cl_path_scan_bytes( const char * input, size_t size, yyscan_t yyscanner )
 {
-    YY_BUFFER_STATE ret = url__scan_bytes( input, size, yyscanner );
+    YY_BUFFER_STATE ret = cl_path__scan_bytes( input, size, yyscanner );
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg -> yyextra_r = (void*)input;
     BEGIN( INITIAL );

@@ -1,23 +1,23 @@
 %define api.pure full
 %lex-param { void * scanner }
-%parse-param { void * scanner }{ NCBI::Logging::URLReceiver * lib }
+%parse-param { void * scanner }{ NCBI::Logging::CLPATHReceiver * lib }
 
 %define parse.trace
 %define parse.error verbose
 
-%name-prefix "url_"
+%name-prefix "cl_path_"
 
 %{
     #define YYDEBUG 1
 
     #include <stdint.h>
-    #include "url_parser.hpp"
-    #include "url_scanner.hpp"
+    #include "cl_path_parser.hpp"
+    #include "cl_path_scanner.hpp"
 
     using namespace std;
     using namespace NCBI::Logging;
 
-    void url_error( yyscan_t locp, NCBI::Logging::URLReceiver * lib, const char* msg );
+    void cl_path_error( yyscan_t locp, NCBI::Logging::CLPATHReceiver * lib, const char* msg );
 
     const t_str EmptyTSTR = { "", 0 };
 
@@ -78,9 +78,9 @@
 %code requires
 {
     #include "types.h"
-    #include "URL_Interface.hpp"
+    #include "CL_PATH_Interface.hpp"
 
-    extern void url_get_scanner_input( void * yyscanner, t_str & str );
+    extern void cl_path_get_scanner_input( void * yyscanner, t_str & str );
 
     using namespace NCBI::Logging;
 
@@ -334,7 +334,7 @@ fragment
 
 %%
 
-void url_error( yyscan_t locp, NCBI::Logging::URLReceiver * lib, const char * msg )
+void cl_path_error( yyscan_t locp, NCBI::Logging::CLPATHReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors rejected lines
 }

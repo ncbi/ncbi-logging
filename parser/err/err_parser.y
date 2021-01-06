@@ -42,7 +42,10 @@ using namespace NCBI::Logging;
 
 log_line
     : error { YYABORT; }
-    | datetime SPACE severity SPACE pid SPACE { err_start_MSG( scanner ); } msg {}
+    | datetime SPACE severity SPACE pid SPACE { err_start_MSG( scanner ); } msg
+        {
+            YYACCEPT;
+        }
     | STR SPACE { err_start_MSG( scanner ); } MSG
         {
             if ( 0 == strncmp( $1.p, "file-meta", $1.n ) )
@@ -62,7 +65,7 @@ datetime
     ;
 
 severity
-    : SEVERITY 
+    : SEVERITY
     {
         lib -> set( ERRReceiver::severity, $1 );
         if ( 0 == strncmp( $1.p, "[notice]", $1.n ) )

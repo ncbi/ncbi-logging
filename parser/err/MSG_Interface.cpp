@@ -37,7 +37,6 @@ MSGParseBlock::MSGParseBlock( MSGReceiver & receiver )
 : m_receiver ( receiver )
 {
     msg_lex_init( &m_sc );
-    SetDebug( false );
 }
 
 MSGParseBlock::~MSGParseBlock()
@@ -45,16 +44,12 @@ MSGParseBlock::~MSGParseBlock()
     msg_lex_destroy( m_sc );
 }
 
-void
-MSGParseBlock::SetDebug( bool onOff )
-{
-    msg_debug = onOff ? 1 : 0;            // bison (op_debug is global)
-    msg_set_debug( onOff ? 1 : 0, m_sc );   // flex
-}
-
 bool
 MSGParseBlock::format_specific_parse( const char * line, size_t line_size )
 {
+    msg_debug = m_debug ? 1 : 0;            // bison (op_debug is global)
+    msg_set_debug( m_debug ? 1 : 0, m_sc );   // flex
+
     YY_BUFFER_STATE bs = msg_scan_bytes( line, line_size, m_sc );
     int ret = msg_parse( m_sc, & m_receiver );
     msg__delete_buffer( bs, m_sc );
