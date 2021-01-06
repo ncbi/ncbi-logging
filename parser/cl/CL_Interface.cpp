@@ -5,7 +5,7 @@
 #include <ncbi/json.hpp>
 
 #include "Formatters.hpp"
-#include "URL_Interface.hpp"
+#include "CL_PATH_Interface.hpp"
 
 extern YY_BUFFER_STATE cl_scan_bytes( const char * input, size_t size, yyscan_t yyscanner );
 
@@ -48,8 +48,8 @@ void CLReceiver::set( CL_Members m, const t_str & v )
 
 ReceiverInterface::Category CLReceiver::post_process( void )
 {
-    URLReceiver url( m_fmt );
-    URLParseBlock pb ( url );
+    CLPATHReceiver url( m_fmt );
+    CLPATHParseBlock pb ( url );
     pb.format_specific_parse( obj_for_postprocess.c_str(), obj_for_postprocess.size() );
 
     obj_for_postprocess.clear();

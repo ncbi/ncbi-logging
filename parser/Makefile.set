@@ -60,6 +60,9 @@ COMMON_SRC = \
 	url_scanner.cpp \
 	url_parser.cpp \
 	URL_Interface.cpp \
+	cl_path_scanner.cpp \
+	cl_path_parser.cpp \
+	CL_PATH_Interface.cpp \
 	cmdline.cpp
 
 COMMON_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(COMMON_SRC)))
