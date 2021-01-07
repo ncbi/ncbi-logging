@@ -40,7 +40,7 @@ echo "parse GS"
 
 echo "parse Splunk"
 ./parse.sh Splunk   |& ts >> "$HOME"/logs/parse_splunk."$DATE".log
-./parse_new.sh Splunk   |& ts >> "$HOME"/parse_new_splunk."$DATE".log
+./parse_new.sh Splunk   |& ts >> "$HOME"/logs/parse_new_splunk."$DATE".log
 
 echo "s3_lister"
 ./s3_lister.sh |& ts >> "$HOME"/logs/s3_lister."$DATE".log

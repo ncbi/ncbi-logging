@@ -27,6 +27,7 @@ export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
 
+indent() { sed 's/^/  /'; }
 
 # GCP VM shouldn't have any other competing load, helps on iebdev
 renice +19 -p $$ &> /dev/null
