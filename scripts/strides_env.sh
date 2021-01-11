@@ -27,6 +27,9 @@ export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
 
+HOST=$(hostname)
+export HOST
+
 indent() { sed 's/^/  /'; }
 
 # GCP VM shouldn't have any other competing load, helps on iebdev

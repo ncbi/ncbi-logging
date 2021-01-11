@@ -45,6 +45,11 @@ PROVIDER_LC=${PROVIDER,,}
 YESTERDAY=${YESTERDAY_UNDER//_}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
+LOGFILE="${HOME}/logs/parse_new.${HOST}.${PROVIDER_LC}.${YESTERDAY}.log"
+touch "$LOGFILE"
+exec 1>"$LOGFILE"
+exec 2>&1
+
 echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
 
 if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
@@ -67,16 +72,16 @@ echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 
 case "$PROVIDER" in
     OP)
-#        PARSER_BIN="op2jsn-rel"
+        #        PARSER_BIN="op2jsn-rel"
         WILDCARD='*'
-#        buckets=("OP") # TODO
+        #        buckets=("OP") # TODO
         ;;
     GS)
-#        PARSER_BIN="gcp2jsn-rel"
+        #        PARSER_BIN="gcp2jsn-rel"
         WILDCARD='*'
         ;;
     S3)
-#        PARSER_BIN="aws2jsn-rel"
+        #        PARSER_BIN="aws2jsn-rel"
         WILDCARD='*'
         ;;
     Splunk)
@@ -107,9 +112,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     echo "    PARSER_BIN is '$PARSER_BIN', PARSER_OPT is '$PARSER_OPT'"
     if [ "$PROVIDER" = "OP" ]; then
-#        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
-#            BUCKET_NAME="srafiles"
-#        fi
+        #        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
+        #            BUCKET_NAME="srafiles"
+        #        fi
         LOG_BUCKET="OP-${BUCKET_NAME}"
         if [ "$LOG_BUCKET" == "OP-OP" ]; then
             LOG_BUCKET="OP"
@@ -148,24 +153,15 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     # shellcheck disable=SC2016
     split -a 3 -d -l 10000000 \
-    --filter='gzip -9 > $FILE.jsonl.gz' \
-    - "recognized.$BASE."  \
-    < "$BASE.good.jsonl" &
+        --filter='gzip -9 > $FILE.jsonl.gz' \
+        - "recognized.$BASE."  \
+        < "$BASE.good.jsonl" &
 
     set +e
-#    if [ "$PROVIDER" = "Splunk" ]; then
-#        # Remove when LOGMON-107 fixed
-#        tar -xaOf "$TGZ" "$WILDCARD" | \
-#            tr -s ' ' | \
-#            time "$PARSER_BIN" -f -t 4 "$BASE" \
-#            > stdout."$BASE" \
-#            2> stderr."$BASE"
-#    else
     tar -xaOf "$TGZ" "$WILDCARD" | \
-        time "$PARSER_BIN" -f -t 4 "$BASE" \
+        time "$PARSER_BIN" -f -t 2 "$BASE" \
         > stdout."$BASE" \
         2> stderr."$BASE"
-#    fi
 
     echo "    Returned $?"
     rm -f "$TGZ"
@@ -227,26 +223,26 @@ for LOG_BUCKET in "${buckets[@]}"; do
         printf '"unrecognized_lines" : %d'  "$unrecwc"
         printf "}"
     } | jq -S -c . > "summary.$BASE.jsonl"
-    echo "  Summary:"
-    jq -M -S . < summary."$BASE".jsonl | indent
+echo "  Summary:"
+jq -M -S . < summary."$BASE".jsonl | indent
 
-    ls -l
-    echo "  Uploading..."
+ls -l
+echo "  Uploading..."
 
-    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
-    export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
-    gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil -q cp ./*ecognized."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
-    gsutil -q cp ./std*."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
-    gsutil -q cp ./stats."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
-    gsutil -q cp ./summary."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
+export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+gcloud config set account 253716305623-compute@developer.gserviceaccount.com
+gsutil -q cp ./*ecognized."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+gsutil -q cp ./std*."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+gsutil -q cp ./stats."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+gsutil -q cp ./summary."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
 
-    gsutil ls -lh \
-        "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/*$BASE*" | \
+gsutil ls -lh \
+    "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/*$BASE*" | \
     indent
 
-    cd ..
-    rm -rf "$PARSE_DEST"
+cd ..
+rm -rf "$PARSE_DEST"
 echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
 echo
 done
