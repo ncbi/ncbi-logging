@@ -6,6 +6,54 @@
 export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
+# {"now": "2021-01-14 09:36:30", "bucket": "sra-pub-metadata-us-east-1", "source": "S3", "key": "sra/metadata/20210113_222240_00067_4zkhy_1b470fee-a945-471d-b0c6-f5caaec94edf", "lastmodified": "2021-01-13 22:24:26", "etag": "215a951cfa6835164c405aa47e35bc1b-11", "size": 84332183, "storageclass": "STANDARD", "md5": "215a951cfa6835164c405aa47e35bc1b-11"}
+
+echo " #### objects "
+cat << EOF > objects.json
+    { "schema": { "fields": [
+    { "name" : "md5", "type": "STRING" },
+    { "name" : "etag", "type": "STRING" },
+    { "name" : "lastmodified", "type": "STRING" },
+    { "name" : "size", "type": "INTEGER" },
+    { "name" : "now", "type": "STRING" },
+    { "name" : "key", "type": "STRING" },
+    { "name" : "storageclass", "type": "STRING" },
+    { "name" : "source", "type": "STRING" },
+    { "name" : "bucket", "type": "STRING" }
+    ]
+  },
+  "sourceFormat": "NEWLINE_DELIMITED_JSON",
+  "sourceUris": [
+  "gs://logmon_objects/gs/2*" ]
+}
+EOF
+
+jq -S -c -e . < objects.json > /dev/null
+jq -S -c .schema.fields < objects.json > objects_schema_only.json
+
+bq rm -f strides_analytics.objects_load
+
+bq load \
+    --source_format=NEWLINE_DELIMITED_JSON \
+    strides_analytics.objects_load \
+        "gs://logmon_objects/gs/2*" \
+    objects_schema_only.json
+
+bq load \
+    --source_format=NEWLINE_DELIMITED_JSON \
+    strides_analytics.objects_load \
+        "gs://logmon_objects/s3/2*" \
+    objects_schema_only.json
+
+bq -q query \
+--use_legacy_sql=false \
+"select count(*) as summary_count from strides_analytics.objects_load"
+
+
+
+
+
+
 # Reduce from 5B ($3.50) -> 50M for cost reduction
 bq rm -f -t strides_analytics.objects_uniq || true
 bq query \
