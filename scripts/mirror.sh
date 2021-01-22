@@ -35,6 +35,11 @@ PROVIDER_LC=${PROVIDER,,}
 YESTERDAY=${YESTERDAY_UNDER//_}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
+LOGFILE="${HOME}/logs/mirror.${HOST}.${PROVIDER_LC}.${YESTERDAY}.log"
+touch "$LOGFILE"
+exec 1>"$LOGFILE"
+exec 2>&1
+
 echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
 
 if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
@@ -45,16 +50,12 @@ fi
 
 case "$PROVIDER" in
     S3)
-#        export PARSER="aws"
         ;;
     GS)
-#        export PARSER="gcp"
         ;;
     OP)
-#        export PARSER="op"
         ;;
     Splunk)
-#        export PARSER="splunk"
         ;;
     *)
         echo "Invalid provider $PROVIDER"
