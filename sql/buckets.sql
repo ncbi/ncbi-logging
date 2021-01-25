@@ -175,6 +175,7 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-4');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-5');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-6');
 
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-odp');
 
 -- https://confluence.ncbi.nlm.nih.gov/display/SRA/SRA+Environments+in+the+Cloud
 update buckets

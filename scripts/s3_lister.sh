@@ -25,4 +25,6 @@ for BUCKET in $buckets; do
     fi
 done
 
+wait
+
 exit 0
