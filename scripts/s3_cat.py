@@ -31,7 +31,7 @@ def main():
     print(f"Extracting s3://{bucket_name}/{prefix} ...", file=sys.stderr)
     count = 0
     for page in paginator.paginate(**kwargs):
-        contents = page["Contents"]
+        contents = page.get("Contents", [])
         for obj in contents:
             key = obj["Key"]
             bytes_buffer = BytesIO()
