@@ -49,7 +49,7 @@ bq load \
 
 bq -q query \
 --use_legacy_sql=false \
-"select count(*) as object_load_count from strides_analytics.objects_load"
+"select source, bucket, count(*) as object_load_count from strides_analytics.objects_load group by source, bucket"
 
 
 echo " #### parsing objects "
@@ -78,7 +78,7 @@ bq query \
     "select distinct * except (now, md5) from strides_analytics.objects"
 bq -q query \
 --use_legacy_sql=false \
-"select count(*) as object_uniq_count from strides_analytics.objects_uniq"
+"select source, bucket, count(*) as object_uniq_count, min(lastmodified), max(lastmodified) from strides_analytics.objects_uniq group by source, bucket order by source, bucket"
 
 
 echo " #### object_delta"
@@ -101,6 +101,10 @@ bq query \
 bq -q query \
 --use_legacy_sql=false \
 "select count(*) as object_delta_count from strides_analytics.object_delta"
+
+bq -q query \
+--use_legacy_sql=false \
+"select source, bucket, count(*) as object_delta_cnt, min(lastmodified), max(lastmodified) from strides_analytics.object_delta group by source, bucket order by source, bucket"
 
 
 gsutil rm -f "gs://logmon_export/object_delta.$DATE.*" || true
@@ -135,7 +139,7 @@ bq query \
      INNER JOIN first_appear USING (key, source)"
 bq -q query \
 --use_legacy_sql=false \
-"select count(*) as object_first_count from strides_analytics.object_first_appearance"
+"select source, bucket, count(*) as object_first_count from strides_analytics.object_first_appearance group by source, bucket order by source, bucket"
 
 
 gsutil rm -f "gs://logmon_export/object_first_appearance.$DATE.*" || true
@@ -166,4 +170,4 @@ bq query \
     WHERE last_seen < timestamp_sub(current_timestamp(), INTERVAL 5 DAY)"
 bq -q query \
 --use_legacy_sql=false \
-"select count(*) as object_disappear_count from strides_analytics.object_disappear"
+"select source, bucket, count(*) as object_disappear_count from strides_analytics.object_disappear group by source, bucket order by source, bucket"
