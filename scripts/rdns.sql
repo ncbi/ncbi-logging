@@ -19,7 +19,7 @@ pragma page_size = 32768;
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210128.json  uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210208.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -116,6 +116,22 @@ WHERE IP LIKE '134.192.%';
 UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
+  OR IP LIKE '58.208%'
+  OR IP LIKE '58.209%'
+  OR IP LIKE '58.210%'
+  OR IP LIKE '58.211%'
+  OR IP LIKE '58.212%'
+  OR IP LIKE '58.213%'
+  OR IP LIKE '58.214%'
+  OR IP LIKE '58.215%'
+  OR IP LIKE '58.216%'
+  OR IP LIKE '58.217%'
+  OR IP LIKE '58.218%'
+  OR IP LIKE '58.219%'
+  OR IP LIKE '58.220%'
+  OR IP LIKE '58.221%'
+  OR IP LIKE '58.222%'
+  OR IP LIKE '58.223%'
   OR IP LIKE '101.81.%'
   OR IP LIKE '114.23%'
   OR IP LIKE '115.218.%'
@@ -130,6 +146,8 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '116.30.%'
   OR IP LIKE '116.31.%'
   OR IP LIKE '116.6.%'
+  OR IP LIKE '117.8%'
+  OR IP LIKE '117.9%'
   OR IP LIKE '119.78.%'
   OR IP LIKE '119.79.%'
   OR IP LIKE '122.22%'
@@ -230,7 +248,8 @@ OR IP LIKE '111.4%'
 OR IP LIKE '111.5%'
 OR IP LIKE '111.6%'
 OR IP LIKE '112.%'
-OR IP like '120.2%'
+OR IP LIKE '117.173.7%'
+OR IP LIKE '120.2%'
 OR IP LIKE '183.19%'
 OR IP LIKE '183.2%'
 OR IP LIKE '223.10%'
@@ -541,6 +560,8 @@ WHERE IP in (
 '52.54.203.43',
 '18.209.227.133',
 '54.80.162.14',
+'54.196.109.116',
+'34.204.8.225',
 '34.229.225.83'
 );
 
@@ -1173,7 +1194,9 @@ update rdns
 set domain='cernet.edu.cn (Zhejiang University)'
 where ip like '210.32.%';
 
-
+update rdns
+set domain='roche.com (Genentech Inc)'
+where ip like '72.34.1%';
 
 
 UPDATE RDNS
