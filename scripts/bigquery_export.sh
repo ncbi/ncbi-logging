@@ -792,7 +792,7 @@ ENDOFQUERY
     "$QUERY"
     bq show --schema strides_analytics.summary_export
 
-    OLD=$(date -d "-5 days" "+%Y%m%d")
+    OLD=$(date -d "-7 days" "+%Y%m%d")
     bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_$OLD"
 
 echo " ### fix summary_export for NIH"

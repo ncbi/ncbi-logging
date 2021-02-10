@@ -22,7 +22,7 @@ def parsedt(str):
 
 def main():
     credentialfile = str(Path.home()) + "/influxdb.json"
-    with open(credentialfile, "r") as fin:
+    with open(credentialfile) as fin:
         credentials = json.load(fin)
 
     host = "influxdb-http.service.bethesda-prod.consul.ncbi.nlm.nih.gov"
