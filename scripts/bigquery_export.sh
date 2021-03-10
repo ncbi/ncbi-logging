@@ -703,6 +703,8 @@ echo " ### Find internal IAMs IPs"
         or requester like '%arn:aws:iam::867126678632%'
         or requester like '%arn:aws:iam::651740271041%'
         or requester like '%arn:aws:sts::784757538848%'
+        or requester like '%::250813660784%'
+        or requester like '%::396554159273%'
         or requester like '%arn:aws:iam::228184908524%'
         or requester like '%arn:aws:iam::313921231432%'
         or requester like '%347258802972%' )
