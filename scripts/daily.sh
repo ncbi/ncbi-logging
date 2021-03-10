@@ -25,6 +25,8 @@ echo "mirror.sh S3"
 echo "mirror.sh Splunk"
 ./mirror.sh Splunk |& ts >> "$HOME"/logs/mirror_splunk."$DATE".log
 
+echo "SRA Main"
+./sra_main.sh |& ts >> "$HOME"/logs/sra_main."$DATE".log
 
 echo "parse S3"
 ./parse.sh S3      |& ts >> "$HOME"/logs/parse_s3."$DATE".log

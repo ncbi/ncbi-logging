@@ -697,10 +697,15 @@ echo " ### Find internal IAMs IPs"
     SET DOMAIN="NCBI Cloud (request.nlm.nih.gov)"
     WHERE ip in (
     SELECT distinct ip FROM \\\`ncbi-logmon.strides_analytics.s3_parsed\\\`
-        WHERE requester like '%arn:aws:iam::783971887864%'
+        WHERE
+           requester like '%arn:aws:iam::783971887864%'
         or requester like '%arn:aws:iam::018000097103%'
         or requester like '%arn:aws:iam::867126678632%'
-        or requester like '%arn:aws:iam::651740271041%' )
+        or requester like '%arn:aws:iam::651740271041%'
+        or requester like '%arn:aws:sts::784757538848%'
+        or requester like '%arn:aws:iam::228184908524%'
+        or requester like '%arn:aws:iam::313921231432%'
+        or requester like '%347258802972%' )
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
