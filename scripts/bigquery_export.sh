@@ -523,8 +523,6 @@ bq -q query \
     --use_legacy_sql=false \
     "delete from strides_analytics.detail_export where start_ts < '2000-01-01'"
 
-#WHERE start_ts > '2000-01-01'
-
 echo " ###  summary_grouped"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
@@ -587,6 +585,7 @@ echo " ###  op_sess"
     AND start between '2016-10-01' and '2020-04-21'
     AND domain not like '%amazon%'
     AND domain not like '%gap%'
+    AND domain not like '%gap-download%'
 
 ENDOFQUERY
 )

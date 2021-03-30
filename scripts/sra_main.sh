@@ -7,6 +7,8 @@ export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
 gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
+
+export PATH="$PATH":/opt/sybase/utils/bin
 mkdir -p "$PANFS/sra_main"
 
 cd "$PANFS/sra_main" || exit

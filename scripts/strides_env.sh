@@ -57,5 +57,19 @@ ${query} ;
 EOF
 }
 
+case "$HOSTNAME" in
+    iebdev11)
+        renice +19 -p $$ > /dev/null 2>&1
+        ;;
+    intprod11)
+        #renice +19 -p $$ > /dev/null 2>&1
+        ;;
+    lmem14)
+        #renice +19 -p $$ > /dev/null 2>&1
+        ;;
+    *)
+        ;;
+esac
+
 echo "____________________________"
 date

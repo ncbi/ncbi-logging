@@ -13,6 +13,11 @@ mkdir -p "$HOME"/logs
 
 /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
 
+homespace=$( df  "$HOME" | tail  -1 | tr -s ' ' | cut -d ' ' -f 4)
+if [ "$homespace" -lt 500000 ]; then
+    df -HT "$HOME" | mailx -s "$HOME low on space" vartanianmh@ncbi.nlm.nih.gov
+fi
+
 echo "mirror.sh GS"
 ./mirror.sh GS |& ts >> "$HOME"/logs/mirror_gs."$DATE".log
 

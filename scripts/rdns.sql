@@ -19,7 +19,7 @@ pragma page_size = 32768;
 
 drop table if exists uniq_ips;
 create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210208.json  uniq_ips
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210315.json  uniq_ips
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -418,9 +418,12 @@ WHERE DOMAIN LIKE '%dtu.dk%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'nig.ac.jp (Japan National Institute of Genetics)'
+SET DOMAIN = 'nih.ac.jp (Japan National Institute of Genetics)'
 WHERE IP LIKE '133.39.%' OR IP LIKE '133.103.%';
 
+UPDATE RDNS
+SET DOMAIN = 'ocn.ad.jpi (Japan Open Computer Network)'
+WHERE IP LIKE '153.24%';
 
 UPDATE RDNS
 SET DOMAIN = 'br.kr (Korea Telecom)'
@@ -879,7 +882,7 @@ WHERE IP LIKE '38.142.232.%' or IP LIKE '65.126.68.%';
 --WHERE IP LIKE '2604:c340:%';
 UPDATE RDNS
 SET DOMAIN = 'utah.edu (University of Utah)'
-where IP LIKE '155.101.%' OR IP LIKE '204.99.128.%';
+where IP LIKE '155.101.%' OR IP LIKE '204.99.128.%' OR IP LIKE '128.110.%';
 
 UPDATE RDNS
 SET DOMAIN = 'ohsu.edu (Oregon Health & Science University)'
@@ -1019,6 +1022,10 @@ SET DOMAIN='Helmholtz Centre for Environmental Research (ufz.de)'
 WHERE IP LIKE '141.65.%';
 
 UPDATE RDNS
+SET DOMAIN='Friedrich-Loeffler-Institut (fli.de)'
+where IP LIKE '193.22.11%';
+
+UPDATE RDNS
 SET DOMAIN='Edinburgh University (ed.ac.uk)'
 WHERE
 IP LIKE '192.41.103%' OR
@@ -1113,7 +1120,7 @@ WHERE IP LIKE '128.143.%';
 
 UPDATE RDNS
 SET DOMAIN='anu.edu.au (Australian National University)'
-WHERE IP LIKE '203.0.19.%';
+WHERE IP LIKE '203.0.19.%' or IP LIKE '130.56.%';
 
 UPDATE RDNS
 SET DOMAIN='ethz.ch (Swiss Federal Institute of Technology Zurich)'
@@ -1236,6 +1243,12 @@ where ip like '210.32.%';
 update rdns
 set domain='roche.com (Genentech Inc)'
 where ip like '72.34.1%';
+
+-- softlayer.com
+update rdns
+set domain='ibm.com (IBM Cloud)'
+where ip like '158.85.%';
+
 
 
 UPDATE RDNS
