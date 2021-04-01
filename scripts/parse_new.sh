@@ -66,7 +66,7 @@ else
     touch "$DONEFILE"
 fi
 
-buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='public' order by log_bucket")
+buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='${STRIDES_SCOPE}' order by log_bucket")
 readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 
@@ -126,7 +126,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     cd "$PARSE_DEST" || exit
     df -HT . | indent
 
-    SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
+    SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
     echo "  Copying $TGZ to $PARSE_DEST"
 
@@ -232,13 +232,13 @@ echo "  Uploading..."
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
 export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-gsutil -q cp ./*ecognized."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
-gsutil -q cp ./std*."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
-gsutil -q cp ./stats."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
-gsutil -q cp ./summary."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/"
+gsutil -q cp ./*ecognized."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+gsutil -q cp ./std*."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+gsutil -q cp ./stats."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+gsutil -q cp ./summary."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
 
 gsutil ls -lh \
-    "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/v3/*$BASE*" | \
+    "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/*$BASE*" | \
     indent
 
 cd ..

@@ -54,7 +54,8 @@ echo "s3_lister"
 ./mirror_obj.sh |& ts >> "$HOME"/logs/mirror_obj."$DATE".log
 
 dow=$(date +%u)
-if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then # Mondays and Thursday
+#if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then # Mondays and Thursday
+if [ "$dow" = "1" ] ; then # Mondays
     echo "bigquery_export"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log

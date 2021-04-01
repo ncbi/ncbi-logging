@@ -59,12 +59,15 @@ EOF
 
 case "$HOSTNAME" in
     iebdev11)
+        export STRIDES_SCOPE="public"
         renice +19 -p $$ > /dev/null 2>&1
         ;;
     intprod11)
+        export STRIDES_SCOPE="private"
         #renice +19 -p $$ > /dev/null 2>&1
         ;;
     lmem14)
+        export STRIDES_SCOPE="public"
         #renice +19 -p $$ > /dev/null 2>&1
         ;;
     *)

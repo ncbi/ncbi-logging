@@ -66,7 +66,7 @@ if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
     exit 2
 fi
 
-buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='public' order by log_bucket desc")
+buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='$PROVIDER' and scope='$STRIDES_SCOPE' order by log_bucket desc")
 readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 
@@ -81,7 +81,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
 
-    SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
+    SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
     echo "  Copying $TGZ to $PARSE_DEST"
 
@@ -186,14 +186,14 @@ for LOG_BUCKET in "${buckets[@]}"; do
     jq -S -c . < "$TGZ.json" > "summary.$TGZ.jsonl"
     cat "summary.$TGZ.jsonl"
 
-    echo "  Uploading to gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/ ..."
+    echo "  Uploading to gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/ ..."
 
     export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-    gsutil cp ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-    gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
-    gsutil cp ./"summary.$TGZ.jsonl" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_public/"
+    gsutil cp ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl.gz "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    gsutil cp ./"$TGZ.err" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    gsutil cp ./"summary.$TGZ.jsonl" "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/"
     cd ..
     rm -rf "$PARSE_DEST"
 

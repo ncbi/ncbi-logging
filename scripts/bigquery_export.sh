@@ -855,4 +855,7 @@ echo " ###  copy to filesystem"
     rm -f "$PANFS"/uniq_ips/uniq_ips."$DATE".* || true
     gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*" "$PANFS/uniq_ips/"
 
+
+bq rm -f strides_analytics.op_parsed
+
 date

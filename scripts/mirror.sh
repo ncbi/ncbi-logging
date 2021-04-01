@@ -64,7 +64,7 @@ case "$PROVIDER" in
 esac
 
 
-buckets=$(sqlcmd "select distinct log_bucket from buckets where scope='public' and cloud_provider='$PROVIDER' order by log_bucket desc")
+buckets=$(sqlcmd "select distinct log_bucket from buckets where scope='$STRIDES_SCOPE' and cloud_provider='$PROVIDER' order by log_bucket desc")
 readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 for LOG_BUCKET in "${buckets[@]}"; do
@@ -198,7 +198,14 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "Tarred"
     ls -hl "$TGZ"
 
-    DEST_BUCKET="gs://logmon_logs/${PROVIDER_LC}_public/"
+    if [ "$STRIDES_SCOPE" = "public" ]; then
+        DEST_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    fi
+
+    if [ "$STRIDES_SCOPE" = "private" ]; then
+        DEST_BUCKET="gs://logmon_logs_private/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+        export GOOGLE_APPLICATION_CREDENTIALS="$HOME/logmon_private.json"
+    fi
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
