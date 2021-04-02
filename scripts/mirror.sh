@@ -136,6 +136,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     if [ "$PROVIDER" = "S3" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/"
+        MIRROR="$RAMDISK/$PROVIDER/$LOG_BUCKET/"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
@@ -227,6 +228,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     if [ "$PROVIDER" != "GS" ] && [ "$PROVIDER" != "Splunk" ]; then
         cd ..
+        df -HT "$MIRROR"
         rm -rf "$MIRROR"
     fi
 
