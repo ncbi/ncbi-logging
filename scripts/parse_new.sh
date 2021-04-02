@@ -45,6 +45,7 @@ PROVIDER_LC=${PROVIDER,,}
 YESTERDAY=${YESTERDAY_UNDER//_}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
+mkdir -p "${HOME}/logs/"
 LOGFILE="${HOME}/logs/parse_new.${HOST}.${PROVIDER_LC}.${YESTERDAY}.log"
 touch "$LOGFILE"
 exec 1>"$LOGFILE"
@@ -58,6 +59,7 @@ if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
     exit 2
 fi
 
+mkdir -p "${HOME}/done/"
 DONEFILE="${HOME}/done/${PROVIDER}_${YESTERDAY}.done"
 if [ -e "$DONEFILE" ]; then
     echo "$DONEFILE done"
@@ -126,12 +128,21 @@ for LOG_BUCKET in "${buckets[@]}"; do
     cd "$PARSE_DEST" || exit
     df -HT . | indent
 
-    SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    if [ "$STRIDES_SCOPE" = "public" ]; then
+        SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    fi
+
+    if [ "$STRIDES_SCOPE" = "private" ]; then
+        SRC_BUCKET="gs://logmon_logs_private/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+        export GOOGLE_APPLICATION_CREDENTIALS="$HOME/logmon_private.json"
+    fi
+
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
     echo "  Copying $TGZ to $PARSE_DEST"
 
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
+
     gsutil -o 'GSUtil:sliced_object_download_threshold=0' cp "${SRC_BUCKET}${TGZ}" . || true
     if [ ! -e "$TGZ" ]; then
         echo "  ${SRC_BUCKET}${TGZ} not found, skipping"
@@ -227,18 +238,26 @@ echo "  Summary:"
 jq -M -S . < summary."$BASE".jsonl | indent
 
 ls -l
-echo "  Uploading..."
+if [ "$STRIDES_SCOPE" = "public" ]; then
+    DEST_BUCKET="gs://logmon_logs_parsed_us"
+    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
+    export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+    gcloud config set account 253716305623-compute@developer.gserviceaccount.com
+fi
 
-export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
-export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
-gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-gsutil -q cp ./*ecognized."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
-gsutil -q cp ./std*."$BASE"* "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
-gsutil -q cp ./stats."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
-gsutil -q cp ./summary."$BASE".jsonl "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+if [ "$STRIDES_SCOPE" = "private" ]; then
+    export GOOGLE_APPLICATION_CREDENTIALS="$HOME/logmon_private.json"
+    DEST_BUCKET="gs://logmon_logs_parsed_private"
+fi
+
+echo "  Uploading to $DEST_BUCKET..."
+gsutil -q cp ./*ecognized."$BASE"* "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+gsutil -q cp ./std*."$BASE"* "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+gsutil -q cp ./stats."$BASE".jsonl "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+gsutil -q cp ./summary."$BASE".jsonl "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
 
 gsutil ls -lh \
-    "gs://logmon_logs_parsed_us/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/*$BASE*" | \
+    "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/*$BASE*" | \
     indent
 
 cd ..

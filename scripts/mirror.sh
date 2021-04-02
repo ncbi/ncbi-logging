@@ -35,6 +35,7 @@ PROVIDER_LC=${PROVIDER,,}
 YESTERDAY=${YESTERDAY_UNDER//_}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
+mkdir -p "${HOME}/logs/"
 LOGFILE="${HOME}/logs/mirror.${HOST}.${PROVIDER_LC}.${YESTERDAY}.log"
 touch "$LOGFILE"
 exec 1>"$LOGFILE"
@@ -68,6 +69,7 @@ buckets=$(sqlcmd "select distinct log_bucket from buckets where scope='$STRIDES_
 readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 for LOG_BUCKET in "${buckets[@]}"; do
+    echo sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'"
     PROFILE=$(sqlcmd "select service_account from buckets where cloud_provider='$PROVIDER' and bucket_name='$LOG_BUCKET'")
     BUCKET_NAME=$(sqlcmd "select distinct bucket_name from buckets where cloud_provider='$PROVIDER' and log_bucket='$LOG_BUCKET' limit 1")
     if [ -n "$BUCKET_ONLY" ]; then
@@ -138,11 +140,19 @@ for LOG_BUCKET in "${buckets[@]}"; do
         cd "$MIRROR" || exit
 
         echo "Profile is $PROFILE, $PROVIDER concatenating to $MIRROR ..."
+
+        if [ "$PROFILE" = "logmon_private" ]; then
+            echo "Overriding AWS_PROFILE to nih-nlm-ncbi-sra-protected"
+            export AWS_PROFILE="nih-nlm-ncbi-sra-protected"
+        fi
+
         if [ "$LOG_BUCKET" = "sra-pub-src-1-logs" ]; then
+            echo "Overriding AWS_PROFILE to opendata"
             export AWS_PROFILE="opendata"
         fi
 
         if [ "$LOG_BUCKET" = "sra-pub-run-1-logs" ]; then
+            echo "Overriding AWS_PROFILE to strides-analytics"
             export AWS_PROFILE="strides-analytics"
         fi
         WILDCARD="${YESTERDAY_DASH}-*"
@@ -150,6 +160,8 @@ for LOG_BUCKET in "${buckets[@]}"; do
         for HH in $(seq 0 1 23); do
             PREFIX=$(printf "%s-%0.2d" "${YESTERDAY_DASH}" "$HH")
             echo "Concatenating $PREFIX..."
+            echo "$HOME/ncbi-logging/scripts/s3_cat.py $LOG_BUCKET ${PREFIX}- $AWS_PROFILE"
+            sleep 1
             "$HOME/ncbi-logging/scripts/s3_cat.py" "$LOG_BUCKET" "${PREFIX}-" "$AWS_PROFILE" > "$MIRROR"/"$PREFIX"-combine &
         done
         wait

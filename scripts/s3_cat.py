@@ -37,7 +37,6 @@ def main():
             bytes_buffer = BytesIO()
             s3.download_fileobj(Bucket=bucket_name, Key=key, Fileobj=bytes_buffer)
             buf = bytes_buffer.getvalue()
-            l = len(buf)
             sys.stdout.buffer.write(buf)
             count += 1
     print(
