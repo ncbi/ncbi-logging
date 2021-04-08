@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/bash -x
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
@@ -13,11 +13,24 @@ if [ "$#" -eq 1 ]; then
     fi
 fi
 
+
+if [ "$STRIDES_SCOPE" == "private" ]; then
+    DATASET="strides_analytics_private"
+    MIRROR_BUCKET="gs://logmon_logs_private"
+    PARSE_BUCKET="gs://logmon_logs_parsed_private"
+    PARSE_VER="/v3"
+else
+    DATASET="strides_analytics"
+    MIRROR_BUCKET="gs://logmon_logs"
+    PARSE_BUCKET="gs://logmon_logs_parsed_us"
+    PARSE_VER=""
+fi
+
 if [ "$skipload" = false ]; then
-gsutil du -s -h gs://logmon_logs/gs_public
-gsutil du -s -h gs://logmon_logs/s3_public
-gsutil du -s -h gs://logmon_logs_parsed_us/logs_gs_public/
-gsutil du -s -h gs://logmon_logs_parsed_us/logs_s3_public/
+    gsutil du -s -h "$PARSE_BUCKET/logs_gs_$STRIDES_SCOPE/"
+    gsutil du -s -h "$PARSE_BUCKET/logs_s3_$STRIDES_SCOPE/"
+    gsutil du -s -h "$MIRROR_BUCKET/gs_$STRIDES_SCOPE"
+    gsutil du -s -h "$MIRROR_BUCKET/s3_$STRIDES_SCOPE"
 
 # TODO: Partition/cluster large tables for incremental inserts and retrievals
 # TODO: Materialized views that automatically refresh
@@ -58,25 +71,24 @@ cat << EOF > gs_schema.json
     ]
   },
   "sourceFormat": "NEWLINE_DELIMITED_JSON",
-  "sourceUris": [ "gs://logmon_logs_parsed_us/logs_gs_public/recognized.*" ]
+  "sourceUris": [ "$PARSE_BUCKET/logs_gs_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" ]
 }
 EOF
 
     jq -S -c -e . < gs_schema.json > /dev/null
     jq -S -c .schema.fields < gs_schema.json > gs_schema_only.json
 
-    #bq mk --external_table_definition=gs_schema_only.json strides_analytics.gs_parsed
+    #bq mk --external_table_definition=gs_schema_only.json $DATASET.gs_parsed
 
-    gsutil ls -lR "gs://logmon_logs_parsed_us/logs_gs_public/recognized.*"
+    gsutil ls -lR "$PARSE_BUCKET/logs_gs_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
 
-    bq rm -f strides_analytics.gs_parsed
+    bq rm -f "$DATASET.gs_parsed"
     bq load \
         --source_format=NEWLINE_DELIMITED_JSON \
-        strides_analytics.gs_parsed \
-        "gs://logmon_logs_parsed_us/logs_gs_public/recognized.*" \
+        "$DATASET.gs_parsed" \
+        "$PARSE_BUCKET/logs_gs_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
         gs_schema_only.json
-    bq show --schema strides_analytics.gs_parsed
-
+    bq show --schema "$DATASET.gs_parsed"
 
 
 echo " #### s3_parsed"
@@ -123,24 +135,23 @@ echo " #### s3_parsed"
         ]
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
-    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_s3_public/recogn*" ]
+    "sourceUris": [ "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recogn*" ]
     }
 EOF
     jq -S -c -e . < s3_schema.json > /dev/null
     jq -S -c .schema.fields < s3_schema.json > s3_schema_only.json
 
-    gsutil ls -lR "gs://logmon_logs_parsed_us/logs_s3_public/recognized.*"
+    gsutil ls -lR "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
 
-    bq rm -f strides_analytics.s3_parsed
+    bq rm -f "$DATASET.s3_parsed"
     bq load \
         --max_bad_records 500 \
         --source_format=NEWLINE_DELIMITED_JSON \
-        strides_analytics.s3_parsed \
-        "gs://logmon_logs_parsed_us/logs_s3_public/recognized.*" \
+        "$DATASET.s3_parsed" \
+        "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
         s3_schema_only.json
 
-    bq show --schema strides_analytics.s3_parsed
-
+    bq show --schema "$DATASET.s3_parsed"
 
 echo " #### op_parsed"
 # TODO
@@ -176,38 +187,37 @@ echo " #### op_parsed"
         ]
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
-    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recogn*" ]
+    "sourceUris": [ "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recogn*" ]
     }
 EOF
 
     jq -S -c -e . < op_schema.json > /dev/null
     jq -S -c .schema.fields < op_schema.json > op_schema_only.json
 
-    gsutil ls -lR "gs://logmon_logs_parsed_us/logs_op_public/recognized.*"
+    gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
 
-    bq rm -f strides_analytics.op_parsed
+    bq rm -f "$DATASET.op_parsed"
     bq load \
         --max_bad_records 5000 \
         --source_format=NEWLINE_DELIMITED_JSON \
-        strides_analytics.op_parsed \
-        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
+        "$DATASET.op_parsed" \
+        "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
         op_schema_only.json
 
-    bq show --schema strides_analytics.op_parsed
-
+    bq show --schema "$DATASET.op_parsed"
 
 
 
 echo " #### Parsed results"
 bq -q query \
     --use_legacy_sql=false \
-    "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from strides_analytics.gs_parsed union all select source, accepted, cast(time as string) as time from strides_analytics.s3_parsed union all select source, accepted, time as time from strides_analytics.op_parsed) group by source, accepted order by source"
+    "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from $DATASET.gs_parsed union all select source, accepted, cast(time as string) as time from $DATASET.s3_parsed union all select source, accepted, time as time from $DATASET.op_parsed) group by source, accepted order by source"
 
 fi # skipload
 
 echo " #### UDFs"
     QUERY=$(cat <<-ENDOFQUERY
-CREATE OR REPLACE FUNCTION strides_analytics.expand_bucket (bucket STRING, path STRING)
+CREATE OR REPLACE FUNCTION $DATASET.expand_bucket (bucket STRING, path STRING)
 RETURNS STRING
 AS
  (case
@@ -234,7 +244,7 @@ ENDOFQUERY
 
 # See LOGMON-93
     QUERY=$(cat <<-ENDOFQUERY
-    CREATE OR REPLACE FUNCTION strides_analytics.map_extension (extension STRING)
+    CREATE OR REPLACE FUNCTION $DATASET.map_extension (extension STRING)
     RETURNS STRING
     AS
     (case
@@ -275,34 +285,32 @@ echo " #### gs_fixed"
     host as host,
     method as http_operation,
     path as request_uri,
-    strides_analytics.map_extension(path) as extension,
+    $DATASET.map_extension(path) as extension,
     referer as referer,
     regexp_extract(path,r'[DES]R[RZ][0-9]{5,10}') as accession,
     result_bytes as bytes_sent,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
-    strides_analytics.expand_bucket(bucket, path) as bucket,
+    $DATASET.expand_bucket(bucket, path) as bucket,
     source as source,
     current_datetime() as fixed_time
-    FROM \\\`ncbi-logmon.strides_analytics.gs_parsed\\\`
-    WHERE accepted=true
+    FROM \\\`ncbi-logmon.$DATASET.gs_parsed\\\`
+    WHERE ifnull(accepted,true)=true
 ENDOFQUERY
 )
 
     # TODO Hack, cause I can't understand bash backtick quoting
     QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f strides_analytics.gs_fixed
+    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed"
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
-    --destination_table strides_analytics.gs_fixed \
+    --destination_table "$DATASET.gs_fixed" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema strides_analytics.gs_fixed
-
-
+    bq show --schema "$DATASET.gs_fixed"
 
     #parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
     #[17/May/2019:23:19:24 +0000]
@@ -326,29 +334,29 @@ echo " #### s3_fixed"
     host_header as host,
     cast (case WHEN res_len='' THEN '0' ELSE res_len END as int64) as bytes_sent,
     path as request_uri,
-    strides_analytics.map_extension(path) as extension,
+    $DATASET.map_extension(path) as extension,
     referer as referer,
     replace(agent, '-head', '') as user_agent,
     source as source,
-    strides_analytics.expand_bucket(bucket, path) as bucket,
+    $DATASET.expand_bucket(bucket, path) as bucket,
     current_datetime() as fixed_time
-    FROM \\\`ncbi-logmon.strides_analytics.s3_parsed\\\`
-    WHERE accepted=true
+    FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
+    WHERE ifnull(accepted,true)=true
 ENDOFQUERY
     )
 
     QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f strides_analytics.s3_fixed
+    bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed"
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
-    --destination_table strides_analytics.s3_fixed \
+    --destination_table $DATASET.s3_fixed \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema strides_analytics.s3_fixed
+    bq show --schema "$DATASET.s3_fixed"
 
 echo " #### op_fixed"
     # LOGMON-1: Remove multiple -heads from agent
@@ -383,29 +391,29 @@ echo " #### op_fixed"
     server as host,
     res_len as bytes_sent,
     path as request_uri,
-    strides_analytics.map_extension(path) as extension,
+    $DATASET.map_extension(path) as extension,
     referer as referer,
     replace(agent, '-head', '') as user_agent,
     'OP' as source,
     current_datetime() as fixed_time
-    FROM \\\`ncbi-logmon.strides_analytics.op_parsed\\\`
-    WHERE accepted=true
+    FROM \\\`ncbi-logmon.$DATASET.op_parsed\\\`
+    WHERE ifnull(accepted,true)=true
 ENDOFQUERY
     )
 
     QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f strides_analytics.op_fixed
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed"
     # shellcheck disable=SC2016
+
     bq query \
     --project_id ncbi-logmon \
-    --destination_table strides_analytics.op_fixed \
+    --destination_table "$DATASET.op_fixed" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema strides_analytics.op_fixed
-
+    bq show --schema "$DATASET.op_fixed"
 
 
 echo " ##### detail_export"
@@ -439,7 +447,7 @@ SELECT
         WHEN http_operation='CONNECT' THEN 7
     ELSE 99
     END as http_operation_combined
-    FROM \\\`strides_analytics.gs_fixed\\\`
+    FROM \\\`$DATASET.gs_fixed\\\`
 UNION ALL SELECT
     accession as accession,
     bucket as bucket,
@@ -469,7 +477,7 @@ UNION ALL SELECT
         WHEN http_operation='CONNECT' THEN 7
     ELSE 99
     END as http_operation_combined
-    FROM \\\`strides_analytics.s3_fixed\\\`
+    FROM \\\`$DATASET.s3_fixed\\\`
 UNION ALL SELECT
     accession as accession,
     host as bucket,
@@ -499,29 +507,29 @@ UNION ALL SELECT
         WHEN http_operation='CONNECT' THEN 7
     ELSE 99
     END as http_operation_combined
-    FROM \\\`strides_analytics.op_fixed\\\`
+    FROM \\\`$DATASET.op_fixed\\\`
 
 ENDOFQUERY
     )
 
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f strides_analytics.detail_export
+    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export"
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
-    --destination_table strides_analytics.detail_export \
+    --destination_table "$DATASET.detail_export" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     --time_partitioning_field=start_ts \
     "$QUERY"
 
-    bq show --schema strides_analytics.detail_export
+    bq show --schema "$DATASET.detail_export"
 
 bq -q query \
     --use_legacy_sql=false \
-    "delete from strides_analytics.detail_export where start_ts < '2000-01-01'"
+    "delete from $DATASET.detail_export where start_ts < '2000-01-01'"
 
 echo " ###  summary_grouped"
     QUERY=$(cat <<-ENDOFQUERY
@@ -542,7 +550,7 @@ echo " ###  summary_grouped"
         sum(bytes_sent) as bytes_sent,
         current_datetime() as export_time
     FROM
-        \\\`strides_analytics.detail_export\\\`
+        \\\`$DATASET.detail_export\\\`
     GROUP BY
         datetime_trunc(start_ts, day), accession, user_agent,
         remote_ip, host, bucket, source, http_operation_combined
@@ -553,64 +561,67 @@ ENDOFQUERY
 
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f strides_analytics.summary_grouped
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped"
     # shellcheck disable=SC2016
     bq query \
-    --destination_table strides_analytics.summary_grouped \
+    --destination_table "$DATASET.summary_grouped" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema strides_analytics.summary_grouped
+    bq show --schema "$DATASET.summary_grouped"
 
-# LOGMON-85: op_fixed is 4/21->, excluding 4/24, 6/25, 6/260
-echo " ###  op_sess"
-    QUERY=$(cat <<-ENDOFQUERY
-    INSERT INTO strides_analytics.summary_grouped
-    (accession, user_agent, remote_ip, host,
-    bucket, source, num_requests, start_ts, end_ts,
-    http_operations,
-    http_statuses,
-    referers, bytes_sent, export_time, file_exts)
-    SELECT
-        acc, agent, ip, domain,
-        domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
-        replace(cmds,' ',','),
-        replace(status,' ',','),
-        '', bytecount, current_datetime(),
-        strides_analytics.map_extension(acc)
-    FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
-    WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
-    AND start between '2016-10-01' and '2020-04-21'
-    AND domain not like '%amazon%'
-    AND domain not like '%gap%'
-    AND domain not like '%gap-download%'
 
-ENDOFQUERY
-)
-    QUERY="${QUERY//\\/}"
-
-    bq query \
-    --use_legacy_sql=false \
-    --batch=true \
-    "$QUERY"
-
-echo " ###  fix op_sess"
-    QUERY=$(cat <<-ENDOFQUERY
-    update strides_analytics.summary_grouped
-    set
-    bucket=ifnull(bucket,'') || ' (ETL + BQS)',
-    http_operations=replace(http_operations,' ',','),
-    http_statuses=replace(http_statuses,' ',','),
-    user_agent=replace(user_agent, '-head', '')
-    where source='OP'
+if [ "$STRIDES_SCOPE" == "public" ]; then
+    # LOGMON-85: op_fixed is 4/21->, excluding 4/24, 6/25, 6/260
+    echo " ###  op_sess"
+        QUERY=$(cat <<-ENDOFQUERY
+        INSERT INTO $DATASET.summary_grouped
+        (accession, user_agent, remote_ip, host,
+        bucket, source, num_requests, start_ts, end_ts,
+        http_operations,
+        http_statuses,
+        referers, bytes_sent, export_time, file_exts)
+        SELECT
+            acc, agent, ip, domain,
+            domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
+            replace(cmds,' ',','),
+            replace(status,' ',','),
+            '', bytecount, current_datetime(),
+            $DATASET.map_extension(acc)
+        FROM \\\`ncbi-logmon.$DATASET.op_sess\\\`
+        WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
+        AND start between '2016-10-01' and '2020-04-21'
+        AND domain not like '%amazon%'
+        AND domain not like '%gap%'
+        AND domain not like '%gap-download%'
 
 ENDOFQUERY
-)
-    QUERY="${QUERY//\\/}"
+    )
+        QUERY="${QUERY//\\/}"
 
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+        bq query \
+        --use_legacy_sql=false \
+        --batch=true \
+        "$QUERY"
+
+    echo " ###  fix op_sess"
+        QUERY=$(cat <<-ENDOFQUERY
+        update $DATASET.summary_grouped
+        set
+        bucket=ifnull(bucket,'') || ' (ETL + BQS)',
+        http_operations=replace(http_operations,' ',','),
+        http_statuses=replace(http_statuses,' ',','),
+        user_agent=replace(user_agent, '-head', '')
+        where source='OP'
+
+ENDOFQUERY
+    )
+        QUERY="${QUERY//\\/}"
+
+        bq query --use_legacy_sql=false --batch=true "$QUERY"
+fi # public
 
 echo " ###  uniq_ips"
     QUERY=$(cat <<-ENDOFQUERY
@@ -625,77 +636,77 @@ echo " ###  uniq_ips"
         else
             6
     end as ipint
-    FROM \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
+    FROM \\\`ncbi-logmon.$DATASET.summary_grouped\\\`
     WHERE length(remote_ip) < 100
 ENDOFQUERY
 )
     #WHERE remote_ip like '%.%'
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f strides_analytics.uniq_ips
+    bq rm --project_id ncbi-logmon -f "$DATASET.uniq_ips"
     # shellcheck disable=SC2016
     bq query \
-    --destination_table strides_analytics.uniq_ips \
+    --destination_table "$DATASET.uniq_ips" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
 
 
-RUN="no"
+RUN="yes"
 if [ "$RUN" = "yes" ]; then
 # Only needs to be running when a lot of new IP addresses appear
 echo " ###  iplookup_new"
     QUERY=$(cat <<-ENDOFQUERY
     SELECT remote_ip, ipint, country_code, region_name, city_name
     FROM \\\`ncbi-logmon.strides_analytics.ip2location\\\`
-    JOIN \\\`ncbi-logmon.strides_analytics.uniq_ips\\\`
+    JOIN \\\`ncbi-logmon.$DATASET.uniq_ips\\\`
     ON (ipint >= ip_from and ipint <= ip_to)
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f strides_analytics.iplookup_new2
+    bq rm --project_id ncbi-logmon -f "$DATASET.iplookup_new2"
     # shellcheck disable=SC2016
     bq query \
-    --destination_table strides_analytics.iplookup_new2 \
+    --destination_table "$DATASET.iplookup_new2" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
 fi # RUN
 
-
-echo " ### Find new IP addresses"
-    QUERY=$(cat <<-ENDOFQUERY
-insert into strides_analytics.rdns (ip)
-select distinct remote_ip as ip from strides_analytics.summary_export where remote_ip not in (select distinct ip from strides_analytics.rdns
-)
+    echo " ### Find new IP addresses"
+        QUERY=$(cat <<-ENDOFQUERY
+    insert into ncbi-logmon.strides_analytics.rdns (ip)
+    select distinct remote_ip as ip from $DATASET.summary_export where remote_ip not in (select distinct ip from ncbi-logmon.strides_analytics.rdns
+    )
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
 
+if [ "$STRIDES_SCOPE" == "public" ]; then
 echo " ### Find internal PUT/POST IPs"
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="NCBI Cloud (put.nlm.nih.gov)"
     WHERE ip in (
     SELECT distinct  remote_ip
-    FROM \\\`ncbi-logmon.strides_analytics.summary_export\\\`
+    FROM \\\`ncbi-logmon.$DATASET.summary_export\\\`
     where http_operations like '%P%'
     and http_statuses like '%200%')
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+#    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Find internal IAMs IPs"
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="NCBI Cloud (request.nlm.nih.gov)"
     WHERE ip in (
-    SELECT distinct ip FROM \\\`ncbi-logmon.strides_analytics.s3_parsed\\\`
+    SELECT distinct ip FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
         WHERE
            requester like '%arn:aws:iam::783971887864%'
         or requester like '%arn:aws:iam::018000097103%'
@@ -740,6 +751,8 @@ ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
+fi # public
+
 
 echo " ###  summary_export"
     QUERY=$(cat <<-ENDOFQUERY
@@ -770,10 +783,10 @@ echo " ###  summary_export"
     ifnull(organism, 'Unknown') as ScientificName,
     ifnull(consent,'Unknown') as consent,
     cast (mbytes as int64) as accession_size_mb
-    FROM \\\`strides_analytics.summary_grouped\\\` grouped
+    FROM \\\`$DATASET.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
         ON grouped.remote_ip=rdns.ip
-    LEFT JOIN \\\`strides_analytics.iplookup_new2\\\` iplookup
+    LEFT JOIN \\\`$DATASET.iplookup_new2\\\` iplookup
         ON grouped.remote_ip=iplookup.remote_ip
     LEFT JOIN \\\`nih-sra-datastore.sra.metadata\\\` metadata
         ON accession=metadata.acc
@@ -782,28 +795,27 @@ echo " ###  summary_export"
 ENDOFQUERY
     )
 
-#    LEFT JOIN \\\`strides_analytics.public_fix\\\`
+#    LEFT JOIN \\\`$DATASET.$STRIDES_SCOPE_fix\\\`
     QUERY="${QUERY//\\/}"
 
-    bq \
-        cp -f strides_analytics.summary_export "strides_analytics.summary_export_$YESTERDAY"
-    bq rm --project_id ncbi-logmon -f strides_analytics.summary_export
+    bq cp -f $DATASET.summary_export "$DATASET.summary_export_$YESTERDAY"
+    bq rm --project_id ncbi-logmon -f $DATASET.summary_export
 
     # shellcheck disable=SC2016
     bq query \
-    --destination_table strides_analytics.summary_export \
+    --destination_table $DATASET.summary_export \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
-    bq show --schema strides_analytics.summary_export
+    bq show --schema $DATASET.summary_export
 
     OLD=$(date -d "-7 days" "+%Y%m%d")
-    bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_$OLD"
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_$OLD"
 
 echo " ### fix summary_export for NIH"
     QUERY=$(cat <<-ENDOFQUERY
-    UPDATE strides_analytics.summary_export
+    UPDATE $DATASET.summary_export
     SET city_name='Bethesda',
     region_name='Maryland',
     country_code='US'
@@ -820,22 +832,22 @@ echo " ###  export to GS"
 #    bq extract \
 #    --destination_format NEWLINE_DELIMITED_JSON \
 #    --compression GZIP \
-#    'strides_analytics.detail_export' \
+#    '$DATASET.detail_export' \
 #    "gs://logmon_export/detail/detail.$DATE.*.json.gz"
 
-    gsutil rm -f "gs://logmon_export/summary/summary.$DATE.*.json.gz" || true
+    gsutil rm -f "gs://logmon_export/summary/summary.$DATE.$STRIDES_SCOPE*.json.gz" || true
     bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
-    'strides_analytics.summary_export' \
-    "gs://logmon_export/summary/summary.$DATE.*.json.gz"
+    "$DATASET.summary_export" \
+    "gs://logmon_export/summary/summary.$DATE.$STRIDES_SCOPE.*.json.gz"
 
-    gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*.json.gz" || true
+    gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*.json.gz" || true
     bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression NONE \
-    'strides_analytics.uniq_ips' \
-    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.json"
+    "$DATASET.uniq_ips" \
+    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.json"
 
 
 
@@ -852,10 +864,21 @@ echo " ###  copy to filesystem"
 
     mkdir -p "$PANFS/uniq_ips"
     cd "$PANFS/uniq_ips" || exit
-    rm -f "$PANFS"/uniq_ips/uniq_ips."$DATE".* || true
-    gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.*" "$PANFS/uniq_ips/"
+    rm -f "$PANFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
+    gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$PANFS/uniq_ips/"
 
 
-bq rm -f strides_analytics.op_parsed
+
+if [ "$STRIDES_SCOPE" == "private" ]; then
+    QUERY=$(cat <<-ENDOFQUERY
+    DELETE from $DATASET.summary_export
+    where source='OP'
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+else
+    bq rm -f "$DATASET.op_parsed"
+fi
 
 date

@@ -1,1 +1,5 @@
 rdns.db
+gs_schema.json
+gs_schema_only.json
+s3_schema.json
+s3_schema_only.json

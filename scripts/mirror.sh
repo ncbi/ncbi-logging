@@ -90,7 +90,14 @@ for LOG_BUCKET in "${buckets[@]}"; do
         export CLOUDSDK_CORE_PROJECT="nih-sra-datastore"
         gcloud config set account strides-analytics@nih-sra-datastore.iam.gserviceaccount.com
 
+        if [ "$PROFILE" = "logmon_private" ]; then
+            export CLOUDSDK_CORE_PROJECT="nih-sra-datastore-protected"
+            export GOOGLE_APPLICATION_CREDENTIALS=/home/vartanianmh/logmon-nih-sra-datastore.json
+            gcloud config set account logmon@nih-sra-datastore-protected.iam.gserviceaccount.com
+        fi
+
         echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
+
         gsutil -m rsync "gs://$LOG_BUCKET/" .
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
     fi
