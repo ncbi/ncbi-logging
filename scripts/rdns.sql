@@ -18,8 +18,21 @@ pragma page_size = 32768;
 
 
 drop table if exists uniq_ips;
-create table uniq_ips (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210315.json  uniq_ips
+drop table if exists uniq_ips_public;
+drop table if exists uniq_ips_private;
+create table uniq_ips_public (line text);
+create table uniq_ips_private (line text);
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210409.private.json  uniq_ips_private
+select count(*) as uniq_ips_public_count from uniq_ips_public;
+select count(*) as uniq_ips_private_count from uniq_ips_private;
+
+create table uniq_ips as
+    select distinct line from
+    (select line from uniq_ips_public
+        union all
+     select line from uniq_ips_private);
+
 select count(*) as uniq_ips_count from uniq_ips;
 
 drop table if exists rdns;
@@ -604,7 +617,17 @@ WHERE IP in (
 '34.232.62.32',
 '3.238.73.202',
 '18.232.55.127',
-'3.237.9.208'
+'3.237.9.208',
+'18.209.30.26',
+'18.206.99.152',
+'34.230.60.147',
+'54.174.130.92',
+'18.212.103.117',
+'3.85.147.25',
+'3.89.145.92',
+'35.245.28.1',
+'35.221.18.10',
+'35.230.184.180'
 );
 
 UPDATE RDNS

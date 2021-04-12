@@ -5,45 +5,47 @@ GS	sra-ca-crun-3	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private
 GS	sra-ca-crun-4	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
 GS	sra-ca-crun-5	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
 GS	sra-ca-crun-6	Cold ETL Data	efremov	sra-ca-run-logs	nih-sra-protected	private	false	ETL + BQS	GS log	cold
-GS	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-11		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-12		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-13		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-14		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-2		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-3		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-4		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-5		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-6		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-7		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-8		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-run-9		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL + BQS	GS log	hot
-GS	sra-ca-src-1		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	hot
-GS	sra-ca-src-10		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-11		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-12		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-13		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-14		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-2		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-3		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-4		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-5		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-6		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-7		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-8		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-src-9		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	Original	GS log	cold
-GS	sra-ca-zq-1		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
-GS	sra-ca-zq-2		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
-GS	sra-ca-zq-3		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
-GS	sra-ca-zq-4		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
-GS	sra-ca-zq-5		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
-GS	sra-ca-zq-6		nih-sra-datastore-protected	sra-ca-logs-1	logmon	private	true	ETL - BQS	GS log	hot
+GS	sra-ca-logs-1	Log bucket	efremov	sra-ca-logs-1	logmon_private	private	true	GS log	GS log	hot
+GS	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-11		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-12		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-13		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-14		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-2		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-3		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-4		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-5		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-6		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-7		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-8		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-9		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-run-logs		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL + BQS	GS log	hot
+GS	sra-ca-src-1		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	hot
+GS	sra-ca-src-10		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-11		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-12		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-13		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-14		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-2		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-3		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-4		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-5		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-6		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-7		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-8		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-src-9		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	Original	GS log	cold
+GS	sra-ca-zq-1		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL - BQS	GS log	hot
+GS	sra-ca-zq-2		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL - BQS	GS log	hot
+GS	sra-ca-zq-3		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL - BQS	GS log	hot
+GS	sra-ca-zq-4		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL - BQS	GS log	hot
+GS	sra-ca-zq-5		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL - BQS	GS log	hot
+GS	sra-ca-zq-6		nih-sra-datastore-protected	sra-ca-logs-1	logmon_private	private	true	ETL - BQS	GS log	hot
 GS	sra-pub-crun-1	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
 GS	sra-pub-crun-10	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
 GS	sra-pub-crun-11	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
 GS	sra-pub-crun-12	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
-GS	sra-pub-crun-13	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
+GS	sra-pub-crun-13	Hot ETL Data	efremov	sra-ca-logs-1	logmon_private	public	true	ETL + BQS	GS log	hot
 GS	sra-pub-crun-2	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
 GS	sra-pub-crun-3	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
 GS	sra-pub-crun-4	Hot ETL Data	efremov	sra-pub-logs-1	nih-datastore	public	false	ETL + BQS	GS log	hot
@@ -149,40 +151,41 @@ S3	sra-ca-crun-3	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protecte
 S3	sra-ca-crun-4	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
 S3	sra-ca-crun-5	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
 S3	sra-ca-crun-6	Cold ETL Data	efremov	sra-ca-run-logs	nih-nlm-ncbi-sra-protected	private	false	ETL + BQS	S3 log	cold
-S3	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-11		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-12		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-13		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-14		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-2		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-3		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-4		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-5		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-6		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-7		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-8		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-run-9		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL + BQS	S3 log	hot
-S3	sra-ca-src-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	hot
-S3	sra-ca-src-10		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-11		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-12		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-13		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-14		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-2		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-3		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-4		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-5		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-6		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-7		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-8		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-src-9		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	Original	S3 log	cold
-S3	sra-ca-zq-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL - BQS	S3 log	hot
-S3	sra-ca-zq-2		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL - BQS	S3 log	hot
-S3	sra-ca-zq-3		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL - BQS	S3 log	hot
-S3	sra-ca-zq-4		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL - BQS	S3 log	hot
-S3	sra-ca-zq-5		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL - BQS	S3 log	hot
-S3	sra-ca-zq-6		nih-sra-datastore-protected	sra-ca-run-logs	logmon	private	true	ETL - BQS	S3 log	hot
+S3	sra-ca-run-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-10		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-11		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-12		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-13		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-14		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-2		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-3		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-4		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-5		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-6		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-7		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-8		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-9		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-run-logs		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL + BQS	S3 log	hot
+S3	sra-ca-src-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	hot
+S3	sra-ca-src-10		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-11		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-12		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-13		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-14		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-2		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-3		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-4		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-5		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-6		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-7		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-8		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-src-9		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	Original	S3 log	cold
+S3	sra-ca-zq-1		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL - BQS	S3 log	hot
+S3	sra-ca-zq-2		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL - BQS	S3 log	hot
+S3	sra-ca-zq-3		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL - BQS	S3 log	hot
+S3	sra-ca-zq-4		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL - BQS	S3 log	hot
+S3	sra-ca-zq-5		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL - BQS	S3 log	hot
+S3	sra-ca-zq-6		nih-sra-datastore-protected	sra-ca-run-logs	logmon_private	private	true	ETL - BQS	S3 log	hot
 S3	sra-pub-metadata-us-east-1	Athena metadata	Efremov	sra-pub-src-1-logs	s3_readers	public	false	metadata	S3 log	hot
 S3	sra-pub-run-1		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	ETL + BQS	S3 log	cold
 S3	sra-pub-run-1-logs		nih-nlm-ncbi-sra	sra-pub-run-1-logs	strides-analytics	public	true	ETL + BQS	S3 log	cold

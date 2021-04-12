@@ -20,6 +20,7 @@ insert into service_accounts (service_account) values ('s3_readers');
 insert into service_accounts (service_account) values ('logmon');
 insert into service_accounts (service_account) values ('nih-nlm-ncbi-sra-protected');
 insert into service_accounts (service_account) values ('nih-sra-datastore-protected');
+insert into service_accounts (service_account) values ('logmon_private');
 
 create table log_formats (
     log_format text primary key,
@@ -128,6 +129,7 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-11'
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-12');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-13');
 
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-logs');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-2');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-run-3');
@@ -196,7 +198,7 @@ update buckets
 
 update buckets
     set owner='nih-sra-datastore-protected',
-    service_account='logmon',
+    service_account='logmon_private',
     log_bucket='sra-ca-run-logs',
     immutable="true",
     scope='private',
@@ -245,6 +247,7 @@ update buckets set log_bucket='sra-pub-logs-1',
     where cloud_provider='GS' and log_bucket='sra-pub-run-1-logs';
 
 update buckets set log_bucket='sra-ca-logs-1',
+    service_account='logmon_private',
     owner='nih-sra-datastore-protected'
     where cloud_provider='GS' and log_bucket='sra-ca-run-logs';
 
@@ -790,8 +793,17 @@ insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account,
     immutable, format, storage_class, scope)
 values ('GS', 'sra-pub-crun-13', 'Hot ETL Data',
-    'efremov', 'sra-pub-logs-1', 'nih-datastore',
-    'false', 'ETL + BQS', 'hot', 'public');
+    'efremov', 'sra-ca-logs-1', 'logmon_private',
+    'true', 'ETL + BQS', 'hot', 'public');
+
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account,
+    immutable, format, storage_class, scope)
+values ('GS', 'sra-ca-logs-1', 'Log bucket',
+    'efremov', 'sra-ca-logs-1', 'logmon_private',
+    'true', 'GS log', 'hot', 'private');
+
 
 
 

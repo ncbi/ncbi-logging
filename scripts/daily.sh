@@ -10,6 +10,7 @@ cd "$HOME/ncbi-logging/scripts" || exit
 set +e
 
 mkdir -p "$HOME"/logs
+find "$HOME/logs" -mtime +5 -size +10M -exec gzip -9 {} \;
 
 /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
 
