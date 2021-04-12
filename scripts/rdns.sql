@@ -23,7 +23,7 @@ drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210409.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210412.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -627,7 +627,14 @@ WHERE IP in (
 '3.89.145.92',
 '35.245.28.1',
 '35.221.18.10',
-'35.230.184.180'
+'35.230.184.180',
+'52.90.213.107',
+'18.234.115.80',
+'3.85.89.69',
+'3.92.161.116',
+'3.85.192.173',
+'18.206.243.108',
+'54.80.250.57'
 );
 
 UPDATE RDNS
@@ -648,6 +655,10 @@ WHERE IP LIKE '4.16.%' or IP LIKE '8.29.8%';
 UPDATE RDNS
 SET DOMAIN = 'rcn.net (RCN Corporation)'
 WHERE IP LIKE '207.237.188.%';
+
+UPDATE RDNS
+SET DOMAIN = 't-mobile.com (T-Mobile USA)'
+WHERE IP LIKE '172.35.%';
 
 
 UPDATE RDNS
@@ -1463,6 +1474,7 @@ limit 10;
 .width 120 120
 -- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
 select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
+select "export CLOUDSDK_CORE_PROJECT=ncbi-logmon" as hint2;
 select "bq rm -f strides_analytics.rdns" as hint2;
 select "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl" as hint3;
 
