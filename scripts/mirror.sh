@@ -83,9 +83,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "BUCKET_NAME is $BUCKET_NAME"
 
     if [ "$PROVIDER" = "GS" ]; then
-        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
-        MIRROR="$RAMDISK/$PROVIDER/$LOG_BUCKET/"
-        #MIRROR="$PANFS/gs_mirror/$PROVIDER/$LOG_BUCKET"
+        MIRROR="$PANFS/gs_mirror/$PROVIDER/$LOG_BUCKET"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
@@ -144,8 +142,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/"
-        MIRROR="$RAMDISK/$PROVIDER/$LOG_BUCKET/"
+        MIRROR="$PANFS/s3_mirror/$PROVIDER/$LOG_BUCKET"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
