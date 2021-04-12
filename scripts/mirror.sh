@@ -84,6 +84,8 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     if [ "$PROVIDER" = "GS" ]; then
         MIRROR="$TMP/$PROVIDER/$LOG_BUCKET/mirror"
+        MIRROR="$RAMDISK/$PROVIDER/$LOG_BUCKET/"
+        #MIRROR="$PANFS/gs_mirror/$PROVIDER/$LOG_BUCKET"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 

@@ -74,5 +74,17 @@ case "$HOSTNAME" in
         ;;
 esac
 
+if [ "$STRIDES_SCOPE" == "private" ]; then
+    DATASET="strides_analytics_private"
+    MIRROR_BUCKET="gs://logmon_logs_private"
+    PARSE_BUCKET="gs://logmon_logs_parsed_private"
+    PARSE_VER="/v3"
+else
+    DATASET="strides_analytics"
+    MIRROR_BUCKET="gs://logmon_logs"
+    PARSE_BUCKET="gs://logmon_logs_parsed_us"
+    PARSE_VER=""
+fi
+
 echo "____________________________"
 date

@@ -13,19 +13,6 @@ if [ "$#" -eq 1 ]; then
     fi
 fi
 
-
-if [ "$STRIDES_SCOPE" == "private" ]; then
-    DATASET="strides_analytics_private"
-    MIRROR_BUCKET="gs://logmon_logs_private"
-    PARSE_BUCKET="gs://logmon_logs_parsed_private"
-    PARSE_VER="/v3"
-else
-    DATASET="strides_analytics"
-    MIRROR_BUCKET="gs://logmon_logs"
-    PARSE_BUCKET="gs://logmon_logs_parsed_us"
-    PARSE_VER=""
-fi
-
 if [ "$skipload" = false ]; then
     gsutil du -s -h "$PARSE_BUCKET/logs_gs_$STRIDES_SCOPE/"
     gsutil du -s -h "$PARSE_BUCKET/logs_s3_$STRIDES_SCOPE/"
@@ -221,6 +208,12 @@ CREATE OR REPLACE FUNCTION $DATASET.expand_bucket (bucket STRING, path STRING)
 RETURNS STRING
 AS
  (case
+        WHEN regexp_contains(bucket, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
+        WHEN regexp_contains(bucket, r'-ca-crun-') THEN bucket || ' (Controlled Access ETL + BQS Cold)'
+        WHEN regexp_contains(bucket, r'-ca-zq-') THEN bucket || ' (Controlled Access ETL - BQS)'
+        WHEN regexp_contains(bucket, r'-ca-src-1') THEN bucket || ' (Controlled Access Original)'
+        WHEN regexp_contains(bucket, r'-ca-src-[2-9]') THEN bucket || ' (Controlled Access Original Cold)'
+        WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
         WHEN ends_with(bucket, '-us-east-1') THEN bucket || '  (Athena metadata)'
         WHEN ends_with(bucket, '-cov2') and
             regexp_contains(path, r'sra-src') THEN bucket || ' (Original)'
@@ -234,7 +227,6 @@ AS
         WHEN ends_with(bucket, 'sra-pub-src-1') THEN bucket || ' (Original)'
         WHEN ends_with(bucket, 'sra-pub-src-2') THEN bucket || ' (Original)'
         WHEN regexp_contains(bucket, r'sra-pub-src-') THEN bucket || ' (Original Cold)'
-        WHEN regexp_contains(bucket, r'-ca-') THEN bucket || ' (Controlled Access)'
     ELSE bucket || ' (Unknown)'
     END)
 ENDOFQUERY
@@ -291,7 +283,7 @@ echo " #### gs_fixed"
     result_bytes as bytes_sent,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
     $DATASET.expand_bucket(bucket, path) as bucket,
-    source as source,
+    ifnull(source,'GS') as source,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.gs_parsed\\\`
     WHERE ifnull(accepted,true)=true
@@ -337,7 +329,7 @@ echo " #### s3_fixed"
     $DATASET.map_extension(path) as extension,
     referer as referer,
     replace(agent, '-head', '') as user_agent,
-    source as source,
+    ifnull(source,'S3') as source,
     $DATASET.expand_bucket(bucket, path) as bucket,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
@@ -695,7 +687,7 @@ echo " ### Find internal PUT/POST IPs"
     SELECT distinct  remote_ip
     FROM \\\`ncbi-logmon.$DATASET.summary_export\\\`
     where http_operations like '%P%'
-    and http_statuses like '%200%')
+    and http_statuses like '%20%')
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
