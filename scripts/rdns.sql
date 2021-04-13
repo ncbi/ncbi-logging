@@ -23,7 +23,7 @@ drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210412.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210413.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -673,6 +673,15 @@ WHERE IP LIKE '0.%'
   OR IP LIKE '172.18.%'
   OR IP LIKE '172.19.%'
   OR IP LIKE '172.20.%'
+  OR IP LIKE '172.21.%'
+  OR IP LIKE '172.22.%'
+  OR IP LIKE '172.23.%'
+  OR IP LIKE '172.24.%'
+  OR IP LIKE '172.25.%'
+  OR IP LIKE '172.26.%'
+  OR IP LIKE '172.27.%'
+  OR IP LIKE '172.28.%'
+  OR IP LIKE '172.29.%'
   OR IP LIKE '172.30.%'
   OR IP LIKE '172.31.%'
   OR IP LIKE '192.0.%'
@@ -1283,6 +1292,10 @@ update rdns
 set domain='ibm.com (IBM Cloud)'
 where ip like '158.85.%';
 
+update rdns
+set domain='jnj.com (Johnson & Johnson)'
+where ip like '148.177.%';
+
 
 
 UPDATE RDNS
@@ -1294,6 +1307,7 @@ WHERE DOMAIN = 'Unknown'
        OR IP LIKE '34.7%'
        OR IP LIKE '34.8%'
        OR IP LIKE '34.9%'
+       OR IP LIKE '34.122%'
        OR IP LIKE '35.1%'
        OR IP LIKE '35.2%'
        OR IP LIKE '2600:1900:%');
