@@ -83,7 +83,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "BUCKET_NAME is $BUCKET_NAME"
 
     if [ "$PROVIDER" = "GS" ]; then
-        MIRROR="$PANFS/gs_mirror/$PROVIDER/$LOG_BUCKET"
+        if [ "$STRIDES_SCOPE" = "public" ]; then
+            MIRROR="$TMP/$PROVIDER/$LOG_BUCKET"
+        else
+            MIRROR="$RAMDISK/$PROVIDER/$LOG_BUCKET"
+        fi
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 

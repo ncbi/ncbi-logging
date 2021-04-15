@@ -75,7 +75,7 @@ pg_dump -h localhost -d grafana | \
 pg_dump -U sa_prod_write -d strides_analytics | \
      xz -T 20 -c > "$PANFS/pg_dumps/pg_dump_sa.$DATE.xz" &
 
-pip3.7 list --outdated
+pip3 list --outdated
 
 #du -shc "$PANFS"/* | sort -hr | head > "$PANFS/dus" &
 du -shc "$LOGDIR"/* | sort -hr | head > "$LOGDIR/dus" &

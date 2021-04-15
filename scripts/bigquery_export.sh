@@ -1,4 +1,4 @@
-#!/usr/bin/bash -x
+#!/usr/bin/bash
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
@@ -678,7 +678,7 @@ ENDOFQUERY
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-if [ "$STRIDES_SCOPE" == "public" ]; then
+# if [ "$STRIDES_SCOPE" == "public" ]; then
 echo " ### Find internal PUT/POST IPs"
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
@@ -691,7 +691,7 @@ echo " ### Find internal PUT/POST IPs"
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-#    bq query --use_legacy_sql=false --batch=true "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Find internal IAMs IPs"
     QUERY=$(cat <<-ENDOFQUERY
@@ -709,6 +709,7 @@ echo " ### Find internal IAMs IPs"
         or requester like '%::396554159273%'
         or requester like '%arn:aws:iam::228184908524%'
         or requester like '%arn:aws:iam::313921231432%'
+        or requester like '%arn:aws:sts::184059545989%'
         or requester like '%347258802972%' )
 ENDOFQUERY
 )
@@ -743,7 +744,7 @@ ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
-fi # public
+# fi # public
 
 
 echo " ###  summary_export"
