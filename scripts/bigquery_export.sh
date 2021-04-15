@@ -342,7 +342,7 @@ ENDOFQUERY
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
-    --destination_table $DATASET.s3_fixed \
+    --destination_table "$DATASET.s3_fixed" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
@@ -791,17 +791,17 @@ ENDOFQUERY
 #    LEFT JOIN \\\`$DATASET.$STRIDES_SCOPE_fix\\\`
     QUERY="${QUERY//\\/}"
 
-    bq cp -f $DATASET.summary_export "$DATASET.summary_export_$YESTERDAY"
-    bq rm --project_id ncbi-logmon -f $DATASET.summary_export
+    bq cp -f "$DATASET.summary_export" "$DATASET.summary_export_$YESTERDAY"
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export"
 
     # shellcheck disable=SC2016
     bq query \
-    --destination_table $DATASET.summary_export \
+    --destination_table "$DATASET.summary_export" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
-    bq show --schema $DATASET.summary_export
+    bq show --schema "$DATASET.summary_export"
 
     OLD=$(date -d "-7 days" "+%Y%m%d")
     bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_$OLD"
@@ -870,6 +870,37 @@ ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+
+    QUERY=$(cat <<-ENDOFQUERY
+    SELECT *
+        REPLACE
+        (
+        "..." AS remote_ip,
+        "..." AS city_name,
+        CASE
+            WHEN regexp_contains(domain, r'AWS') THEN domain
+            WHEN regexp_contains(domain, r'GCP') THEN domain
+            WHEN regexp_contains(domain, r'nih.gov') THEN domain
+            ELSE "..."
+         END AS domain,
+         regexp_replace(user_agent, r'phid=[0-9a-z,=.]+', '...') as user_agent
+        )
+    from $DATASET.summary_export
+ENDOFQUERY
+)
+#    QUERY="${QUERY//\\/}"
+
+    bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked"
+    # shellcheck disable=SC2016
+    bq query \
+    --project_id ncbi-logmon \
+    --destination_table "strides_analytics.summary_export_ca_masked" \
+    --use_legacy_sql=false \
+    --batch=true \
+    --max_rows=5 \
+    "$QUERY"
+
 else
     bq rm -f "$DATASET.op_parsed"
 fi
