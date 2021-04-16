@@ -188,7 +188,7 @@ EOF
         --max_bad_records 5000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.op_parsed" \
-        "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
+        "$PARSE_BUCKET/logs_op_public/recognized.*" \
         op_schema_only.json
 
     bq show --schema "$DATASET.op_parsed"
@@ -565,9 +565,9 @@ ENDOFQUERY
     bq show --schema "$DATASET.summary_grouped"
 
 
+echo " ###  op_sess"
 if [ "$STRIDES_SCOPE" == "public" ]; then
     # LOGMON-85: op_fixed is 4/21->, excluding 4/24, 6/25, 6/260
-    echo " ###  op_sess"
         QUERY=$(cat <<-ENDOFQUERY
         INSERT INTO $DATASET.summary_grouped
         (accession, user_agent, remote_ip, host,
@@ -591,6 +591,27 @@ if [ "$STRIDES_SCOPE" == "public" ]; then
 
 ENDOFQUERY
     )
+else
+        QUERY=$(cat <<-ENDOFQUERY
+        INSERT INTO $DATASET.summary_grouped
+        (accession, user_agent, remote_ip, host,
+        bucket, source, num_requests, start_ts, end_ts,
+        http_operations,
+        http_statuses,
+        referers, bytes_sent, export_time, file_exts)
+        SELECT
+            acc, agent, ip, domain,
+            domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
+            replace(cmds,' ',','),
+            replace(status,' ',','),
+            '', bytecount, current_datetime(),
+            $DATASET.map_extension(acc)
+        FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
+        WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
+ENDOFQUERY
+    )
+
+fi # public
         QUERY="${QUERY//\\/}"
 
         bq query \
@@ -613,10 +634,13 @@ ENDOFQUERY
         QUERY="${QUERY//\\/}"
 
         bq query --use_legacy_sql=false --batch=true "$QUERY"
-fi # public
 
 echo " ###  uniq_ips"
     QUERY=$(cat <<-ENDOFQUERY
+
+    CREATE OR REPLACE TABLE $DATASET.uniq_ips
+    PARTITION BY RANGE_BUCKET(ipint, GENERATE_ARRAY(0, 4294967296, 429496729))
+    AS
     SELECT DISTINCT remote_ip as remote_ip,
         case when
             regexp_contains(
@@ -628,44 +652,70 @@ echo " ###  uniq_ips"
         else
             6
     end as ipint
-    FROM \\\`ncbi-logmon.$DATASET.summary_grouped\\\`
+    FROM (
+    select remote_ip from \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
+    union all
+    select remote_ip from \\\`ncbi-logmon.strides_analytics_private.summary_grouped\\\`
+        )
     WHERE length(remote_ip) < 100
 ENDOFQUERY
 )
-    #WHERE remote_ip like '%.%'
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f "$DATASET.uniq_ips"
-    # shellcheck disable=SC2016
-    bq query \
-    --destination_table "$DATASET.uniq_ips" \
-    --use_legacy_sql=false \
-    --batch=true \
-    --max_rows=5 \
-    "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 
 RUN="yes"
 if [ "$RUN" = "yes" ]; then
 # Only needs to be running when a lot of new IP addresses appear
-echo " ###  iplookup_new"
+echo " ###  iplookup_part"
     QUERY=$(cat <<-ENDOFQUERY
-    SELECT remote_ip, ipint, country_code, region_name, city_name
-    FROM \\\`ncbi-logmon.strides_analytics.ip2location\\\`
-    JOIN \\\`ncbi-logmon.$DATASET.uniq_ips\\\`
-    ON (ipint >= ip_from and ipint <= ip_to)
+
+    CREATE OR REPLACE TABLE $DATASET.ip2location_part
+    PARTITION BY
+       RANGE_BUCKET(ip_from, GENERATE_ARRAY(0, 4294967296, 429496729))
+    AS
+    SELECT * from \\\`ncbi-logmon.strides_analytics.ip2location\\\`
 ENDOFQUERY
 )
+    #WHERE remote_ip like '%.%'
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f "$DATASET.iplookup_new2"
-    # shellcheck disable=SC2016
-    bq query \
-    --destination_table "$DATASET.iplookup_new2" \
-    --use_legacy_sql=false \
-    --batch=true \
-    --max_rows=5 \
-    "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+echo " ###  iplookup_new3"
+    QUERY=$(cat <<-ENDOFQUERY
+    CREATE OR REPLACE TABLE $DATASET.iplookup_new3
+    (remote_ip string,
+     ipint int64,
+     country_code string,
+     region_name string,
+     city_name string)
+ENDOFQUERY
+)
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+   #step=429496729
+    step=100000000
+    for part in $(seq 0 $step 4294967296); do
+        top=$((step+part))
+        QUERY=$(cat <<-ENDOFQUERY
+        INSERT INTO $DATASET.iplookup_new3
+        SELECT remote_ip, ipint, country_code, region_name, city_name
+        FROM \\\`ncbi-logmon.strides_analytics.ip2location_part\\\`
+        JOIN \\\`ncbi-logmon.$DATASET.uniq_ips\\\`
+        ON (ipint >= ip_from and ipint <= ip_to)
+        WHERE ipint   between $part and $top AND
+            ip_from between $part and $top
+ENDOFQUERY
+)
+
+        QUERY="${QUERY//\\/}"
+        #echo $QUERY
+
+        echo "   ipint between $part and $top"
+        bq query --use_legacy_sql=false --batch=true "$QUERY"
+    done
 fi # RUN
 
     echo " ### Find new IP addresses"
@@ -779,7 +829,7 @@ echo " ###  summary_export"
     FROM \\\`$DATASET.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
         ON grouped.remote_ip=rdns.ip
-    LEFT JOIN \\\`$DATASET.iplookup_new2\\\` iplookup
+    LEFT JOIN \\\`$DATASET.iplookup_new3\\\` iplookup
         ON grouped.remote_ip=iplookup.remote_ip
     LEFT JOIN \\\`nih-sra-datastore.sra.metadata\\\` metadata
         ON accession=metadata.acc
@@ -869,7 +919,7 @@ if [ "$STRIDES_SCOPE" == "private" ]; then
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+# TODO    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 
     QUERY=$(cat <<-ENDOFQUERY
@@ -881,7 +931,17 @@ ENDOFQUERY
         CASE
             WHEN regexp_contains(domain, r'AWS') THEN domain
             WHEN regexp_contains(domain, r'GCP') THEN domain
-            WHEN regexp_contains(domain, r'nih.gov') THEN domain
+            WHEN regexp_contains(domain, r'\.edu\.au') THEN '*.edu.au'
+            WHEN regexp_contains(domain, r'\.edu') THEN '*.edu'
+            WHEN regexp_contains(domain, r'\.ed') THEN '*.edu'
+            WHEN regexp_contains(domain, r'\.edu') THEN '*.edu'
+            WHEN regexp_contains(domain, r'\.gov') THEN '*.gov'
+            WHEN regexp_contains(domain, r'\.ac.uk') THEN '*.ac.uk'
+            WHEN regexp_contains(domain, r'\.ac.jp') THEN '*.ac.jp'
+            WHEN regexp_contains(domain, r'\.cn') THEN '*.cn'
+            WHEN regexp_contains(domain, r'\.cn\.') THEN '*.cn'
+            WHEN regexp_contains(domain, r'hinamobile') THEN '*.cn'
+            WHEN regexp_contains(domain, r'\.com') THEN '*.com'
             ELSE "..."
          END AS domain,
          regexp_replace(user_agent, r'phid=[0-9a-z,=.]+', '...') as user_agent
@@ -891,6 +951,7 @@ ENDOFQUERY
 )
 #    QUERY="${QUERY//\\/}"
 
+echo " ###  masking
     bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked"
     # shellcheck disable=SC2016
     bq query \
