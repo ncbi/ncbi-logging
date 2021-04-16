@@ -226,12 +226,12 @@ WHERE IP LIKE '141.80.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'yale.edu'
+SET DOMAIN = 'yale.edu (Yale University)'
 WHERE IP LIKE '192.31.2.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'duke.edu'
+SET DOMAIN = 'duke.edu (Duke University)'
 WHERE IP LIKE '152.16.%';
 
 
@@ -700,12 +700,12 @@ OR IP LIKE '145.101.3';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Baylor College of Medicine'
+SET DOMAIN = 'bcm.edu (Baylor College of Medicine)'
 WHERE IP LIKE '128.249.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Rothamsted Research Institute'
+SET DOMAIN = 'rothamsted.ac.uk (Rothamsted Research Institute)'
 WHERE IP LIKE '149.155.2%';
 
 
@@ -726,7 +726,7 @@ WHERE IP LIKE '131.247.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Celgene Corporation'
+SET DOMAIN = 'celgene.ca (Celgene Corporation)'
 WHERE IP LIKE '38.99.110.%'
   OR IP LIKE '173.227.5.%';
 
@@ -776,7 +776,7 @@ WHERE IP LIKE '122.207.8%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'University of Geneva'
+SET DOMAIN = 'unige.ch (University of Geneva)'
 WHERE IP LIKE '129.194.%';
 
 
