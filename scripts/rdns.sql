@@ -23,7 +23,7 @@ drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210413.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210416.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -129,6 +129,7 @@ WHERE IP LIKE '134.192.%';
 UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
+  OR IP LIKE '27.15%'
   OR IP LIKE '58.208%'
   OR IP LIKE '58.209%'
   OR IP LIKE '58.210%'
@@ -147,6 +148,7 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '58.223%'
   OR IP LIKE '101.81.%'
   OR IP LIKE '114.23%'
+  OR IP LIKE '115.201.%'
   OR IP LIKE '115.218.%'
   OR IP LIKE '115.219.%'
   OR IP LIKE '115.221.%'
@@ -246,6 +248,28 @@ OR IP LIKE '129.106.%';
 UPDATE RDNS
 SET DOMAIN = 'Chinamobile.com'
 WHERE IP LIKE '36.1%'
+OR IP LIKE '39.128.%'
+OR IP LIKE '39.129.%'
+OR IP LIKE '39.130.%'
+OR IP LIKE '39.131.%'
+OR IP LIKE '39.132.%'
+OR IP LIKE '39.133.%'
+OR IP LIKE '39.134.%'
+OR IP LIKE '39.135.%'
+OR IP LIKE '39.136.%'
+OR IP LIKE '39.137.%'
+OR IP LIKE '39.138.%'
+OR IP LIKE '39.139.%'
+OR IP LIKE '39.140.%'
+OR IP LIKE '39.141.%'
+OR IP LIKE '39.142.%'
+OR IP LIKE '39.143.%'
+OR IP LIKE '39.144.%'
+OR IP LIKE '39.145.%'
+OR IP LIKE '39.146.%'
+OR IP LIKE '39.147.%'
+OR IP LIKE '39.148.%'
+OR IP LIKE '39.149.%'
 OR IP LIKE '39.181.%'
 OR IP LIKE '39.182.%'
 OR IP LIKE '39.183.%'
@@ -1296,6 +1320,9 @@ update rdns
 set domain='jnj.com (Johnson & Johnson)'
 where ip like '148.177.%';
 
+update rdns
+set domain='cmu.edu (Carngie Mellon)'
+where ip like '128.2.%';
 
 
 UPDATE RDNS
