@@ -667,7 +667,7 @@ ENDOFQUERY
 
 RUN="yes"
 if [ "$RUN" = "yes" ]; then
-# Only needs to be running when a lot of new IP addresses appear
+# Only needs to be run when a lot of new IP addresses appear
 echo " ###  iplookup_part"
     QUERY=$(cat <<-ENDOFQUERY
 
@@ -915,11 +915,13 @@ echo " ###  copy to filesystem"
 if [ "$STRIDES_SCOPE" == "private" ]; then
     QUERY=$(cat <<-ENDOFQUERY
     DELETE from $DATASET.summary_export
-    where source='OP'
+    where source='OP' and 
+      (host not like '%download%' or
+       consent='public')
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
-# TODO    bq query --use_legacy_sql=false --batch=true "$QUERY"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 
     QUERY=$(cat <<-ENDOFQUERY
@@ -951,7 +953,7 @@ ENDOFQUERY
 )
 #    QUERY="${QUERY//\\/}"
 
-echo " ###  masking
+echo " ###  masking"
     bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked"
     # shellcheck disable=SC2016
     bq query \
@@ -961,9 +963,9 @@ echo " ###  masking
     --batch=true \
     --max_rows=5 \
     "$QUERY"
-
 else
     bq rm -f "$DATASET.op_parsed"
 fi
 
+echo "bigquery_export.sh complete"
 date
