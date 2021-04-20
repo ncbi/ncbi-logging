@@ -23,7 +23,7 @@ drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210416.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210420.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -167,6 +167,7 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '119.79.%'
   OR IP LIKE '122.22%'
   OR IP LIKE '122.23%'
+  OR IP LIKE '140.250.%'
   OR IP LIKE '140.237.%'
   OR IP LIKE '180.126%'
   OR IP LIKE '180.160.%'
@@ -207,7 +208,8 @@ WHERE IP LIKE '162.105.%';
 UPDATE RDNS
 SET DOMAIN = 'cstnet.cn (China Science Network)'
 WHERE IP LIKE '159.226.%' OR IP LIKE '162.105.%' OR
-IP LIKE '202.127.2%' OR IP LIKE '124.16.%' or IP LIKE '124.17.%';
+IP LIKE '202.127.2%' OR IP LIKE '124.16.%' or IP LIKE '124.17.%'
+OR IP LIKE '210.75.25%';
 
 
 UPDATE RDNS
@@ -289,7 +291,7 @@ OR IP LIKE '111.4%'
 OR IP LIKE '111.5%'
 OR IP LIKE '111.6%'
 OR IP LIKE '112.%'
-OR IP LIKE '117.173.7%'
+OR IP LIKE '117.1%'
 OR IP LIKE '120.2%'
 OR IP LIKE '183.19%'
 OR IP LIKE '183.2%'
@@ -313,6 +315,8 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '119.4.%'
   OR IP LIKE '119.5.%'
   OR IP LIKE '119.6.%'
+  OR IP LIKE '123.138.%'
+  OR IP LIKE '123.139.%'
   OR IP LIKE '171.36.%'
   OR IP LIKE '171.37.%'
   OR IP LIKE '171.38.%'
@@ -929,8 +933,13 @@ SET DOMAIN = 'gwu.edu (The George Washington University)'
 WHERE IP LIKE '161.253.%';
 
 UPDATE RDNS
+SET DOMAIN = 'nyu.edu (New York University)'
+WHERE IP LIKE '216.165.%';
+
+UPDATE RDNS
 SET DOMAIN = 'embl.org (European Molecular Biology Laboratory)'
-WHERE IP LIKE '194.94.4%';
+WHERE IP LIKE '194.94.4%'
+OR IP LIKE '185.111.6%';
 
 UPDATE RDNS
 SET DOMAIN = 'kaust.edu.sa (King Abdullah University of Science and Technology)'
