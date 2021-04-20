@@ -577,7 +577,9 @@ if [ "$STRIDES_SCOPE" == "public" ]; then
         http_statuses,
         referers, bytes_sent, export_time, file_exts)
         SELECT
-            acc, agent, ip, domain,
+            acc,
+            substr(agent,0,200),
+            ip, domain,
             domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
             replace(cmds,' ',','),
             replace(status,' ',','),
@@ -601,7 +603,9 @@ else
         http_statuses,
         referers, bytes_sent, export_time, file_exts)
         SELECT
-            acc, agent, ip, domain,
+            acc,
+            substr(agent,0,200),
+            ip, domain,
             domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
             replace(cmds,' ',','),
             replace(status,' ',','),
@@ -609,6 +613,7 @@ else
             $DATASET.map_extension(acc)
         FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
         WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
+        AND start between '2016-10-01' and '2020-04-21'
 ENDOFQUERY
     )
 
@@ -916,7 +921,7 @@ echo " ###  copy to filesystem"
 if [ "$STRIDES_SCOPE" == "private" ]; then
     QUERY=$(cat <<-ENDOFQUERY
     DELETE from $DATASET.summary_export
-    where source='OP' and 
+    where source='OP' and
       (host not like '%download%' or
        consent='public')
 ENDOFQUERY
@@ -932,6 +937,8 @@ ENDOFQUERY
         "..." AS remote_ip,
         "..." AS city_name,
         CASE
+            WHEN regexp_contains(domain, r'.nih.gov') THEN domain
+            WHEN regexp_contains(domain, r'Unknown') then domain
             WHEN regexp_contains(domain, r'AWS') THEN domain
             WHEN regexp_contains(domain, r'GCP') THEN domain
             WHEN regexp_contains(domain, r'\.edu\.au') THEN '*.edu.au'
@@ -939,8 +946,9 @@ ENDOFQUERY
             WHEN regexp_contains(domain, r'\.ed') THEN '*.edu'
             WHEN regexp_contains(domain, r'\.edu') THEN '*.edu'
             WHEN regexp_contains(domain, r'\.gov') THEN '*.gov'
-            WHEN regexp_contains(domain, r'\.ac.uk') THEN '*.ac.uk'
-            WHEN regexp_contains(domain, r'\.ac.jp') THEN '*.ac.jp'
+            WHEN regexp_contains(domain, r'ebi\.ac\.uk') THEN domain
+            WHEN regexp_contains(domain, r'\.ac\.uk') THEN '*.ac.uk'
+            WHEN regexp_contains(domain, r'\.ac\.jp') THEN '*.ac.jp'
             WHEN regexp_contains(domain, r'\.cn') THEN '*.cn'
             WHEN regexp_contains(domain, r'\.cn\.') THEN '*.cn'
             WHEN regexp_contains(domain, r'hinamobile') THEN '*.cn'

@@ -19,7 +19,7 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 #    --use_legacy_sql=false \
 #    "select source, accepted, count(*) as parsed_count from (select source, accepted from $DATASET.gs_parsed union all select source, accepted from $DATASET.s3_parsed) group by source, accepted order by source"
 
-echo $DATASET
+echo "$DATASET"
 
 bq -q query \
     --format "$FORMAT" \
@@ -201,18 +201,28 @@ bq -q query \
     --max_rows 10000 \
 "SELECT case when user_agent like '%toolkit%' then 'toolkit' when user_agent like '%cli%' then 'cli' else user_agent end as agent_type, sum(num_requests) as sessions FROM $DATASET.summary_export export group by agent_type order by sessions desc limit 50"
 
-bq -q query \
-    --use_legacy_sql=false \
-    --format "$FORMAT" \
-    "SELECT CASE WHEN key LIKE '%.cram%' THEN 'cram,crai' WHEN key LIKE '%.crai%' THEN 'cram,crai' WHEN key LIKE '%.bam%' THEN 'bam,bai' WHEN key LIKE '%.bai%' THEN 'bam,bai' WHEN key like '%.fastq.gz%' THEN 'fastq.gz' WHEN key like '%.fq.gz%' THEN 'fq.gz' WHEN key like '%.fastq.%' THEN 'fastq' WHEN key like '%.sam%' THEN 'sam' ELSE 'other' END AS type, format('%\'d',COUNT(*)) AS cnt, format('%\'d', cast(AVG(size) as int64)) AS average_size FROM $DATASET.objects_uniq GROUP BY type order by type"
+if [ "$STRIDES_SCOPE" == "private" ]; then
 
-bq -q query \
-    --use_legacy_sql=false \
-    --format "$FORMAT" \
-    "SELECT distinct source || '/' || bucket as unlogged_bucket from $DATASET.objects where source || '/' || bucket not in (select distinct source || '/' || regexp_extract(bucket,r'^[\S]+') from $DATASET.summary_export) order by unlogged_bucket"
+    bq -q query \
+        --use_legacy_sql=false \
+        --format "$FORMAT" \
+        "SELECT bucket, source, domain, country_code, count(*) as sessions FROM strides_analytics.summary_export_ca_masked group by bucket, source, domain, country_code order by count(*) desc"
 
-bq -q query \
-    --use_legacy_sql=false \
-    --format "$FORMAT" \
-    "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from $DATASET.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from $DATASET.objects) order by unlisted_bucket"
+else
 
+    bq -q query \
+        --use_legacy_sql=false \
+        --format "$FORMAT" \
+        "SELECT CASE WHEN key LIKE '%.cram%' THEN 'cram,crai' WHEN key LIKE '%.crai%' THEN 'cram,crai' WHEN key LIKE '%.bam%' THEN 'bam,bai' WHEN key LIKE '%.bai%' THEN 'bam,bai' WHEN key like '%.fastq.gz%' THEN 'fastq.gz' WHEN key like '%.fq.gz%' THEN 'fq.gz' WHEN key like '%.fastq.%' THEN 'fastq' WHEN key like '%.sam%' THEN 'sam' ELSE 'other' END AS type, format('%\'d',COUNT(*)) AS cnt, format('%\'d', cast(AVG(size) as int64)) AS average_size FROM $DATASET.objects_uniq GROUP BY type order by type"
+
+    bq -q query \
+        --use_legacy_sql=false \
+        --format "$FORMAT" \
+        "SELECT distinct source || '/' || bucket as unlogged_bucket from $DATASET.objects where source || '/' || bucket not in (select distinct source || '/' || regexp_extract(bucket,r'^[\S]+') from $DATASET.summary_export) order by unlogged_bucket"
+
+    bq -q query \
+        --use_legacy_sql=false \
+        --format "$FORMAT" \
+        "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from $DATASET.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from $DATASET.objects) order by unlisted_bucket"
+
+fi # public
