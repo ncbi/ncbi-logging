@@ -69,7 +69,7 @@ EOF
 
     gsutil ls -lR "$PARSE_BUCKET/logs_gs_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
 
-    bq rm -f "$DATASET.gs_parsed"
+    bq rm -f "$DATASET.gs_parsed" || true
     bq load \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.gs_parsed" \
@@ -130,7 +130,7 @@ EOF
 
     gsutil ls -lR "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
 
-    bq rm -f "$DATASET.s3_parsed"
+    bq rm -f "$DATASET.s3_parsed" || true
     bq load \
         --max_bad_records 500 \
         --source_format=NEWLINE_DELIMITED_JSON \
@@ -183,12 +183,13 @@ EOF
 
     gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
 
-    bq rm -f "$DATASET.op_parsed"
+    bq rm -f "$DATASET.op_parsed" || true
+#        "$PARSE_BUCKET/logs_op_public/recognized.*" \
     bq load \
         --max_bad_records 5000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.op_parsed" \
-        "$PARSE_BUCKET/logs_op_public/recognized.*" \
+        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
         op_schema_only.json
 
     bq show --schema "$DATASET.op_parsed"
@@ -292,7 +293,7 @@ ENDOFQUERY
 
     # TODO Hack, cause I can't understand bash backtick quoting
     QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed"
+    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
@@ -338,7 +339,7 @@ ENDOFQUERY
     )
 
     QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed"
+    bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
@@ -394,7 +395,7 @@ ENDOFQUERY
     )
 
     QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed"
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
     # shellcheck disable=SC2016
 
     bq query \
@@ -506,7 +507,7 @@ ENDOFQUERY
 
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export"
+    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
@@ -553,7 +554,7 @@ ENDOFQUERY
 
     QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped"
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped" || true
     # shellcheck disable=SC2016
     bq query \
     --destination_table "$DATASET.summary_grouped" \
@@ -576,7 +577,9 @@ if [ "$STRIDES_SCOPE" == "public" ]; then
         http_statuses,
         referers, bytes_sent, export_time, file_exts)
         SELECT
-            acc, agent, ip, domain,
+            acc,
+            substr(agent,0,200),
+            ip, domain,
             domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
             replace(cmds,' ',','),
             replace(status,' ',','),
@@ -600,7 +603,9 @@ else
         http_statuses,
         referers, bytes_sent, export_time, file_exts)
         SELECT
-            acc, agent, ip, domain,
+            acc,
+            substr(agent,0,200),
+            ip, domain,
             domain, 'OP', cnt, cast (start as datetime), cast (\\\`end\\\` as datetime),
             replace(cmds,' ',','),
             replace(status,' ',','),
@@ -608,6 +613,7 @@ else
             $DATASET.map_extension(acc)
         FROM \\\`ncbi-logmon.strides_analytics.op_sess\\\`
         WHERE regexp_contains(acc,r'[DES]R[RZ][0-9]{5,10}')
+        AND start between '2016-10-01' and '2020-04-21'
 ENDOFQUERY
     )
 
@@ -842,7 +848,7 @@ ENDOFQUERY
     QUERY="${QUERY//\\/}"
 
     bq cp -f "$DATASET.summary_export" "$DATASET.summary_export_$YESTERDAY"
-    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export"
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export" || true
 
     # shellcheck disable=SC2016
     bq query \
@@ -854,7 +860,7 @@ ENDOFQUERY
     bq show --schema "$DATASET.summary_export"
 
     OLD=$(date -d "-7 days" "+%Y%m%d")
-    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_$OLD"
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_$OLD" || true
 
 echo " ### fix summary_export for NIH"
     QUERY=$(cat <<-ENDOFQUERY
@@ -915,9 +921,9 @@ echo " ###  copy to filesystem"
 if [ "$STRIDES_SCOPE" == "private" ]; then
     QUERY=$(cat <<-ENDOFQUERY
     DELETE from $DATASET.summary_export
-    where source='OP' and 
-      (host not like '%download%' or
-       consent='public')
+    where source='OP' and
+      ( host not like '%download%' or
+        consent in ('public', 'none', 'Unknown') )
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
@@ -931,6 +937,8 @@ ENDOFQUERY
         "..." AS remote_ip,
         "..." AS city_name,
         CASE
+            WHEN regexp_contains(domain, r'.nih.gov') THEN domain
+            WHEN regexp_contains(domain, r'Unknown') then domain
             WHEN regexp_contains(domain, r'AWS') THEN domain
             WHEN regexp_contains(domain, r'GCP') THEN domain
             WHEN regexp_contains(domain, r'\.edu\.au') THEN '*.edu.au'
@@ -938,8 +946,9 @@ ENDOFQUERY
             WHEN regexp_contains(domain, r'\.ed') THEN '*.edu'
             WHEN regexp_contains(domain, r'\.edu') THEN '*.edu'
             WHEN regexp_contains(domain, r'\.gov') THEN '*.gov'
-            WHEN regexp_contains(domain, r'\.ac.uk') THEN '*.ac.uk'
-            WHEN regexp_contains(domain, r'\.ac.jp') THEN '*.ac.jp'
+            WHEN regexp_contains(domain, r'ebi\.ac\.uk') THEN domain
+            WHEN regexp_contains(domain, r'\.ac\.uk') THEN '*.ac.uk'
+            WHEN regexp_contains(domain, r'\.ac\.jp') THEN '*.ac.jp'
             WHEN regexp_contains(domain, r'\.cn') THEN '*.cn'
             WHEN regexp_contains(domain, r'\.cn\.') THEN '*.cn'
             WHEN regexp_contains(domain, r'hinamobile') THEN '*.cn'
@@ -954,7 +963,9 @@ ENDOFQUERY
 #    QUERY="${QUERY//\\/}"
 
 echo " ###  masking"
-    bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked"
+    bq cp -f "strides_analytics.summary_export_ca_masked" "strides_analytics.summary_export_ca_masked_$YESTERDAY"
+    bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked" || true
+
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
@@ -964,7 +975,7 @@ echo " ###  masking"
     --max_rows=5 \
     "$QUERY"
 else
-    bq rm -f "$DATASET.op_parsed"
+    bq rm -f "$DATASET.op_parsed" || true
 fi
 
 echo "bigquery_export.sh complete"
