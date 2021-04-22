@@ -359,60 +359,67 @@ values ('OP', 'srafiles36',
     '', 'false', 'nginx log', 'hot');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
+values ('OP', 'faspgap',
+    'applog rotated', 'Applog',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fasp*/access_*.gz',
+    '', 'false', 'nginx log', 'hot', 'private');
+
+insert into buckets (cloud_provider, bucket_name, description,
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap1',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap1/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap21',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap21/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap31',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap31/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap11',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap11/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap12',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap12/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap22',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap22/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap3',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fapgap3/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'faspgap32',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/faspgap32/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)
@@ -496,13 +503,6 @@ insert into buckets (cloud_provider, bucket_name, description,
 values ('OP', 'gapsview21',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gapsview21/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
-
-insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
-values ('OP', 'faspgap',
-    'applog rotated', 'Applog',
-    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/fasp*/access_*.gz',
     '', 'false', 'nginx log', 'hot');
 
 insert into buckets (cloud_provider, bucket_name, description,
@@ -611,6 +611,8 @@ values ('OP', 'sweb',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/weblog/local_archive/*/*/*/sweb*/*.gz',
     '', 'false', 'nginx log', 'hot');
+
+
 
 -- SRA-8546
 insert into buckets (cloud_provider, bucket_name, description,

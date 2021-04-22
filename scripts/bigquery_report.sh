@@ -206,7 +206,7 @@ if [ "$STRIDES_SCOPE" == "private" ]; then
     bq -q query \
         --use_legacy_sql=false \
         --format "$FORMAT" \
-        "SELECT bucket, source, domain, country_code, count(*) as sessions FROM strides_analytics.summary_export_ca_masked group by bucket, source, domain, country_code order by count(*) desc"
+        "SELECT bucket, source, domain, country_code, count(*) as sessions, count(distinct accession) as num_accesions FROM strides_analytics.summary_export_ca_masked group by bucket, source, domain, country_code order by count(*) desc"
 
 else
 

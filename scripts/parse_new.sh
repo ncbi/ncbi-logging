@@ -265,3 +265,7 @@ rm -rf "$PARSE_DEST"
 echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
 echo
 done
+
+echo " Done"
+date
+

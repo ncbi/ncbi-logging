@@ -922,8 +922,8 @@ if [ "$STRIDES_SCOPE" == "private" ]; then
     QUERY=$(cat <<-ENDOFQUERY
     DELETE from $DATASET.summary_export
     where source='OP' and
-      (host not like '%download%' or
-       consent='public')
+      ( host not like '%download%' or
+        consent in ('public', 'none', 'Unknown') )
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
@@ -963,7 +963,9 @@ ENDOFQUERY
 #    QUERY="${QUERY//\\/}"
 
 echo " ###  masking"
+    bq cp -f "strides_analytics.summary_export_ca_masked" "strides_analytics.summary_export_ca_masked_$YESTERDAY"
     bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked" || true
+
     # shellcheck disable=SC2016
     bq query \
     --project_id ncbi-logmon \
