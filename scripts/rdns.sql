@@ -23,7 +23,7 @@ drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210420.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210422.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -1332,6 +1332,18 @@ where ip like '148.177.%';
 update rdns
 set domain='cmu.edu (Carngie Mellon)'
 where ip like '128.2.%';
+
+update rdns
+set domain='mssm.edu (Mount Sinai School of Medicine)'
+where ip like '146.203.%';
+
+update rdns
+set domain='meduniwien.ac.at (Medical University of Vienna)'
+where ip like '193.171.1%';
+
+update rdns
+set domain='partners.org (Brigham & Womens Hospital)'
+where ip like '170.223.%';
 
 
 UPDATE RDNS
