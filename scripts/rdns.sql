@@ -23,7 +23,7 @@ drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210422.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210426.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -603,6 +603,7 @@ UPDATE RDNS
 SET DOMAIN = 'nih.gov (NIH)'
 WHERE IP LIKE '128.231.%' OR IP LIKE '156.40.2%'
 OR IP LIKE '165.112.%'
+OR IP LIKE '137.187.%'
 OR IP LIKE '2607:f220:%';
 
 UPDATE RDNS
