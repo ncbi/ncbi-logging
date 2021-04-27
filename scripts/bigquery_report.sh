@@ -208,6 +208,13 @@ if [ "$STRIDES_SCOPE" == "private" ]; then
         --format "$FORMAT" \
         "SELECT bucket, source, domain, country_code, count(*) as sessions, count(distinct accession) as num_accesions FROM strides_analytics.summary_export_ca_masked group by bucket, source, domain, country_code order by count(*) desc"
 
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    --max_rows 10000 \
+"select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests, internal from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests, domain like '%nih.gov%' as internal from strides_analytics.summary_export_ca_masked where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2020-01-01' ) group by internal, day order by internal, day"
+
+
 else
 
     bq -q query \

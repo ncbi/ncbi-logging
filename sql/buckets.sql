@@ -492,25 +492,11 @@ values ('OP', 'ftp33',
     '', 'false', 'nginx log', 'hot');
 
 insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
-values ('OP', 'gapsview11',
-    'applog rotated', 'Applog',
-    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gapsview11/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
-
-insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
-values ('OP', 'gapsview21',
-    'applog rotated', 'Applog',
-    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gapsview21/access.log_??????*gz',
-    '', 'false', 'nginx log', 'hot');
-
-insert into buckets (cloud_provider, bucket_name, description,
-    owner, log_bucket, service_account, immutable, format, storage_class)
+    owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'gapsview',
     'applog rotated', 'Applog',
     '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gaps*/access_*.gz',
-    '', 'false', 'nginx log', 'hot');
+    '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class)

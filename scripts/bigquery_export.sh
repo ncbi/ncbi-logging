@@ -942,24 +942,29 @@ ENDOFQUERY
             WHEN regexp_contains(domain, r'AWS') THEN domain
             WHEN regexp_contains(domain, r'GCP') THEN domain
             WHEN regexp_contains(domain, r'\.edu\.au') THEN '*.edu.au'
-            WHEN regexp_contains(domain, r'\.edu') THEN '*.edu'
-            WHEN regexp_contains(domain, r'\.ed') THEN '*.edu'
-            WHEN regexp_contains(domain, r'\.edu') THEN '*.edu'
+            WHEN regexp_contains(domain, r'\.edu') THEN '*.edu (' || country_code || ')'
+            WHEN regexp_contains(domain, r'\.ed') THEN '*.edu ('  || country_code || ')'
+            WHEN regexp_contains(domain, r'\.edu') THEN '*.edu (' || country_code || ')'
             WHEN regexp_contains(domain, r'\.gov') THEN '*.gov'
-            WHEN regexp_contains(domain, r'ebi\.ac\.uk') THEN domain
-            WHEN regexp_contains(domain, r'\.ac\.uk') THEN '*.ac.uk'
-            WHEN regexp_contains(domain, r'\.ac\.jp') THEN '*.ac.jp'
-            WHEN regexp_contains(domain, r'\.cn') THEN '*.cn'
-            WHEN regexp_contains(domain, r'\.cn\.') THEN '*.cn'
-            WHEN regexp_contains(domain, r'hinamobile') THEN '*.cn'
-            WHEN regexp_contains(domain, r'\.com') THEN '*.com'
-            ELSE "..."
+            WHEN regexp_contains(domain, r'ebi\.ac\.uk') THEN domain  || ' (' || country_code || ')'
+            WHEN regexp_contains(domain, r'\.ac\.uk') THEN '*.ac.uk (' || country_code || ')'
+            WHEN regexp_contains(domain, r'\.ac\.jp') THEN '*.ac.jp (' || country_code || ')'
+            WHEN regexp_contains(domain, r'\.cn') THEN '*.cn ('  || country_code || ')'
+            WHEN regexp_contains(domain, r'\.cn\.') THEN '*.cn (' || country_code || ')'
+            WHEN regexp_contains(domain, r'hinamobile') THEN '*.cn (' || country_code || ')'
+            WHEN regexp_contains(domain, r'\.com') THEN '*.com ('  || country_code || ')'
+            ELSE '(' || country_code || ')'
          END AS domain,
          regexp_replace(user_agent, r'phid=[0-9a-z,=.]+', '...') as user_agent
         )
     from $DATASET.summary_export
+    where consent not in
+    ('DS-MHIV', 'DS-INF', 'DS-PTL', 'DS-MRUH')
 ENDOFQUERY
 )
+
+# TODO: Use cloud_analytics.isConsentPublic()
+
 #    QUERY="${QUERY//\\/}"
 
 echo " ###  masking"
