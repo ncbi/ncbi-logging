@@ -149,116 +149,125 @@ for LOG_BUCKET in "${buckets[@]}"; do
         continue
     fi
     ls -hl "$TGZ"
+    tarsz=$(stat -c %s "$TGZ")
+    if [ "$tarsz" -lt 100 ]; then
+        echo " $TGZ too small ($tarsz bytes), skipping"
+        continue
+    fi
 
     echo "  Counting $TGZ ..."
-    totalwc=$(tar -xaOf "$TGZ" "$WILDCARD" | wc -l | cut -f1 -d' ')
+    totalwc=$(tar -xaOf "$TGZ" "$WILDCARD" | wc -l | cut -f1 -d' ') || true
     #touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
-    VERSION=$($PARSER_BIN --version)
-    echo "  Parsing $TGZ (pattern=$WILDCARD), $totalwc lines with $PARSER_BIN $VERSION..."
+    if [ "$totalwc" -gt 0 ]; then
+        VERSION=$($PARSER_BIN --version)
+        echo "  Parsing $TGZ (pattern=$WILDCARD), $totalwc lines with $PARSER_BIN $VERSION..."
 
-    BASE="$LOG_BUCKET.$YESTERDAY_DASH"
-    echo "    BASE is $BASE"
+        BASE="$LOG_BUCKET.$YESTERDAY_DASH"
+        echo "    BASE is $BASE"
 
-    mkfifo "$BASE.good.jsonl"
+        mkfifo "$BASE.good.jsonl"
 
-    # shellcheck disable=SC2016
-    split -a 3 -d -l 10000000 \
-        --filter='gzip -9 > $FILE.jsonl.gz' \
-        - "recognized.$BASE."  \
-        < "$BASE.good.jsonl" &
+        # shellcheck disable=SC2016
+        split -a 3 -d -l 10000000 \
+            --filter='gzip -9 > $FILE.jsonl.gz' \
+            - "recognized.$BASE."  \
+            < "$BASE.good.jsonl" &
 
-    set +e
-    tar -xaOf "$TGZ" "$WILDCARD" | \
-        time "$PARSER_BIN" -f -t 2 "$BASE" \
-        > stdout."$BASE" \
-        2> stderr."$BASE"
+        set +e
+        tar -xaOf "$TGZ" "$WILDCARD" | \
+            time "$PARSER_BIN" -f -t 2 "$BASE" \
+            > stdout."$BASE" \
+            2> stderr."$BASE"
 
-    echo "    Returned $?"
-    rm -f "$TGZ"
-    head -v stderr."$BASE"
-    echo "==="
+        echo "    Returned $?"
+        rm -f "$TGZ"
+        head -v stderr."$BASE"
+        echo "==="
 
-    ls -l
+        ls -l
 
-    echo
+        echo
 
-    echo "  Record format is:"
-    zcat recognized."$BASE".*.jsonl.gz | head -1 | jq -SM .
+        echo "  Record format is:"
+        zcat recognized."$BASE".*.jsonl.gz | head -1 | jq -SM .
 
 
-    touch "$BASE.bad.jsonl"
-    touch "$BASE.review.jsonl"
-    touch "$BASE.ugly.jsonl"
-    touch "$BASE.unrecog.jsonl"
+        touch "$BASE.bad.jsonl"
+        touch "$BASE.review.jsonl"
+        touch "$BASE.ugly.jsonl"
+        touch "$BASE.unrecog.jsonl"
 
-    cat "$BASE.unrecog.jsonl" \
-        "$BASE.bad.jsonl" \
-        "$BASE.review.jsonl" \
-        "$BASE.ugly.jsonl" \
-        > "unrecognized.$BASE.jsonl"
+        cat "$BASE.unrecog.jsonl" \
+            "$BASE.bad.jsonl" \
+            "$BASE.review.jsonl" \
+            "$BASE.ugly.jsonl" \
+            > "unrecognized.$BASE.jsonl"
 
-    rm -f "$BASE.unrecog.jsonl" "$BASE.bad.jsonl" "$BASE.review.jsonl" \
-        "$BASE.ugly.jsonl" "$BASE.good.jsonl"
+        rm -f "$BASE.unrecog.jsonl" "$BASE.bad.jsonl" "$BASE.review.jsonl" \
+            "$BASE.ugly.jsonl" "$BASE.good.jsonl"
 
-    mv "$BASE.stats.jsonl" "stats.$BASE.jsonl"
+        mv "$BASE.stats.jsonl" "stats.$BASE.jsonl"
 
-    # shellcheck disable=SC2016
-    recwc=$(zcat recognized."$BASE".*.jsonl.gz | wc -l | cut -f1 -d' ')
-    printf "Recognized lines:   %8d\n" "$recwc"
-    unrecwc=$(wc -l "unrecognized.$BASE.jsonl" | cut -f1 -d' ')
-    printf "Unrecognized lines: %8d\n" "$unrecwc"
+        # shellcheck disable=SC2016
+        recwc=$(zcat recognized."$BASE".*.jsonl.gz | wc -l | cut -f1 -d' ')
+        printf "Recognized lines:   %8d\n" "$recwc"
+        unrecwc=$(wc -l "unrecognized.$BASE.jsonl" | cut -f1 -d' ')
+        printf "Unrecognized lines: %8d\n" "$unrecwc"
 
-    #if [ ! -s "recognized.$BASE.jsonl" ]; then
-    #    echo "ERROR: Empty recognized.$BASE.jsonl"
-    #    #continue
-    #fi
+        #if [ ! -s "recognized.$BASE.jsonl" ]; then
+        #    echo "ERROR: Empty recognized.$BASE.jsonl"
+        #    #continue
+        #fi
 
-    #if [ ! -s "unrecognized.$BASE.jsonl" ]; then
-    #    rm -f "unrecognized.$BASE.jsonl"
-    #fi
+        #if [ ! -s "unrecognized.$BASE.jsonl" ]; then
+        #    rm -f "unrecognized.$BASE.jsonl"
+        #fi
 
-    echo "  Gzipping ..."
-    gzip -f -v ./*recognized."$BASE"*jsonl
-    find ./ -name "*$BASE*" -size 0c -exec rm -f {} \;
+        echo "  Gzipping ..."
+        gzip -f -v ./*recognized."$BASE"*jsonl
+        find ./ -name "*$BASE*" -size 0c -exec rm -f {} \;
 
-    {
-        printf "{"
-        printf '"log_bucket": "%s",' "$LOG_BUCKET"
-        printf '"provider": "%s",' "$PROVIDER"
-        printf '"log_date": "%s",' "$YESTERDAY"
-        printf '"parse_date": "%s",' "$DATE"
-        printf '"parser_version" : "%s",' "$VERSION"
-        printf '"total_lines" : %d,' "$totalwc"
-        printf '"recognized_lines" : %d,' "$recwc"
-        printf '"unrecognized_lines" : %d'  "$unrecwc"
-        printf "}"
-    } | jq -S -c . > "summary.$BASE.jsonl"
-echo "  Summary:"
-jq -M -S . < summary."$BASE".jsonl | indent
+        {
+            printf "{"
+            printf '"log_bucket": "%s",' "$LOG_BUCKET"
+            printf '"provider": "%s",' "$PROVIDER"
+            printf '"log_date": "%s",' "$YESTERDAY"
+            printf '"parse_date": "%s",' "$DATE"
+            printf '"parser_version" : "%s",' "$VERSION"
+            printf '"total_lines" : %d,' "$totalwc"
+            printf '"recognized_lines" : %d,' "$recwc"
+            printf '"unrecognized_lines" : %d'  "$unrecwc"
+            printf "}"
+        } | jq -S -c . > "summary.$BASE.jsonl"
+        echo "  Summary:"
+        jq -M -S . < summary."$BASE".jsonl | indent
 
-ls -l
-if [ "$STRIDES_SCOPE" = "public" ]; then
-    DEST_BUCKET="gs://logmon_logs_parsed_us"
-    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
-    export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
-    gcloud config set account 253716305623-compute@developer.gserviceaccount.com
-fi
+        ls -l
+        if [ "$STRIDES_SCOPE" = "public" ]; then
+            DEST_BUCKET="gs://logmon_logs_parsed_us"
+            export GOOGLE_APPLICATION_CREDENTIALS=$HOME/logmon.json
+            export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
+            gcloud config set account 253716305623-compute@developer.gserviceaccount.com
+        fi
 
-if [ "$STRIDES_SCOPE" = "private" ]; then
-    export GOOGLE_APPLICATION_CREDENTIALS="$HOME/logmon_private.json"
-    DEST_BUCKET="gs://logmon_logs_parsed_private"
-fi
+        if [ "$STRIDES_SCOPE" = "private" ]; then
+            export GOOGLE_APPLICATION_CREDENTIALS="$HOME/logmon_private.json"
+            DEST_BUCKET="gs://logmon_logs_parsed_private"
+        fi
 
-echo "  Uploading to $DEST_BUCKET..."
-gsutil -q cp ./*ecognized."$BASE"* "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
-gsutil -q cp ./std*."$BASE"* "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
-gsutil -q cp ./stats."$BASE".jsonl "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
-gsutil -q cp ./summary."$BASE".jsonl "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+        echo "  Uploading to $DEST_BUCKET..."
+        gsutil -q cp ./*ecognized."$BASE"* "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+        gsutil -q cp ./std*."$BASE"* "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+        gsutil -q cp ./stats."$BASE".jsonl "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
+        gsutil -q cp ./summary."$BASE".jsonl "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
 
-gsutil ls -lh \
-    "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/*$BASE*" | \
-    indent
+        gsutil ls -lh \
+            "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/*$BASE*" | \
+            indent
+    else
+        echo "File has $totalwc records, skipping"
+    fi # totalwc gt 0
 
 cd ..
 rm -rf "$PARSE_DEST"
@@ -266,6 +275,6 @@ echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
 echo
 done
 
-echo " Done"
+echo " Done parse_new"
 date
 

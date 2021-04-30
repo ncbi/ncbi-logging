@@ -15,8 +15,10 @@ fi
 
 if [ "$skipload" = false ]; then
     gsutil du -s -h "$PARSE_BUCKET/logs_gs_$STRIDES_SCOPE/"
+    gsutil du -s -h "$PARSE_BUCKET/logs_op_$STRIDES_SCOPE/"
     gsutil du -s -h "$PARSE_BUCKET/logs_s3_$STRIDES_SCOPE/"
     gsutil du -s -h "$MIRROR_BUCKET/gs_$STRIDES_SCOPE"
+    gsutil du -s -h "$MIRROR_BUCKET/op_$STRIDES_SCOPE"
     gsutil du -s -h "$MIRROR_BUCKET/s3_$STRIDES_SCOPE"
 
 # TODO: Partition/cluster large tables for incremental inserts and retrievals

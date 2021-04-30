@@ -41,8 +41,8 @@ echo "parse OP"
 
 
 dow=$(date +%u)
-if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then # Mondays and Thursday
-#if [ "$dow" = "1" ] ; then # Mondays
+if [ "$dow" = "1" ];  then
+#if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then # Mondays and Thursday
     echo "bigquery_export"
     #./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     #./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
