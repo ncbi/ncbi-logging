@@ -116,7 +116,7 @@ OP,ftp22,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tm
 OP,ftp31,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp31/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
 OP,ftp32,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp32/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
 OP,ftp33,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/ftp33/access.log_??????*gz,"",public,false,"nginx log","nginx log",hot
-OP,gapsview,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gaps*/access_*.gz,"",private,false,"nginx log","nginx log",hot
+OP,gapsview,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/*gap*/access*.gz,"",private,false,"nginx log","nginx log",hot
 OP,sdl-index-err,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*err_*.gz,"",public,false,"nginx log",traceweb,hot
 OP,sdl-index-log,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*log_*.gz,"",public,false,"nginx log",traceweb,hot
 OP,sdl-index-trace,"applog rotated",Applog,/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/applog/local_archive/*/*/*/traceweb*/index.*trace_*.gz,"",public,false,"nginx log",traceweb,hot

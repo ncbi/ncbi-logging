@@ -15,7 +15,7 @@ mkdir -p "$HOME"/logs
 
 homespace=$( df  "$HOME" | tail  -1 | tr -s ' ' | cut -d ' ' -f 4)
 if [ "$homespace" -lt 500000 ]; then
-    df -HT "$HOME" | mailx -s "$HOME low on space" vartanianmh@ncbi.nlm.nih.gov
+    df -HT "$HOME" | mailx -s "$HOST $HOME low on space" vartanianmh@ncbi.nlm.nih.gov
 fi
 
 echo "mirror.sh GS"
@@ -41,7 +41,7 @@ echo "parse OP"
 
 
 dow=$(date +%u)
-if [ "$dow" = "1" ];  then
+if [ "$dow" = "3" ];  then
 #if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then # Mondays and Thursday
     echo "bigquery_export"
     #./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log

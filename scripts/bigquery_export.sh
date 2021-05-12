@@ -187,11 +187,12 @@ EOF
 
     bq rm -f "$DATASET.op_parsed" || true
 #        "$PARSE_BUCKET/logs_op_public/recognized.*" \
+#        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
     bq load \
-        --max_bad_records 5000 \
+        --max_bad_records 50000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.op_parsed" \
-        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
+        "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
         op_schema_only.json
 
     bq show --schema "$DATASET.op_parsed"

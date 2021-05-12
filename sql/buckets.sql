@@ -495,7 +495,7 @@ insert into buckets (cloud_provider, bucket_name, description,
     owner, log_bucket, service_account, immutable, format, storage_class, scope)
 values ('OP', 'gapsview',
     'applog rotated', 'Applog',
-    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/gaps*/access_*.gz',
+    '/panfs/pan1.be-md.ncbi.nlm.nih.gov/applog_db_tmp/database/logarchive/ftp.http/local_archive/*/*/*/*gap*/access*.gz',
     '', 'false', 'nginx log', 'hot', 'private');
 
 insert into buckets (cloud_provider, bucket_name, description,
