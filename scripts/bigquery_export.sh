@@ -645,6 +645,8 @@ ENDOFQUERY
         bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ###  uniq_ips"
+    bq query --use_legacy_sql=false --batch=true "DROP TABLE IF EXISTS $DATASET.uniq_ips"
+
     QUERY=$(cat <<-ENDOFQUERY
 
     CREATE OR REPLACE TABLE $DATASET.uniq_ips
