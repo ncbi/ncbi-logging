@@ -260,6 +260,10 @@ ENDOFQUERY
     WHEN regexp_contains(extension, '[DES]R[RZ]{6,10}') THEN 'SRA ETL'
     WHEN regexp_contains(extension, r'\.tar.gz') THEN 'TARGZ'
     WHEN regexp_contains(extension, r'\.tar') THEN 'TAR'
+    WHEN regexp_contains(extension, r'BLAST_DB/' THEN 'blast_db'
+    WHEN regexp_contains(extension, r'RAO/' THEN 'rao'
+    WHEN regexp_contains(extension, r'SPDI/' THEN 'spdi'
+    WHEN regexp_contains(extension, r'VCF/' THEN 'vcf'
     ELSE 'other'
     END)
 ENDOFQUERY
@@ -526,6 +530,29 @@ ENDOFQUERY
 bq -q query \
     --use_legacy_sql=false \
     "delete from $DATASET.detail_export where start_ts < '2000-01-01'"
+
+
+#if [ "$STRIDES_SCOPE" == "public" ]; then
+#    echo " ###  improve file_exts
+#        QUERY=$(cat <<-ENDOFQUERY
+#        update $DATASET.detail_export
+#        set
+#        extension=
+#            case
+#                when request_uri like '%BLAST_DB/%' then 'blast_db'
+#                when request_uri like '%RAO/%' then 'rao'
+#                when request_uri like '%SPDI/%' then 'spdi'
+#                when request_uri like '%VCF/%' then 'vcf'
+#            else request_uri
+#            end
+#    where request_uri like '%cov2%'
+#
+#ENDOFQUERY
+#    )
+#        QUERY="${QUERY//\\/}"
+#
+#        bq query --use_legacy_sql=false --batch=true "$QUERY"
+#fi
 
 echo " ###  summary_grouped"
     QUERY=$(cat <<-ENDOFQUERY
