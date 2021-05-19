@@ -260,10 +260,10 @@ ENDOFQUERY
     WHEN regexp_contains(extension, '[DES]R[RZ]{6,10}') THEN 'SRA ETL'
     WHEN regexp_contains(extension, r'\.tar.gz') THEN 'TARGZ'
     WHEN regexp_contains(extension, r'\.tar') THEN 'TAR'
-    WHEN regexp_contains(extension, r'BLAST_DB/' THEN 'blast_db'
-    WHEN regexp_contains(extension, r'RAO/' THEN 'rao'
-    WHEN regexp_contains(extension, r'SPDI/' THEN 'spdi'
-    WHEN regexp_contains(extension, r'VCF/' THEN 'vcf'
+    WHEN regexp_contains(extension, r'BLAST_DB/') THEN 'blast_db'
+    WHEN regexp_contains(extension, r'RAO/') THEN 'rao'
+    WHEN regexp_contains(extension, r'SPDI/') THEN 'spdi'
+    WHEN regexp_contains(extension, r'VCF/') THEN 'vcf'
     ELSE 'other'
     END)
 ENDOFQUERY
