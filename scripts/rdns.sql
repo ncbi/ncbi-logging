@@ -23,7 +23,7 @@ drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
 .import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210426.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210511.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -98,7 +98,8 @@ WHERE IP = '133.1.63.238';
 
 UPDATE RDNS
 SET DOMAIN = 'u-tokyo.ac.jp'
-WHERE IP LIKE '202.175.1%';
+WHERE IP LIKE '202.175.1%'
+or ip like '202.242.%';
 
 
 UPDATE RDNS
@@ -244,6 +245,7 @@ SET DOMAIN = 'utexas.edu (University of Texas)'
 WHERE IP LIKE '206.76.%'
   OR IP LIKE'206.77.%'
 OR IP LIKE '129.112.%'
+OR IP LIKE '143.111.%'
 OR IP LIKE '129.106.%';
 
 
@@ -512,6 +514,10 @@ WHERE IP LIKE '211.69.141.%';
 UPDATE RDNS
 SET DOMAIN = 'ucdavis.edu (University of California Davis)'
 WHERE IP LIKE '128.120.%';
+
+UPDATE RDNS
+SET DOMAIN = 'ucsd.edu (University of California San Diego)'
+WHERE IP LIKE '137.110.%';
 
 
 UPDATE RDNS
@@ -1022,7 +1028,8 @@ where IP like '134.95.%';
 
 UPDATE RDNS
 SET DOMAIN='pitt.edu (University of Pittsburgh)'
-where IP like '130.49.%';
+where IP like '130.49.%'
+or ip like '136.142.%';
 
 UPDATE RDNS
 SET DOMAIN='tohoku.ac.jp (Tohoku University)'
@@ -1263,7 +1270,23 @@ where ip like '129.237.%';
 
 update rdns
 set domain='att.com (AT&T)'
-where ip like '2600:1700:%';
+where ip like '2600:1700:%'
+or ip like '104.176.%'
+or ip like '104.177.%'
+or ip like '104.178.%'
+or ip like '104.179.%'
+or ip like '104.180.%'
+or ip like '104.181.%'
+or ip like '104.182.%'
+or ip like '104.183.%'
+or ip like '104.184.%'
+or ip like '104.185.%'
+or ip like '104.186.%'
+or ip like '104.187.%'
+or ip like '104.188.%'
+or ip like '104.189.%'
+or ip like '104.190.%'
+or ip like '104.191.%' ;
 
 update rdns
 set domain='nih.go.jp (Japan National Institute of Infectious Diseases)'
@@ -1345,6 +1368,16 @@ where ip like '193.171.1%';
 update rdns
 set domain='partners.org (Brigham & Womens Hospital)'
 where ip like '170.223.%';
+
+update rdns
+set domain='stanford.edu (Stanford University)'
+where
+ip like '171.64.%' or
+ip like '171.65.%' or
+ip like '171.66.%' or
+ip like '171.67.%';
+
+
 
 
 UPDATE RDNS
@@ -1514,7 +1547,8 @@ where IP in (
  '34.226.204.124',
  '35.172.18.176',
  '104.196.216.152',
- '35.173.203.167'
+ '35.173.203.167',
+ '35.221.3.33', '34.86.254.11', '35.245.149.51', '34.86.152.95', '35.236.206.30'
 );
 
 

@@ -100,7 +100,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             gcloud config set account logmon@nih-sra-datastore-protected.iam.gserviceaccount.com
         fi
 
-        echo "Profile is $PROFILE, $PROVIDER rsyncing to $MIRROR..."
+        echo "Profile is $PROFILE, $PROVIDER rsyncing gs://$LOG_BUCKET to $MIRROR..."
 
         gsutil -m rsync "gs://$LOG_BUCKET/" .
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
@@ -238,6 +238,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     if [ "$PROVIDER" != "GS" ] && [ "$PROVIDER" != "Splunk" ]; then
         cd ..
+        echo "Deleting $MIRROR"
         df -HT "$MIRROR"
         rm -rf "$MIRROR"
     fi
