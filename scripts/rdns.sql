@@ -22,8 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210405.json  uniq_ips_public
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210511.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210519.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -97,10 +96,18 @@ WHERE IP = '133.1.63.238';
 
 
 UPDATE RDNS
-SET DOMAIN = 'u-tokyo.ac.jp'
+SET DOMAIN = 'u-tokyo.ac.jp (University of Tokyo)'
 WHERE IP LIKE '202.175.1%'
-or ip like '202.242.%';
+or ip like '202.242.%'
+or ip like '130.69.%';
 
+update rdns
+set domain = 'rcts.pt (University of Lisbon)'
+where ip like '194.117.2%';
+
+update rdns
+set domain = 'essex.ac.uk (University of Essex)'
+where ip like '155.245.%';
 
 UPDATE RDNS
 SET DOMAIN = 'cdc.gov (Centers for Disease Control and Prevention)'
@@ -1376,8 +1383,6 @@ ip like '171.64.%' or
 ip like '171.65.%' or
 ip like '171.66.%' or
 ip like '171.67.%';
-
-
 
 
 UPDATE RDNS
