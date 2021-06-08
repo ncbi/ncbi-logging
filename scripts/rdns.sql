@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210519.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210607.public.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -1409,103 +1409,103 @@ WHERE DOMAIN = 'bc.googleusercontent.com (GCP)'
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Known Virus Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Known Virus Team (GCP)'
 WHERE IP = '35.231.190.137';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '34.73.156.113';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '35.231.230.192';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '35.243.208.79';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '34.73.133.228';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Novel Virus Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Novel Virus Team (GCP)'
 WHERE IP = '34.73.180.208';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Project Testing Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Project Testing Team (GCP)'
 WHERE IP = '34.73.135.146';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Computational Scaling and Indexing Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Computational Scaling and Indexing Team (GCP)'
 WHERE IP IN ('35.237.148.23',
              '35.196.81.205');
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - Machine Learning Team (GCP)'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Machine Learning Team (GCP)'
 WHERE IP = '35.245.82.131';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-clustering'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-rnaseq-clustering'
 WHERE IP = '35.196.70.3';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-metadata'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-rnaseq-metadata'
 WHERE IP = '35.190.160.141';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-splice-variant'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-rnaseq-splice-variant'
 WHERE IP = '35.196.107.66';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-sre-and-var'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-rnaseq-sre-and-var'
 WHERE IP = '35.196.72.10';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-visualization'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-rnaseq-visualization'
 WHERE IP = '35.196.10.168';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-test'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-rnaseq-test'
 WHERE IP = '35.212.2.36';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-rnaseq-gan-gpu'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-rnaseq-gan-gpu'
 WHERE IP = '35.196.150.8';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-pangenome-data-upload'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-pangenome-data-upload'
 WHERE IP = '35.235.88.60';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - aa-pangenome-data-upload'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - aa-pangenome-data-upload'
 WHERE IP = '35.227.101.5';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - vkt-mongodb02'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - vkt-mongodb02'
 WHERE IP = '33.245.126.160';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Hackathon (nih.gov)  - vkt-mongodb02'
+SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - vkt-mongodb02'
 WHERE IP = '35.245.126.160';
 
 update RDNS
@@ -1579,6 +1579,7 @@ select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
 select "export CLOUDSDK_CORE_PROJECT=ncbi-logmon" as hint2;
 select "bq rm -f strides_analytics.rdns" as hint2;
 select "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl" as hint3;
+select "rm -f rdns.db" as hint4;
 
 .headers off
 .output /tmp/rdns.jsonl

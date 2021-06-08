@@ -802,18 +802,38 @@ echo " ### Find internal IAMs IPs"
         or requester like '%820248442686%'
         or requester like '%377855366243%'
         or requester like '%065193671012%'
-        or requester like '%065193671012%'
         or requester like '%182221319577%'
         or requester like '%513880734999%'
         or requester like '%492028860168%'
-        or requester like '%414262389673%'
         or requester like '%036922703339%'
+        or requester like '%350784804014%' )
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.rdns
+    SET DOMAIN="NCBI Internal Research (research.nlm.nih.gov)"
+    WHERE ip in (
+    SELECT distinct ip FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
+        WHERE
+        requester like '%414262389673%'
         or requester like '%293555909480%'
         or requester like '%347258802972%'
-        or requester like '%865472100019%'
-        or requester like '%350784804014%'
-        or requester like '%591266071882%'
-        or requester like '%347258802972%' )
+        or requester like '%865472100019%' )
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+    QUERY=$(cat <<-ENDOFQUERY
+    UPDATE strides_analytics.rdns
+    SET DOMAIN="NCBI Codeathon (codeathon.nlm.nih.gov)"
+    WHERE ip in (
+    SELECT distinct ip FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
+        WHERE
+        requester like '%591266071882%')
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
