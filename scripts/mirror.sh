@@ -247,4 +247,6 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "Done with $LOG_BUCKET"
 done
 
+gzip -9 -v "$LOGFILE"
+
 echo "Done"
