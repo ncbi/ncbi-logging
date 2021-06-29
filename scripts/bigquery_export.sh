@@ -276,6 +276,7 @@ ENDOFQUERY
     WHEN regexp_contains(extension, r'vcf/') THEN 'vcf'
     WHEN regexp_contains(extension, r'\.VCF') THEN 'vcf'
     WHEN regexp_contains(extension, r'\.vcf') THEN 'vcf'
+    WHEN regexp_contains(extension, r'[DES]R[RZ][0-9]{6,10}') THEN 'SRA ETL'
     ELSE 'other'
     END)
 ENDOFQUERY
