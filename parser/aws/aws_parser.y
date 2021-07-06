@@ -283,9 +283,15 @@ time
     | dash                  { SET_VALUE( AWSReceiver::time, $1 ); }
     ;
 
+end_token
+    : DASH /* trailing dash is not reported, see LOGMON-200 */
+        { SET_VALUE( AWSReceiver::_extra, $1 ); }
+    | STR /* will match anything else */
+        { SET_VALUE( AWSReceiver::_extra, $1 ); lib->reportField("Extra fields discovered"); }
+    ;
+
 rest_of_line
-    : SPACE { aws_start_rest_of( scanner ); } STR
-        { SET_VALUE( AWSReceiver::_extra, $3 ); lib->reportField("Extra fields discovered"); }
+    : SPACE { aws_start_rest_of( scanner ); } end_token
     | %empty
     ;
 

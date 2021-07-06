@@ -145,6 +145,7 @@ RESULTCODE      ([0-9]{3})|"-"
 <REFERER>{QSTR_ESC}     { MAKE_STR(); return QSTR; }
 <REFERER>.              { MAKE_STR(); return QSTR; }
 
+<REST_OF_LINE>-         { MAKE_STR(); return DASH; }
 <REST_OF_LINE>.*        { MAKE_STR(); return STR; }
 
 %%
