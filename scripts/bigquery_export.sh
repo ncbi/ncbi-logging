@@ -120,7 +120,8 @@ echo " #### s3_parsed"
         { "name" : "vdb_phid_guid", "type": "STRING" },
         { "name" : "vdb_phid_session_id", "type": "STRING" },
         { "name" : "vdb_release", "type": "STRING" },
-        { "name" : "vdb_tool", "type": "STRING" }
+        { "name" : "vdb_tool", "type": "STRING" },
+        { "name" : "_extra", "type": "STRING" }
         ]
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
