@@ -247,9 +247,14 @@ ENDOFQUERY
     (case
     WHEN regexp_contains(extension, r'\.bam') THEN 'BAM'
     WHEN regexp_contains(extension, r'\.cram') THEN 'CRAM'
-    WHEN regexp_contains(extension, r'\.fastq') OR regexp_contains(extension, r'\.fq') THEN 'FASTQ'
-    WHEN regexp_contains(extension, r'\.hdf5') OR regexp_contains(extension, r'\.bax\.h5') THEN 'HDF5-BAX'
-    WHEN regexp_contains(extension, r'\.hdf5') OR regexp_contains(extension, r'\.bas.h5') THEN 'HDF5-BAS'
+    WHEN regexp_contains(extension, r'\.fastq') THEN 'FASTQ'
+    WHEN regexp_contains(extension, r'\.fq') THEN 'FASTQ'
+    WHEN regexp_contains(extension, r'\.fasta') THEN 'FASTA'
+    WHEN regexp_contains(extension, r'\.fq') THEN 'FASTA'
+    WHEN regexp_contains(extension, r'\.hdf5') THEN 'HDF5-BAX'
+    WHEN regexp_contains(extension, r'\.bax\.h5') THEN 'HDF5-BAX'
+    WHEN regexp_contains(extension, r'\.hdf5')  THEN 'HDF5-BAS'
+    WHEN regexp_contains(extension, r'\.bas.h5') THEN 'HDF5-BAS'
     WHEN regexp_contains(extension, r'\.zq') THEN 'ZQ'
     WHEN regexp_contains(extension , r'/traces/refseq') THEN 'RefSeq'
     WHEN regexp_contains(extension , r'/traces%2Frefseq') THEN 'RefSeq'
@@ -261,10 +266,18 @@ ENDOFQUERY
     WHEN regexp_contains(extension, '[DES]R[RZ]{6,10}') THEN 'SRA ETL'
     WHEN regexp_contains(extension, r'\.tar.gz') THEN 'TARGZ'
     WHEN regexp_contains(extension, r'\.tar') THEN 'TAR'
+    WHEN regexp_contains(extension, r'.gff3') THEN 'GFF'
     WHEN regexp_contains(extension, r'BLAST_DB/') THEN 'blast_db'
+    WHEN regexp_contains(extension, r'blast_db/') THEN 'blast_db'
     WHEN regexp_contains(extension, r'RAO/') THEN 'rao'
+    WHEN regexp_contains(extension, r'rao/') THEN 'rao'
     WHEN regexp_contains(extension, r'SPDI/') THEN 'spdi'
+    WHEN regexp_contains(extension, r'spdi/') THEN 'spdi'
     WHEN regexp_contains(extension, r'VCF/') THEN 'vcf'
+    WHEN regexp_contains(extension, r'vcf/') THEN 'vcf'
+    WHEN regexp_contains(extension, r'\.VCF') THEN 'vcf'
+    WHEN regexp_contains(extension, r'\.vcf') THEN 'vcf'
+    WHEN regexp_contains(extension, r'[DES]R[RZ][0-9]{6,10}') THEN 'SRA ETL'
     ELSE 'other'
     END)
 ENDOFQUERY
@@ -784,26 +797,60 @@ ENDOFQUERY
 
 echo " ### Find internal IAMs IPs"
     QUERY=$(cat <<-ENDOFQUERY
-    UPDATE strides_analytics.rdns
-    SET DOMAIN="NCBI Cloud (request.nlm.nih.gov)"
-    WHERE ip in (
-    SELECT distinct ip FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
+    CREATE OR REPLACE TABLE strides_analytics.internal_rdns AS
+    SELECT ip, string_agg(distinct requester) as reqagg
+    FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
         WHERE
-           requester like '%arn:aws:iam::783971887864%'
+           requester like '%036922703339%'
+        or requester like '%065193671012%'
+        or requester like '%182221319577%'
+        or requester like '%250813660784%'
+        or requester like '%350784804014%'
+        or requester like '%377855366243%'
+        or requester like '%388320727108%'
+        or requester like '%396554159273%'
+        or requester like '%492028860168%'
+        or requester like '%513880734999%'
+        or requester like '%820248442686%'
         or requester like '%arn:aws:iam::018000097103%'
-        or requester like '%arn:aws:iam::867126678632%'
-        or requester like '%arn:aws:iam::651740271041%'
-        or requester like '%arn:aws:sts::784757538848%'
-        or requester like '%::250813660784%'
-        or requester like '%::396554159273%'
         or requester like '%arn:aws:iam::228184908524%'
         or requester like '%arn:aws:iam::313921231432%'
+        or requester like '%arn:aws:iam::651740271041%'
+        or requester like '%arn:aws:iam::783971887864%'
+        or requester like '%arn:aws:iam::867126678632%'
         or requester like '%arn:aws:sts::184059545989%'
-        or requester like '%347258802972%' )
+        or requester like '%arn:aws:sts::784757538848%'
+        or requester like '%414262389673%'
+        or requester like '%293555909480%'
+        or requester like '%347258802972%'
+        or requester like '%865472100019%'
+        or requester like '%591266071882%'
+    GROUP BY ip
+ENDOFQUERY
+    )
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+
+    QUERY=$(cat <<-ENDOFQUERY
+    DELETE FROM strides_analytics.rdns
+    WHERE ip in (select distinct ip from strides_analytics.internal_rdns)
 ENDOFQUERY
 )
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+
+    QUERY=$(cat <<-ENDOFQUERY
+    INSERT INTO strides_analytics.rdns (ip, domain)
+    SELECT ip, "NCBI Cloud (nlm.nih.gov " || reqagg || ")" as domain
+    FROM strides_analytics.internal_rdns t2
+ENDOFQUERY
+)
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
+
+
 
 echo " ### Update RDNS"
     QUERY=$(cat <<-ENDOFQUERY
