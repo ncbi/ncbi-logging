@@ -502,6 +502,22 @@ TEST_F( AWSTestFixture, two_lines_with_and_without_accessions )
     ASSERT_EQ( "{\"accession\":\"SRR123456\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\".1\",\"filename\":\"SRR123456\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"SRR123456.1\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n{\"accession\":\"\",\"agent\":\"\",\"auth_type\":\"\",\"bucket\":\"\",\"cipher_suite\":\"\",\"error\":\"\",\"extension\":\"\",\"filename\":\"\",\"host_header\":\"\",\"host_id\":\"\",\"ip\":\"\",\"key\":\"\",\"method\":\"\",\"obj_size\":\"\",\"operation\":\"\",\"owner\":\"\",\"path\":\"\",\"referer\":\"\",\"request_id\":\"\",\"requester\":\"\",\"res_code\":\"\",\"res_len\":\"\",\"sig_ver\":\"\",\"time\":\"\",\"tls_version\":\"\",\"total_time\":\"\",\"turnaround_time\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\",\"version_id\":\"\"}\n", res );
 }
 
+TEST_F( AWSTestFixture, dash_as_extra_field )
+{   // the line is good, the dash goes into "_extra"
+    std::string res = try_to_parse_good(
+"384e684d1d83331f62ec686c0aae5c0513b488404eca7a6744bbeb7f5c6a7834 sra-ca-run-4 [29/Jun/2021:22:48:34 +0000] 34.226.216.239 arn:aws:sts::184059545989:assumed-role/sra-developer-instance-profile-role/i-07cffb826ea1814dd WC0X4C0EB5NQJQGB REST.GET.BUCKET - \"GET /?list-type=2&delimiter=%2F&prefix=SRR13431598%2FSRR13431598.2&encoding-type=url HTTP/1.1\" 200 - 324 - 25 24 \"-\" \"aws-cli/1.18.147 Python/2.7.18 Linux/4.14.231-173.361.amzn2.x86_64 botocore/1.18.6\" - Sp3lYc2YbhTGkIh700Tmw/4m3Bt7AawTZlRpEY5GoFSByNYqyHiOfJF5MgLTC/MhtmyV21E84+Y= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-ca-run-4.s3.amazonaws.com TLSv1.2 -"
+    );
+        ASSERT_EQ( "-", extract_value( res, "_extra" ) );
+}
+
+TEST_F( AWSTestFixture, dash_as_extra_field_followed_by_more_fields )
+{   // the line is to_review, the dash and everything following go into "_extra"
+    std::string res = try_to_parse_review(
+"384e684d1d83331f62ec686c0aae5c0513b488404eca7a6744bbeb7f5c6a7834 sra-ca-run-4 [29/Jun/2021:22:48:34 +0000] 34.226.216.239 arn:aws:sts::184059545989:assumed-role/sra-developer-instance-profile-role/i-07cffb826ea1814dd WC0X4C0EB5NQJQGB REST.GET.BUCKET - \"GET /?list-type=2&delimiter=%2F&prefix=SRR13431598%2FSRR13431598.2&encoding-type=url HTTP/1.1\" 200 - 324 - 25 24 \"-\" \"aws-cli/1.18.147 Python/2.7.18 Linux/4.14.231-173.361.amzn2.x86_64 botocore/1.18.6\" - Sp3lYc2YbhTGkIh700Tmw/4m3Bt7AawTZlRpEY5GoFSByNYqyHiOfJF5MgLTC/MhtmyV21E84+Y= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-ca-run-4.s3.amazonaws.com TLSv1.2 - a b c d"
+    );
+        ASSERT_EQ( "- a b c d", extract_value( res, "_extra" ) );
+}
+
 TEST_F( AWSTestFixture, MultiThreading )
 {
     std::string input(
@@ -555,4 +571,3 @@ extern "C"
         return RUN_ALL_TESTS ();
     }
 }
-
