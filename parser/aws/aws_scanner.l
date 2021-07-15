@@ -99,12 +99,14 @@ RESULTCODE      ([0-9]{3})|"-"
 <PATH>{SPACE}       { yy_pop_state( yyscanner ); return SPACE; }
 <PATH>\"            { yy_pop_state( yyscanner ); return QUOTE; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
-<PATH>.             { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
+    /* the 3 expressions above will now consume anything */
+    /*<PATH>.             { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }*/
 
 <KEY>{SPACE}        { yy_pop_state( yyscanner ); return SPACE; }
 <KEY>\"             { yy_pop_state( yyscanner ); return QUOTE; }
 <KEY>{PATHSTR}      { MAKE_STR(); return PATHSTR; }
-<KEY>.              { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
+    /* the 3 expressions above will now consume anything */
+    /*<KEY>.              { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }*/
 
     /* Agent can be a naked dash or a quoted string.
        In case of quoted string (the AGENT state) we consume everything between the quotes and
