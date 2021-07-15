@@ -45,7 +45,7 @@ QCHARS      [.?&=%/\\]|{CHARS}|{CTRLCHARS}
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
 
-PATHSTR     (\\\"|[^ "])+
+PATHSTR     (\\\"|[^ ])+
 
 STR         [.\-a-zA-Z0-9_]+
 STR1        [/:+=%@&*!~;$\],#.\-a-zA-Z0-9_\[]+
