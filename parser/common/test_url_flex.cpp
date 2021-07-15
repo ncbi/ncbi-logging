@@ -27,15 +27,16 @@ public:
         url_lex_destroy( sc );
     }
 
-    int StartScan( const char * input, size_t size )
+    int StartScan( const char * input, size_t size, bool debug = false )
     {
+        url_set_debug( debug ? 1 : 0, sc );
         url__scan_bytes( input, size, sc );
         return url_lex( & token, sc );
     }
 
-    int StartScan( const char * input )
+    int StartScan( const char * input, bool debug = false )
     {
-        return StartScan( input, strlen( input ) );
+        return StartScan( input, strlen( input ), debug );
     }
 
     int NextTokenType()
@@ -211,4 +212,14 @@ TEST_F ( URL_TestFlexFixture, Fragments2 )
     ASSERT_EQ( HASH, NextTokenType() );
     ASSERT_EQ( FRAGMENT_TOKEN, NextTokenType() );
     ASSERT_EQ( "something", TokenValue() );
+}
+
+TEST_F ( URL_TestFlexFixture, QueryGarbage )
+{
+    ASSERT_EQ( QMARK, StartScan( "?\x7f", true ) );
+    ASSERT_EQ( PATHSTR, NextTokenType() );
+}
+TEST_F ( URL_TestFlexFixture, PathGarbage )
+{
+    ASSERT_EQ( PATHSTR, StartScan( "\x7f", true ) );
 }

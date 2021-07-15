@@ -515,7 +515,14 @@ TEST_F( AWSTestFixture, dash_as_extra_field_followed_by_more_fields )
     std::string res = try_to_parse_review(
 "384e684d1d83331f62ec686c0aae5c0513b488404eca7a6744bbeb7f5c6a7834 sra-ca-run-4 [29/Jun/2021:22:48:34 +0000] 34.226.216.239 arn:aws:sts::184059545989:assumed-role/sra-developer-instance-profile-role/i-07cffb826ea1814dd WC0X4C0EB5NQJQGB REST.GET.BUCKET - \"GET /?list-type=2&delimiter=%2F&prefix=SRR13431598%2FSRR13431598.2&encoding-type=url HTTP/1.1\" 200 - 324 - 25 24 \"-\" \"aws-cli/1.18.147 Python/2.7.18 Linux/4.14.231-173.361.amzn2.x86_64 botocore/1.18.6\" - Sp3lYc2YbhTGkIh700Tmw/4m3Bt7AawTZlRpEY5GoFSByNYqyHiOfJF5MgLTC/MhtmyV21E84+Y= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-ca-run-4.s3.amazonaws.com TLSv1.2 - a b c d"
     );
-        ASSERT_EQ( "- a b c d", extract_value( res, "_extra" ) );
+    ASSERT_EQ( "- a b c d", extract_value( res, "_extra" ) );
+}
+
+TEST_F( AWSTestFixture, allow_any_chars_in_URL )
+{   // \x7f in a URL
+    std::string res = try_to_parse_good(
+"7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-run-odp [10/Mar/2021:19:44:03 +0000] 130.127.121.24 - MDQHTJ6B6C6NNMPV REST.GET.OBJECT sra/SRR494336/%253F%253FII%253F%253FC%253F%253FK%253F%253F%255D%253F%253F0C%253F%253F%253F%253F%253F%253F%253F%253F%253F%253F%251C%253F%253FB%253F%253FW%253F%253F \"GET /sra/SRR494336/? HTTP/1.0\" 404 NoSuchKey 325 - 10 - \"-\" \"Wget/1.12 (linux-gnu)\" - ttklc2AcdB5EWPAm9UIngCvhLzkz5A2LO7Xch5EJSfSWckvlABTEkchSwPwqNXhNtpblP+n68Us= - ECDHE-RSA-AES128-GCM-SHA256 - sra-pub-run-odp.s3.amazonaws.com TLSv1.2");
+    ASSERT_EQ( "/sra/SRR494336/?", extract_value( res, "path" ) );
 }
 
 TEST_F( AWSTestFixture, MultiThreading )
