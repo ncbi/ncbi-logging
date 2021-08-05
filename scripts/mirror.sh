@@ -102,7 +102,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
         echo "Profile is $PROFILE, $PROVIDER rsyncing gs://$LOG_BUCKET to $MIRROR..."
 
-        gsutil -m rsync "gs://$LOG_BUCKET/" .
+        gsutil -m rsync -x ".*_2019_.*|.*_2020_.*" "gs://$LOG_BUCKET/" .
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
     fi
 
@@ -247,6 +247,6 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "Done with $LOG_BUCKET"
 done
 
-gzip -9 -v "$LOGFILE"
+# gzip -9 -v "$LOGFILE"
 
 echo "Done"

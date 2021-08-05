@@ -12,15 +12,18 @@ set +e
 mkdir -p "$HOME"/logs
 find "$HOME/logs" -mtime +2 -size +10M -exec gzip -9 {} \;
 
-/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
+panspace=$( /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | tail -1 | tr -s ' ' | cut -d ' ' -f 5 | tr -d '%' )
+if [ "$panspace" -gt 95 ]; then
+    /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | mailx -s "panfs low on space" vartanianmh@ncbi.nlm.nih.gov
+fi
 
 homespace=$( df  "$HOME" | tail  -1 | tr -s ' ' | cut -d ' ' -f 4)
 if [ "$homespace" -lt 500000 ]; then
     df -HT "$HOME" | mailx -s "$HOME low on space" vartanianmh@ncbi.nlm.nih.gov
 fi
 
-echo "mirror.sh GS"
-./mirror.sh GS |& ts >> "$HOME"/logs/mirror_gs."$DATE".log
+#echo "mirror.sh GS"
+#./mirror.sh GS |& ts >> "$HOME"/logs/mirror_gs."$DATE".log
 
 #echo "mirror.sh OP"
 #./mirror.sh OP |& ts >> "$HOME"/logs/mirror_op."$DATE".log
@@ -55,7 +58,7 @@ echo "s3_lister"
 ./mirror_obj.sh |& ts >> "$HOME"/logs/mirror_obj."$DATE".log
 
 dow=$(date +%u)
-if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then # Mondays and Thursday
+if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
 #if [ "$dow" = "1" ] ; then # Mondays
     echo "bigquery_export"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log

@@ -16,3 +16,4 @@ MAILTO=""
  16  8 * * * cd $HOME/ncbi-logging/scripts && ./mirror.sh OP  | ts 2>&1 >> $HOME/mirror_op.log
   5 11 * * * cd $HOME/ncbi-logging/scripts && ./parse.sh OP  | ts >> $HOME/logs/parse_op.log
   5 15 * * * cd $HOME/ncbi-logging/scripts && ./parse_new.sh OP  | ts >> $HOME/logs/parse_new_op.log
+ 32  4 * * * cd $HOME/ncbi-logging/scripts && ./mirror.sh GS | ts 2>&1 >> "$HOME"/logs/mirror_gs."$DATE".log
