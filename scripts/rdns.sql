@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210628.public.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210809.public.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -472,7 +472,7 @@ SET DOMAIN = 'nih.ac.jp (Japan National Institute of Genetics)'
 WHERE IP LIKE '133.39.%' OR IP LIKE '133.103.%';
 
 UPDATE RDNS
-SET DOMAIN = 'ocn.ad.jpi (Japan Open Computer Network)'
+SET DOMAIN = 'ocn.ad.jp (Japan Open Computer Network)'
 WHERE IP LIKE '153.24%';
 
 UPDATE RDNS

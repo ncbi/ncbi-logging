@@ -21,6 +21,12 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 echo "$DATASET"
 
+
+bq -q query \
+--use_legacy_sql=false \
+--format "$FORMAT" \
+"WITH day_counts AS ( select day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests FROM $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2020-09-01' ) group by day having s3_requests <  1000 or gs_requests < 1000 or op_requests < 1000), pop AS ( SELECT * FROM UNNEST(GENERATE_DATE_ARRAY('2020-09-01', current_date(), INTERVAL 1 DAY)) AS missing_day) select missing_day, gs_requests, s3_requests, op_requests from day_counts, pop where missing_day=day order by day desc "
+
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
@@ -212,7 +218,7 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-"select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests, internal from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests, domain like '%nih.gov%' as internal from strides_analytics.summary_export_ca_masked where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2020-01-01' ) group by internal, day order by internal, day"
+"select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests, internal from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests, domain like '%nih.gov%' as internal from strides_analytics.summary_export_ca_masked where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2021-01-01' ) group by internal, day order by internal, day"
 
 
 else
