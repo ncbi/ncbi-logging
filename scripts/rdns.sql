@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210809.public.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210826.public.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -1384,7 +1384,8 @@ ip like '171.65.%' or
 ip like '171.66.%' or
 ip like '171.67.%';
 
-
+-- NetRange:       34.128.0.0 - 34.191.255.255
+-- 34.64.0.0 - 34.127.255.255
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'
@@ -1394,7 +1395,15 @@ WHERE DOMAIN = 'Unknown'
        OR IP LIKE '34.7%'
        OR IP LIKE '34.8%'
        OR IP LIKE '34.9%'
-       OR IP LIKE '34.122%'
+       OR IP LIKE '34.12%'
+       OR IP LIKE '34.13%'
+       OR IP LIKE '34.14%'
+       OR IP LIKE '34.15%'
+       OR IP LIKE '34.16%'
+       OR IP LIKE '34.17%'
+       OR IP LIKE '34.18%'
+       OR IP LIKE '34.190.%'
+       OR IP LIKE '34.191.%'
        OR IP LIKE '35.1%'
        OR IP LIKE '35.2%'
        OR IP LIKE '2600:1900:%');
