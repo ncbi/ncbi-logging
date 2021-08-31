@@ -795,6 +795,7 @@ ENDOFQUERY
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
 
+# https://confluence.ncbi.nlm.nih.gov/pages/viewpage.action?spaceKey=Edu&title=NCBI+Cloud+Education+Onboarding+Reference+Page
 echo " ### Find internal IAMs IPs"
     QUERY=$(cat <<-ENDOFQUERY
     CREATE OR REPLACE TABLE strides_analytics.internal_rdns AS

@@ -75,6 +75,7 @@ insert into log_buckets values ('sra-pub-logs-1');
 insert into log_buckets values ('sra-pub-run-1-logs');
 insert into log_buckets values ('sra-ca-logs-1');
 insert into log_buckets values ('sra-ca-run-logs');
+insert into log_buckets values ('sra-ca-run-odp-logs');
 
 create table buckets (
     cloud_provider text not null references cloud_providers (cloud_provider),
@@ -179,6 +180,29 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-6');
 
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-odp');
 
+insert into buckets (
+        cloud_provider,
+        bucket_name,
+        log_bucket,
+        service_account,
+        owner,
+        scope,
+        format,
+        log_format
+    )
+    values (
+        'S3',
+        'sra-ca-run-odp',
+        'sra-ca-run-odp-logs',
+        'logmon_private',
+        'nih-sra-datastore-protected',
+        'private',
+        'ETL + BQS',
+        'GS log'
+    );
+
+
+
 -- https://confluence.ncbi.nlm.nih.gov/display/SRA/SRA+Environments+in+the+Cloud
 update buckets
     set owner='nih-nlm-ncbi-sra',
@@ -189,7 +213,7 @@ update buckets
     where bucket_name like 'sra-pub-%';
 
 update buckets
-    set format='EQL + BQS'
+    set format='ETL + BQS'
     where bucket_name like 'sra-pub-run-%' and bucket_name not like '%log%';
 
 update buckets
