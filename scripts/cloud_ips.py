@@ -3,7 +3,7 @@
 # Usage:
 # 1) update uniq_ips below
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519
-SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20210823.json"
+SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20210906.json"
 # 3) cloud_ips.py > $PANFS/cloud_ips.jsonl
 # 4) run rdns.sql
 

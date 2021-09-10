@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210826.public.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210909.public.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -1363,7 +1363,7 @@ set domain='jnj.com (Johnson & Johnson)'
 where ip like '148.177.%';
 
 update rdns
-set domain='cmu.edu (Carngie Mellon)'
+set domain='cmu.edu (Carnegie Mellon)'
 where ip like '128.2.%';
 
 update rdns
@@ -1385,6 +1385,10 @@ ip like '171.64.%' or
 ip like '171.65.%' or
 ip like '171.66.%' or
 ip like '171.67.%';
+
+update rdns
+set domain='kaist.ac.kr (Korea Advanced Institute of Science and Technology)'
+where ip like '143.248.%';
 
 -- NetRange:       34.128.0.0 - 34.191.255.255
 -- 34.64.0.0 - 34.127.255.255
