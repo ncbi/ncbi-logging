@@ -143,6 +143,7 @@ INSERT INTO buckets VALUES('S3','sra-ca-src-11',NULL,'nih-sra-datastore-protecte
 INSERT INTO buckets VALUES('S3','sra-ca-src-12',NULL,'nih-sra-datastore-protected','sra-ca-run-logs','logmon_private','private','true','Original','S3 log','cold');
 INSERT INTO buckets VALUES('S3','sra-ca-src-13',NULL,'nih-sra-datastore-protected','sra-ca-run-logs','logmon_private','private','true','Original','S3 log','cold');
 INSERT INTO buckets VALUES('S3','sra-ca-src-14',NULL,'nih-sra-datastore-protected','sra-ca-run-logs','logmon_private','private','true','Original','S3 log','cold');
+INSERT INTO buckets VALUES('S3','sra-ca-src-udn',NULL,'nih-sra-datastore-protected','sra-ca-run-logs','logmon_private','private','true','Original','S3 log','cold');
 INSERT INTO buckets VALUES('S3','sra-pub-zq-1',NULL,'nih-nlm-ncbi-sra','sra-pub-run-1-logs','strides-analytics','public','true','ETL - BQS','S3 log','cold');
 INSERT INTO buckets VALUES('S3','sra-pub-zq-2',NULL,'nih-nlm-ncbi-sra','sra-pub-run-1-logs','strides-analytics','public','true','ETL - BQS','S3 log','cold');
 INSERT INTO buckets VALUES('S3','sra-pub-zq-3',NULL,'nih-nlm-ncbi-sra','sra-pub-run-1-logs','strides-analytics','public','true','ETL - BQS','S3 log','cold');
@@ -221,6 +222,7 @@ INSERT INTO buckets VALUES('GS','sra-ca-src-11',NULL,'nih-sra-datastore-protecte
 INSERT INTO buckets VALUES('GS','sra-ca-src-12',NULL,'nih-sra-datastore-protected','sra-ca-logs-1','logmon_private','private','true','Original','GS log','cold');
 INSERT INTO buckets VALUES('GS','sra-ca-src-13',NULL,'nih-sra-datastore-protected','sra-ca-logs-1','logmon_private','private','true','Original','GS log','cold');
 INSERT INTO buckets VALUES('GS','sra-ca-src-14',NULL,'nih-sra-datastore-protected','sra-ca-logs-1','logmon_private','private','true','Original','GS log','cold');
+INSERT INTO buckets VALUES('GS','sra-ca-src-udn',NULL,'nih-sra-datastore-protected','sra-ca-logs-1','logmon_private','private','true','Original','GS log','cold');
 INSERT INTO buckets VALUES('GS','sra-pub-zq-1',NULL,'nih-sra-datastore','sra-pub-logs-1','strides-analytics','public','true','ETL - BQS','GS log','cold');
 INSERT INTO buckets VALUES('GS','sra-pub-zq-2',NULL,'nih-sra-datastore','sra-pub-logs-1','strides-analytics','public','true','ETL - BQS','GS log','cold');
 INSERT INTO buckets VALUES('GS','sra-pub-zq-3',NULL,'nih-sra-datastore','sra-pub-logs-1','strides-analytics','public','true','ETL - BQS','GS log','cold');

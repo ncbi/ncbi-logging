@@ -160,6 +160,7 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-11')
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-12');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-13');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-14');
+insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-src-udn');
 
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-zq-1');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-zq-2');
@@ -179,6 +180,7 @@ insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-5');
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-ca-zq-6');
 
 insert into buckets (cloud_provider, bucket_name) values ('S3', 'sra-pub-run-odp');
+
 
 insert into buckets (
         cloud_provider,
