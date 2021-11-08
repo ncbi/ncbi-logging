@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20210909.public.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20211101.public.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -138,6 +138,10 @@ UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
   OR IP LIKE '27.15%'
+  OR IP LIKE '49.6%'
+  OR IP LIKE '49.7%'
+  OR IP LIKE '49.8%'
+  OR IP LIKE '49.9%'
   OR IP LIKE '58.208%'
   OR IP LIKE '58.209%'
   OR IP LIKE '58.210%'
@@ -155,11 +159,55 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '58.222%'
   OR IP LIKE '58.223%'
   OR IP LIKE '101.81.%'
+  OR IP LIKE '106.108.%'
+  OR IP LIKE '106.109.%'
+  OR IP LIKE '106.110.%'
+  OR IP LIKE '106.111.%'
+  OR IP LIKE '106.112.%'
+  OR IP LIKE '106.113.%'
+  OR IP LIKE '106.114.%'
+  OR IP LIKE '106.115.%'
+  OR IP LIKE '106.116.%'
+  OR IP LIKE '106.117.%'
+  OR IP LIKE '106.118.%'
+  OR IP LIKE '106.119.%'
+  OR IP LIKE '114.96.%'
+  OR IP LIKE '114.97.%'
+  OR IP LIKE '114.98.%'
+  OR IP LIKE '114.99.%'
+  OR IP LIKE '114.100.%'
+  OR IP LIKE '114.101.%'
+  OR IP LIKE '114.102.%'
+  OR IP LIKE '114.103.%'
   OR IP LIKE '114.23%'
+  OR IP LIKE '115.234.%'
+  OR IP LIKE '115.235.%'
+  OR IP LIKE '115.236.%'
+  OR IP LIKE '115.237.%'
+  OR IP LIKE '115.238.%'
+  OR IP LIKE '115.239.%'
+  OR IP LIKE '115.48.%'
+  OR IP LIKE '115.49.%'
+  OR IP LIKE '115.50.%'
+  OR IP LIKE '115.51.%'
+  OR IP LIKE '115.52.%'
+  OR IP LIKE '115.53.%'
+  OR IP LIKE '115.54.%'
+  OR IP LIKE '115.55.%'
+  OR IP LIKE '115.56.%'
+  OR IP LIKE '115.57.%'
+  OR IP LIKE '115.58.%'
+  OR IP LIKE '115.59.%'
+  OR IP LIKE '115.60.%'
+  OR IP LIKE '115.61.%'
+  OR IP LIKE '115.62.%'
+  OR IP LIKE '115.63.%'
   OR IP LIKE '115.201.%'
   OR IP LIKE '115.218.%'
   OR IP LIKE '115.219.%'
+  OR IP LIKE '115.220.%'
   OR IP LIKE '115.221.%'
+  OR IP LIKE '115.222.%'
   OR IP LIKE '116.16.%'
   OR IP LIKE '116.17.%'
   OR IP LIKE '116.17.%'
@@ -169,12 +217,47 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '116.30.%'
   OR IP LIKE '116.31.%'
   OR IP LIKE '116.6.%'
+  OR IP LIKE '117.64.%'
+  OR IP LIKE '117.65.%'
+  OR IP LIKE '117.66.%'
+  OR IP LIKE '117.67.%'
+  OR IP LIKE '117.68.%'
+  OR IP LIKE '117.69.%'
+  OR IP LIKE '117.70.%'
+  OR IP LIKE '117.71.%'
   OR IP LIKE '117.8%'
   OR IP LIKE '117.9%'
+  OR IP LIKE '118.112.%'
+  OR IP LIKE '118.113.%'
+  OR IP LIKE '118.114.%'
+  OR IP LIKE '118.115.%'
+  OR IP LIKE '118.116.%'
+  OR IP LIKE '118.117.%'
+  OR IP LIKE '118.118.%'
+  OR IP LIKE '118.119.%'
   OR IP LIKE '119.78.%'
   OR IP LIKE '119.79.%'
-  OR IP LIKE '122.22%'
-  OR IP LIKE '122.23%'
+  OR IP LIKE '121.204.%'
+  OR IP LIKE '121.205.%'
+  OR IP LIKE '121.206.%'
+  OR IP LIKE '121.207.%'
+  OR IP LIKE '121.224.%'
+  OR IP LIKE '121.225.%'
+  OR IP LIKE '121.226.%'
+  OR IP LIKE '121.227.%'
+  OR IP LIKE '121.228.%'
+  OR IP LIKE '121.229.%'
+  OR IP LIKE '121.230.%'
+  OR IP LIKE '121.231.%'
+  OR IP LIKE '121.232.%'
+  OR IP LIKE '121.233.%'
+  OR IP LIKE '121.234.%'
+  OR IP LIKE '121.235.%'
+  OR IP LIKE '121.236.%'
+  OR IP LIKE '121.237.%'
+  OR IP LIKE '121.238.%'
+  OR IP LIKE '121.239.%'
+  OR IP LIKE '122.2%'
   OR IP LIKE '140.250.%'
   OR IP LIKE '140.237.%'
   OR IP LIKE '180.126%'
@@ -308,10 +391,13 @@ OR IP LIKE '223.10%'
 OR IP LIKE '223.64.%'
 OR IP LIKE '223.65.%'
 OR IP LIKE '223.66.%'
+OR IP LIKE '223.67.%'
+OR IP LIKE '223.68.%'
+OR IP LIKE '223.69.%'
 OR IP LIKE '223.7%'
 OR IP LIKE '223.8%'
 OR IP LIKE '223.9%'
-OR IP LIKE '223.67.%'
+OR IP LIKE '223.1%'
 OR IP LIKE '111.5%';
 
 
@@ -513,11 +599,6 @@ WHERE IP LIKE '192.152.118.%';
 UPDATE RDNS
 SET DOMAIN = 'Seoul National University'
 WHERE IP LIKE '147.47.%';
-
-
-UPDATE RDNS
-SET DOMAIN = 'Wuhan Hua Zhong Augulture University'
-WHERE IP LIKE '211.69.141.%';
 
 
 UPDATE RDNS
@@ -1019,10 +1100,6 @@ SET DOMAIN='ufpa.br (Universidade Federal do Para)'
 WHERE IP like '200.239.%';
 
 UPDATE RDNS
-SET DOMAIN='net.edu.cn (Huazhong University Of Science And Technology)'
-WHERE IP like '211.67.3%';
-
-UPDATE RDNS
 SET DOMAIN='UPenn.edu (University of Pennsylvania)'
 WHERE IP like '128.91.%'
 OR IP LIKE '130.91.%';
@@ -1085,7 +1162,21 @@ UPDATE RDNS
 SET DOMAIN='Tsinghua University (net.edu.cn)'
 where IP like '58.206.%' OR
 IP LIKE '219.246.7%'
+OR IP LIKE '211.64.%'
+OR IP LIKE '211.65.%'
+OR IP LIKE '211.66.%'
+OR IP LIKE '211.67.%'
+OR IP LIKE '211.68.%'
+OR IP LIKE '211.69.%'
 OR IP LIKE '166.111.%';
+
+UPDATE RDNS
+SET DOMAIN='net.edu.cn (Huazhong University Of Science And Technology)'
+WHERE IP like '211.67.3%';
+
+UPDATE RDNS
+SET DOMAIN = 'Wuhan Hua Zhong Augulture University'
+WHERE IP LIKE '211.69.141.%';
 
 UPDATE RDNS
 SET DOMAIN='St. Jude Childrens Research Hospital (stjude.org)'
@@ -1389,6 +1480,19 @@ ip like '171.67.%';
 update rdns
 set domain='kaist.ac.kr (Korea Advanced Institute of Science and Technology)'
 where ip like '143.248.%';
+
+update rdns
+set domain='Bredband2.se (Bredband2 i Skandinavien AB)'
+where ip like '31.208.100.%';
+
+update rdns
+set domain='wanadoo.fr (France Telecom/Orange)'
+where ip like '86.247.9%' or ip like '86.247.10%';
+
+update rdns
+set domain='nat.moe (Nato Research Ltd)'
+where ip like '134.195.101.%';
+
 
 -- NetRange:       34.128.0.0 - 34.191.255.255
 -- 34.64.0.0 - 34.127.255.255

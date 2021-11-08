@@ -135,7 +135,7 @@ EOF
 
     bq rm -f "$DATASET.s3_parsed" || true
     bq load \
-        --max_bad_records 500 \
+        --max_bad_records 5000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.s3_parsed" \
         "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
@@ -190,7 +190,7 @@ EOF
 #        "$PARSE_BUCKET/logs_op_public/recognized.*" \
 #        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
     bq load \
-        --max_bad_records 50000 \
+        --max_bad_records 200000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.op_parsed" \
         "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
