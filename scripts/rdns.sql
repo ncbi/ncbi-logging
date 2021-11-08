@@ -653,8 +653,39 @@ WHERE IP LIKE '128.182.%';
 
 UPDATE RDNS
 SET DOMAIN = 'mit.edu (MIT)'
-WHERE IP LIKE '18.4%';
-
+WHERE
+IP LIKE '18.0.%'
+or IP LIKE '18.1.%'
+or IP LIKE '18.2.%'
+or IP LIKE '18.3.%'
+or IP LIKE '18.4.%'
+or IP LIKE '18.5.%'
+or IP LIKE '18.6.%'
+or IP LIKE '18.7.%'
+or IP LIKE '18.9.%'
+or IP LIKE '18.9.%'
+or IP LIKE '18.10.%'
+or IP LIKE '18.11.%'
+or IP LIKE '18.12.%'
+or IP LIKE '18.13.%'
+or IP LIKE '18.14.%'
+or IP LIKE '18.15.%'
+or IP LIKE '18.16.%'
+or IP LIKE '18.17.%'
+or IP LIKE '18.18.%'
+or IP LIKE '18.19.%'
+or IP LIKE '18.20.%'
+or IP LIKE '18.21.%'
+or IP LIKE '18.22.%'
+or IP LIKE '18.23.%'
+or IP LIKE '18.24.%'
+or IP LIKE '18.25.%'
+or IP LIKE '18.26.%'
+or IP LIKE '18.27.%'
+or IP LIKE '18.28.%'
+or IP LIKE '18.29.%'
+or IP LIKE '18.30.%'
+or IP LIKE '18.31.%';
 
 UPDATE RDNS
 SET DOMAIN = 'cnnic.ch (Nongkeyuan Science & Technology Information)'
@@ -1493,6 +1524,13 @@ update rdns
 set domain='nat.moe (Nato Research Ltd)'
 where ip like '134.195.101.%';
 
+update rdns
+set domain='utk.edu (Universift of Tennessee Knoxville)'
+where ip like '192.249.%';
+
+update rdns
+set domain='warwick.ac.uk (University of Warwick)'
+where ip like '137.205.%';
 
 -- NetRange:       34.128.0.0 - 34.191.255.255
 -- 34.64.0.0 - 34.127.255.255
