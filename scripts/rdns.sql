@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20211101.public.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20211117.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -1532,8 +1532,21 @@ update rdns
 set domain='warwick.ac.uk (University of Warwick)'
 where ip like '137.205.%';
 
--- NetRange:       34.128.0.0 - 34.191.255.255
--- 34.64.0.0 - 34.127.255.255
+update rdns
+set domain='Vodafone NRW GmbH (unitymedia.de)'
+where ip like '92.50.%';
+
+update rdns
+set domain='Centurylink (lumen.com)'
+where ip like '75.16%'
+or ip like '75.17%';
+
+update rdns
+set domain='Memorial Sloan-Kettering Cancer Center (mskcc.org)'
+where ip like '140.163.%';
+
+
+
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'
