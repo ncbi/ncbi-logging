@@ -431,6 +431,7 @@ ENDOFQUERY
 
 
 echo " ##### detail_export"
+echo " ##### detail_export_gs"
     QUERY=$(cat <<-ENDOFQUERY
 SELECT
     accession as accession,
@@ -462,7 +463,25 @@ SELECT
     ELSE 99
     END as http_operation_combined
     FROM \\\`$DATASET.gs_fixed\\\`
-UNION ALL SELECT
+ENDOFQUERY
+    )
+QUERY="${QUERY//\\/}"
+
+bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
+    # shellcheck disable=SC2016
+bq query \
+    --project_id ncbi-logmon \
+    --destination_table "$DATASET.detail_export_gs" \
+    --use_legacy_sql=false \
+    --batch=true \
+    --max_rows=5 \
+    --time_partitioning_field=start_ts \
+    "$QUERY"
+
+
+echo " ##### detail_export_s3"
+    QUERY=$(cat <<-ENDOFQUERY
+SELECT
     accession as accession,
     bucket as bucket,
     bytes_sent as bytes_sent,
@@ -492,7 +511,24 @@ UNION ALL SELECT
     ELSE 99
     END as http_operation_combined
     FROM \\\`$DATASET.s3_fixed\\\`
-UNION ALL SELECT
+ENDOFQUERY
+    )
+QUERY="${QUERY//\\/}"
+
+bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_s3" || true
+    # shellcheck disable=SC2016
+bq query \
+    --project_id ncbi-logmon \
+    --destination_table "$DATASET.detail_export_s3" \
+    --use_legacy_sql=false \
+    --batch=true \
+    --max_rows=5 \
+    --time_partitioning_field=start_ts \
+    "$QUERY"
+
+echo " ##### detail_export_op"
+    QUERY=$(cat <<-ENDOFQUERY
+SELECT
     accession as accession,
     host as bucket,
     bytes_sent as bytes_sent,
@@ -522,10 +558,30 @@ UNION ALL SELECT
     ELSE 99
     END as http_operation_combined
     FROM \\\`$DATASET.op_fixed\\\`
-
 ENDOFQUERY
     )
+QUERY="${QUERY//\\/}"
 
+bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
+    # shellcheck disable=SC2016
+bq query \
+    --project_id ncbi-logmon \
+    --destination_table "$DATASET.detail_export_op" \
+    --use_legacy_sql=false \
+    --batch=true \
+    --max_rows=5 \
+    --time_partitioning_field=start_ts \
+    "$QUERY"
+
+echo " ##### detail_export_union"
+    QUERY=$(cat <<-ENDOFQUERY
+SELECT * FROM \\\`$DATASET.detail_export_gs\\\`
+UNION ALL
+SELECT * FROM \\\`$DATASET.detail_export_op\\\`
+UNION ALL
+SELECT * FROM \\\`$DATASET.detail_export_s3\\\`
+ENDOFQUERY
+    )
     QUERY="${QUERY//\\/}"
 
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
@@ -541,6 +597,7 @@ ENDOFQUERY
 
     bq show --schema "$DATASET.detail_export"
 
+echo " ##### detail_export prune"
 bq -q query \
     --use_legacy_sql=false \
     "delete from $DATASET.detail_export where start_ts < '2000-01-01'"
