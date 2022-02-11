@@ -67,6 +67,7 @@ if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
     ./bigquery_report.sh  |& ts >> "$HOME"/logs/bigquery_report."$DATE".log
     ./bigquery_summary.sh |& ts >> "$HOME"/logs/bigquery_summary."$DATE".log
 
+    # cat bigquery_report."$DATE".log | perl -pe 's/\d{1,3}(?=(\d{3})+(?!\d))/$&,/g'
     mailx -s "BigQuery Report" vartanianmh@ncbi.nlm.nih.gov < "$HOME"/logs/bigquery_report."$DATE".log
 fi
 

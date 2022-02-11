@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20211117.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220211.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -171,6 +171,10 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '106.117.%'
   OR IP LIKE '106.118.%'
   OR IP LIKE '106.119.%'
+  OR IP LIKE '113.6%'
+  OR IP LIKE '113.7%'
+  OR IP LIKE '113.8%'
+  OR IP LIKE '113.9%'
   OR IP LIKE '114.96.%'
   OR IP LIKE '114.97.%'
   OR IP LIKE '114.98.%'
@@ -422,7 +426,8 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '116.1%'
   OR IP LIKE '221.206.%'
   OR IP LIKE '61.158.%'
-  OR IP LIKE '60.12.%';
+  OR IP LIKE '60.12.%'
+  OR IP LIKE '175.4%';
 
 
 UPDATE RDNS
@@ -458,8 +463,13 @@ SET DOMAIN = 'China Telecom'
 WHERE IP LIKE '183.63.%'
 OR IP LIKE '171.2%'
 OR IP LIKE '119.138.%'
+OR IP LIKE '113.9%'
+OR IP LIKE '113.10%'
+OR IP LIKE '113.11%'
+OR IP LIKE '120.3%'
 OR IP LIKE '101.110.119.%'
-OR IP LIKE '180.16%';
+OR IP LIKE '180.16%'
+OR IP LIKE '183.16%';
 
 
 

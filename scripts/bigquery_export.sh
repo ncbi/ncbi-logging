@@ -20,6 +20,8 @@ if [ "$skipload" = false ]; then
     gsutil du -s -h "$MIRROR_BUCKET/gs_$STRIDES_SCOPE"
     gsutil du -s -h "$MIRROR_BUCKET/op_$STRIDES_SCOPE"
     gsutil du -s -h "$MIRROR_BUCKET/s3_$STRIDES_SCOPE"
+    gsutil du -s -h gs://logmon_objects/gs
+    gsutil du -s -h gs://logmon_objects/s3
 
 # TODO: Partition/cluster large tables for incremental inserts and retrievals
 # TODO: Materialized views that automatically refresh
