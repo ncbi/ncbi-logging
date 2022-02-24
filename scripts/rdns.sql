@@ -280,6 +280,7 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '182.149.%'
   OR IP LIKE '182.150.%'
   OR IP LIKE '182.151.%'
+  OR IP LIKE '183.141.%'
   OR IP LIKE '183.20.%'
   OR IP LIKE '183.4%'
   OR IP LIKE '183.5%'
@@ -417,6 +418,7 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '119.5.%'
   OR IP LIKE '119.6.%'
   OR IP LIKE '123.138.%'
+  OR IP LIKE '123.15%'
   OR IP LIKE '123.139.%'
   OR IP LIKE '171.36.%'
   OR IP LIKE '171.37.%'
@@ -467,6 +469,8 @@ OR IP LIKE '113.9%'
 OR IP LIKE '113.10%'
 OR IP LIKE '113.11%'
 OR IP LIKE '120.3%'
+OR IP LIKE '124.112.%'
+OR IP LIKE '124.113.%'
 OR IP LIKE '101.110.119.%'
 OR IP LIKE '180.16%'
 OR IP LIKE '183.16%';
@@ -1572,6 +1576,11 @@ where ip like '128.250.252.%';
 update rdns
 set domain='Science Park Watergraafsmeer (surfsara.nl)'
 where ip like '145.100.20%';
+
+update rdns
+set domain='ZhangPan Corp Yancheng (yc.js.cn)'
+where ip like '221.231.5.%';
+
 
 
 UPDATE RDNS
