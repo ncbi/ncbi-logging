@@ -21,6 +21,7 @@ insert into service_accounts (service_account) values ('logmon');
 insert into service_accounts (service_account) values ('nih-nlm-ncbi-sra-protected');
 insert into service_accounts (service_account) values ('nih-sra-datastore-protected');
 insert into service_accounts (service_account) values ('logmon_private');
+insert into service_accounts (service_account) values ('ca-odp');
 
 create table log_formats (
     log_format text primary key,
@@ -194,13 +195,34 @@ insert into buckets (
     )
     values (
         'S3',
-        'sra-ca-run-odp',
         'sra-ca-run-odp-logs',
-        'logmon_private',
-        'nih-sra-datastore-protected',
+        'sra-ca-run-odp-logs',
+        'ca-odp',
+        'ODP',
         'private',
         'ETL + BQS',
-        'GS log'
+        'S3 log'
+    );
+
+insert into buckets (
+        cloud_provider,
+        bucket_name,
+        log_bucket,
+        service_account,
+        owner,
+        scope,
+        format,
+        log_format
+    )
+    values (
+        'S3',
+        'sra-ca-run-odp',
+        'sra-ca-run-odp-logs',
+        'ca-odp',
+        'ODP',
+        'private',
+        'ETL + BQS',
+        'S3 log'
     );
 
 
@@ -229,7 +251,7 @@ update buckets
     immutable="true",
     scope='private',
     storage_class='hot'
-    where bucket_name like '%-ca-%';
+    where bucket_name like '%-ca-%' and bucket_name not like '%odp%';
 
 update buckets
     set format='ETL + BQS'
@@ -262,7 +284,8 @@ insert into buckets (cloud_provider, bucket_name, description,
         scope
         from buckets
         where cloud_provider='S3'
-        and bucket_name like 'sra-pub-%' or bucket_name like 'sra-ca-%' or bucket_name like '%-zq-%';
+        and (bucket_name like 'sra-pub-%' or bucket_name like 'sra-ca-%' or bucket_name like '%-zq-%')
+        and bucket_name not like '%ca-run-odp%';
 
 update buckets
     set format='GS bucket'

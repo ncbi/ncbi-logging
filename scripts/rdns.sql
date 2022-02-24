@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220211.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220223.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -633,7 +633,8 @@ WHERE IP LIKE '168.105.%';
 
 UPDATE RDNS
 SET DOMAIN = 'nazu.edu (Northern Arizona University)'
-WHERE IP LIKE '134.114.%';
+WHERE IP LIKE '134.114.%'
+or IP LIKE '206.207.50.%';
 
 
 UPDATE RDNS
@@ -1146,6 +1147,10 @@ WHERE IP like '128.91.%'
 OR IP LIKE '130.91.%';
 
 UPDATE RDNS
+SET DOMAIN='Pennsylvania State University (psu.edu)'
+where IP LIKE '146.186.%';
+
+UPDATE RDNS
 SET DOMAIN='mcgill.ca (McGill University)'
 where IP like '132.216.%';
 
@@ -1325,7 +1330,8 @@ WHERE IP LIKE '129.187.%';
 
 UPDATE RDNS
 SET DOMAIN='ucla.edu'
-where IP LIKE '164.67.%';
+where IP LIKE '164.67.%'
+or IP LIKE '192.154.2.%';
 
 UPDATE RDNS
 SET DOMAIN='rochester.edu (University of Rochester)'
@@ -1555,6 +1561,17 @@ update rdns
 set domain='Memorial Sloan-Kettering Cancer Center (mskcc.org)'
 where ip like '140.163.%';
 
+update rdns
+set domain='Educational and research network for Luxembourg (restena.lu)'
+where ip like '158.64.%';
+
+update rdns
+set domain='University of Melbourne (unimelb.edu.au)'
+where ip like '128.250.252.%';
+
+update rdns
+set domain='Science Park Watergraafsmeer (surfsara.nl)'
+where ip like '145.100.20%';
 
 
 UPDATE RDNS
