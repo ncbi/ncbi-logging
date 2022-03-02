@@ -3,7 +3,7 @@
 # Usage:
 # 1) update uniq_ips below
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519
-SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20220221.json"
+SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20220228.json"
 # 3) cloud_ips.py > $PANFS/cloud_ips.jsonl
 # 4) run rdns.sql
 
@@ -98,7 +98,7 @@ already = set()
 
 # {"remote_ip":"18.212.9.218","ipint":"315886042"}
 ips = open(
-    "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220223.private.json"
+    "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220228.public.json"
 )
 for line in ips:
     j = json.loads(line)
@@ -112,6 +112,9 @@ for value in AZURE_JSON["values"]:
     name = name.replace("Azure", "")
     for prefix in value["properties"]["addressPrefixes"]:
         # print(f"Azure prefix {prefix}", file=sys.stderr)
+        if prefix.startswith("2603:1") or prefix.startswith("2a01:1"):
+            # Dealt with in rdns.sql
+            continue
         nums = int(prefix.split("/")[1])
         if nums >= 40 and nums <= 80:
             print(f"Azure prefix {prefix} too big:{nums}", file=sys.stderr)

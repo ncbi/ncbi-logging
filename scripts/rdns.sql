@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220223.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220228.public.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -1610,6 +1610,9 @@ SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'bc.googleusercontent.com (GCP)'
   OR DOMAIN = 'bc.googleusercontent.com';
 
+UPDATE RDNS
+SET DOMAIN='microsoft.com (Azure Cloud)'
+where ip like '2603:1%' or ip like '2a01:1%';
 
 
 
@@ -1759,7 +1762,9 @@ where IP in (
  '35.172.18.176',
  '104.196.216.152',
  '35.173.203.167',
- '35.221.3.33', '34.86.254.11', '35.245.149.51', '34.86.152.95', '35.236.206.30'
+ '35.221.3.33', '34.86.254.11', '35.245.149.51', '34.86.152.95', '35.236.206.30',
+'3.235.229.68', '3.215.190.1', '44.192.48.128', '34.229.119.117', '44.200.64.42',
+'3.214.224.20', '44.192.48.128', '3.237.10.148', '44.197.198.131'
 );
 
 
