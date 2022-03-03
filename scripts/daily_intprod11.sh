@@ -10,6 +10,7 @@ cd "$HOME/ncbi-logging/scripts" || exit
 set +e
 
 mkdir -p "$HOME"/logs
+find "$HOME/logs" -mtime +2 -size +10M -exec gzip -9 {} \;
 
 #/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
 
@@ -50,7 +51,9 @@ if [ "$dow" = "3" ];  then
     ./bigquery_report.sh  |& ts >> "$HOME"/logs/bigquery_report."$DATE".log
     #./bigquery_summary.sh |& ts >> "$HOME"/logs/bigquery_summary."$DATE".log
 
-    mailx -s "$HOST BigQuery Report" vartanianmh@ncbi.nlm.nih.gov < "$HOME"/logs/bigquery_report."$DATE".log
+    cat "$HOME"/logs/bigquery_report."$DATE".log | \
+        sed -re ' :restart ; s/([0-9])([0-9]{3})($|[^0-9])/\1,\2\3/ ; t restart ' | \
+        mailx -s "$HOST BigQuery Report" vartanianmh@ncbi.nlm.nih.gov
 fi
 
 echo "    --- Daily Processing Complete ($$) ---"
