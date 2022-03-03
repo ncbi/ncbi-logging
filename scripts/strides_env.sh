@@ -15,7 +15,6 @@ export AWS_PROFILE="strides-analytics"
 export LD_LIBRARY_PATH="$HOME/$PGVER/lib"
 export LD_LIBRARY_PATH="$HOME/lib:$HOME/.local/lib:$LD_LIBRARY_PATH"
 export LOGDIR=$HOME
-export TMP="/tmp/$USER"
 export PANFS="/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics"
 DATE=$(date "+%Y%m%d") #_%H%M%S
 export DATE
@@ -62,14 +61,17 @@ export STRIDES_SCOPE="public"
 case "$HOSTNAME" in
     iebdev11)
         export STRIDES_SCOPE="public"
+        export TMP="/tmp/$USER"
         renice +19 -p $$ > /dev/null 2>&1
         ;;
     intprod11)
         export STRIDES_SCOPE="private"
+        export TMP="/export/home/TMP/$USER"
         #renice +19 -p $$ > /dev/null 2>&1
         ;;
     lmem14)
         export STRIDES_SCOPE="public"
+        export TMP="/tmp/$USER"
         #renice +19 -p $$ > /dev/null 2>&1
         ;;
     *)
