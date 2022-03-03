@@ -10,7 +10,7 @@ cd "$HOME/ncbi-logging/scripts" || exit
 set +e
 
 mkdir -p "$HOME"/logs
-find "$HOME/logs" -mtime +2 -size +10M -exec gzip -9 {} \;
+find "$HOME/logs" -mtime +1 -size +10M -exec gzip -9 {} \;
 
 panspace=$( /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | tail -1 | tr -s ' ' | cut -d ' ' -f 5 | tr -d '%' )
 if [ "$panspace" -gt 95 ]; then
@@ -60,13 +60,14 @@ echo "s3_lister"
 dow=$(date +%u)
 if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
 #if [ "$dow" = "1" ] ; then # Mondays
-    echo "bigquery_export"
+    echo "bigqueries"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
     ./bigquery_export.sh  |& ts >> "$HOME"/logs/bigquery_export."$DATE".log
     ./bigquery_report.sh  |& ts >> "$HOME"/logs/bigquery_report."$DATE".log
     ./bigquery_summary.sh |& ts >> "$HOME"/logs/bigquery_summary."$DATE".log
 
+    # cat bigquery_report."$DATE".log | perl -pe 's/\d{1,3}(?=(\d{3})+(?!\d))/$&,/g'
     mailx -s "BigQuery Report" vartanianmh@ncbi.nlm.nih.gov < "$HOME"/logs/bigquery_report."$DATE".log
 fi
 
