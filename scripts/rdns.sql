@@ -324,6 +324,10 @@ UPDATE RDNS
 SET DOMAIN = 'mdc-berlin.de'
 WHERE IP LIKE '141.80.%';
 
+UPDATE RDNS
+SET DOMAIN='uni-kl.de (Technical University of Kaiserslautern)'
+where ip like '131.246.%';
+
 
 UPDATE RDNS
 SET DOMAIN = 'yale.edu (Yale University)'
@@ -567,7 +571,6 @@ or IP LIKE '35.10.%';
 UPDATE RDNS
 SET DOMAIN = 'dtu.dk (Technical University of Denmark)'
 WHERE DOMAIN LIKE '%dtu.dk%';
-
 
 UPDATE RDNS
 SET DOMAIN = 'nih.ac.jp (Japan National Institute of Genetics)'
