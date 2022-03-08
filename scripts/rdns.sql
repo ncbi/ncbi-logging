@@ -1183,6 +1183,14 @@ SET DOMAIN='unil.ch (University of Lausanne)'
 where IP like '130.223.%';
 
 UPDATE RDNS
+SET DOMAIN='epfl.ch (Swiss Federal Institute of Technology)'
+where IP LIKE '128.178.%' OR IP LIKE '128.179.%';
+
+UPDATE RDNS
+set DOMAIN='lilly.com (Eli Lilly and Company)'
+where ip like '40.0.%';
+
+UPDATE RDNS
 SET DOMAIN='NC Biolabs (frontiernet.net)'
 where IP like '50.55.%'
 or IP LIKE '50.45.%';
@@ -1584,6 +1592,9 @@ update rdns
 set domain='ZhangPan Corp Yancheng (yc.js.cn)'
 where ip like '221.231.5.%';
 
+update rdns
+set domain='Mastertel Network For Wargaming (mastertel.ru)'
+where ip like '195.133.216.%';
 
 
 UPDATE RDNS
@@ -1767,7 +1778,9 @@ where IP in (
  '35.173.203.167',
  '35.221.3.33', '34.86.254.11', '35.245.149.51', '34.86.152.95', '35.236.206.30',
 '3.235.229.68', '3.215.190.1', '44.192.48.128', '34.229.119.117', '44.200.64.42',
-'3.214.224.20', '44.192.48.128', '3.237.10.148', '44.197.198.131'
+'3.214.224.20', '44.192.48.128', '3.237.10.148', '44.197.198.131',
+'34.86.149.202', '35.199.4.74',
+'3.235.246.35', '34.236.37.231', '44.192.81.182', '3.238.50.204', '44.192.54.107'
 );
 
 
