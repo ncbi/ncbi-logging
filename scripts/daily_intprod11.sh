@@ -2,6 +2,8 @@
 
 echo "    --- Daily Processing Beginning ($$) ---"
 
+umask u=rwx,g=r,o=
+
 cd "$HOME/ncbi-logging/scripts" || exit
 
 # shellcheck source=strides_env.sh
