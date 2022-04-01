@@ -189,7 +189,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select datetime_trunc(start_ts, day) as day, count(distinct remote_ip) as uniq_ips, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' and source='S3' and bucket like '%cov2%' and day > '2022-01-01' group by day order by day desc"
+    "select datetime_trunc(start_ts, day) as day, count(distinct remote_ip) as uniq_ips, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' and source='S3' and bucket like '%cov2%' and start_ts > '2022-01-01' group by day order by day desc"
 
 bq -q query \
     --use_legacy_sql=false \

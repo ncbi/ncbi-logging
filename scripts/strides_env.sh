@@ -15,6 +15,7 @@ export AWS_PROFILE="strides-analytics"
 export LD_LIBRARY_PATH="$HOME/$PGVER/lib"
 export LD_LIBRARY_PATH="$HOME/lib:$HOME/.local/lib:$LD_LIBRARY_PATH"
 export LOGDIR=$HOME
+export PYTHONWARNINGS="ignore::DeprecationWarning" # bq still uses deprecated imp
 export PANFS="/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics"
 DATE=$(date "+%Y%m%d") #_%H%M%S
 export DATE
