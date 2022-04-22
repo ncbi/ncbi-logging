@@ -244,6 +244,17 @@ TEST_F ( AWS_TestFlexFixture, Agent_Escaped_quote )
     ASSERT_EQ( QUOTE, NextTokenType() );
 }
 
+TEST_F ( AWS_TestFlexFixture, Agent_Unescaped_quote )
+{
+    const char * input = "\"\"linux64\" sra\"";
+    aws__scan_bytes( input, strlen( input ), sc );
+    aws_start_UserAgent( sc );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( "\"linux64\"", TokenValue() );
+    ASSERT_EQ( STR, NextTokenType() ); ASSERT_EQ( " sra", TokenValue() );
+    ASSERT_EQ( QUOTE, NextTokenType() );
+}
+
 TEST_F ( AWS_TestFlexFixture, Agent_Empty )
 {
     const char * input = "\"\"";
