@@ -74,16 +74,13 @@ echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
 
 case "$PROVIDER" in
     OP)
-        #        PARSER_BIN="op2jsn-rel"
         WILDCARD='*'
         #        buckets=("OP") # TODO
         ;;
     GS)
-        #        PARSER_BIN="gcp2jsn-rel"
         WILDCARD='*'
         ;;
     S3)
-        #        PARSER_BIN="aws2jsn-rel"
         WILDCARD='*'
         ;;
     Splunk)
@@ -95,7 +92,6 @@ case "$PROVIDER" in
         exit 1
         ;;
 esac
-ls -l "$PARSER_BIN"
 
 for LOG_BUCKET in "${buckets[@]}"; do
     BUCKET_NAME=$(sqlcmd "select distinct bucket_name from buckets where cloud_provider='$PROVIDER' and log_bucket='$LOG_BUCKET' limit 1")
@@ -112,6 +108,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     PARSER_REC=$(sqlcmd "select parser_binary || ':' || parser_options from log_formats where log_format = (select log_format from buckets where cloud_provider='$PROVIDER' and bucket_name='$BUCKET_NAME')")
     PARSER_BIN=$(echo "$PARSER_REC" | cut -d':' -f 1)
     PARSER_OPT=$(echo "$PARSER_REC" | cut -d':' -f 2)
+    type -a "$PARSER_BIN"
 
     echo "    PARSER_BIN is '$PARSER_BIN', PARSER_OPT is '$PARSER_OPT'"
     if [ "$PROVIDER" = "OP" ]; then
