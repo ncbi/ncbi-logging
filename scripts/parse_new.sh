@@ -95,6 +95,7 @@ case "$PROVIDER" in
         exit 1
         ;;
 esac
+ls -l "$PARSER_BIN"
 
 for LOG_BUCKET in "${buckets[@]}"; do
     BUCKET_NAME=$(sqlcmd "select distinct bucket_name from buckets where cloud_provider='$PROVIDER' and log_bucket='$LOG_BUCKET' limit 1")
@@ -277,4 +278,3 @@ done
 
 echo " Done parse_new"
 date
-

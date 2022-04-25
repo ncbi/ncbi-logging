@@ -110,7 +110,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/cl2jsn-rel --version)
 
         tar -xaOf "$TGZ" "$wildcard" | \
-            tr -s ' ' | \ # Remove when LOGMON-107 fixed
+            tr -s ' ' | \
             time "$HOME/devel/ncbi-logging/parser/bin/cl2jsn-rel" -f "$PARSER" > \
             "$YESTERDAY_DASH.${LOG_BUCKET}.out" \
             2> "$TGZ.err"
@@ -127,6 +127,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     else
         VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel --version)
+        ls -l "$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel
 
         tar -xaOf "$TGZ" "$wildcard" | \
             time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
