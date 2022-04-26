@@ -38,7 +38,7 @@ QCHARS      [.?&=%/\x00-\x1f]|{CHARS}
 QSTR        {QCHARS}+
 QSTR_ESC    (\\\"|{QCHARS})+
 
-PATHSTR     {QSTR_ESC}
+PATHSTR     (\\\"|{QCHARS})+
 
 SPACE   " "
 
@@ -46,7 +46,7 @@ SPACE   " "
 %x PATH
 
 AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/(),=\\. ]
-AGENTSTR        (\\\"|{AGENTCHARS})+
+AGENTSTR        (\\\"|\"\"|{AGENTCHARS})+
 
 %x AGENT
 
@@ -62,6 +62,7 @@ AGENTSTR        (\\\"|{AGENTCHARS})+
 <QUOTED>{IPV6ADDR}  { MAKE_STR(); return IPV6; }
 <QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
 <QUOTED>{QSTR_ESC}  { MAKE_STR(); return QSTR; }
+<QUOTED>""          { MAKE_STR(); return QUOTE; }
 <QUOTED>.           { }
 
 <PATH>\"            { MAKE_STR(); return QUOTE; }

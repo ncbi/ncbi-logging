@@ -84,7 +84,7 @@ TEST_F( GCPTestFixture, ErrorRecovery )
 {
     try_to_parse(
         "line1 blah\n"
-        "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n");
+        "\"1\",\"\",\"\",\"\",\"GET\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"\n", true);
     ASSERT_EQ( "{\"_line_nr\":1,\"_unparsed\":\"line1 blah\"}\n",
                 s_outputs.get_ugly() );
     ASSERT_EQ( "{\"accession\":\"\",\"agent\":\"\",\"bucket\":\"\",\"extension\":\"\",\"filename\":\"\",\"host\":\"\",\"ip\":\"\",\"ip_region\":\"\",\"ip_type\":\"\",\"method\":\"GET\",\"operation\":\"\",\"path\":\"\",\"referer\":\"\",\"request_bytes\":\"\",\"request_id\":\"\",\"result_bytes\":\"\",\"status\":\"\",\"time\":\"1\",\"time_taken\":\"\",\"uri\":\"\",\"vdb_libc\":\"\",\"vdb_os\":\"\",\"vdb_phid_compute_env\":\"\",\"vdb_phid_guid\":\"\",\"vdb_phid_session_id\":\"\",\"vdb_release\":\"\",\"vdb_tool\":\"\",\"vers\":\"\"}\n",
@@ -311,6 +311,17 @@ TEST_F( GCPTestFixture, header_bad )
 {
     string s = try_to_parse_review( "\"blah\"" );
     ASSERT_NE( "", s );
+}
+
+TEST_F( GCPTestFixture, LOGMON_208 )
+{
+    string res = try_to_parse_good(
+        "\"1650240002834549\",\"34.86.77.8\",\"1\",\"\",\"GET\",\"/sra-pub-run-7/SRR000002/SRR000002.3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=data-access-service%40nih-sra-datastore.iam.gserviceaccount.com%2F20220418%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20220418T000002Z&X-Goog-Expires=360000&X-Goog-SignedHeaders=host&userProject=nih-sra-datastore&X-Goog-Signature=b2641e3eb68d942584a955284f6314a9b79973128b18fe5037c9166bd252fcd1b51445a814f554ca6c6414ee5577855fde8e8f1fbe44f467ed19d927fe46edd931143bd6f39c7dd29d42e56cc18ad385cc21ba011d974372cb11757d27cb35d1747aec172f1f48685b59cd039fc6c860486b21b9205eb05389c54fa78e5b38477f216c9928f816b97274bd38674d3f7b33f0899b36cdeb040898f24627404e296b3566610143dccbd57f8ef0fb2037b58b6dbf45f924c5c64cf657e96fb531b38ee3f9529ec62255e64107b7771258ffa81df866ff3cc1013866bdc45d73709624018c8466d4b0fed9e4761c146e75f28560d5bb964b00a2a14cb91ac50a5417\",\"206\",\"0\",\"262144\",\"89000\",\"storage.googleapis.com\",\"\",\"\"\"linux64\"\" sra-toolkit vdb-dump.3-head (phid=bGc77b715a,libc=2.28,bmap=nob)\",\"ADPycdvACa6n_nW35L2ltwqjWbblm7_fFNEFwq2QbMFHVjal-nZh3mLLVRc4qmz3TPtF_C1j0IHAC5EumKoF4AHFOClJYw\",\"GET_Object\",\"sra-pub-run-7\",\"SRR000002/SRR000002.3\"" );
+    ASSERT_EQ( "\"\"linux64\"\" sra-toolkit vdb-dump.3-head (phid=bGc77b715a,libc=2.28,bmap=nob)",
+               extract_value( res, "agent" ) );
+    // un-escaped
+    ASSERT_EQ( string( "\"linux64\" sra-toolkit vdb-dump.3-head (phid=bGc77b715a,libc=2.28,bmap=nob)" ),
+               static_cast<const GCPReceiver&>( pb -> GetReceiver() ) . agent_for_postprocess );
 }
 
 extern "C"

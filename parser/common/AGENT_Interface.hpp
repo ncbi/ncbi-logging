@@ -26,7 +26,7 @@ namespace NCBI
             virtual void set( AGENT_Members m, const t_str & );
             virtual Category post_process( void ) { return cat_good; }
 
-            Category ParseUserAgent( std::string & source );
+            Category ParseUserAgent( const std::string & source );
         };
 
         // exposed for testing

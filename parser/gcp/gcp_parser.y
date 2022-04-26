@@ -25,16 +25,18 @@ const t_str EmptyTSTR = { "", 0 };
 
 %code requires
 {
-#include "types.h"
-#include "GCP_Interface.hpp"
+    #include "types.h"
+    #include "GCP_Interface.hpp"
+    #include <string>
 
-extern void gcp_get_scanner_input( void * yyscanner, t_str & str );
-extern void gcp_start_URL( void * yyscanner );
-extern void gcp_start_UserAgent( void * yyscanner );
-extern void gcp_pop_state( void * yyscanner );
+    extern void gcp_get_scanner_input( void * yyscanner, t_str & str );
+    extern void gcp_start_URL( void * yyscanner );
+    extern void gcp_start_UserAgent( void * yyscanner );
+    extern void gcp_pop_state( void * yyscanner );
 
-using namespace NCBI::Logging;
+    using namespace NCBI::Logging;
 
+    std::string Unescape( t_str & input );
 }
 
 %define api.value.type {t_str}
@@ -81,7 +83,11 @@ log_gcp
        { gcp_pop_state( scanner ); }
       COMMA status COMMA req_bytes COMMA res_bytes COMMA time_taken COMMA host COMMA
       referrer COMMA
-      { gcp_start_UserAgent( scanner ); }
+      QUOTE
+        {
+            gcp_pop_state( scanner ); // out of QUOTE state
+            gcp_start_UserAgent( scanner );
+        }
       agent
       { gcp_pop_state( scanner ); }
       COMMA req_id COMMA operation COMMA bucket COMMA
@@ -145,12 +151,12 @@ vdb_agent
     ;
 
 agent
-    : QUOTE vdb_agent QUOTE
+    : vdb_agent QUOTE
         {
-            lib -> set( ReceiverInterface::agent, $2 );
-            lib -> agent_for_postprocess = string( $2.p, $2.n );
+            lib -> set( ReceiverInterface::agent, $1 );
+            lib -> agent_for_postprocess = Unescape( $1 );
         }
-    | QUOTE QUOTE       { lib -> set( ReceiverInterface::agent, EmptyTSTR ); }
+    | QUOTE       { lib -> set( ReceiverInterface::agent, EmptyTSTR ); }
     ;
 
 req_id
@@ -206,4 +212,27 @@ q_i64
 void gcp_error( yyscan_t locp, NCBI::Logging::GCPReceiver * lib, const char * msg )
 {
     // intentionally left empty, we communicate errors by rejecting lines
+}
+
+#include <iostream>
+using namespace std;
+std::string
+Unescape( t_str & input )
+{
+    std::string ret;
+    ret.reserve( input.n );
+    size_t i = 0;
+    while( i < input.n )
+    {
+        if ( input.p[i] == '"')
+        {
+            if ( i < input.n - 1 && input.p[ i + 1 ] == '"' )
+            {
+                ++i;
+            }
+        }
+        ret.append( 1, input.p[i] );
+        i++;
+    }
+    return ret;
 }

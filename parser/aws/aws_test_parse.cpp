@@ -518,6 +518,13 @@ TEST_F( AWSTestFixture, dash_as_extra_field_followed_by_more_fields )
         ASSERT_EQ( "- a b c d", extract_value( res, "_extra" ) );
 }
 
+TEST_F( AWSTestFixture, LOGMON_208 )
+{   // unescaped double quotes in the UserAgent
+    std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"\"linux64\" sra-toolkit vdb-dump.3-head (phid=noce2034c0,libc=2.17,bmap=nob)\" - - - - - - - -" );
+    ASSERT_EQ( "\"linux64\" sra-toolkit vdb-dump.3-head (phid=noce2034c0,libc=2.17,bmap=nob)", extract_value( res, "agent" ) );
+}
+
+
 TEST_F( AWSTestFixture, MultiThreading )
 {
     std::string input(

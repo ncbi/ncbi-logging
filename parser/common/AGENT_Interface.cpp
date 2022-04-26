@@ -37,12 +37,11 @@ void AGENTReceiver::set( AGENT_Members m, const t_str & v )
 }
 
 ReceiverInterface::Category
-AGENTReceiver::ParseUserAgent( string & source )
+AGENTReceiver::ParseUserAgent( const string & source )
 {
     AGENTParseBlock pb ( *this );
     // handle failure of parser (set cat to ugly) here and everywhere in post-process
     pb.format_specific_parse( source.c_str(), source.size() );
-    source.clear();
     return GetCategory();
 }
 
