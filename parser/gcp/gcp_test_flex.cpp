@@ -52,6 +52,14 @@ public:
         return gcp_lex( & token, sc );
     }
 
+    int StartAgent(const char * input, bool debug = false )
+    {
+        gcp__scan_bytes( input, strlen( input ), sc );
+        gcp_set_debug ( debug, sc );
+        gcp_start_UserAgent( sc );
+        return gcp_lex( & token, sc );
+    }
+
     string TokenValue() const { return string( token  . p, token  . n ); }
 
     void TestIPV6 ( const char * addr )
@@ -105,6 +113,13 @@ TEST_F ( GCP_TestFlexFixture, QuotedEscapedQuote )
     ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
     ASSERT_EQ( QSTR, NextTokenType() );
     ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
+    ASSERT_EQ( QUOTE, NextTokenType() );
+    #undef str
+}
+TEST_F ( GCP_TestFlexFixture, AgentDoubledQuote )
+{
+    ASSERT_EQ( QSTR, StartAgent("\"\"\"", true) );  /* """" */
+    ASSERT_EQ( "\"\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str
 }

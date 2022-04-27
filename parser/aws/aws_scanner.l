@@ -108,11 +108,14 @@ RESULTCODE      ([0-9]{3})|"-"
 
     /* Agent can be a naked dash or a quoted string.
        In case of quoted string (the AGENT state) we consume everything between the quotes and
-       return it as a sequence of STR tokens */
+       return it as a sequence of STR tokens
+       LOGMON-208: be careful to handle embedded unescaped " */
 <AGENT_OPEN>\"      { yy_pop_state( yyscanner ); yy_push_state( AGENT, yyscanner ); MAKE_STR(); return QUOTE; }
 <AGENT_OPEN>-       { yy_pop_state( yyscanner ); MAKE_STR(); return DASH; }
 
 <AGENT>\"           { yy_pop_state( yyscanner ); MAKE_STR(); return QUOTE; }
+<AGENT>\"(linux|mac|windows)(32|64)\"  { MAKE_STR(); return STR; }
+<AGENT>\"ncbi-vdb\"  { MAKE_STR(); return STR; }
 <AGENT>{AGENTSTR}   { MAKE_STR(); return STR; }
 <AGENT>.            { MAKE_STR(); return STR; }
 
