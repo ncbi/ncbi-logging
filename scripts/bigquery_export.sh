@@ -71,7 +71,7 @@ EOF
 
     #bq mk --external_table_definition=gs_schema_only.json $DATASET.gs_parsed
 
-    gsutil ls -lR "$PARSE_BUCKET/logs_gs_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
+    gsutil ls -lR "$PARSE_BUCKET/logs_gs_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" | tail
 
     bq rm -f "$DATASET.gs_parsed" || true
     bq load \
@@ -133,7 +133,7 @@ EOF
     jq -S -c -e . < s3_schema.json > /dev/null
     jq -S -c .schema.fields < s3_schema.json > s3_schema_only.json
 
-    gsutil ls -lR "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
+    gsutil ls -lR "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" | tail
 
     bq rm -f "$DATASET.s3_parsed" || true
     bq load \
@@ -186,7 +186,7 @@ EOF
     jq -S -c -e . < op_schema.json > /dev/null
     jq -S -c .schema.fields < op_schema.json > op_schema_only.json
 
-    gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*"
+    gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" | tail
 
     bq rm -f "$DATASET.op_parsed" || true
 #        "$PARSE_BUCKET/logs_op_public/recognized.*" \
@@ -374,7 +374,7 @@ ENDOFQUERY
 
     bq show --schema "$DATASET.s3_fixed"
 
-echo " #### op_fixed"
+echo " #### op_fixed1"
     # LOGMON-1: Remove multiple -heads from agent
     QUERY=$(cat <<-ENDOFQUERY
     SELECT
@@ -407,13 +407,46 @@ echo " #### op_fixed"
     server as host,
     res_len as bytes_sent,
     path as request_uri,
-    $DATASET.map_extension(path) as extension,
     referer as referer,
-    replace(agent, '-head', '') as user_agent,
-    'OP' as source,
-    current_datetime() as fixed_time
+    replace(agent, '-head', '') as user_agent
     FROM \\\`ncbi-logmon.$DATASET.op_parsed\\\`
     WHERE ifnull(accepted,true)=true
+ENDOFQUERY
+    )
+
+    QUERY="${QUERY//\\/}"
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
+    # shellcheck disable=SC2016
+
+    bq query \
+    --project_id ncbi-logmon \
+    --destination_table "$DATASET.op_fixed1" \
+    --time_partitioning_field=start_ts \
+    --use_legacy_sql=false \
+    --batch=true \
+    --max_rows=5 \
+    "$QUERY"
+
+    bq show --schema "$DATASET.op_fixed1"
+
+echo " #### op_fixed"
+    QUERY=$(cat <<-ENDOFQUERY
+    SELECT
+    remote_ip,
+    start_ts,
+    end_ts,
+    accession,
+    version,
+    http_operation,
+    http_status,
+    host,
+    bytes_sent,
+    request_uri,
+    $DATASET.map_extension(request_uri) as extension,
+    referer,
+    'OP' as source,
+    current_datetime() as fixed_time
+    FROM \\\`ncbi-logmon.$DATASET.op_fixed1\\\`
 ENDOFQUERY
     )
 
@@ -424,6 +457,7 @@ ENDOFQUERY
     bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.op_fixed" \
+    --time_partitioning_field=start_ts \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
