@@ -129,7 +129,14 @@ for LOG_BUCKET in "${buckets[@]}"; do
         VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel --version)
         ls -l "$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel
 
+        # sed to work around """linux64 bug (LOGMON-208)
+        # The seds require about 15% the CPU of log2jsn-rel
         tar -xaOf "$TGZ" "$wildcard" | \
+            sed 's/"""linux64""/"linux64/g'  | \
+            sed 's/"""linux64"/"linux64/g'  | \
+            sed  's/""linux64"/"linux64/g'  | \
+            sed  's/""mac64"/"mac64/g'  | \
+            sed  's/""windows64"/"windows64/g'  | \
             time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
             "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
             2> "$TGZ.err"
