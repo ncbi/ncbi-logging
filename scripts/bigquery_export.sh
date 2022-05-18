@@ -445,6 +445,7 @@ echo " #### op_fixed"
     $DATASET.map_extension(request_uri) as extension,
     referer,
     'OP' as source,
+    user_agent,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.op_fixed1\\\`
 ENDOFQUERY
