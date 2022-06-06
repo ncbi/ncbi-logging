@@ -16,5 +16,4 @@ DATE=$(date "+%Y%m%d") #_%H%M%S
 
 15 5 * * 1-5 /home/vartanianmh/backup.sh >> /home/vartanianmh/backup.log 2>&1
 17 * * * * /home/vartanianmh/strides/intprod11_check.sh > /dev/null 2>&1
-
-06  2 * * * cd $HOME/ncbi-logging/scripts && ./daily.sh | ts 2>&1 >> $HOME/daily.log
+#06  2 * * * cd $HOME/ncbi-logging/scripts && ./daily.sh | ts 2>&1 >> $HOME/daily.log

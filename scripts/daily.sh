@@ -22,32 +22,37 @@ if [ "$homespace" -lt 500000 ]; then
     df -HT "$HOME" | mailx -s "$HOME low on space" vartanianmh@ncbi.nlm.nih.gov
 fi
 
-#echo "mirror.sh GS"
-#./mirror.sh GS |& ts >> "$HOME"/logs/mirror_gs."$DATE".log
+echo "mirror.sh GS"
+./mirror.sh GS |& ts >> "$HOME"/logs/mirror_gs."$DATE".log
 
-#echo "mirror.sh OP"
-#./mirror.sh OP |& ts >> "$HOME"/logs/mirror_op."$DATE".log
+echo "mirror.sh OP"
+./mirror.sh OP |& ts >> "$HOME"/logs/mirror_op."$DATE".log
 
 echo "mirror.sh S3"
 ./mirror.sh S3 |& ts >> "$HOME"/logs/mirror_s3."$DATE".log
 
 echo "mirror.sh Splunk"
-./mirror.sh Splunk |& ts >> "$HOME"/logs/mirror_splunk."$DATE".log
+./mirror.sh Splunk |& ts >> "$HOME"/logs/mirror_splunk."$DATE".log &
 
 echo "SRA Main"
 ./sra_main.sh |& ts >> "$HOME"/logs/sra_main."$DATE".log
 
 echo "parse S3"
-./parse.sh S3      |& ts >> "$HOME"/logs/parse_s3."$DATE".log
-./parse_new.sh S3  |& ts >> "$HOME"/logs/parse_new_s3."$DATE".log
+./parse.sh S3      |& ts >> "$HOME"/logs/parse_s3."$DATE".log &
+./parse_new.sh S3  |& ts >> "$HOME"/logs/parse_new_s3."$DATE".log &
 
 echo "parse GS"
 ./parse.sh GS      |& ts >> "$HOME"/logs/parse_gs."$DATE".log
 ./parse_new.sh GS  |& ts >> "$HOME"/logs/parse_new_gs."$DATE".log
 
-#echo "parse OP"
-#./parse.sh OP      |& ts >> "$HOME"/logs/parse_op."$DATE".log
-#./parse_new.sh OP  |& ts >> "$HOME"/logs/parse_new_op."$DATE".log
+echo "parse OP"
+./parse.sh OP      |& ts >> "$HOME"/logs/parse_op."$DATE".log
+./parse_new.sh OP  |& ts >> "$HOME"/logs/parse_new_op."$DATE".log
+
+echo "waiting.."
+date
+jobs
+wait
 
 echo "parse Splunk"
 ./parse.sh Splunk   |& ts >> "$HOME"/logs/parse_splunk."$DATE".log
@@ -59,7 +64,6 @@ echo "s3_lister"
 
 dow=$(date +%u)
 if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
-#if [ "$dow" = "1" ] ; then # Mondays
     echo "bigqueries"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
