@@ -141,6 +141,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
             2> "$TGZ.err"
 
+        rm -f "$TGZ"
         echo "  Record format is:"
         head -1 "$YESTERDAY_DASH.${LOG_BUCKET}.json" | jq -SM .
 
@@ -162,7 +163,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     printf "Recognized lines:   %8d\n" "$recwc"
     printf "Unrecognized lines: %8d\n" "$unrecwc"
-
+    ls -l
     echo "  splitting"
     split -a 3 -d -e -l 20000000 --additional-suffix=.jsonl \
         - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \

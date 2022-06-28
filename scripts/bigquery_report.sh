@@ -135,7 +135,7 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-"select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from $DATASET.summary_export where domain not like '%nih.gov%' and (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day order by day"
+"select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from $DATASET.summary_export where domain not like '%nih.gov%' and (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day order by day desc"
 
 
 bq -q query \
@@ -243,3 +243,10 @@ else
         "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from $DATASET.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from $DATASET.objects) order by unlisted_bucket"
 
 fi # public
+
+for SOURCE in GS S3 OP; do
+    bq -q query \
+        --use_legacy_sql=false \
+        --format "$FORMAT" \
+        "select datetime_Trunc(start_ts,day) as day, source, count(distinct remote_ip) as num_ips, count(distinct accession) as num_accs from $DATASET.summary_export where source='$SOURCE' group by day, source order by day desc limit 30"
+done

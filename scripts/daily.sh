@@ -31,8 +31,8 @@ echo "mirror.sh OP"
 echo "mirror.sh S3"
 ./mirror.sh S3 |& ts >> "$HOME"/logs/mirror_s3."$DATE".log
 
-echo "mirror.sh Splunk"
-./mirror.sh Splunk |& ts >> "$HOME"/logs/mirror_splunk."$DATE".log &
+#echo "mirror.sh Splunk"
+#./mirror.sh Splunk |& ts >> "$HOME"/logs/mirror_splunk."$DATE".log &
 
 echo "SRA Main"
 ./sra_main.sh |& ts >> "$HOME"/logs/sra_main."$DATE".log
@@ -54,9 +54,9 @@ date
 jobs
 wait
 
-echo "parse Splunk"
-./parse.sh Splunk   |& ts >> "$HOME"/logs/parse_splunk."$DATE".log
-./parse_new.sh Splunk   |& ts >> "$HOME"/logs/parse_new_splunk."$DATE".log
+#echo "parse Splunk"
+#./parse.sh Splunk   |& ts >> "$HOME"/logs/parse_splunk."$DATE".log
+#./parse_new.sh Splunk   |& ts >> "$HOME"/logs/parse_new_splunk."$DATE".log
 
 echo "s3_lister"
 ./s3_lister.sh |& ts >> "$HOME"/logs/s3_lister."$DATE".log
