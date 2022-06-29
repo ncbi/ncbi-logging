@@ -1164,10 +1164,12 @@ echo "Cleanup large temp tables"
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_s3" || true
 
+    bq rm --project_id ncbi-logmon -f "$DATASET.cloudian_fixed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
+
 
 echo "bigquery_export.sh complete"
 date

@@ -55,6 +55,11 @@ bq -q query \
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
+    "select table_id, row_count, size_bytes FROM $DATASET.__TABLES__ order by size_bytes desc"
+
+bq -q query \
+    --format "$FORMAT" \
+    --use_legacy_sql=false \
     "select source, count(*) as external_records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source order by source "
 
 
