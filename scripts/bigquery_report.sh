@@ -32,20 +32,20 @@ bq -q query \
 --format "$FORMAT" \
 "WITH day_counts AS ( select day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests FROM $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2021-01-01' ) group by day having s3_requests <  $REQUEST_CUTOFF or gs_requests < $REQUEST_CUTOFF or op_requests < $REQUEST_CUTOFF ), pop AS ( SELECT * FROM UNNEST(GENERATE_DATE_ARRAY('2021-01-01', current_date(), INTERVAL 1 DAY)) AS missing_day) select missing_day, gs_requests, s3_requests, op_requests from day_counts, pop where missing_day=day order by day desc "
 
-bq -q query \
-    --format "$FORMAT" \
-    --use_legacy_sql=false \
-    "select max(datetime_trunc(start_ts, day)) as gs_max_day from $DATASET.gs_fixed"
+#bq -q query \
+#    --format "$FORMAT" \
+#    --use_legacy_sql=false \
+#    "select max(datetime_trunc(start_ts, day)) as gs_max_day from $DATASET.gs_fixed"
 
-bq -q query \
-    --format "$FORMAT" \
-    --use_legacy_sql=false \
-    "select max(datetime_trunc(start_ts, day)) as op_max_day from $DATASET.op_fixed"
+#bq -q query \
+#    --format "$FORMAT" \
+#    --use_legacy_sql=false \
+#    "select max(datetime_trunc(start_ts, day)) as op_max_day from $DATASET.op_fixed"
 
-bq -q query \
-    --format "$FORMAT" \
-    --use_legacy_sql=false \
-    "select max(datetime_trunc(start_ts, day)) as s3_max_day from $DATASET.s3_fixed"
+#bq -q query \
+#    --format "$FORMAT" \
+#    --use_legacy_sql=false \
+#    "select max(datetime_trunc(start_ts, day)) as s3_max_day from $DATASET.s3_fixed"
 
 #bq -q query \
 #    --format "$FORMAT" \
@@ -255,3 +255,6 @@ for SOURCE in GS S3 OP; do
         --format "$FORMAT" \
         "select datetime_Trunc(start_ts,day) as day, source, count(distinct remote_ip) as num_ips, count(distinct accession) as num_accs from $DATASET.summary_export where source='$SOURCE' group by day, source order by day desc limit 30"
 done
+
+echo "End of BigQuery Report"
+date
