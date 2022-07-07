@@ -1143,7 +1143,7 @@ ENDOFQUERY
 #    QUERY="${QUERY//\\/}"
 
 echo " ###  masking"
-    bq cp -f "strides_analytics.summary_export_ca_masked" "strides_analytics.summary_export_ca_masked_$YESTERDAY"
+    bq cp -f "strides_analytics.summary_export_ca_masked" "strides_analytics.summary_export_ca_masked_$YESTERDAY" || true
     bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked" || true
 
     # shellcheck disable=SC2016
@@ -1154,11 +1154,8 @@ echo " ###  masking"
     --batch=true \
     --max_rows=5 \
     "$QUERY"
-else
-    bq rm -f "$DATASET.op_parsed" || true
-fi
-
-echo "Cleanup large temp tables"
+else # not private
+    echo "Cleanup large temp tables"
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
@@ -1169,6 +1166,11 @@ echo "Cleanup large temp tables"
     bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
+
+    bq rm --project_id ncbi-logmon -f "$DATASET.gs_parsed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
+fi # private
 
 
 echo "bigquery_export.sh complete"

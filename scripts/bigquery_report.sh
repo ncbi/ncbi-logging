@@ -78,7 +78,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select datetime_trunc(start_ts, month) as month, source, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, month order by month"
+    "select datetime_trunc(start_ts, month) as month, source, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, month order by month desc"
 
 
 bq -q query \
@@ -189,7 +189,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "SELECT datetime_trunc(start_ts, month) as month, bucket_owner, user_location, SUM(bytes_sent) as total_bytes, COUNT(*) as num_accesses, count(distinct accession) as distinct_accessions FROM ( SELECT start_ts, accession, case when starts_with(bucket ,'sra-pub-src-1') then 'Public' when starts_with(bucket , 'sra-pub-src-2') then 'Public' else 'NCBI' end as bucket_owner, bytes_sent, CASE when domain like '%nih.gov%' THEN 'NCBI' WHEN domain LIKE '%AWS%' THEN 'AWS' ELSE 'External' END AS user_location FROM $DATASET.summary_export WHERE source='S3' AND http_operations NOT LIKE '%P%' ) GROUP BY month, bucket_owner, user_location order by month, bucket_owner, user_location"
+    "SELECT datetime_trunc(start_ts, month) as month, bucket_owner, user_location, SUM(bytes_sent) as total_bytes, COUNT(*) as num_accesses, count(distinct accession) as distinct_accessions FROM ( SELECT start_ts, accession, case when starts_with(bucket ,'sra-pub-src-1') then 'Public' when starts_with(bucket , 'sra-pub-src-2') then 'Public' else 'NCBI' end as bucket_owner, bytes_sent, CASE when domain like '%nih.gov%' THEN 'NCBI' WHEN domain LIKE '%AWS%' THEN 'AWS' ELSE 'External' END AS user_location FROM $DATASET.summary_export WHERE source='S3' AND http_operations NOT LIKE '%P%' ) GROUP BY month, bucket_owner, user_location order by month desc, bucket_owner, user_location"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -253,8 +253,13 @@ for SOURCE in GS S3 OP; do
     bq -q query \
         --use_legacy_sql=false \
         --format "$FORMAT" \
-        "select datetime_Trunc(start_ts,day) as day, source, count(distinct remote_ip) as num_ips, count(distinct accession) as num_accs from $DATASET.summary_export where source='$SOURCE' group by day, source order by day desc limit 30"
+        "select datetime_trunc(start_ts,day) as day, source, count(distinct remote_ip) as num_ips, count(distinct accession) as num_accs from $DATASET.summary_export where source='$SOURCE' group by day, source order by day desc limit 30"
 done
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select datetime_trunc(start_ts, month) as month, source, count(distinct remote_ip) as num_ips, count(distinct accession) as num_accs, sum(bytes_sent) as bytes_sent from $DATASET.summary_export where start_ts > date_sub(current_date(), interval 6 month) group by month, source order by source, month desc limit 30"
 
 echo "End of BigQuery Report"
 date
