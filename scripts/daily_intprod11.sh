@@ -43,9 +43,10 @@ echo "parse OP"
 ./parse_new.sh OP  |& ts >> "$HOME"/logs/parse_new_op."$DATE".log
 
 
-dow=$(date +%u)
-if [ "$dow" = "3" ];  then
-#if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then # Mondays and Thursday
+#dow=$(date +%u) # 1=Monday
+dom=$(date +%e)
+# Kurtis mirrors on 8th of month, pre-check before
+if [ "$dom" = "2" ] || [ "$dom" -eq "6" ] ; then
     echo "bigquery_export"
     #./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     #./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
@@ -53,8 +54,8 @@ if [ "$dow" = "3" ];  then
     ./bigquery_report.sh  |& ts >> "$HOME"/logs/bigquery_report."$DATE".log
     #./bigquery_summary.sh |& ts >> "$HOME"/logs/bigquery_summary."$DATE".log
 
-    cat "$HOME"/logs/bigquery_report."$DATE".log | \
-        sed -re ' :restart ; s/([0-9])([0-9]{3})($|[^0-9])/\1,\2\3/ ; t restart ' | \
+    sed -re ' :restart ; s/([0-9])([0-9]{3})($|[^0-9])/\1,\2\3/ ; t restart ' \
+        < "$HOME"/logs/bigquery_report."$DATE".log | \
         mailx -s "$HOST BigQuery Report" vartanianmh@ncbi.nlm.nih.gov
 fi
 
