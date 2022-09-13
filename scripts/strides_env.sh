@@ -68,6 +68,7 @@ case "$HOSTNAME" in
     intprod11)
         export STRIDES_SCOPE="private"
         export TMP="/export/home/TMP/$USER"
+        export RAMDISK="$HOME/ramdisk"
         #renice +19 -p $$ > /dev/null 2>&1
         ;;
     lmem14)
