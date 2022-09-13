@@ -62,11 +62,10 @@ echo "s3_lister"
 ./s3_lister.sh |& ts >> "$HOME"/logs/s3_lister."$DATE".log
 ./mirror_obj.sh |& ts >> "$HOME"/logs/mirror_obj."$DATE".log
 
-dow=$(date +%u) # 1=Monday
+#dow=$(date +%u) # 1=Monday
 dom=$(date +%e)
-#if [ "$dow" = "1" ] || [ "$dow" = "4" ]; then
-# Kurtis mirrors on 8th of month
-if [ "$dow" = "1" ] || [ "$dom" -eq "5" ] ; then
+# Kurtis mirrors on 8th of month, pre-check before
+if [ "$dom" = "2" ] || [ "$dom" -eq "6" ] ; then
     echo "bigqueries"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
