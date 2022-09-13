@@ -10,7 +10,7 @@ cd "$HOME/ncbi-logging/scripts" || exit
 set +e
 
 mkdir -p "$HOME"/logs
-find "$HOME/logs" -mtime +1 -size +10M -exec xz -9 {} \;
+find "$HOME/logs" ! -name "*xz" -mtime +1 -size +10M -exec xz -9 {} \;
 
 panspace=$( /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | tail -1 | tr -s ' ' | cut -d ' ' -f 5 | tr -d '%' )
 if [ "$panspace" -gt 95 ]; then
