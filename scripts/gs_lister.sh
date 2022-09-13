@@ -9,7 +9,7 @@ buckets=$(sqlcmd "select bucket_name from buckets where cloud_provider='GS' and 
 
 echo "buckets is '$buckets'"
 
-mkdir -p "$PANFS/s3_prod/objects/"
+mkdir -p "$PANFS/gs_prod/objects/"
 
 for LOG_BUCKET in $buckets; do
     profile=$(sqlcmd "select service_account from buckets where cloud_provider='GS' and bucket_name='$LOG_BUCKET'")

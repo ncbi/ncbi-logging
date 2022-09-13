@@ -30,6 +30,11 @@ echo "mirror.sh OP"
 echo "mirror.sh S3"
 ./mirror.sh S3 |& ts >> "$HOME"/logs/mirror_s3."$DATE".log
 
+# SYS-436845/LOGMON-215
+rm -f "$HOME"/s3_prod/*.err
+rm -f /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod/*.err
+find "$HOME"/s3_prod -type f -mtime +30 -exec rm -f {} \;
+
 echo "parse S3"
 #./parse.sh S3      |& ts >> "$HOME"/logs/parse_s3."$DATE".log
 ./parse_new.sh S3  |& ts >> "$HOME"/logs/parse_new_s3."$DATE".log
