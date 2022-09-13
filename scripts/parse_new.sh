@@ -121,7 +121,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         fi
     fi
 
-    PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
+    PARSE_DEST="$TMP/parsed_new/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
     df -HT . | indent

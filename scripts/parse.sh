@@ -74,12 +74,12 @@ if [ "$PROVIDER" = "OP" ]; then
     buckets=("OP-srafiles11" "OP-srafiles12" "OP-srafiles13" "OP-srafiles21" "OP-srafiles22" "OP-srafiles23" "OP-srafiles31" "OP-srafiles32" "OP-srafiles33" "OP-srafiles34" "OP-srafiles35" "OP-srafiles36" "OP-ftp" "OP-ftp1" "OP-ftp11" "OP-ftp12" "OP-ftp13" "OP-ftp2" "OP-ftp21" "OP-ftp22" "OP-ftp31" "OP-ftp32" "OP-ftp33" "OP")
 fi
 
-df -HT .
 for LOG_BUCKET in "${buckets[@]}"; do
     echo "  LOG_BUCKET=$LOG_BUCKET"
     PARSE_DEST="$TMP/parsed/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
+    df -HT .
 
     SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
@@ -141,6 +141,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
             2> "$TGZ.err"
 
+        ls -l
         rm -f "$TGZ"
         echo "  Record format is:"
         head -1 "$YESTERDAY_DASH.${LOG_BUCKET}.json" | jq -SM .
@@ -163,9 +164,10 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     printf "Recognized lines:   %8d\n" "$recwc"
     printf "Unrecognized lines: %8d\n" "$unrecwc"
+    df -HT .
     ls -l
     echo "  splitting"
-    split -a 3 -d -e -l 20000000 --additional-suffix=.jsonl \
+    split -a 3 -d -e -l 10000000 --additional-suffix=.jsonl \
         - "recognized.$YESTERDAY_DASH.${LOG_BUCKET}." \
         < "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
 
@@ -175,9 +177,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
         rm -f "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
     fi
 
+    ls -l
     echo "  Gzipping..."
     gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl &
     wait
+    ls -l
 
     echo "  Summarizing..."
     {
