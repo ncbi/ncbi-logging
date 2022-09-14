@@ -32,7 +32,6 @@ echo "mirror.sh S3"
 
 # SYS-436845/LOGMON-215
 rm -f "$HOME"/s3_prod/*.err
-rm -f /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod/*.err
 find "$HOME"/s3_prod -type f -mtime +30 -exec rm -f {} \;
 
 echo "parse S3"
