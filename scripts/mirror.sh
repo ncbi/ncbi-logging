@@ -84,9 +84,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     if [ "$PROVIDER" = "GS" ]; then
         if [ "$STRIDES_SCOPE" = "public" ]; then
-            MIRROR="$TMP/$PROVIDER/$LOG_BUCKET"
+            MIRROR="$TMP/$PROVIDER/$YESTERDAY/$LOG_BUCKET"
         else
-            MIRROR="$RAMDISK/$PROVIDER/$LOG_BUCKET"
+            MIRROR="$RAMDISK/$PROVIDER/$YESTERDAY/$LOG_BUCKET"
         fi
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
@@ -100,10 +100,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
             gcloud config set account logmon@nih-sra-datastore-protected.iam.gserviceaccount.com
         fi
 
-        echo "Profile is $PROFILE, $PROVIDER rsyncing gs://$LOG_BUCKET to $MIRROR..."
+        echo "Profile is $PROFILE, $PROVIDER copying gs://$LOG_BUCKET for $YESTERDAY_UNDER to $MIRROR..."
 
-        gsutil -m rsync -x ".*_2019_.*|.*_2020_.*|.*_2021_.*" "gs://$LOG_BUCKET/" .
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
+        gsutil -m cp "gs://$LOG_BUCKET/*_${YESTERDAY_UNDER}_*" .
+        # gsutil -m rsync -x ".*_2019_.*|.*_2020_.*|.*_2021_.*" "gs://$LOG_BUCKET/" .
     fi
 
     if [ "$PROVIDER" = "OP" ]; then
@@ -241,7 +242,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "Copying $TGZ to $DEST_BUCKET"
     gsutil cp "$TGZ" "$DEST_BUCKET"
 
-    if [ "$PROVIDER" != "GS" ] && [ "$PROVIDER" != "Splunk" ]; then
+    if [ "$PROVIDER" != "Splunk" ]; then
         cd ..
         echo "Deleting $MIRROR"
         df -HT "$MIRROR"
