@@ -17,7 +17,7 @@ find "$HOME/logs" -mtime +2 -size +1M -exec xz -9 {} \;
 #/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
 
 homespace=$( df  "$HOME" | tail  -1 | tr -s ' ' | cut -d ' ' -f 4)
-if [ "$homespace" -lt 500000 ]; then
+if [ "$homespace" -lt 5000000 ]; then
     df -HT "$HOME" | mailx -s "$HOST $HOME low on space" vartanianmh@ncbi.nlm.nih.gov
 fi
 
