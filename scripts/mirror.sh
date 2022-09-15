@@ -221,9 +221,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     # ls -lh
 
-    echo "rsynced to $MIRROR, tarring $WILDCARD to $TGZ ..."
+    echo "synced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
-    find . -name "$WILDCARD" -print0 | sort -z | tar -cavf "$TGZ" --null --files-from -
+    find . -name "$WILDCARD" -print0 | sort -z | tar -caf "$TGZ" --null --files-from -
     echo "Tarred"
     ls -hl "$TGZ"
 
