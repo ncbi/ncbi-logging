@@ -1227,5 +1227,5 @@ else # not private
 fi # private
 
 
-echo "bigquery_export.sh complete"
+echo "bigquery_annual.sh complete"
 date
