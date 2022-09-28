@@ -73,7 +73,8 @@ if [ "$dom" = "2" ] || [ "$dom" -eq "6" ] ; then
     echo "bigqueries"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
-    ./bigquery_export.sh  |& ts >> "$HOME"/logs/bigquery_export."$DATE".log
+    #./bigquery_export.sh  |& ts >> "$HOME"/logs/bigquery_export."$DATE".log
+    ./bigquery_annual.sh  |& ts >> "$HOME"/logs/bigquery_annual."$DATE".log
     ./bigquery_report.sh  |& ts >> "$HOME"/logs/bigquery_report."$DATE".log
     ./bigquery_summary.sh |& ts >> "$HOME"/logs/bigquery_summary."$DATE".log
 
