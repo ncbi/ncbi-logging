@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.9
 
 import datetime
-import sys
 import json
+import sys
 from pathlib import Path
+
 from influxdb import InfluxDBClient
 
 
@@ -42,7 +43,9 @@ def main():
         if "accession" in rec:
             outrec = {
                 "measurement": "summary_gs_v011",
-                "tags": {"source": rec["source"],},
+                "tags": {
+                    "source": rec["source"],
+                },
                 "time": parsedt(rec["start_ts"]),
                 "fields": {
                     "bucket": rec["bucket"],

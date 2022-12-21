@@ -107,11 +107,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     echo "  Parsing $LOG_BUCKET..."
     if [ "$PARSER" = "cl" ]; then
-        VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/cl2jsn-rel --version)
+        VERSION=$("$HOME"/ncbi-logging/parser/bin/cl2jsn-rel --version)
 
         tar -xaOf "$TGZ" "$wildcard" | \
             tr -s ' ' | \
-            time "$HOME/devel/ncbi-logging/parser/bin/cl2jsn-rel" -f "$PARSER" > \
+            time "$HOME/ncbi-logging/parser/bin/cl2jsn-rel" -f "$PARSER" > \
             "$YESTERDAY_DASH.${LOG_BUCKET}.out" \
             2> "$TGZ.err"
 
@@ -126,8 +126,8 @@ for LOG_BUCKET in "${buckets[@]}"; do
             set -e
 
     else
-        VERSION=$("$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel --version)
-        ls -l "$HOME"/devel/ncbi-logging/parser/bin/log2jsn-rel
+        VERSION=$("$HOME"/ncbi-logging/parser/bin/log2jsn-rel --version)
+        ls -l "$HOME"/ncbi-logging/parser/bin/log2jsn-rel
 
         # sed to work around """linux64 bug (LOGMON-208)
         # The seds require about 15% the CPU of log2jsn-rel
@@ -137,7 +137,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed  's/""linux64"/"linux64/g'  | \
             sed  's/""mac64"/"mac64/g'  | \
             sed  's/""windows64"/"windows64/g'  | \
-            time "$HOME/devel/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
+            time "$HOME/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
             "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
             2> "$TGZ.err"
 

@@ -10,7 +10,7 @@ export PREFIX="strides_analytics"
 export PGVER="postgresql-12.3"
 export PGDATA="$HOME/pgdata12"
 export PATH="$HOME/$PGVER/bin:$HOME/.local/bin:/opt/python-all/bin:$HOME/google-cloud-sdk/bin:/netopt/ncbi_tools64/bin/:$PATH"
-export PATH="$PATH:$HOME/devel/ncbi-logging/parser/bin:$HOME/ncbi-logging/parser/bin:$HOME/bin"
+export PATH="$PATH:$HOME/ncbi-logging/parser/bin:$HOME/ncbi-logging/parser/bin:$HOME/bin"
 export AWS_PROFILE="strides-analytics"
 export LD_LIBRARY_PATH="$HOME/$PGVER/lib"
 export LD_LIBRARY_PATH="$HOME/lib:$HOME/.local/lib:$LD_LIBRARY_PATH"
@@ -32,7 +32,6 @@ export HOST
 
 indent() { sed 's/^/  /'; }
 
-# GCP VM shouldn't have any other competing load, helps on iebdev
 renice +19 -p $$ &> /dev/null
 
 SQLCACHE="$RAMDISK/${USER}_${DATE}"
@@ -63,18 +62,15 @@ case "$HOSTNAME" in
     iebdev11)
         export STRIDES_SCOPE="public"
         export TMP="/tmp/$USER"
-        renice +19 -p $$ > /dev/null 2>&1
         ;;
     intprod11)
         export STRIDES_SCOPE="private"
         export TMP="/export/home/TMP/$USER"
         export RAMDISK="$HOME/ramdisk"
-        #renice +19 -p $$ > /dev/null 2>&1
         ;;
     lmem14)
         export STRIDES_SCOPE="public"
         export TMP="/tmp/$USER"
-        #renice +19 -p $$ > /dev/null 2>&1
         ;;
     *)
         ;;

@@ -102,6 +102,8 @@ for LOG_BUCKET in "${buckets[@]}"; do
         fi
     fi
 
+    echo
+    echo "---------------------------------"
     echo "  Parsing $LOG_BUCKET..."
     echo "    BUCKET_NAME is $BUCKET_NAME"
 
@@ -122,8 +124,10 @@ for LOG_BUCKET in "${buckets[@]}"; do
     fi
 
     PARSE_DEST="$TMP/parsed_new/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
+    rm -rf "$PARSE_DEST"
     mkdir -p "$PARSE_DEST"
     cd "$PARSE_DEST" || exit
+    pwd
     df -HT . | indent
 
     if [ "$STRIDES_SCOPE" = "public" ]; then
@@ -159,7 +163,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     if [ "$totalwc" -gt 0 ]; then
         VERSION=$($PARSER_BIN --version)
-        echo "  Parsing $TGZ (pattern=$WILDCARD), $totalwc lines with $PARSER_BIN $VERSION..."
+        echo "  Parsing and gzsplitting $TGZ (pattern=$WILDCARD), $totalwc lines with $PARSER_BIN $VERSION..."
 
         BASE="$LOG_BUCKET.$YESTERDAY_DASH"
         echo "    BASE is $BASE"
@@ -173,16 +177,26 @@ for LOG_BUCKET in "${buckets[@]}"; do
             < "$BASE.good.jsonl" &
 
         set +e
-        tar -xaOf "$TGZ" "$WILDCARD" | \
-            time "$PARSER_BIN" -f -t 2 "$BASE" \
+        tar -xaOf "$TGZ" "$WILDCARD"           | \
+            sed 's/ - -$//g'                   | \
+            sed 's/ - Yes$//g'                 | \
+            sed 's/ - $//g'                    | \
+            sed 's/"""linux64""/"linux64/g'    | \
+            sed 's/"""linux64"/"linux64/g'     | \
+            sed  's/""linux64"/"linux64/g'     | \
+            sed  's/""mac64"/"mac64/g'         | \
+            sed  's/""windows64"/"windows64/g' | \
+            sed 's/TLSv1.2 .*/TLSv1.2 -/'      | \
+            time "$PARSER_BIN" -f -t 2 "$BASE"   \
             > stdout."$BASE" \
             2> stderr."$BASE"
 
-        echo "    Returned $?"
+        echo "    $PARSER_BIN returned $?"
         rm -f "$TGZ"
         head -v stderr."$BASE"
         echo "==="
 
+        pwd
         ls -l
 
         echo

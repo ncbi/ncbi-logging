@@ -3,11 +3,12 @@ import datetime
 import dbm
 import http.client
 import json
-from io import StringIO, BytesIO
 import logging
 import re
 import sys
 import urllib
+from io import BytesIO, StringIO
+
 import boto3
 
 

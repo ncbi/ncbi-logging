@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20220627.public.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20221207.public.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -137,6 +137,14 @@ WHERE IP LIKE '134.192.%';
 UPDATE RDNS
 SET DOMAIN = 'chinanet.cn.net (ChinaNetCenter)'
 WHERE IP LIKE '222.178.%'
+  OR IP LIKE '14.104.%'
+  OR IP LIKE '14.105.%'
+  OR IP LIKE '14.106.%'
+  OR IP LIKE '14.107.%'
+  OR IP LIKE '14.108.%'
+  OR IP LIKE '14.109.%'
+  OR IP LIKE '14.110.%'
+  OR IP LIKE '14.111.%'
   OR IP LIKE '27.15%'
   OR IP LIKE '49.6%'
   OR IP LIKE '49.7%'
@@ -171,6 +179,14 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '106.117.%'
   OR IP LIKE '106.118.%'
   OR IP LIKE '106.119.%'
+  OR IP LIKE '110.80.%'
+  OR IP LIKE '110.81.%'
+  OR IP LIKE '110.82.%'
+  OR IP LIKE '110.83.%'
+  OR IP LIKE '110.84.%'
+  OR IP LIKE '110.85.%'
+  OR IP LIKE '110.86.%'
+  OR IP LIKE '110.87.%'
   OR IP LIKE '113.6%'
   OR IP LIKE '113.7%'
   OR IP LIKE '113.8%'
@@ -183,6 +199,10 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '114.101.%'
   OR IP LIKE '114.102.%'
   OR IP LIKE '114.103.%'
+  OR IP LIKE '114.104.%'
+  OR IP LIKE '114.105.%'
+  OR IP LIKE '114.106.%'
+  OR IP LIKE '114.107.%'
   OR IP LIKE '114.23%'
   OR IP LIKE '115.234.%'
   OR IP LIKE '115.235.%'
@@ -221,6 +241,14 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '116.30.%'
   OR IP LIKE '116.31.%'
   OR IP LIKE '116.6.%'
+  OR IP LIKE '117.24.%'
+  OR IP LIKE '117.25.%'
+  OR IP LIKE '117.26.%'
+  OR IP LIKE '117.27.%'
+  OR IP LIKE '117.28.%'
+  OR IP LIKE '117.29.%'
+  OR IP LIKE '117.30.%'
+  OR IP LIKE '117.31.%'
   OR IP LIKE '117.64.%'
   OR IP LIKE '117.65.%'
   OR IP LIKE '117.66.%'
@@ -272,6 +300,21 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '180.126.%'
   OR IP LIKE '180.127.%'
   OR IP LIKE '180.96.%'
+  OR IP LIKE '182.97.%'
+  OR IP LIKE '182.98.%'
+  OR IP LIKE '182.99.%'
+  OR IP LIKE '182.100.%'
+  OR IP LIKE '182.101.%'
+  OR IP LIKE '182.102.%'
+  OR IP LIKE '182.103.%'
+  OR IP LIKE '182.104.%'
+  OR IP LIKE '182.105.%'
+  OR IP LIKE '182.106.%'
+  OR IP LIKE '182.107.%'
+  OR IP LIKE '182.108.%'
+  OR IP LIKE '182.109.%'
+  OR IP LIKE '182.110.%'
+  OR IP LIKE '182.111.%'
   OR IP LIKE '182.144.%'
   OR IP LIKE '182.145.%'
   OR IP LIKE '182.146.%'
@@ -290,7 +333,8 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '219.139.%'
   OR IP LIKE '219.140.%'
   OR IP LIKE '220.243.135.%'
-  OR IP LIKE '221.231.5.%'
+  OR IP LIKE '221.22%'
+  OR IP LIKE '221.23%'
   OR IP LIKE '59.50.85.%'
   OR IP LIKE '60.162.%'
   OR IP LIKE '60.184.%'
@@ -422,9 +466,11 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '119.4.%'
   OR IP LIKE '119.5.%'
   OR IP LIKE '119.6.%'
+  OR IP LIKE '120.8%'
   OR IP LIKE '123.138.%'
   OR IP LIKE '123.15%'
   OR IP LIKE '123.139.%'
+  OR IP LIKE '124.161.%'
   OR IP LIKE '171.36.%'
   OR IP LIKE '171.37.%'
   OR IP LIKE '171.38.%'
@@ -486,7 +532,10 @@ OR IP LIKE '124.112.%'
 OR IP LIKE '124.113.%'
 OR IP LIKE '101.110.119.%'
 OR IP LIKE '180.16%'
-OR IP LIKE '222.188.5.%'
+OR IP LIKE '222.188.%'
+OR IP LIKE '125.123.%'
+OR IP LIKE '58.4%'
+OR IP LIKE '58.5%'
 OR IP LIKE '183.16%';
 
 
@@ -828,7 +877,7 @@ WHERE IP LIKE '128.227.%';
 
 UPDATE RDNS
 SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
-WHERE IP LIKE '65.196.%';
+WHERE IP LIKE '65.196.%' or ip like '71.174.%';
 
 
 UPDATE RDNS
@@ -842,7 +891,11 @@ WHERE IP LIKE '207.237.188.%';
 
 UPDATE RDNS
 SET DOMAIN = 't-mobile.com (T-Mobile USA)'
-WHERE IP LIKE '172.35.%';
+WHERE
+IP LIKE '172.3%'
+OR IP LIKE '172.4%'
+OR IP LIKE '172.5%'
+OR IP LIKE '172.6%';
 
 
 UPDATE RDNS
@@ -1410,7 +1463,7 @@ where IP LIKE '203.181.243.%';
 
 UPDATE RDNS
 SET DOMAIN='moffitt.org (H. Lee Moffitt Cancer Center & Research Institute, Inc)'
-where IP LIKE '206.81.15$';
+where IP LIKE '206.81.15$' or ip like '206.81.16%';
 
 UPDATE RDNS
 set DOMAIN='en.sbu.ac.ir (Shahid Beheshti University)'
@@ -1514,7 +1567,7 @@ where ip like '210.32.%';
 
 update rdns
 set domain='roche.com (Genentech Inc)'
-where ip like '72.34.1%';
+where ip like '72.34.1%' or ip like '128.137.%';
 
 -- softlayer.com
 update rdns
@@ -1605,6 +1658,18 @@ where ip like '221.231.5.%';
 update rdns
 set domain='Mastertel Network For Wargaming (mastertel.ru)'
 where ip like '195.133.216.%';
+
+update rdns
+set domain='City of Hope Medical Center (cityofhope.org)'
+where ip like '128.137.%';
+
+update rdns
+set domain='University of Wyoming (uwyo.edu)'
+where ip like '129.72.%';
+
+update rdns
+set domain='Shadowserver Foundation (shadowserver.org)'
+where ip like '2001:470%';
 
 
 UPDATE RDNS
