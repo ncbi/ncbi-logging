@@ -45,6 +45,7 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
     CASE( auth_type )
     CASE( host_header )
     CASE( tls_version )
+    CASE( acl_required )
     CASE( _extra )
 
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
@@ -275,6 +276,7 @@ AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
         extract_and_set( obj, formatter, "auth_type" );
         extract_and_set( obj, formatter, "host_header" );
         extract_and_set( obj, formatter, "tls_version" );
+        extract_and_set( obj, formatter, "acl_required" );
 
         receiver . SetCategory( ReceiverInterface::cat_good );
 
