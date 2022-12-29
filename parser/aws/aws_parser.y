@@ -1,4 +1,5 @@
 %define api.pure full
+
 %lex-param { void * scanner }
 %parse-param { void * scanner }{ NCBI::Logging::AWSReceiver * lib }
 
@@ -91,8 +92,9 @@ log_aws
       aws_cipher SPACE
       aws_auth SPACE
       aws_host_hdr SPACE
-      { aws_start_TLS_vers( scanner ); } aws_tls_vers { aws_pop_state( scanner ); }
-      aws_aclRequired_opt
+      { aws_start_TLS_vers( scanner ); } aws_tls_vers { aws_pop_state( scanner ); } SPACE
+      aws_accessPoint SPACE
+      aws_aclRequired
       rest_of_line
     ;
 
@@ -194,10 +196,14 @@ aws_tls_vers
     | dash                  { SET_VALUE( AWSReceiver::tls_version, $1 ); }
     ;
 
-aws_aclRequired_opt
-    : SPACE STR              { SET_VALUE( AWSReceiver::acl_required, $2 ); }
-    | SPACE dash             { SET_VALUE( AWSReceiver::acl_required, $2 ); }
-    | %empty
+aws_accessPoint
+    : STR1      { SET_VALUE( AWSReceiver::access_point, $1 ); }
+    | dash      { SET_VALUE( AWSReceiver::access_point, $1 ); }
+    ;
+
+aws_aclRequired
+    : STR              { SET_VALUE( AWSReceiver::acl_required, $1 ); }
+    | dash             { SET_VALUE( AWSReceiver::acl_required, $1 ); }
     ;
 
 ip
