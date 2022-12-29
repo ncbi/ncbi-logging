@@ -2,8 +2,10 @@
 
 # Usage:
 # 1) update uniq_ips below
+UNIQIPS = "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20221207.public.json"
+UNIQIPS = "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20221229.all.json"
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519
-SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20221212.json"
+SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20221226.json"
 # 3) cloud_ips.py > $PANFS/cloud_ips.jsonl
 # 4) run rdns.sql
 
@@ -97,9 +99,7 @@ uniq_ips = set()
 already = set()
 
 # {"remote_ip":"18.212.9.218","ipint":"315886042"}
-ips = open(
-    "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20221207.public.json"
-)
+ips = open(UNIQIPS)
 for line in ips:
     j = json.loads(line)
     uniq_ips.add(j["remote_ip"])
