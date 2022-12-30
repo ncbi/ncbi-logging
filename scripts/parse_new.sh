@@ -178,15 +178,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
         set +e
         tar -xaOf "$TGZ" "$WILDCARD"           | \
-            sed 's/ - -$//g'                   | \
-            sed 's/ - Yes$//g'                 | \
-            sed 's/ - $//g'                    | \
             sed 's/"""linux64""/"linux64/g'    | \
             sed 's/"""linux64"/"linux64/g'     | \
             sed  's/""linux64"/"linux64/g'     | \
             sed  's/""mac64"/"mac64/g'         | \
             sed  's/""windows64"/"windows64/g' | \
-            sed 's/TLSv1.2 .*/TLSv1.2 -/'      | \
             time "$PARSER_BIN" -f -t 2 "$BASE"   \
             > stdout."$BASE" \
             2> stderr."$BASE"

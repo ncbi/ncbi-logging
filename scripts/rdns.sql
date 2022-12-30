@@ -905,7 +905,7 @@ WHERE IP LIKE '128.227.%';
 
 UPDATE RDNS
 SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
-WHERE IP LIKE '65.196.%' or ip like '71.174.%';
+WHERE IP LIKE '65.196.%' or ip like '71.174.%' or ip like '173.6%' or ip like '173.7%';
 
 
 UPDATE RDNS
@@ -1591,7 +1591,7 @@ where ip like '72.138.%';
 
 update rdns
 set domain='cernet.edu.cn (Zhejiang University)'
-where ip like '210.32.%';
+where ip like '210.32.%' or ip like '222.192.%';
 
 update rdns
 set domain='roche.com (Genentech Inc)'
@@ -1699,6 +1699,41 @@ update rdns
 set domain='Shadowserver Foundation (shadowserver.org)'
 where ip like '2001:470%';
 
+update rdns
+set domain='Telefonica de Espana (telefonica.es)' where
+ip like '80.36.%' or
+ip like '80.37.%' or
+ip like '80.38.%' or
+ip like '80.39.%';
+
+update rdns
+set domain='Jackson Laboratory (jax.org)'
+where
+ip like '64.147.48' or
+ip like '64.147.49' or
+ip like '64.147.50' or
+ip like '64.147.51' or
+ip like '64.147.52' or
+ip like '64.147.53' or
+ip like '64.147.54' or
+ip like '64.147.55' or
+ip like '64.147.56' or
+ip like '64.147.57' or
+ip like '64.147.58' or
+ip like '64.147.59' or
+ip like '64.147.60' or
+ip like '64.147.61' or
+ip like '64.147.62' or
+ip like '64.147.63';
+
+update rdns
+set domain='Mayo Clinic (mayo.edu)'
+where ip like '129.176.%';
+
+update rdns
+set domain='PiKNiK & Company Inc (congentco.com)'
+where ip like '38.70.%';
+
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
@@ -1721,6 +1756,8 @@ WHERE DOMAIN = 'Unknown'
        OR IP LIKE '35.1%'
        OR IP LIKE '35.2%'
        OR IP LIKE '2600:1900:%');
+
+
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
@@ -1882,7 +1919,8 @@ where IP in (
 '3.214.224.20', '44.192.48.128', '3.237.10.148', '44.197.198.131',
 '34.86.149.202', '35.199.4.74',
 '3.235.246.35', '34.236.37.231', '44.192.81.182', '3.238.50.204', '44.192.54.107',
-'34.145.176.141', '35.245.167.208'
+'34.145.176.141', '35.245.167.208',
+'34.85.237.116', '35.236.230.198', '44.200.103.44', '3.236.218.131'
 );
 
 

@@ -29,7 +29,8 @@ if [ "$#" -eq 1 ]; then
 fi
 
 if [ "$annual" = true ]; then
-    for year in $PREVYEARS; do
+#    for year in $PREVYEARS; do
+#    for year in 2022; do
         echo " #### Annual extraction of $year"
 
         QUERY=$(cat <<-ENDOFQUERY
@@ -43,7 +44,7 @@ ENDOFQUERY
         QUERY="${QUERY//\\/}"
         bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-    done
+#    done
 
     exit 0
 fi
@@ -910,7 +911,6 @@ ENDOFQUERY
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-# if [ "$STRIDES_SCOPE" == "public" ]; then
 echo " ### Find internal PUT/POST IPs"
     QUERY=$(cat <<-ENDOFQUERY
     UPDATE strides_analytics.rdns
