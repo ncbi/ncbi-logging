@@ -525,7 +525,7 @@ TEST_F( AWSTestFixture, quote_in_path )
     ASSERT_EQ( "a\\\"", extract_value( res, "path" ) );
 }
 
-TEST_F( AWSTestFixture, investigate )
+TEST_F( AWSTestFixture, ip )
 {
     std::string res = try_to_parse_good( "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-run-1 [20/Mar/2019:19:44:01 +0000] 130.14.20.103 arn:aws:iam::783971887864:user/ignatovi 92D3B218463A63EA REST.GET.TAGGING - \"GET /sra-pub-run-1?tagging= HTTP/1.1\" 404 NoSuchTagSet 293 - 59 - \"-\" \"S3Console/0.4, aws-internal/3 aws-sdk-java/1.11.509 Linux/4.9.137-0.1.ac.218.74.329.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.202-b08 java/1.8.0_202\" - AIDAISBTTLPGXGH6YFFAY LzYGhqEwXn5Xiuil9tI6JtK2PiIo+SC6Ute3Isq2qEmt/t0Z7qFkyD0mp1ZIc43bm0qSX4tBbbc= SigV4 ECDHE-RSA-AES128-SHA AuthHeader s3.amazonaws.com TLSv1.2 - -");
     ASSERT_FALSE( res.empty() );
@@ -553,15 +553,6 @@ TEST_F( AWSTestFixture, two_lines_with_and_without_accessions )
     ASSERT_EQ( "", extract_value( res2, "key" ) );
 }
 
-TEST_F( AWSTestFixture, aclRequired_followed_by_more_fields )
-{   // the line is to_review, the dash and everything following go into "_extra"
-    std::string res = try_to_parse_review(
-"384e684d1d83331f62ec686c0aae5c0513b488404eca7a6744bbeb7f5c6a7834 sra-ca-run-4 [29/Jun/2021:22:48:34 +0000] 34.226.216.239 arn:aws:sts::184059545989:assumed-role/sra-developer-instance-profile-role/i-07cffb826ea1814dd WC0X4C0EB5NQJQGB REST.GET.BUCKET - \"GET /?list-type=2&delimiter=%2F&prefix=SRR13431598%2FSRR13431598.2&encoding-type=url HTTP/1.1\" 200 - 324 - 25 24 \"-\" \"aws-cli/1.18.147 Python/2.7.18 Linux/4.14.231-173.361.amzn2.x86_64 botocore/1.18.6\" - Sp3lYc2YbhTGkIh700Tmw/4m3Bt7AawTZlRpEY5GoFSByNYqyHiOfJF5MgLTC/MhtmyV21E84+Y= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-ca-run-4.s3.amazonaws.com TLSv1.2 - - a b c d"
-    );
-    ASSERT_FALSE( res.empty() );
-    ASSERT_EQ( "a b c d", extract_value( res, "_extra" ) );
-}
-
 TEST_F( AWSTestFixture, LOGMON_208 )
 {   // unescaped double quotes in the UserAgent
     std::string res = try_to_parse_good( "- - - - - - - - - - - - - - - - \"\"linux64\" sra-toolkit vdb-dump.3-head (phid=noce2034c0,libc=2.17,bmap=nob)\" - - - - - - - - - -" );
@@ -571,30 +562,46 @@ TEST_F( AWSTestFixture, LOGMON_208 )
 
 TEST_F( AWSTestFixture, accessPointARN_missing )
 {   // LOGMON_271: accessPointARN = '-'
-    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - - - -");
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - TLSv1.2 - -");
     ASSERT_FALSE( res.empty() );
     ASSERT_EQ( "", extract_value( res, "access_point" ) );
 }
 
 TEST_F( AWSTestFixture, accessPointARN_present )
 {   // LOGMON_271: accessPointARN = '-'
-    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - - arn:aws:s3:us-east-1:123456789012:accesspoint/example-AP -" );
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - TLSv1.2 arn:aws:s3:us-east-1:123456789012:accesspoint/example-AP -" );
     ASSERT_FALSE( res.empty() );
     ASSERT_EQ( "arn:aws:s3:us-east-1:123456789012:accesspoint/example-AP", extract_value( res, "access_point" ) );
 }
 
 TEST_F( AWSTestFixture, aclRequired_no )
 {   // LOGMON_271: aclRequired = '-'
-    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - - - -");
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - TLSv1.2 - -");
     ASSERT_FALSE( res.empty() );
     ASSERT_EQ( "", extract_value( res, "acl_required" ) );
 }
 
 TEST_F( AWSTestFixture, aclRequired_yes )
 {   // LOGMON_271: aclRequired = '-'
-    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - - - Yes");
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - TLSv1.2 - Yes");
     ASSERT_FALSE( res.empty() );
     ASSERT_EQ( "Yes", extract_value( res, "acl_required" ) );
+}
+
+TEST_F( AWSTestFixture, aclRequired_missing )
+{   // LOGMON_271: aclRequired is temporarily optional
+    std::string res = try_to_parse_good( "- - - - - - - - \"GET a\\\" HTTP/1.1\" - - - - - - - - - - - - - - TLSv1.2 -" );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "", extract_value( res, "acl_required" ) );
+}
+
+TEST_F( AWSTestFixture, aclRequired_followed_by_more_fields )
+{   // the line is to_review, the dash and everything following go into "_extra"
+    std::string res = try_to_parse_review(
+"384e684d1d83331f62ec686c0aae5c0513b488404eca7a6744bbeb7f5c6a7834 sra-ca-run-4 [29/Jun/2021:22:48:34 +0000] 34.226.216.239 arn:aws:sts::184059545989:assumed-role/sra-developer-instance-profile-role/i-07cffb826ea1814dd WC0X4C0EB5NQJQGB REST.GET.BUCKET - \"GET /?list-type=2&delimiter=%2F&prefix=SRR13431598%2FSRR13431598.2&encoding-type=url HTTP/1.1\" 200 - 324 - 25 24 \"-\" \"aws-cli/1.18.147 Python/2.7.18 Linux/4.14.231-173.361.amzn2.x86_64 botocore/1.18.6\" - Sp3lYc2YbhTGkIh700Tmw/4m3Bt7AawTZlRpEY5GoFSByNYqyHiOfJF5MgLTC/MhtmyV21E84+Y= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-ca-run-4.s3.amazonaws.com TLSv1.2 - - a b c d"
+    );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "a b c d", extract_value( res, "_extra" ) );
 }
 
 TEST_F( AWSTestFixture, MultiThreading )
