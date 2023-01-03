@@ -69,7 +69,7 @@ echo "s3_lister"
 #dow=$(date +%u) # 1=Monday
 dom=$(date +%e)
 # Kurtis mirrors on 8th of month, pre-check before
-if [ "$dom" = "2" ] || [ "$dom" -eq "6" ] ; then
+if [ "$dom" = "2" ] || [ "$dom" -eq "5" ] ; then
     echo "bigqueries"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
