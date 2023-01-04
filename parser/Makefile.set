@@ -28,7 +28,7 @@ $(OBJDIR)/%.prof.o: %.cpp
 	flex $(FLEXFLAGS) --header-file=$(subst .cpp,.hpp,$@) --outfile=$@ $<
 
 %parser.cpp : %parser.y
-	bison --report all -d $< --output-file $@
+	bison --report all --warnings=error=conflicts-sr --warnings=error=conflicts-rr -d $< --output-file $@
 
 .phony: all test clean mkdir
 
