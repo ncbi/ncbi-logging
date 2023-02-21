@@ -103,7 +103,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         echo "Profile is $PROFILE, $PROVIDER copying gs://$LOG_BUCKET for $YESTERDAY_UNDER to $MIRROR..."
 
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
-        gsutil -m cp "gs://$LOG_BUCKET/*_${YESTERDAY_UNDER}_*" . || true
+        gsutil cp "gs://$LOG_BUCKET/*_${YESTERDAY_UNDER}_*" . || true
         # gsutil -m rsync -x ".*_2019_.*|.*_2020_.*|.*_2021_.*" "gs://$LOG_BUCKET/" .
     fi
 

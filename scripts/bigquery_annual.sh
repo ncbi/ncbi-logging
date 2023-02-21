@@ -174,6 +174,7 @@ EOF
     bq rm -f "$DATASET.s3_parsed" || true
     bq load \
         --max_bad_records 5000 \
+        --ignore_unknown_values \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.s3_parsed" \
         "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" \
