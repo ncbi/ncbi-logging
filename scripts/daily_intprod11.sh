@@ -50,7 +50,7 @@ echo "parse OP"
 #dow=$(date +%u) # 1=Monday
 dom=$(date +%e)
 # Kurtis mirrors on 8th of month, pre-check before
-if [ "$dom" = "2" ] || [ "$dom" -eq "6" ] ; then
+if [ "$dom" -eq 2 ] || [ "$dom" -eq 6 ] ; then
     echo "bigquery_export"
     #./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     #./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
