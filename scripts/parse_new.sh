@@ -234,7 +234,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
         echo "  Gzipping ..."
         gzip -f -v ./*recognized."$BASE"*jsonl
-        find ./ -name "*$BASE*" -size 0c -exec rm -f {} \;
+        find ./ -name "*$BASE*" -size 0c -delete
 
         {
             printf "{"

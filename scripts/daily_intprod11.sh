@@ -32,7 +32,7 @@ echo "mirror.sh S3"
 
 # SYS-436845/LOGMON-215
 rm -f "$HOME"/s3_prod/*.err
-find "$HOME"/s3_prod -type f -mtime +30 -exec rm -f {} \;
+find "$HOME"/s3_prod -type f -mtime +30 -delete
 
 echo "parse S3"
 #./parse.sh S3      |& ts >> "$HOME"/logs/parse_s3."$DATE".log

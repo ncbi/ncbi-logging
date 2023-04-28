@@ -33,7 +33,7 @@ echo "mirror.sh S3"
 
 # SYS-436845/LOGMON-215
 rm -f /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod/*.err
-find /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod -type f -mtime +30 -exec rm -f {} \;
+find /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod -type f -mtime +30 -delete
 
 #echo "mirror.sh Splunk"
 #./mirror.sh Splunk |& ts >> "$HOME"/logs/mirror_splunk."$DATE".log &
@@ -69,7 +69,7 @@ echo "s3_lister"
 #dow=$(date +%u) # 1=Monday
 dom=$(date +%e)
 # Kurtis mirrors on 8th of month, pre-check before
-if [ "$dom" = "2" ] || [ "$dom" -eq "5" ] ; then
+if [ "$dom" -eq 2 ] || [ "$dom" -eq 5 ] ; then
     echo "bigqueries"
     ./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
