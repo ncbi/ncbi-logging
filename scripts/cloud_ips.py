@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3.11
 
 # Usage:
 # 1) update uniq_ips below
