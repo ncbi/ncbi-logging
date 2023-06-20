@@ -22,7 +22,7 @@ export DATE
 export "RAMDISK=/dev/shm"
 YESTERDAY_DASH=$(date -d "yesterday" "+%Y-%m-%d")
 export YESTERDAY_DASH
-YESTERDAY=${YESTERDAY_DASH//-}
+YESTERDAY=${YESTERDAY_DASH//-/}
 export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
@@ -46,7 +46,7 @@ if [ ! -s "$SQLCACHE/buckets.db" ]; then
 fi
 
 # Usage: results=$(sqlcmd "select foo from bar")
-sqlcmd () {
+sqlcmd() {
     local query="$1"
     sqlite3 -batch "${SQLCACHE}/buckets.db" << EOF
 .headers off
@@ -72,8 +72,8 @@ case "$HOSTNAME" in
         export STRIDES_SCOPE="public"
         export TMP="/tmp/$USER"
         ;;
-    *)
-        ;;
+    *) ;;
+
 esac
 
 if [ "$STRIDES_SCOPE" == "private" ]; then

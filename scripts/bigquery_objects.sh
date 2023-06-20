@@ -37,20 +37,19 @@ bq load \
     --source_format=NEWLINE_DELIMITED_JSON \
     --max_bad_records 500 \
     strides_analytics.objects_load \
-        "gs://logmon_objects/gs/2*" \
+    "gs://logmon_objects/gs/2*" \
     objects_schema_only.json
 
 bq load \
     --source_format=NEWLINE_DELIMITED_JSON \
     --max_bad_records 500 \
     strides_analytics.objects_load \
-        "gs://logmon_objects/s3/2*" \
+    "gs://logmon_objects/s3/2*" \
     objects_schema_only.json
 
 bq -q query \
---use_legacy_sql=false \
-"select source, bucket, count(*) as object_load_count from strides_analytics.objects_load group by source, bucket"
-
+    --use_legacy_sql=false \
+    "select source, bucket, count(*) as object_load_count from strides_analytics.objects_load group by source, bucket"
 
 echo " #### parsing objects "
 bq rm -f -t strides_analytics.objects || true
@@ -63,10 +62,8 @@ bq query \
     safe.parse_timestamp('%Y-%m-%d %H:%M:%S', lastmodified) as lastmodified
     FROM strides_analytics.objects_load"
 bq -q query \
---use_legacy_sql=false \
-"select count(*) as objects_count from strides_analytics.objects"
-
-
+    --use_legacy_sql=false \
+    "select count(*) as objects_count from strides_analytics.objects"
 
 echo " #### objects_uniq "
 # Reduce from 5B ($3.50) -> 50M for cost reduction
@@ -77,9 +74,8 @@ bq query \
     --max_rows=5 \
     "select distinct * except (now, md5) from strides_analytics.objects"
 bq -q query \
---use_legacy_sql=false \
-"select source, bucket, count(*) as object_uniq_count, min(lastmodified), max(lastmodified) from strides_analytics.objects_uniq group by source, bucket order by source, bucket"
-
+    --use_legacy_sql=false \
+    "select source, bucket, count(*) as object_uniq_count, min(lastmodified), max(lastmodified) from strides_analytics.objects_uniq group by source, bucket order by source, bucket"
 
 echo " #### object_delta"
 # TODO: Add first_appearance_accession_provider that ignores accession.version
@@ -99,13 +95,12 @@ bq query \
   FROM ncbi-logmon.strides_analytics.objects_uniq
   INNER JOIN changed_objects USING (key, storageclass, source, bucket)"
 bq -q query \
---use_legacy_sql=false \
-"select count(*) as object_delta_count from strides_analytics.object_delta"
+    --use_legacy_sql=false \
+    "select count(*) as object_delta_count from strides_analytics.object_delta"
 
 bq -q query \
---use_legacy_sql=false \
-"select source, bucket, count(*) as object_delta_cnt, min(lastmodified), max(lastmodified) from strides_analytics.object_delta group by source, bucket order by source, bucket"
-
+    --use_legacy_sql=false \
+    "select source, bucket, count(*) as object_delta_cnt, min(lastmodified), max(lastmodified) from strides_analytics.object_delta group by source, bucket order by source, bucket"
 
 gsutil rm -f "gs://logmon_export/object_delta.$DATE.*" || true
 bq extract \
@@ -117,9 +112,7 @@ bq extract \
 mkdir -p "$PANFS/export/object_delta"
 cd "$PANFS/export/object_delta" || exit
 rm -f object_delta."$DATE".* || true
-gsutil  cp -r "gs://logmon_export/object_delta.$DATE.*" .
-
-
+gsutil cp -r "gs://logmon_export/object_delta.$DATE.*" .
 
 echo " #### object_first_appearance"
 bq rm -f -t strides_analytics.object_first_appearance || true
@@ -138,9 +131,8 @@ bq query \
      FROM strides_analytics.objects_uniq
      INNER JOIN first_appear USING (key, source)"
 bq -q query \
---use_legacy_sql=false \
-"select source, bucket, count(*) as object_first_count from strides_analytics.object_first_appearance group by source, bucket order by source, bucket"
-
+    --use_legacy_sql=false \
+    "select source, bucket, count(*) as object_first_count from strides_analytics.object_first_appearance group by source, bucket order by source, bucket"
 
 gsutil rm -f "gs://logmon_export/object_first_appearance.$DATE.*" || true
 bq extract \
@@ -152,8 +144,7 @@ bq extract \
 mkdir -p "$PANFS/export/object_first_appearance"
 cd "$PANFS/export/object_first_appearance" || exit
 rm -f object_first_appearance."$DATE".* || true
-gsutil  cp -r "gs://logmon_export/object_first_appearance.$DATE.*" .
-
+gsutil cp -r "gs://logmon_export/object_first_appearance.$DATE.*" .
 
 echo " #### object_disappear"
 bq rm -f -t strides_analytics.object_disappear || true
@@ -169,5 +160,5 @@ bq query \
     FROM last_appear
     WHERE last_seen < timestamp_sub(current_timestamp(), INTERVAL 5 DAY)"
 bq -q query \
---use_legacy_sql=false \
-"select source, bucket, count(*) as object_disappear_count from strides_analytics.object_disappear group by source, bucket order by source, bucket"
+    --use_legacy_sql=false \
+    "select source, bucket, count(*) as object_disappear_count from strides_analytics.object_disappear group by source, bucket order by source, bucket"

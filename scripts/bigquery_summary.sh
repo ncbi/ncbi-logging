@@ -42,5 +42,4 @@ bq -q query \
     --use_legacy_sql=false \
     "select log_bucket, provider, string_agg(distinct parser_version) as parser_versions, sum(total_lines) as total_lines, sum(recognized_lines) as recognized_lines, sum(unrecognized_lines) as unrecognized_lines, count(*) as num_logs from strides_analytics.summary group by log_bucket, provider order by log_bucket, provider"
 
-
 date

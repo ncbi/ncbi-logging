@@ -66,7 +66,7 @@ for bucket in $BUCKETS; do
 
     # Don't bother with empty
     echo "Gzipping..."
-    find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;
+    find ./ -name "*.jsonl" -size 0c -delete
     gzip -v -9 ./*.jsonl
 
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/sandbox-blast-847af7ab431a.json
