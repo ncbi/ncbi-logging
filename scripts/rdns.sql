@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20221229.all.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20230620.all.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -1734,6 +1734,9 @@ update rdns
 set domain='PiKNiK & Company Inc (congentco.com)'
 where ip like '38.70.%';
 
+update rdns
+set domain='DigitalOcean (digitalocean.com)'
+where ip like '192.241.%';
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
