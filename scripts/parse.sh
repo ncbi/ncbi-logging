@@ -108,8 +108,8 @@ for LOG_BUCKET in "${buckets[@]}"; do
     if [ "$PARSER" = "cl" ]; then
         VERSION=$("$HOME"/ncbi-logging/parser/bin/cl2jsn-rel --version)
 
-        tar -xaOf "$TGZ" "$wildcard" |
-            tr -s ' ' |
+        tar -xaOf "$TGZ" "$wildcard" | \
+            tr -s ' ' | \
             time "$HOME/ncbi-logging/parser/bin/cl2jsn-rel" -f "$PARSER" > \
                 "$YESTERDAY_DASH.${LOG_BUCKET}.out" \
                 2> "$TGZ.err"
@@ -135,7 +135,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/"""linux64"/"linux64/g' |
             sed 's/""linux64"/"linux64/g' |
             sed 's/""mac64"/"mac64/g' |
-            sed 's/""windows64"/"windows64/g' |
+            sed 's/""windows64"/"windows64/g' | \
             time "$HOME/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
                 "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
                 2> "$TGZ.err"
