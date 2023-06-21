@@ -245,5 +245,11 @@ bq -q query \
     --format "$FORMAT" \
     "select datetime_trunc(start_ts, month) as month, source, count(distinct remote_ip) as num_ips, count(distinct accession) as num_accs, sum(bytes_sent) as bytes_sent from $DATASET.summary_export where start_ts > date_sub(current_date(), interval 6 month) group by month, source order by source, month desc limit 30"
 
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    --max_rows 10000 \
+    "SELECT consent, count(*) as consent_counts FROM $DATASET.summary_export group by consent order by count(*) desc limit 10"
+
 echo "End of BigQuery Report"
 date
