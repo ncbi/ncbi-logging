@@ -53,10 +53,11 @@ echo "parse OP"
 ./parse.sh OP |& ts >> "$HOME"/logs/parse_op."$DATE".log
 ./parse_new.sh OP |& ts >> "$HOME"/logs/parse_new_op."$DATE".log
 
-echo "waiting.."
+echo "waiting..."
 date
 jobs
 wait
+date
 
 #echo "parse Splunk"
 #./parse.sh Splunk   |& ts >> "$HOME"/logs/parse_splunk."$DATE".log
