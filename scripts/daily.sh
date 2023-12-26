@@ -72,7 +72,7 @@ dom=$(date +%e)
 # Kurtis mirrors on 8th of month, pre-check before
 if [ "$dom" -eq 2 ] || [ "$dom" -eq 5 ]; then
     echo "bigqueries"
-    ./bigquery_objects.sh |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
+    # ./bigquery_objects.sh |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     ./bigquery_cloudian.sh |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
     #./bigquery_export.sh  |& ts >> "$HOME"/logs/bigquery_export."$DATE".log
     ./bigquery_annual.sh |& ts >> "$HOME"/logs/bigquery_annual."$DATE".log

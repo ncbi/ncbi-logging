@@ -35,14 +35,14 @@ bq rm -f strides_analytics.objects_load
 
 bq load \
     --source_format=NEWLINE_DELIMITED_JSON \
-    --max_bad_records 500 \
+    --max_bad_records 5000 \
     strides_analytics.objects_load \
     "gs://logmon_objects/gs/2*" \
     objects_schema_only.json
 
 bq load \
     --source_format=NEWLINE_DELIMITED_JSON \
-    --max_bad_records 500 \
+    --max_bad_records 5000 \
     strides_analytics.objects_load \
     "gs://logmon_objects/s3/2*" \
     objects_schema_only.json
