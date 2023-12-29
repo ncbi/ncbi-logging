@@ -222,6 +222,12 @@ for LOG_BUCKET in "${buckets[@]}"; do
         unrecwc=$(wc -l "unrecognized.$BASE.jsonl" | cut -f1 -d' ')
         printf "Unrecognized lines: %8d\n" "$unrecwc"
 
+        if [ "$PROVIDER" != "OP" ]; then
+            if [ "$unrecwc" -gt 50 ]; then
+                mailx -s "${HOST} parse_new unrecognized $unrecwc" vartanianmh@ncbi.nlm.nih.gov
+            fi
+        fi
+
         #if [ ! -s "recognized.$BASE.jsonl" ]; then
         #    echo "ERROR: Empty recognized.$BASE.jsonl"
         #    #continue
