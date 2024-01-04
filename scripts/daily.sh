@@ -83,5 +83,13 @@ if [ "$dom" -eq 2 ] || [ "$dom" -eq 5 ]; then
     mailx -s "BigQuery Report" vartanianmh@ncbi.nlm.nih.gov < "$HOME"/logs/bigquery_report."$DATE".log
 fi
 
+DONEFILE="${HOME}/done/daily_${YESTERDAY}.done"
+if [ ! -e "$DONEFILE" ]; then
+    mailx -s "$HOST daily not done" vartanianmh@ncbi.nlm.nih.gov
+fi
+TODAY=$(date "+%Y%m%d")
+DONEFILE="${HOME}/done/daily_${TODAY}.done"
+touch "$DONEFILE"
+
 echo "    --- Daily Processing Complete ($$) ---"
 date
