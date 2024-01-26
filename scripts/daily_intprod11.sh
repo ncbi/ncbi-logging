@@ -13,6 +13,7 @@ set +e
 
 mkdir -p "$HOME"/logs
 find "$HOME/logs" -mtime +2 -size +1M -exec xz -9 {} \;
+du -shc "$HOME"/* | sort -hr | head > "$HOME/dus" &
 
 #/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
 
@@ -63,5 +64,12 @@ if [ "$dom" -eq 2 ] || [ "$dom" -eq 6 ] ; then
         mailx -s "$HOST BigQuery Report" vartanianmh@ncbi.nlm.nih.gov
 fi
 
+DONEFILE="${HOME}/done/daily_${YESTERDAY}.done"
+if [ ! -e "$DONEFILE" ]; then
+    echo "No done"
+    mailx -s "$HOST daily not done $YESTERDAY" vartanianmh@ncbi.nlm.nih.gov
+fi
+DONEFILE="${HOME}/done/daily_${TODAY}.done"
+touch "$DONEFILE"
 echo "    --- Daily Processing Complete ($$) ---"
 date

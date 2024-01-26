@@ -26,6 +26,8 @@ YESTERDAY=${YESTERDAY_DASH//-/}
 export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
+TODAY=$(date "+%Y%m%d")
+export TODAY
 
 HOST=$(hostname)
 export HOST

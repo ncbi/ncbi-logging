@@ -11,6 +11,7 @@ set +e
 
 mkdir -p "$HOME"/logs
 find "$HOME/logs" ! -name "*xz" -mtime +1 -size +2M -exec xz -9 {} \;
+find "$HOME/done" -mtime +60 -delete
 
 panspace=$(/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | tail -1 | tr -s ' ' | cut -d ' ' -f 5 | tr -d '%')
 if [ "$panspace" -gt 95 ]; then
@@ -85,9 +86,9 @@ fi
 
 DONEFILE="${HOME}/done/daily_${YESTERDAY}.done"
 if [ ! -e "$DONEFILE" ]; then
-    mailx -s "$HOST daily not done" vartanianmh@ncbi.nlm.nih.gov
+    echo "No done"
+    mailx -s "$HOST daily not done $YESTERDAY" vartanianmh@ncbi.nlm.nih.gov
 fi
-TODAY=$(date "+%Y%m%d")
 DONEFILE="${HOME}/done/daily_${TODAY}.done"
 touch "$DONEFILE"
 
