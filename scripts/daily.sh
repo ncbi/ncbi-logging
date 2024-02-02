@@ -26,6 +26,9 @@ fi
 echo "mirror.sh GS"
 ./mirror.sh GS |& ts >> "$HOME"/logs/mirror_gs."$DATE".log
 
+echo "sra_prod.sh"
+./sra_prod.sh |& ts >>  "$HOME"/logs/sra_prod."$DATE".log
+
 echo "mirror.sh OP"
 ./mirror.sh OP |& ts >> "$HOME"/logs/mirror_op."$DATE".log
 
