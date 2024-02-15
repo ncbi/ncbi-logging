@@ -1967,11 +1967,12 @@ limit 10;
 
 .width 120 120
 -- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
-select "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl" as hint;
-select "export CLOUDSDK_CORE_PROJECT=ncbi-logmon" as hint2;
-select "bq rm -f strides_analytics.rdns" as hint2;
-select "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl" as hint3;
-select "rm -f rdns.db" as hint4;
+.print "hints"
+.print "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl"
+.print "export CLOUDSDK_CORE_PROJECT=ncbi-logmon"
+.print "bq rm -f strides_analytics.rdns"
+.print "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl"
+.print "rm -f rdns.db"
 
 .headers off
 .output /tmp/rdns.jsonl

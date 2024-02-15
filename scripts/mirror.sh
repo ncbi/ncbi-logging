@@ -236,11 +236,16 @@ for LOG_BUCKET in "${buckets[@]}"; do
         export GOOGLE_APPLICATION_CREDENTIALS="$HOME/logmon_private.json"
     fi
 
+    TARSIZE=$(stat -c '%s' "$TGZ")
+#    if [ "$TARSIZE" -ge 50 ]; then
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
-    echo "Copying $TGZ to $DEST_BUCKET"
+    echo "Copying $TGZ ($TARSIZE bytes) to $DEST_BUCKET"
     gsutil cp "$TGZ" "$DEST_BUCKET"
+#    else
+#        echo "Tarfile is $TARSIZE bytes, not uploading"
+#    fi
 
     if [ "$PROVIDER" != "Splunk" ]; then
         cd ..
