@@ -61,7 +61,7 @@ EOF
 export STRIDES_SCOPE="public"
 
 case "$HOSTNAME" in
-    iebdev11)
+    iebdev12)
         export STRIDES_SCOPE="public"
         export TMP="/tmp/$USER"
         ;;

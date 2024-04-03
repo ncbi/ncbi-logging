@@ -1,13 +1,6 @@
 #!/usr/bin/env python3.11
-import datetime
-import dbm
-import http.client
-import json
-import logging
-import re
 import sys
-import urllib
-from io import BytesIO, StringIO
+from io import BytesIO
 
 import boto3
 
@@ -31,17 +24,24 @@ def main():
 
     print(f"Extracting s3://{bucket_name}/{prefix} ...", file=sys.stderr)
     count = 0
+    bytecount = 0
+    truncated = False
     for page in paginator.paginate(**kwargs):
         contents = page.get("Contents", [])
         for obj in contents:
             key = obj["Key"]
             bytes_buffer = BytesIO()
-            s3.download_fileobj(Bucket=bucket_name, Key=key, Fileobj=bytes_buffer)
-            buf = bytes_buffer.getvalue()
-            sys.stdout.buffer.write(buf)
-            count += 1
+            if bytecount < 50 * 1024 * 1024 * 1024:
+                s3.download_fileobj(Bucket=bucket_name, Key=key, Fileobj=bytes_buffer)
+                buf = bytes_buffer.getvalue()
+                bytecount += len(buf)
+                sys.stdout.buffer.write(buf)
+                count += 1
+            else:
+                truncated = True
     print(
-        f"Extracted {count} objects from s3://{bucket_name}/{prefix}", file=sys.stderr
+        f"Extracted {count} objects, {bytecount} bytes {truncated=}, from s3://{bucket_name}/{prefix}",
+        file=sys.stderr,
     )
 
     return 0
