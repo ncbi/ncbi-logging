@@ -183,6 +183,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""linux64"/"linux64/g' |
             sed 's/""mac64"/"mac64/g' |
             sed 's/""windows64"/"windows64/g' | \
+            grep -v "GCS Lifecycle Management" | \
             time "$PARSER_BIN" -f -t 2 "$BASE" \
                 > stdout."$BASE" \
                 2> stderr."$BASE"
@@ -224,7 +225,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
         if [ "$PROVIDER" != "OP" ]; then
             if [ "$unrecwc" -gt 50 ]; then
-                mailx -s "${HOST} parse_new unrecognized $unrecwc" vartanianmh@ncbi.nlm.nih.gov
+                head -5 "unrecognized.$BASE.jsonl" | mailx -s "${HOST} parse_new $PROVIDER unrecognized $unrecwc" vartanianmh@ncbi.nlm.nih.gov
             fi
         fi
 
