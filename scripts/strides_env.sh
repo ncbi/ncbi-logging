@@ -9,7 +9,7 @@ export SCRIPTDIR="$PWD"
 export PREFIX="strides_analytics"
 export PGVER="postgresql-12.3"
 export PGDATA="$HOME/pgdata12"
-export PATH="$HOME/$PGVER/bin:$HOME/.local/bin:/opt/python-all/bin:$HOME/google-cloud-sdk/bin:/netopt/ncbi_tools64/bin/:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:/opt/python-all/bin:$HOME/google-cloud-sdk/bin:/netopt/ncbi_tools64/bin/:$PATH"
 export PATH="$PATH:$HOME/ncbi-logging/parser/bin:$HOME/ncbi-logging/parser/bin:$HOME/bin"
 export AWS_PROFILE="strides-analytics"
 export LD_LIBRARY_PATH="$HOME/$PGVER/lib"
@@ -22,10 +22,12 @@ export DATE
 export "RAMDISK=/dev/shm"
 YESTERDAY_DASH=$(date -d "yesterday" "+%Y-%m-%d")
 export YESTERDAY_DASH
-YESTERDAY=${YESTERDAY_DASH//-}
+YESTERDAY=${YESTERDAY_DASH//-/}
 export YESTERDAY
 YESTERDAY_UNDER=$(date -d "yesterday" "+%Y_%m_%d")
 export YESTERDAY_UNDER
+TODAY=$(date "+%Y%m%d")
+export TODAY
 
 HOST=$(hostname)
 export HOST
@@ -46,7 +48,7 @@ if [ ! -s "$SQLCACHE/buckets.db" ]; then
 fi
 
 # Usage: results=$(sqlcmd "select foo from bar")
-sqlcmd () {
+sqlcmd() {
     local query="$1"
     sqlite3 -batch "${SQLCACHE}/buckets.db" << EOF
 .headers off
@@ -59,7 +61,7 @@ EOF
 export STRIDES_SCOPE="public"
 
 case "$HOSTNAME" in
-    iebdev11)
+    iebdev12)
         export STRIDES_SCOPE="public"
         export TMP="/tmp/$USER"
         ;;
@@ -72,8 +74,8 @@ case "$HOSTNAME" in
         export STRIDES_SCOPE="public"
         export TMP="/tmp/$USER"
         ;;
-    *)
-        ;;
+    *) ;;
+
 esac
 
 if [ "$STRIDES_SCOPE" == "private" ]; then

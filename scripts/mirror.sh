@@ -32,13 +32,13 @@ case "$#" in
 esac
 
 PROVIDER_LC=${PROVIDER,,}
-YESTERDAY=${YESTERDAY_UNDER//_}
+YESTERDAY=${YESTERDAY_UNDER//_/}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
 mkdir -p "${HOME}/logs/"
 LOGFILE="${HOME}/logs/mirror.${HOST}.${PROVIDER_LC}.${YESTERDAY}.log"
 touch "$LOGFILE"
-exec 1>"$LOGFILE"
+exec 1> "$LOGFILE"
 exec 2>&1
 
 echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
@@ -50,20 +50,20 @@ if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
 fi
 
 case "$PROVIDER" in
-    S3)
-        ;;
-    GS)
-        ;;
-    OP)
-        ;;
-    Splunk)
-        ;;
+    S3) ;;
+
+    GS) ;;
+
+    OP) ;;
+
+    Splunk) ;;
+
     *)
         echo "Invalid provider $PROVIDER"
         echo "$USAGE"
         exit 1
+        ;;
 esac
-
 
 buckets=$(sqlcmd "select distinct log_bucket from buckets where scope='$STRIDES_SCOPE' and cloud_provider='$PROVIDER' order by log_bucket desc")
 readarray -t buckets <<< "$buckets"
@@ -103,14 +103,14 @@ for LOG_BUCKET in "${buckets[@]}"; do
         echo "Profile is $PROFILE, $PROVIDER copying gs://$LOG_BUCKET for $YESTERDAY_UNDER to $MIRROR..."
 
         WILDCARD="*_usage_${YESTERDAY_UNDER}_*v0"
-        gsutil -m cp "gs://$LOG_BUCKET/*_${YESTERDAY_UNDER}_*" . || true
+        gsutil cp "gs://$LOG_BUCKET/*_${YESTERDAY_UNDER}_*" . || true
         # gsutil -m rsync -x ".*_2019_.*|.*_2020_.*|.*_2021_.*" "gs://$LOG_BUCKET/" .
     fi
 
     if [ "$PROVIDER" = "OP" ]; then
-#        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
-#            BUCKET_NAME="srafiles"
-#        fi
+        #        if [[ "$LOG_BUCKET" =~ "srafiles" ]]; then
+        #            BUCKET_NAME="srafiles"
+        #        fi
 
         if [ "$YESTERDAY" -lt "20180701" ]; then
             files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
@@ -118,12 +118,12 @@ for LOG_BUCKET in "${buckets[@]}"; do
             files=""
             echo "Recent, LOG_BUCKET=$LOG_BUCKET"
             for f in $LOG_BUCKET; do
-                if [[ $f == *"$YESTERDAY"* ]] || [[ $f == *"$YESTERDAY_DASH"* ]] || [[ $f == *"$YESTERDAY_UNDER"* ]] ; then
+                if [[ $f == *"$YESTERDAY"* ]] || [[ $f == *"$YESTERDAY_DASH"* ]] || [[ $f == *"$YESTERDAY_UNDER"* ]]; then
                     files="$files $f"
                 fi
             done
-#            files=$(/bin/ls -1 $LOG_BUCKET)
-#            files=$(find $LOG_BUCKET -type f)
+            #            files=$(/bin/ls -1 $LOG_BUCKET)
+            #            files=$(find $LOG_BUCKET -type f)
         else
             files=$(find "$PANFS/sra_prod/$YESTERDAY" -type f -name "*$YESTERDAY*")
         fi
@@ -137,9 +137,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
         for x in $files; do
             newfile=$(echo "$x" | tr '/' '+')
             newfile=${newfile%".gz"}
-#            if [ -s "$newfile" ]; then
-#                continue
-#            fi
+            #            if [ -s "$newfile" ]; then
+            #                continue
+            #            fi
             echo "  $x -> $newfile"
             zcat "$x" > "$newfile" || true # Some files are corrupt, continue
         done
@@ -203,7 +203,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         for HH in $(seq -f "%02.0f" 0 1 23); do
             for MM in $(seq -f "%02.0f" 0 5 59); do
                 HH_MM_FROM="$HH:${MM}:00"
-                MM_END=$(( MM + 4 ))
+                MM_END=$((MM + 4))
                 MM_END=$(printf "%02.0f" $MM_END)
                 HH_MM_TO="$HH:${MM_END}:59"
                 echo "From   $YESTERDAY_SLASH $HH_MM_FROM to $HH_MM_TO"
@@ -211,7 +211,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
                     --bearer "$HOME/splunk_bearer.txt" \
                     --timeout 900 \
                     --earliest "$YESTERDAY_SLASH:$HH_MM_FROM" \
-                    --latest   "$YESTERDAY_SLASH:$HH_MM_TO" \
+                    --latest "$YESTERDAY_SLASH:$HH_MM_TO" \
                     > "$YESTERDAY_DASH:$HH_MM_FROM"
             done
         done
@@ -236,11 +236,16 @@ for LOG_BUCKET in "${buckets[@]}"; do
         export GOOGLE_APPLICATION_CREDENTIALS="$HOME/logmon_private.json"
     fi
 
+    TARSIZE=$(stat -c '%s' "$TGZ")
+#    if [ "$TARSIZE" -ge 50 ]; then
     export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
     gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
-    echo "Copying $TGZ to $DEST_BUCKET"
+    echo "Copying $TGZ ($TARSIZE bytes) to $DEST_BUCKET"
     gsutil cp "$TGZ" "$DEST_BUCKET"
+#    else
+#        echo "Tarfile is $TARSIZE bytes, not uploading"
+#    fi
 
     if [ "$PROVIDER" != "Splunk" ]; then
         cd ..

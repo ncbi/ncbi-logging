@@ -69,7 +69,7 @@ for bucket in $BUCKETS; do
 
     echo "Gzipping..."
     # Don't bother with empty
-    find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;
+    find ./ -name "*.jsonl" -size 0c -delete
     gzip -9 -v ./*.jsonl
 
     echo "Uploading..."

@@ -432,3 +432,11 @@ TEST_F( URLTestFixture, QM_backticks_in_query )
     ASSERT_EQ( "|\\x22`id`\\x22|", extract_value( res, "filename" ) );
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
+
+TEST_F( URLTestFixture, LOGMON_217 )
+{
+    const std::string res = try_to_parse_good( "/NC_000001.10/NC_000001.10.1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA3NCC5VL4MPW55HQR%2F20221207%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20221207T235607Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&ncbi_phid=939B96813FA3F435000028A3698CA5E0.1.1&x-amz-request-payer=requester&X-Amz-Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" );
+    ASSERT_EQ( "NC_000001", extract_value( res, "accession" ) );
+    ASSERT_EQ( "NC_000001", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".10.1", extract_value( res, "extension" ) );
+}

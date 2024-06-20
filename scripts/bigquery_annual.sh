@@ -9,7 +9,7 @@ YEAR="$FIRSTYEAR"
 PREVYEARS=""
 while [ "$YEAR" -ne "$CURYEAR" ]; do
     PREVYEARS="$PREVYEARS $YEAR"
-    YEAR=$((YEAR+1))
+    YEAR=$((YEAR + 1))
 done
 
 echo "PREVYEARS is $PREVYEARS"
@@ -29,21 +29,24 @@ if [ "$#" -eq 1 ]; then
 fi
 
 if [ "$annual" = true ]; then
-    for year in $PREVYEARS; do
-        echo " #### Annual extraction of $year"
+    #    for year in $PREVYEARS; do
+    #    for year in 2022; do
+    year=2023
+    echo " #### Annual extraction of $year"
 
-        QUERY=$(cat <<-ENDOFQUERY
+    QUERY=$(
+        cat <<- ENDOFQUERY
         CREATE OR REPLACE TABLE $DATASET.annual_summary_export_$year
         as SELECT * from $DATASET.summary_export where start_ts between
         '$year-01-01 00:00:00' and '$year-12-31 23:59:59'
 ENDOFQUERY
-        )
+    )
 
-        echo "$QUERY"
-        QUERY="${QUERY//\\/}"
-        bq query --use_legacy_sql=false --batch=true "$QUERY"
+    echo "$QUERY"
+    QUERY="${QUERY//\\/}"
+    bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-    done
+    #    done
 
     exit 0
 fi
@@ -58,11 +61,11 @@ if [ "$skipload" = false ]; then
     gsutil du -s -h gs://logmon_objects/gs
     gsutil du -s -h gs://logmon_objects/s3
 
-# TODO: Partition/cluster large tables for incremental inserts and retrievals
-# TODO: Materialized views that automatically refresh
+    # TODO: Partition/cluster large tables for incremental inserts and retrievals
+    # TODO: Materialized views that automatically refresh
 
-echo " #### gs_parsed"
-cat << EOF > gs_schema.json
+    echo " #### gs_parsed"
+    cat << EOF > gs_schema.json
     { "schema": { "fields": [
     { "name" : "accepted", "type": "BOOLEAN" },
     { "name" : "accession", "type": "STRING" },
@@ -116,8 +119,7 @@ EOF
         gs_schema_only.json
     bq show --schema "$DATASET.gs_parsed"
 
-
-echo " #### s3_parsed"
+    echo " #### s3_parsed"
     cat << EOF > s3_schema.json
     { "schema": { "fields": [
         { "name" : "accepted", "type": "BOOLEAN" },
@@ -173,6 +175,7 @@ EOF
     bq rm -f "$DATASET.s3_parsed" || true
     bq load \
         --max_bad_records 5000 \
+        --ignore_unknown_values \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.s3_parsed" \
         "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" \
@@ -180,8 +183,8 @@ EOF
 
     bq show --schema "$DATASET.s3_parsed"
 
-echo " #### op_parsed"
-# TODO
+    echo " #### op_parsed"
+    # TODO
     cat << EOF > op_schema.json
     { "schema": { "fields": [
         { "name" : "accepted", "type": "BOOLEAN" },
@@ -224,8 +227,8 @@ EOF
     gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" | tail
 
     bq rm -f "$DATASET.op_parsed" || true
-#        "$PARSE_BUCKET/logs_op_public/recognized.*" \
-#        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
+    #        "$PARSE_BUCKET/logs_op_public/recognized.*" \
+    #        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
     bq load \
         --max_bad_records 200000 \
         --source_format=NEWLINE_DELIMITED_JSON \
@@ -235,17 +238,16 @@ EOF
 
     bq show --schema "$DATASET.op_parsed"
 
-
-
-echo " #### Parsed results"
-bq -q query \
-    --use_legacy_sql=false \
-    "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from $DATASET.gs_parsed union all select source, accepted, cast(time as string) as time from $DATASET.s3_parsed union all select source, accepted, time as time from $DATASET.op_parsed) group by source, accepted order by source"
+    echo " #### Parsed results"
+    bq -q query \
+        --use_legacy_sql=false \
+        "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from $DATASET.gs_parsed union all select source, accepted, cast(time as string) as time from $DATASET.s3_parsed union all select source, accepted, time as time from $DATASET.op_parsed) group by source, accepted order by source"
 
 fi # skipload
 
 echo " #### UDFs"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
 CREATE OR REPLACE FUNCTION $DATASET.expand_bucket (bucket STRING, path STRING)
 RETURNS STRING
 AS
@@ -273,11 +275,12 @@ AS
     END)
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 # See LOGMON-93
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     CREATE OR REPLACE FUNCTION $DATASET.map_extension (extension STRING)
     RETURNS STRING
     AS
@@ -319,12 +322,12 @@ ENDOFQUERY
     END)
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
-
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " #### gs_fixed"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     SELECT
     ip as remote_ip,
         parse_datetime('%s', cast ( cast (time/1000000 as int64) as string) ) as start_ts,
@@ -349,11 +352,11 @@ echo " #### gs_fixed"
 ENDOFQUERY
 )
 
-    # TODO Hack, cause I can't understand bash backtick quoting
-    QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
-    # shellcheck disable=SC2016
-    bq query \
+# TODO Hack, cause I can't understand bash backtick quoting
+QUERY="${QUERY//\\/}"
+bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
+# shellcheck disable=SC2016
+bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.gs_fixed" \
     --use_legacy_sql=false \
@@ -361,13 +364,14 @@ ENDOFQUERY
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema "$DATASET.gs_fixed"
+bq show --schema "$DATASET.gs_fixed"
 
-    #parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
-    #[17/May/2019:23:19:24 +0000]
+#parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
+#[17/May/2019:23:19:24 +0000]
 echo " #### s3_fixed"
-    # LOGMON-1: Remove multiple -heads from agent
-    QUERY=$(cat <<-ENDOFQUERY
+# LOGMON-1: Remove multiple -heads from agent
+QUERY=$(
+    cat <<- ENDOFQUERY
     SELECT
     ip as remote_ip,
     parse_datetime('[%d/%b/%Y:%H:%M:%S +0000]', time) as start_ts,
@@ -394,12 +398,12 @@ echo " #### s3_fixed"
     FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
     WHERE ifnull(accepted,true)=true
 ENDOFQUERY
-    )
+)
 
-    QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
-    # shellcheck disable=SC2016
-    bq query \
+QUERY="${QUERY//\\/}"
+bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
+# shellcheck disable=SC2016
+bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.s3_fixed" \
     --use_legacy_sql=false \
@@ -407,11 +411,12 @@ ENDOFQUERY
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema "$DATASET.s3_fixed"
+bq show --schema "$DATASET.s3_fixed"
 
 echo " #### op_fixed1"
-    # LOGMON-1: Remove multiple -heads from agent
-    QUERY=$(cat <<-ENDOFQUERY
+# LOGMON-1: Remove multiple -heads from agent
+QUERY=$(
+    cat <<- ENDOFQUERY
     SELECT
     ip as remote_ip,
     case
@@ -447,13 +452,13 @@ echo " #### op_fixed1"
     FROM \\\`ncbi-logmon.$DATASET.op_parsed\\\`
     WHERE ifnull(accepted,true)=true
 ENDOFQUERY
-    )
+)
 
-    QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
-    # shellcheck disable=SC2016
+QUERY="${QUERY//\\/}"
+bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
+# shellcheck disable=SC2016
 
-    bq query \
+bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.op_fixed1" \
     --time_partitioning_field=start_ts \
@@ -462,10 +467,11 @@ ENDOFQUERY
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema "$DATASET.op_fixed1"
+bq show --schema "$DATASET.op_fixed1"
 
 echo " #### op_fixed"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     SELECT
     remote_ip,
     start_ts,
@@ -484,13 +490,13 @@ echo " #### op_fixed"
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.op_fixed1\\\`
 ENDOFQUERY
-    )
+)
 
-    QUERY="${QUERY//\\/}"
-    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
-    # shellcheck disable=SC2016
+QUERY="${QUERY//\\/}"
+bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
+# shellcheck disable=SC2016
 
-    bq query \
+bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.op_fixed" \
     --time_partitioning_field=start_ts \
@@ -499,12 +505,12 @@ ENDOFQUERY
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema "$DATASET.op_fixed"
-
+bq show --schema "$DATASET.op_fixed"
 
 echo " ##### detail_export"
 echo " ##### detail_export_gs"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
 SELECT
     accession as accession,
     bucket as bucket,
@@ -536,11 +542,11 @@ SELECT
     END as http_operation_combined
     FROM \\\`$DATASET.gs_fixed\\\`
 ENDOFQUERY
-    )
+)
 QUERY="${QUERY//\\/}"
 
 bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
-    # shellcheck disable=SC2016
+# shellcheck disable=SC2016
 bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export_gs" \
@@ -550,9 +556,9 @@ bq query \
     --time_partitioning_field=start_ts \
     "$QUERY"
 
-
 echo " ##### detail_export_s3"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
 SELECT
     accession as accession,
     bucket as bucket,
@@ -584,11 +590,11 @@ SELECT
     END as http_operation_combined
     FROM \\\`$DATASET.s3_fixed\\\`
 ENDOFQUERY
-    )
+)
 QUERY="${QUERY//\\/}"
 
 bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_s3" || true
-    # shellcheck disable=SC2016
+# shellcheck disable=SC2016
 bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export_s3" \
@@ -599,7 +605,8 @@ bq query \
     "$QUERY"
 
 echo " ##### detail_export_op"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
 SELECT
     accession as accession,
     host as bucket,
@@ -631,11 +638,11 @@ SELECT
     END as http_operation_combined
     FROM \\\`$DATASET.op_fixed\\\`
 ENDOFQUERY
-    )
+)
 QUERY="${QUERY//\\/}"
 
 bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
-    # shellcheck disable=SC2016
+# shellcheck disable=SC2016
 bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export_op" \
@@ -646,19 +653,20 @@ bq query \
     "$QUERY"
 
 echo " ##### detail_export_union"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
 SELECT * FROM \\\`$DATASET.detail_export_gs\\\`
 UNION ALL
 SELECT * FROM \\\`$DATASET.detail_export_op\\\`
 UNION ALL
 SELECT * FROM \\\`$DATASET.detail_export_s3\\\`
 ENDOFQUERY
-    )
-    QUERY="${QUERY//\\/}"
+)
+QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
-    # shellcheck disable=SC2016
-    bq query \
+bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
+# shellcheck disable=SC2016
+bq query \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export" \
     --use_legacy_sql=false \
@@ -668,13 +676,12 @@ ENDOFQUERY
     "$QUERY"
 
 echo " #### unioned"
-    bq show --schema "$DATASET.detail_export"
+bq show --schema "$DATASET.detail_export"
 
 echo " ##### detail_export prune"
 bq -q query \
     --use_legacy_sql=false \
     "delete from $DATASET.detail_export where start_ts < '2000-01-01'"
-
 
 #if [ "$STRIDES_SCOPE" == "public" ]; then
 #    echo " ###  improve file_exts
@@ -699,7 +706,8 @@ bq -q query \
 #fi
 
 echo " ###  summary_grouped"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     SELECT
         accession,
         user_agent,
@@ -724,26 +732,26 @@ echo " ###  summary_grouped"
     HAVING
         bytes_sent > 0
 ENDOFQUERY
-    )
+)
 
-    QUERY="${QUERY//\\/}"
+QUERY="${QUERY//\\/}"
 
-    bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped" || true
-    # shellcheck disable=SC2016
-    bq query \
+bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped" || true
+# shellcheck disable=SC2016
+bq query \
     --destination_table "$DATASET.summary_grouped" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
 
-    bq show --schema "$DATASET.summary_grouped"
-
+bq show --schema "$DATASET.summary_grouped"
 
 echo " ###  op_sess"
 if [ "$STRIDES_SCOPE" == "public" ]; then
     # LOGMON-85: op_fixed is 4/21->, excluding 4/24, 6/25, 6/260
-        QUERY=$(cat <<-ENDOFQUERY
+    QUERY=$(
+        cat <<- ENDOFQUERY
         INSERT INTO $DATASET.summary_grouped
         (accession, user_agent, remote_ip, host,
         bucket, source, num_requests, start_ts, end_ts,
@@ -769,7 +777,8 @@ if [ "$STRIDES_SCOPE" == "public" ]; then
 ENDOFQUERY
     )
 else
-        QUERY=$(cat <<-ENDOFQUERY
+    QUERY=$(
+        cat <<- ENDOFQUERY
         INSERT INTO $DATASET.summary_grouped
         (accession, user_agent, remote_ip, host,
         bucket, source, num_requests, start_ts, end_ts,
@@ -792,15 +801,16 @@ ENDOFQUERY
     )
 
 fi # public
-        QUERY="${QUERY//\\/}"
+QUERY="${QUERY//\\/}"
 
-        bq query \
-        --use_legacy_sql=false \
-        --batch=true \
-        "$QUERY"
+bq query \
+    --use_legacy_sql=false \
+    --batch=true \
+    "$QUERY"
 
-    echo " ###  fix op_sess"
-        QUERY=$(cat <<-ENDOFQUERY
+echo " ###  fix op_sess"
+QUERY=$(
+    cat <<- ENDOFQUERY
         update $DATASET.summary_grouped
         set
         bucket=ifnull(bucket,'') || ' (ETL + BQS)',
@@ -810,15 +820,16 @@ fi # public
         where source='OP'
 
 ENDOFQUERY
-    )
-        QUERY="${QUERY//\\/}"
+)
+QUERY="${QUERY//\\/}"
 
-        bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ###  uniq_ips"
-    bq query --use_legacy_sql=false --batch=true "DROP TABLE IF EXISTS $DATASET.uniq_ips"
+bq query --use_legacy_sql=false --batch=true "DROP TABLE IF EXISTS $DATASET.uniq_ips"
 
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
 
     CREATE OR REPLACE TABLE $DATASET.uniq_ips
     PARTITION BY RANGE_BUCKET(ipint, GENERATE_ARRAY(0, 4294967296, 429496729))
@@ -842,16 +853,16 @@ echo " ###  uniq_ips"
     WHERE length(remote_ip) < 100
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
+QUERY="${QUERY//\\/}"
 
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
-
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 RUN="yes"
 if [ "$RUN" = "yes" ]; then
-# Only needs to be run when a lot of new IP addresses appear
-echo " ###  iplookup_part"
-    QUERY=$(cat <<-ENDOFQUERY
+    # Only needs to be run when a lot of new IP addresses appear
+    echo " ###  iplookup_part"
+    QUERY=$(
+        cat <<- ENDOFQUERY
 
     CREATE OR REPLACE TABLE $DATASET.ip2location_part
     PARTITION BY
@@ -859,14 +870,15 @@ echo " ###  iplookup_part"
     AS
     SELECT * from \\\`ncbi-logmon.strides_analytics.ip2location\\\`
 ENDOFQUERY
-)
+    )
     #WHERE remote_ip like '%.%'
     QUERY="${QUERY//\\/}"
 
     bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-echo " ###  iplookup_new3"
-    QUERY=$(cat <<-ENDOFQUERY
+    echo " ###  iplookup_new3"
+    QUERY=$(
+        cat <<- ENDOFQUERY
     CREATE OR REPLACE TABLE $DATASET.iplookup_new3
     (remote_ip string,
      ipint int64,
@@ -874,14 +886,15 @@ echo " ###  iplookup_new3"
      region_name string,
      city_name string)
 ENDOFQUERY
-)
+    )
     bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-   #step=429496729
+    #step=429496729
     step=100000000
     for part in $(seq 0 $step 4294967296); do
-        top=$((step+part))
-        QUERY=$(cat <<-ENDOFQUERY
+        top=$((step + part))
+        QUERY=$(
+            cat <<- ENDOFQUERY
         INSERT INTO $DATASET.iplookup_new3
         SELECT remote_ip, ipint, country_code, region_name, city_name
         FROM \\\`ncbi-logmon.strides_analytics.ip2location_part\\\`
@@ -890,7 +903,7 @@ ENDOFQUERY
         WHERE ipint   between $part and $top AND
             ip_from between $part and $top
 ENDOFQUERY
-)
+        )
 
         QUERY="${QUERY//\\/}"
         #echo $QUERY
@@ -900,19 +913,20 @@ ENDOFQUERY
     done
 fi # RUN
 
-    echo " ### Find new IP addresses"
-        QUERY=$(cat <<-ENDOFQUERY
+echo " ### Find new IP addresses"
+QUERY=$(
+    cat <<- ENDOFQUERY
     insert into ncbi-logmon.strides_analytics.rdns (ip)
     select distinct remote_ip as ip from $DATASET.summary_export where remote_ip not in (select distinct ip from ncbi-logmon.strides_analytics.rdns
     )
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-# if [ "$STRIDES_SCOPE" == "public" ]; then
 echo " ### Find internal PUT/POST IPs"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="NCBI Cloud (put.nlm.nih.gov)"
     WHERE ip in (
@@ -922,12 +936,13 @@ echo " ### Find internal PUT/POST IPs"
     and http_statuses like '%20%')
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 # https://confluence.ncbi.nlm.nih.gov/pages/viewpage.action?spaceKey=Edu&title=NCBI+Cloud+Education+Onboarding+Reference+Page
 echo " ### Find internal IAMs IPs"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     CREATE OR REPLACE TABLE strides_analytics.internal_rdns AS
     SELECT ip, string_agg(distinct requester) as reqagg
     FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
@@ -958,64 +973,65 @@ echo " ### Find internal IAMs IPs"
         or requester like '%591266071882%'
     GROUP BY ip
 ENDOFQUERY
-    )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+)
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     DELETE FROM strides_analytics.rdns
     WHERE ip in (select distinct ip from strides_analytics.internal_rdns)
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     INSERT INTO strides_analytics.rdns (ip, domain)
     SELECT ip, "NCBI Cloud (nlm.nih.gov " || reqagg || ")" as domain
     FROM strides_analytics.internal_rdns t2
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
-
-
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Update RDNS"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="Unknown"
     WHERE domain is null
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="IPv6"
     WHERE ip like '%:%'
     and domain='Unknown'
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     UPDATE strides_analytics.rdns
     SET DOMAIN="IPv6 IANA Unicast (ncbi.nlm.nih.gov)"
     WHERE ip like 'fda3%'
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 # fi # public
 
-
 echo " ###  annual_summary_export_$CURYEAR"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     SELECT
     accession,
     user_agent,
@@ -1053,28 +1069,29 @@ echo " ###  annual_summary_export_$CURYEAR"
     WHERE
         accession IS NOT NULL AND accession != ""
 ENDOFQUERY
-    )
+)
 
 #    LEFT JOIN \\\`$DATASET.$STRIDES_SCOPE_fix\\\`
-    QUERY="${QUERY//\\/}"
+QUERY="${QUERY//\\/}"
 
-    bq cp -f "$DATASET.annual_summary_export_$CURYEAR" "$DATASET.summary_export_$YESTERDAY" || true
-    bq rm --project_id ncbi-logmon -f "$DATASET.annual_summary_export_$CURYEAR" || true
+bq cp -f "$DATASET.annual_summary_export_$CURYEAR" "$DATASET.summary_export_$YESTERDAY" || true
+bq rm --project_id ncbi-logmon -f "$DATASET.annual_summary_export_$CURYEAR" || true
 
-    # shellcheck disable=SC2016
-    bq query \
+# shellcheck disable=SC2016
+bq query \
     --destination_table "$DATASET.annual_summary_export_$CURYEAR" \
     --use_legacy_sql=false \
     --batch=true \
     --max_rows=5 \
     "$QUERY"
-    bq show --schema "$DATASET.annual_summary_export_$CURYEAR"
+bq show --schema "$DATASET.annual_summary_export_$CURYEAR"
 
 #    OLD=$(date -d "-7 days" "+%Y%m%d")
 #    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_$OLD" || true
 
 echo " ### fix summary_export for NIH"
-    QUERY=$(cat <<-ENDOFQUERY
+QUERY=$(
+    cat <<- ENDOFQUERY
     UPDATE $DATASET.annual_summary_export_$CURYEAR
     SET city_name='Bethesda',
     region_name='Maryland',
@@ -1082,52 +1099,47 @@ echo " ### fix summary_export for NIH"
     WHERE domain like '%nih.gov%' and (city_name is null or city_name='Unknown')
 ENDOFQUERY
 )
-    QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
-
+QUERY="${QUERY//\\/}"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### union previous years into summary_export"
-    first=true
-    QUERY="CREATE OR REPLACE TABLE $DATASET.summary_export AS "
-    ALLYEARS="$PREVYEARS $CURYEAR"
-    for year in $ALLYEARS; do
-        if [ "$first" = true ]; then
-            first=false
-        else
-            QUERY="$QUERY union all "
-        fi
-        QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year "
-    done
+first=true
+QUERY="CREATE OR REPLACE TABLE $DATASET.summary_export AS "
+ALLYEARS="$PREVYEARS $CURYEAR"
+for year in $ALLYEARS; do
+    if [ "$first" = true ]; then
+        first=false
+    else
+        QUERY="$QUERY union all "
+    fi
+    QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year "
+done
 
-    QUERY="${QUERY//\\/}"
-    echo "$QUERY"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
-
-
+QUERY="${QUERY//\\/}"
+echo "$QUERY"
+bq query --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ###  export to GS"
-    gsutil rm -f "gs://logmon_export/detail/detail.$DATE.*.json.gz" || true
+gsutil rm -f "gs://logmon_export/detail/detail.$DATE.*.json.gz" || true
 #    bq extract \
 #    --destination_format NEWLINE_DELIMITED_JSON \
 #    --compression GZIP \
 #    '$DATASET.detail_export' \
 #    "gs://logmon_export/detail/detail.$DATE.*.json.gz"
 
-    gsutil rm -f "gs://logmon_export/summary/summary.$DATE.$STRIDES_SCOPE*.json.gz" || true
-    bq extract \
+gsutil rm -f "gs://logmon_export/summary/summary.$DATE.$STRIDES_SCOPE*.json.gz" || true
+bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression GZIP \
     "$DATASET.summary_export" \
     "gs://logmon_export/summary/summary.$DATE.$STRIDES_SCOPE.*.json.gz"
 
-    gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*.json.gz" || true
-    bq extract \
+gsutil rm -f "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*.json.gz" || true
+bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression NONE \
     "$DATASET.uniq_ips" \
     "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.json"
-
-
 
 echo " ###  copy to filesystem"
 #    mkdir -p "$PANFS/detail"
@@ -1140,26 +1152,25 @@ echo " ###  copy to filesystem"
 #    rm -f "$PANFS"/summary/summary."$DATE".* || true
 #    gsutil cp -r "gs://logmon_export/summary/summary.$DATE.*" "$PANFS/summary/"
 
-    mkdir -p "$PANFS/uniq_ips"
-    cd "$PANFS/uniq_ips" || exit
-    rm -f "$PANFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
-    gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$PANFS/uniq_ips/"
-
-
+mkdir -p "$PANFS/uniq_ips"
+cd "$PANFS/uniq_ips" || exit
+rm -f "$PANFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
+gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$PANFS/uniq_ips/"
 
 if [ "$STRIDES_SCOPE" == "private" ]; then
-    QUERY=$(cat <<-ENDOFQUERY
+    QUERY=$(
+        cat <<- ENDOFQUERY
     DELETE from $DATASET.summary_export
     where source='OP' and
       ( host not like '%download%' or
         consent in ('public', 'none', 'Unknown') )
 ENDOFQUERY
-)
+    )
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
 
-
-    QUERY=$(cat <<-ENDOFQUERY
+    QUERY=$(
+        cat <<- ENDOFQUERY
     SELECT *
         REPLACE
         (
@@ -1190,24 +1201,24 @@ ENDOFQUERY
     where consent not in
     ('DS-MHIV', 'DS-INF', 'DS-PTL', 'DS-MRUH')
 ENDOFQUERY
-)
+    )
 
-# TODO: Use cloud_analytics.isConsentPublic()
+    # TODO: Use cloud_analytics.isConsentPublic()
 
-#    QUERY="${QUERY//\\/}"
+    #    QUERY="${QUERY//\\/}"
 
-echo " ###  masking"
+    echo " ###  masking"
     bq cp -f "strides_analytics.summary_export_ca_masked" "strides_analytics.summary_export_ca_masked_$YESTERDAY" || true
     bq rm --project_id ncbi-logmon -f "strides_analytics.summary_export_ca_masked" || true
 
     # shellcheck disable=SC2016
     bq query \
-    --project_id ncbi-logmon \
-    --destination_table "strides_analytics.summary_export_ca_masked" \
-    --use_legacy_sql=false \
-    --batch=true \
-    --max_rows=5 \
-    "$QUERY"
+        --project_id ncbi-logmon \
+        --destination_table "strides_analytics.summary_export_ca_masked" \
+        --use_legacy_sql=false \
+        --batch=true \
+        --max_rows=5 \
+        "$QUERY"
 else # not private
     echo "Cleanup large temp tables"
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
@@ -1225,7 +1236,6 @@ else # not private
     bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
 fi # private
-
 
 echo "bigquery_annual.sh complete"
 date

@@ -83,6 +83,7 @@ EOF
 
 
 echo " #### s3_parsed"
+#    { "name" : "access_point", "type": "STRING" },
     cat << EOF > s3_schema.json
     { "schema": { "fields": [
         { "name" : "accepted", "type": "BOOLEAN" },
@@ -136,9 +137,11 @@ EOF
     gsutil ls -lR "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" | tail
 
     bq rm -f "$DATASET.s3_parsed" || true
+    # ignore new access_point
     bq load \
         --max_bad_records 5000 \
         --source_format=NEWLINE_DELIMITED_JSON \
+        --ignore_unknown_values \
         "$DATASET.s3_parsed" \
         "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.*" \
         s3_schema_only.json

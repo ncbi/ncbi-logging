@@ -15,7 +15,6 @@ sleep $((RANDOM / 500))
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
 
-
 case "$#" in
     0)
         echo "$USAGE"
@@ -36,7 +35,7 @@ case "$#" in
 esac
 
 PROVIDER_LC=${PROVIDER,,}
-YESTERDAY=${YESTERDAY_UNDER//_}
+YESTERDAY=${YESTERDAY_UNDER//_/}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
 echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
@@ -58,6 +57,7 @@ case "$PROVIDER" in
         echo "Invalid provider $PROVIDER"
         echo "$USAGE"
         exit 1
+        ;;
 esac
 
 if [[ ${#YESTERDAY_UNDER} -ne 10 ]]; then
@@ -104,7 +104,6 @@ for LOG_BUCKET in "${buckets[@]}"; do
     echo "  Parsing $TGZ (pattern=$wildcard), $totalwc lines ..."
     touch "$YESTERDAY_DASH.${LOG_BUCKET}.json"
 
-
     echo "  Parsing $LOG_BUCKET..."
     if [ "$PARSER" = "cl" ]; then
         VERSION=$("$HOME"/ncbi-logging/parser/bin/cl2jsn-rel --version)
@@ -112,18 +111,18 @@ for LOG_BUCKET in "${buckets[@]}"; do
         tar -xaOf "$TGZ" "$wildcard" | \
             tr -s ' ' | \
             time "$HOME/ncbi-logging/parser/bin/cl2jsn-rel" -f "$PARSER" > \
-            "$YESTERDAY_DASH.${LOG_BUCKET}.out" \
-            2> "$TGZ.err"
+                "$YESTERDAY_DASH.${LOG_BUCKET}.out" \
+                2> "$TGZ.err"
 
-            echo "  Record format is:"
-            head -1 "cl.good.jsonl" | jq -SM .
+        echo "  Record format is:"
+        head -1 "cl.good.jsonl" | jq -SM .
 
-            set +e
-            cat cl.unrecog.jsonl cl.review.jsonl cl.bad.jsonl > \
-                "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-            mv cl.good.jsonl \
-                "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-            set -e
+        set +e
+        cat cl.unrecog.jsonl cl.review.jsonl cl.bad.jsonl > \
+            "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+        mv cl.good.jsonl \
+            "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
+        set -e
 
     else
         VERSION=$("$HOME"/ncbi-logging/parser/bin/log2jsn-rel --version)
@@ -131,15 +130,15 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
         # sed to work around """linux64 bug (LOGMON-208)
         # The seds require about 15% the CPU of log2jsn-rel
-        tar -xaOf "$TGZ" "$wildcard" | \
-            sed 's/"""linux64""/"linux64/g'  | \
-            sed 's/"""linux64"/"linux64/g'  | \
-            sed  's/""linux64"/"linux64/g'  | \
-            sed  's/""mac64"/"mac64/g'  | \
-            sed  's/""windows64"/"windows64/g'  | \
+        tar -xaOf "$TGZ" "$wildcard" |
+            sed 's/"""linux64""/"linux64/g' |
+            sed 's/"""linux64"/"linux64/g' |
+            sed 's/""linux64"/"linux64/g' |
+            sed 's/""mac64"/"mac64/g' |
+            sed 's/""windows64"/"windows64/g' | \
             time "$HOME/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
-            "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
-            2> "$TGZ.err"
+                "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
+                2> "$TGZ.err"
 
         ls -l
         rm -f "$TGZ"
@@ -147,9 +146,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
         head -1 "$YESTERDAY_DASH.${LOG_BUCKET}.json" | jq -SM .
 
         set +e
-        grep "\"accepted\":false," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
+        grep '"accepted":false,' "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
             "unrecognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
-        grep "\"accepted\":true," "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
+        grep '"accepted":true,' "$YESTERDAY_DASH.${LOG_BUCKET}.json" > \
             "recognized.$YESTERDAY_DASH.${LOG_BUCKET}.jsonl"
         rm -f "$YESTERDAY_DASH.${LOG_BUCKET}.json"
         set -e
@@ -193,7 +192,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         printf '"parser_version" : "%s",' "$VERSION"
         printf '"total_lines" : %d,' "$totalwc"
         printf '"recognized_lines" : %d,' "$recwc"
-        printf '"unrecognized_lines" : %d'  "$unrecwc"
+        printf '"unrecognized_lines" : %d' "$unrecwc"
         printf "}"
     } > "$TGZ.json"
     jq -S -c . < "$TGZ.json" > "summary.$TGZ.jsonl"
