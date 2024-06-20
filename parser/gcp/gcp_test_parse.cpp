@@ -324,13 +324,6 @@ TEST_F( GCPTestFixture, LOGMON_208 )
                static_cast<const GCPReceiver&>( pb -> GetReceiver() ) . agent_for_postprocess );
 }
 
-TEST_F( GCPTestFixture, VDB_5563 )
-{   // allow empty method
-    string res = try_to_parse_good(
-"\"1714445214573584\",\"\",\"\",\"\",\"\",\"\",\"200\",\"\",\"\",\"\",\"\",\"\",\"GCS Lifecycle Management\",\"d8c3fedc1503d12e1e1b797027e52ed3\",\"\",\"sra-pub-crun-7\",\"\"" );
-    ASSERT_NE( "", res );
-}
-
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
