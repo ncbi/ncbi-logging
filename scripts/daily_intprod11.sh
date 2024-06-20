@@ -13,6 +13,7 @@ set +e
 
 mkdir -p "$HOME"/logs
 find "$HOME/logs" -mtime +2 -size +1M -exec xz -9 {} \;
+du -shc "$HOME"/* | sort -hr | head > "$HOME/dus" &
 
 #/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
 
@@ -32,7 +33,7 @@ echo "mirror.sh S3"
 
 # SYS-436845/LOGMON-215
 rm -f "$HOME"/s3_prod/*.err
-find "$HOME"/s3_prod -type f -mtime +30 -exec rm -f {} \;
+find "$HOME"/s3_prod -type f -mtime +30 -delete
 
 echo "parse S3"
 #./parse.sh S3      |& ts >> "$HOME"/logs/parse_s3."$DATE".log
@@ -50,7 +51,7 @@ echo "parse OP"
 #dow=$(date +%u) # 1=Monday
 dom=$(date +%e)
 # Kurtis mirrors on 8th of month, pre-check before
-if [ "$dom" = "2" ] || [ "$dom" -eq "6" ] ; then
+if [ "$dom" -eq 2 ] || [ "$dom" -eq 6 ] ; then
     echo "bigquery_export"
     #./bigquery_objects.sh  |& ts >> "$HOME"/logs/bigquery_objects."$DATE".log
     #./bigquery_cloudian.sh  |& ts >> "$HOME"/logs/bigquery_cloudian."$DATE".log
@@ -63,5 +64,12 @@ if [ "$dom" = "2" ] || [ "$dom" -eq "6" ] ; then
         mailx -s "$HOST BigQuery Report" vartanianmh@ncbi.nlm.nih.gov
 fi
 
+DONEFILE="${HOME}/done/daily_${YESTERDAY}.done"
+if [ ! -e "$DONEFILE" ]; then
+    echo "No done"
+    mailx -s "$HOST daily not done $YESTERDAY" vartanianmh@ncbi.nlm.nih.gov
+fi
+DONEFILE="${HOME}/done/daily_${TODAY}.done"
+touch "$DONEFILE"
 echo "    --- Daily Processing Complete ($$) ---"
 date

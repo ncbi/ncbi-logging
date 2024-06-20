@@ -29,5 +29,5 @@
         ]
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
-    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recogn*" ]
+    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recognized.2024-*" ]
     }

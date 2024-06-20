@@ -42,13 +42,13 @@ case "$#" in
 esac
 
 PROVIDER_LC=${PROVIDER,,}
-YESTERDAY=${YESTERDAY_UNDER//_}
+YESTERDAY=${YESTERDAY_UNDER//_/}
 YESTERDAY_DASH=${YESTERDAY_UNDER//_/-}
 
 mkdir -p "${HOME}/logs/"
 LOGFILE="${HOME}/logs/parse_new.${HOST}.${PROVIDER_LC}.${YESTERDAY}.log"
 touch "$LOGFILE"
-exec 1>"$LOGFILE"
+exec 1> "$LOGFILE"
 exec 2>&1
 
 echo "YESTERDAY=$YESTERDAY YESTERDAY_UNDER=$YESTERDAY_UNDER YESTERDAY_DASH=$YESTERDAY_DASH"
@@ -173,23 +173,20 @@ for LOG_BUCKET in "${buckets[@]}"; do
         # shellcheck disable=SC2016
         split -a 3 -d -l 10000000 \
             --filter='gzip -9 > $FILE.jsonl.gz' \
-            - "recognized.$BASE."  \
+            - "recognized.$BASE." \
             < "$BASE.good.jsonl" &
 
         set +e
-        tar -xaOf "$TGZ" "$WILDCARD"           | \
-            sed 's/ - -$//g'                   | \
-            sed 's/ - Yes$//g'                 | \
-            sed 's/ - $//g'                    | \
-            sed 's/"""linux64""/"linux64/g'    | \
-            sed 's/"""linux64"/"linux64/g'     | \
-            sed  's/""linux64"/"linux64/g'     | \
-            sed  's/""mac64"/"mac64/g'         | \
-            sed  's/""windows64"/"windows64/g' | \
-            sed 's/TLSv1.2 .*/TLSv1.2 -/'      | \
-            time "$PARSER_BIN" -f -t 2 "$BASE"   \
-            > stdout."$BASE" \
-            2> stderr."$BASE"
+        tar -xaOf "$TGZ" "$WILDCARD" |
+            sed 's/"""linux64""/"linux64/g' |
+            sed 's/"""linux64"/"linux64/g' |
+            sed 's/""linux64"/"linux64/g' |
+            sed 's/""mac64"/"mac64/g' |
+            sed 's/""windows64"/"windows64/g' | \
+            grep -v "GCS Lifecycle Management" | \
+            time "$PARSER_BIN" -f -t 2 "$BASE" \
+                > stdout."$BASE" \
+                2> stderr."$BASE"
 
         echo "    $PARSER_BIN returned $?"
         rm -f "$TGZ"
@@ -203,7 +200,6 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
         echo "  Record format is:"
         zcat recognized."$BASE".*.jsonl.gz | head -1 | jq -SM .
-
 
         touch "$BASE.bad.jsonl"
         touch "$BASE.review.jsonl"
@@ -227,6 +223,12 @@ for LOG_BUCKET in "${buckets[@]}"; do
         unrecwc=$(wc -l "unrecognized.$BASE.jsonl" | cut -f1 -d' ')
         printf "Unrecognized lines: %8d\n" "$unrecwc"
 
+        if [ "$PROVIDER" != "OP" ]; then
+            if [ "$unrecwc" -gt 50 ]; then
+                head -5 "unrecognized.$BASE.jsonl" | mailx -s "${HOST} parse_new $PROVIDER unrecognized $unrecwc" vartanianmh@ncbi.nlm.nih.gov
+            fi
+        fi
+
         #if [ ! -s "recognized.$BASE.jsonl" ]; then
         #    echo "ERROR: Empty recognized.$BASE.jsonl"
         #    #continue
@@ -238,7 +240,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
         echo "  Gzipping ..."
         gzip -f -v ./*recognized."$BASE"*jsonl
-        find ./ -name "*$BASE*" -size 0c -exec rm -f {} \;
+        find ./ -name "*$BASE*" -size 0c -delete
 
         {
             printf "{"
@@ -249,7 +251,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             printf '"parser_version" : "%s",' "$VERSION"
             printf '"total_lines" : %d,' "$totalwc"
             printf '"recognized_lines" : %d,' "$recwc"
-            printf '"unrecognized_lines" : %d'  "$unrecwc"
+            printf '"unrecognized_lines" : %d' "$unrecwc"
             printf "}"
         } | jq -S -c . > "summary.$BASE.jsonl"
         echo "  Summary:"
@@ -275,16 +277,16 @@ for LOG_BUCKET in "${buckets[@]}"; do
         gsutil -q cp ./summary."$BASE".jsonl "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/"
 
         gsutil ls -lh \
-            "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/*$BASE*" | \
+            "$DEST_BUCKET/logs_${PROVIDER_LC}_${STRIDES_SCOPE}/v3/*$BASE*" |
             indent
     else
         echo "File has $totalwc records, skipping"
     fi # totalwc gt 0
 
-cd ..
-rm -rf "$PARSE_DEST"
-echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
-echo
+    cd ..
+    rm -rf "$PARSE_DEST"
+    echo "  Done $LOG_BUCKET for $YESTERDAY_DASH..."
+    echo
 done
 
 echo " Done parse_new"

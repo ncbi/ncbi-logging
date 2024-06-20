@@ -63,7 +63,7 @@ for YESTERDAY in $MISSING; do
 
         if [ "$unrecwc" -eq "0" ]; then
             echo "Gzipping..."
-            find ./ -name "*.jsonl" -size 0c -exec rm -f {} \;  # Don't bother with empty
+            find ./ -name "*.jsonl" -size 0c -delete  # Don't bother with empty
             gzip -v -9 ./*.jsonl
 
             ls -la
