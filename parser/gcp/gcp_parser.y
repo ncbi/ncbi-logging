@@ -111,6 +111,7 @@ ip_region
 
 method
     : QUOTE QSTR QUOTE      { $$ = $2; lib->set( GCPReceiver::method, $2 ); }
+    | QUOTE QUOTE           { lib->set( GCPReceiver::method, EmptyTSTR ); }
     ;
 
 status
