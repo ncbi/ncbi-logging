@@ -122,13 +122,13 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-    "select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, nih from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, domain like '%nih.gov%' as nih from $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day, nih order by day desc limit 100"
+    "select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, nih from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, domain like '%nih.gov%' as nih from $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day, nih order by day desc limit 30"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-    "select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from $DATASET.summary_export where domain not like '%nih.gov%' and (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day order by day desc"
+    "select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests from $DATASET.summary_export where domain not like '%nih.gov%' and (http_operations like '%GET%' or http_operations like '%HEAD%' ) ) group by day order by day desc limit 30"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -215,21 +215,21 @@ if [ "$STRIDES_SCOPE" == "private" ]; then
         "select day as day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests, internal from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests, domain like '%nih.gov%' as internal from strides_analytics.summary_export_ca_masked where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2021-01-01' ) group by internal, day order by internal, day limit 50"
 
 else
+    echo
+#    bq -q query \
+#        --use_legacy_sql=false \
+#        --format "$FORMAT" \
+#        "SELECT CASE WHEN key LIKE '%.cram%' THEN 'cram,crai' WHEN key LIKE '%.crai%' THEN 'cram,crai' WHEN key LIKE '%.bam%' THEN 'bam,bai' WHEN key LIKE '%.bai%' THEN 'bam,bai' WHEN key like '%.fastq.gz%' THEN 'fastq.gz' WHEN key like '%.fq.gz%' THEN 'fq.gz' WHEN key like '%.fastq.%' THEN 'fastq' WHEN key like '%.sam%' THEN 'sam' ELSE 'other' END AS type, format('%\'d',COUNT(*)) AS cnt, format('%\'d', cast(AVG(size) as int64)) AS average_size FROM $DATASET.objects_uniq GROUP BY type order by type"
 
-    bq -q query \
-        --use_legacy_sql=false \
-        --format "$FORMAT" \
-        "SELECT CASE WHEN key LIKE '%.cram%' THEN 'cram,crai' WHEN key LIKE '%.crai%' THEN 'cram,crai' WHEN key LIKE '%.bam%' THEN 'bam,bai' WHEN key LIKE '%.bai%' THEN 'bam,bai' WHEN key like '%.fastq.gz%' THEN 'fastq.gz' WHEN key like '%.fq.gz%' THEN 'fq.gz' WHEN key like '%.fastq.%' THEN 'fastq' WHEN key like '%.sam%' THEN 'sam' ELSE 'other' END AS type, format('%\'d',COUNT(*)) AS cnt, format('%\'d', cast(AVG(size) as int64)) AS average_size FROM $DATASET.objects_uniq GROUP BY type order by type"
+#    bq -q query \
+#        --use_legacy_sql=false \
+#        --format "$FORMAT" \
+#        "SELECT distinct source || '/' || bucket as unlogged_bucket from $DATASET.objects where source || '/' || bucket not in (select distinct source || '/' || regexp_extract(bucket,r'^[\S]+') from $DATASET.summary_export) order by unlogged_bucket"
 
-    bq -q query \
-        --use_legacy_sql=false \
-        --format "$FORMAT" \
-        "SELECT distinct source || '/' || bucket as unlogged_bucket from $DATASET.objects where source || '/' || bucket not in (select distinct source || '/' || regexp_extract(bucket,r'^[\S]+') from $DATASET.summary_export) order by unlogged_bucket"
-
-    bq -q query \
-        --use_legacy_sql=false \
-        --format "$FORMAT" \
-        "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from $DATASET.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from $DATASET.objects) order by unlisted_bucket"
+#    bq -q query \
+#        --use_legacy_sql=false \
+#        --format "$FORMAT" \
+#        "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from $DATASET.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from $DATASET.objects) order by unlisted_bucket"
 
 fi # public
 

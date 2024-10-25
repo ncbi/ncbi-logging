@@ -271,7 +271,7 @@ AS
         WHEN ends_with(bucket, 'sra-pub-src-1') THEN bucket || ' (Original)'
         WHEN ends_with(bucket, 'sra-pub-src-2') THEN bucket || ' (Original)'
         WHEN regexp_contains(bucket, r'sra-pub-src-') THEN bucket || ' (Original Cold)'
-        WHEN regexp_contains(path, 'r-zq-') THEN bucket || ' (ETL - BQS)'
+        WHEN contains_substr(path, 'sra-pub-zq-') THEN bucket || ' (ETL - BQS)'
         WHEN regexp_contains(path, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-run-') THEN bucket || ' (ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-src-') THEN bucket || ' (Original)'
@@ -817,10 +817,7 @@ QUERY=$(
     cat <<- ENDOFQUERY
         update $DATASET.summary_grouped
         set
-        bucket=case
-            when regexp_contains(bucket, r'gap-') then bucket || ' (Controlled Access ETL + BQS)'
-            else ifnull(bucket,'') || ' (Unknown)'
-        end,
+        bucket=ifnull(bucket,'(Unknown)')
         http_operations=replace(http_operations,' ',','),
         http_statuses=replace(http_statuses,' ',','),
         user_agent=replace(user_agent, '-head', '')

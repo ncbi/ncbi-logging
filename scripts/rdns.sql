@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20231226.all.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20240517.all.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -470,6 +470,8 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '123.15%'
   OR IP LIKE '123.139.%'
   OR IP LIKE '124.161.%'
+  OR IP LIKE '153.36.%'
+  OR IP LIKE '153.37.%'
   OR IP LIKE '171.36.%'
   OR IP LIKE '171.37.%'
   OR IP LIKE '171.38.%'
@@ -1759,6 +1761,15 @@ where ip like '38.70.%';
 update rdns
 set domain='DigitalOcean (digitalocean.com)'
 where ip like '192.241.%';
+
+update rdns
+set domain='Juelich Supercomputing Centre (fz-juelich.de)'
+where ip like '134.94.%';
+
+update rdns
+set domain='Speedium.nl (speedium.nl)'
+where ip like '212.6.53.%';
+
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
