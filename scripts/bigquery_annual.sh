@@ -273,6 +273,7 @@ AS
         WHEN regexp_contains(bucket, r'sra-pub-src-') THEN bucket || ' (Original Cold)'
         WHEN contains_substr(path, '-zq-') THEN bucket || ' (ETL - BQS)'
         WHEN contains_substr(path, '-hup-') THEN bucket || ' (Hold)'
+        WHEN contains_substr(path, '-hold') THEN bucket || ' (Hold)'
         WHEN contains_substr(path, '-etc-') THEN bucket || ' (Other)'
         WHEN contains_substr(path, '-ra-') THEN bucket || ' (ETL - BQS)'
         WHEN regexp_contains(path, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
