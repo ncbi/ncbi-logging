@@ -821,7 +821,7 @@ QUERY=$(
     cat <<- ENDOFQUERY
         update $DATASET.summary_grouped
         set
-        bucket=ifnull(bucket,'(Unknown)')
+        bucket=ifnull(bucket,'(Unknown)'),
         http_operations=replace(http_operations,' ',','),
         http_statuses=replace(http_statuses,' ',','),
         user_agent=replace(user_agent, '-head', '')
