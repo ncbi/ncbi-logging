@@ -279,7 +279,7 @@ AS
         WHEN regexp_contains(path, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-run-') THEN bucket || ' (ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-src-') THEN bucket || ' (Original)'
-    ELSE bucket || ' (Unknown)'
+    ELSE ifnull(bucket,'') || ' (Unknown)'
     END)
 ENDOFQUERY
 )
@@ -1236,12 +1236,12 @@ else # not private
 
     bq rm --project_id ncbi-logmon -f "$DATASET.cloudian_fixed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
 
     bq rm --project_id ncbi-logmon -f "$DATASET.gs_parsed" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
 fi # private
 
