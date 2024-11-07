@@ -237,6 +237,14 @@ AS
         WHEN ends_with(bucket, 'sra-pub-src-1') THEN bucket || ' (Original)'
         WHEN ends_with(bucket, 'sra-pub-src-2') THEN bucket || ' (Original)'
         WHEN regexp_contains(bucket, r'sra-pub-src-') THEN bucket || ' (Original Cold)'
+        WHEN contains_substr(path, '-zq-') THEN bucket || ' (ETL - BQS)'
+        WHEN contains_substr(path, '-hup-') THEN bucket || ' (Hold)'
+        WHEN contains_substr(path, '-hold') THEN bucket || ' (Hold)'
+        WHEN contains_substr(path, '-etc-') THEN bucket || ' (Other)'
+        WHEN contains_substr(path, '-ra-') THEN bucket || ' (ETL - BQS)'
+        WHEN regexp_contains(path, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
+        WHEN regexp_contains(path, r'-pub-run-') THEN bucket || ' (ETL + BQS)'
+        WHEN regexp_contains(path, r'-pub-src-') THEN bucket || ' (Original)'
     ELSE bucket || ' (Unknown)'
     END)
 ENDOFQUERY
@@ -442,7 +450,7 @@ echo " #### op_fixed"
     version,
     http_operation,
     http_status,
-    host,
+    $DATASET.expand_bucket(host, request_uri) as host,
     bytes_sent,
     request_uri,
     $DATASET.map_extension(request_uri) as extension,
