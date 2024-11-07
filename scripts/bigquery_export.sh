@@ -245,7 +245,7 @@ AS
         WHEN regexp_contains(path, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-run-') THEN bucket || ' (ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-src-') THEN bucket || ' (Original)'
-    ELSE bucket || ' (Unknown)'
+    ELSE ifnull(bucket,'') || ' (Unknown)'
     END)
 ENDOFQUERY
 )
@@ -774,11 +774,11 @@ fi # public
         --batch=true \
         "$QUERY"
 
+#        bucket=ifnull(bucket,'') || ' (ETL + BQS)',
     echo " ###  fix op_sess"
         QUERY=$(cat <<-ENDOFQUERY
         update $DATASET.summary_grouped
         set
-        bucket=ifnull(bucket,'') || ' (ETL + BQS)',
         http_operations=replace(http_operations,' ',','),
         http_statuses=replace(http_statuses,' ',','),
         user_agent=replace(user_agent, '-head', '')
