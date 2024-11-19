@@ -218,6 +218,7 @@ CREATE OR REPLACE FUNCTION $DATASET.expand_bucket (bucket STRING, path STRING)
 RETURNS STRING
 AS
  (case
+        WHEN regexp_contains(bucket, r'ETL') THEN bucket
         WHEN regexp_contains(bucket, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
         WHEN regexp_contains(bucket, r'-ca-crun-') THEN bucket || ' (Controlled Access ETL + BQS Cold)'
         WHEN regexp_contains(bucket, r'-ca-zq-') THEN bucket || ' (Controlled Access ETL - BQS)'
