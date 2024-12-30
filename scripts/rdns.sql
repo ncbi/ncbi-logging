@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20240517.all.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20241206.private.json  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -146,6 +146,8 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '14.110.%'
   OR IP LIKE '14.111.%'
   OR IP LIKE '27.15%'
+  OR IP LIKE '36.48.%'
+  OR IP LIKE '36.49.%'
   OR IP LIKE '49.6%'
   OR IP LIKE '49.7%'
   OR IP LIKE '49.8%'
@@ -166,6 +168,7 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '58.221%'
   OR IP LIKE '58.222%'
   OR IP LIKE '58.223%'
+  OR IP LIKE '60.188.%'
   OR IP LIKE '101.81.%'
   OR IP LIKE '106.108.%'
   OR IP LIKE '106.109.%'
@@ -179,14 +182,9 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '106.117.%'
   OR IP LIKE '106.118.%'
   OR IP LIKE '106.119.%'
-  OR IP LIKE '110.80.%'
-  OR IP LIKE '110.81.%'
-  OR IP LIKE '110.82.%'
-  OR IP LIKE '110.83.%'
-  OR IP LIKE '110.84.%'
-  OR IP LIKE '110.85.%'
-  OR IP LIKE '110.86.%'
-  OR IP LIKE '110.87.%'
+  OR IP LIKE '110.8%'
+  OR IP LIKE '110.90.%'
+  OR IP LIKE '110.91.%'
   OR IP LIKE '110.184.%'
   OR IP LIKE '110.185.%'
   OR IP LIKE '110.186.%'
@@ -301,14 +299,14 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '140.250.%'
   OR IP LIKE '140.237.%'
   OR IP LIKE '144.255.%'
-  OR IP LIKE '180.126%'
-  OR IP LIKE '180.160.%'
-  OR IP LIKE '180.161.%'
-  OR IP LIKE '180.124.%'
-  OR IP LIKE '180.125.%'
-  OR IP LIKE '180.126.%'
-  OR IP LIKE '180.127.%'
-  OR IP LIKE '180.96.%'
+  OR IP LIKE '171.88.%'
+  OR IP LIKE '171.89.%'
+  OR IP LIKE '171.90.%'
+  OR IP LIKE '171.91.%'
+  OR IP LIKE '171.92.%'
+  OR IP LIKE '171.93.%'
+  OR IP LIKE '171.94.%'
+  OR IP LIKE '171.95.%'
   OR IP LIKE '182.97.%'
   OR IP LIKE '182.98.%'
   OR IP LIKE '182.99.%'
@@ -397,14 +395,24 @@ UPDATE RDNS
 SET DOMAIN = 'utexas.edu (University of Texas)'
 WHERE IP LIKE '206.76.%'
   OR IP LIKE'206.77.%'
+OR IP LIKE '129.106.%'
+OR IP LIKE '129.107.%'
+OR IP LIKE '129.108.%'
+OR IP LIKE '129.109.%'
+OR IP LIKE '129.110.%'
+OR IP LIKE '129.111.%'
 OR IP LIKE '129.112.%'
-OR IP LIKE '143.111.%'
+OR IP LIKE '129.113.%'
 OR IP LIKE '129.114.%'
-OR IP LIKE '129.106.%';
+OR IP LIKE '129.115.%'
+OR IP LIKE '129.116.%'
+OR IP LIKE '129.117.%'
+OR IP LIKE '129.118.%'
+OR IP LIKE '143.111.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'Chinamobile.com'
+SET DOMAIN = 'chinamobile.com'
 WHERE IP LIKE '36.1%'
 OR IP LIKE '39.12%'
 OR IP LIKE '39.13%'
@@ -447,11 +455,42 @@ OR IP LIKE '111.5%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'chinaunicom.cn (China Unicom Henan Province)'
+SET DOMAIN = 'chinaunicom.cn (China Unicom)'
 WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '14.204.%'
   OR IP LIKE '14.205.%'
   OR IP LIKE '14.23.%'
+  OR IP LIKE '27.192.%'
+  OR IP LIKE '27.193.%'
+  OR IP LIKE '27.194.%'
+  OR IP LIKE '27.195.%'
+  OR IP LIKE '27.196.%'
+  OR IP LIKE '27.197.%'
+  OR IP LIKE '27.199.%'
+  OR IP LIKE '27.199.%'
+  OR IP LIKE '27.200.%'
+  OR IP LIKE '27.201.%'
+  OR IP LIKE '27.202.%'
+  OR IP LIKE '27.203.%'
+  OR IP LIKE '27.204.%'
+  OR IP LIKE '27.205.%'
+  OR IP LIKE '27.206.%'
+  OR IP LIKE '27.207.%'
+  OR IP LIKE '27.208.%'
+  OR IP LIKE '27.209.%'
+  OR IP LIKE '27.210.%'
+  OR IP LIKE '27.211.%'
+  OR IP LIKE '27.212.%'
+  OR IP LIKE '27.213.%'
+  OR IP LIKE '27.214.%'
+  OR IP LIKE '27.215.%'
+  OR IP LIKE '27.216.%'
+  OR IP LIKE '27.217.%'
+  OR IP LIKE '27.219.%'
+  OR IP LIKE '27.220.%'
+  OR IP LIKE '27.221.%'
+  OR IP LIKE '27.222.%'
+  OR IP LIKE '27.223.%'
   OR IP LIKE '42.22%'
   OR IP LIKE '42.23%'
   OR IP LIKE '42.176.%'
@@ -462,13 +501,43 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '42.181.%'
   OR IP LIKE '42.182.%'
   OR IP LIKE '42.183.%'
+  OR IP LIKE '60.12.%'
+  OR IP LIKE '61.158.%'
+  OR IP LIKE '101.64.%'
+  OR IP LIKE '101.65.%'
+  OR IP LIKE '101.66.%'
+  OR IP LIKE '101.67.%'
+  OR IP LIKE '101.68.%'
+  OR IP LIKE '101.69.%'
+  OR IP LIKE '101.70.%'
+  OR IP LIKE '101.71.%'
+  OR IP LIKE '114.119.%'
+  OR IP LIKE '114.240.%'
+  OR IP LIKE '114.241.%'
+  OR IP LIKE '114.242.%'
+  OR IP LIKE '114.243.%'
+  OR IP LIKE '114.244.%'
+  OR IP LIKE '114.245.%'
+  OR IP LIKE '114.246.%'
+  OR IP LIKE '114.247.%'
+  OR IP LIKE '114.248.%'
+  OR IP LIKE '114.249.%'
+  OR IP LIKE '114.250.%'
+  OR IP LIKE '114.251.%'
+  OR IP LIKE '114.252.%'
+  OR IP LIKE '114.253.%'
+  OR IP LIKE '114.254.%'
+  OR IP LIKE '114.255.%'
+  OR IP LIKE '116.1%'
   OR IP LIKE '119.4.%'
   OR IP LIKE '119.5.%'
   OR IP LIKE '119.6.%'
+  OR IP LIKE '119.7.%'
   OR IP LIKE '120.8%'
   OR IP LIKE '123.138.%'
   OR IP LIKE '123.15%'
   OR IP LIKE '123.139.%'
+  OR IP LIKE '124.89.%'
   OR IP LIKE '124.161.%'
   OR IP LIKE '153.36.%'
   OR IP LIKE '153.37.%'
@@ -476,11 +545,19 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '171.37.%'
   OR IP LIKE '171.38.%'
   OR IP LIKE '171.39.%'
-  OR IP LIKE '119.7.%'
-  OR IP LIKE '116.1%'
+  OR IP LIKE '182.88.%'
+  OR IP LIKE '182.89.%'
+  OR IP LIKE '182.90.%'
+  OR IP LIKE '182.91.%'
+  OR IP LIKE '183.92.%'
+  OR IP LIKE '183.93.%'
+  OR IP LIKE '183.94.%'
+  OR IP LIKE '183.95.%'
+  OR IP LIKE '219.154.%'
+  OR IP LIKE '219.155.%'
+  OR IP LIKE '219.156.%'
+  OR IP LIKE '219.157.%'
   OR IP LIKE '221.206.%'
-  OR IP LIKE '61.158.%'
-  OR IP LIKE '60.12.%'
   OR IP LIKE '175.4%';
 
 
@@ -513,8 +590,25 @@ WHERE IP LIKE '165.194.%';
 
 
 UPDATE RDNS
-SET DOMAIN = 'China Telecom'
+SET DOMAIN = 'chinatelcom.cn (China Telecom)'
 WHERE IP LIKE '183.63.%'
+OR IP LIKE '101.80.%'
+OR IP LIKE '101.81.%'
+OR IP LIKE '101.82.%'
+OR IP LIKE '101.83.%'
+OR IP LIKE '101.84.%'
+OR IP LIKE '101.85.%'
+OR IP LIKE '101.86.%'
+OR IP LIKE '101.87.%'
+OR IP LIKE '101.88.%'
+OR IP LIKE '101.89.%'
+OR IP LIKE '101.90.%'
+OR IP LIKE '101.91.%'
+OR IP LIKE '101.92.%'
+OR IP LIKE '101.93.%'
+OR IP LIKE '101.94.%'
+OR IP LIKE '101.95.%'
+OR IP LIKE '101.110.119.%'
 OR IP LIKE '111.72.%'
 OR IP LIKE '111.73.%'
 OR IP LIKE '111.74.%'
@@ -523,6 +617,8 @@ OR IP LIKE '111.76.%'
 OR IP LIKE '111.77.%'
 OR IP LIKE '111.78.%'
 OR IP LIKE '111.79.%'
+OR IP LIKE '113.128.%'
+OR IP LIKE '113.129.%'
 OR IP LIKE '171.2%'
 OR IP LIKE '171.60.%'
 OR IP LIKE '171.61.%'
@@ -539,6 +635,11 @@ OR IP LIKE '113.124%'
 OR IP LIKE '113.125%'
 OR IP LIKE '113.126%'
 OR IP LIKE '113.127%'
+OR IP LIKE '115.215.%'
+OR IP LIKE '117.60.%'
+OR IP LIKE '117.61.%'
+OR IP LIKE '117.62.%'
+OR IP LIKE '117.63.%'
 OR IP LIKE '119.128.%'
 OR IP LIKE '119.129.%'
 OR IP LIKE '119.130.%'
@@ -566,8 +667,80 @@ OR IP LIKE '123.182%'
 OR IP LIKE '123.183%'
 OR IP LIKE '124.112.%'
 OR IP LIKE '124.113.%'
-OR IP LIKE '101.110.119.%'
+OR IP LIKE '125.73.%'
+OR IP LIKE '125.80.%'
+OR IP LIKE '125.81.%'
+OR IP LIKE '125.82.%'
+OR IP LIKE '125.83.%'
+OR IP LIKE '125.84.%'
+OR IP LIKE '125.85.%'
+OR IP LIKE '125.86.%'
+OR IP LIKE '125.87.%'
+OR IP LIKE '144.12.%'
 OR IP LIKE '180.16%'
+OR IP LIKE '180.96.%'
+OR IP LIKE '180.97.%'
+OR IP LIKE '180.98.%'
+OR IP LIKE '180.99.%'
+OR IP LIKE '180.100.%'
+OR IP LIKE '180.101.%'
+OR IP LIKE '180.102.%'
+OR IP LIKE '180.103.%'
+OR IP LIKE '180.104.%'
+OR IP LIKE '180.105.%'
+OR IP LIKE '180.106.%'
+OR IP LIKE '180.107.%'
+OR IP LIKE '180.108.%'
+OR IP LIKE '180.109.%'
+OR IP LIKE '180.110.%'
+OR IP LIKE '180.111.%'
+OR IP LIKE '180.112.%'
+OR IP LIKE '180.113.%'
+OR IP LIKE '180.114.%'
+OR IP LIKE '180.115.%'
+OR IP LIKE '180.116.%'
+OR IP LIKE '180.117.%'
+OR IP LIKE '180.118.%'
+OR IP LIKE '180.119.%'
+OR IP LIKE '180.120.%'
+OR IP LIKE '180.121.%'
+OR IP LIKE '180.122.%'
+OR IP LIKE '180.123.%'
+OR IP LIKE '180.124.%'
+OR IP LIKE '180.125.%'
+OR IP LIKE '180.126.%'
+OR IP LIKE '180.127.%'
+OR IP LIKE '182.32.%'
+OR IP LIKE '182.33.%'
+OR IP LIKE '182.34.%'
+OR IP LIKE '182.35.%'
+OR IP LIKE '182.36.%'
+OR IP LIKE '182.37.%'
+OR IP LIKE '182.38.%'
+OR IP LIKE '182.39.%'
+OR IP LIKE '182.40.%'
+OR IP LIKE '182.41.%'
+OR IP LIKE '182.42.%'
+OR IP LIKE '182.43.%'
+OR IP LIKE '182.44.%'
+OR IP LIKE '182.45.%'
+OR IP LIKE '182.46.%'
+OR IP LIKE '182.47.%'
+OR IP LIKE '182.129.%'
+OR IP LIKE '182.130.%'
+OR IP LIKE '182.131.%'
+OR IP LIKE '182.132.%'
+OR IP LIKE '182.133.%'
+OR IP LIKE '182.134.%'
+OR IP LIKE '182.135.%'
+OR IP LIKE '182.136.%'
+OR IP LIKE '182.137.%'
+OR IP LIKE '182.138.%'
+OR IP LIKE '182.139.%'
+OR IP LIKE '182.140.%'
+OR IP LIKE '182.141.%'
+OR IP LIKE '182.142.%'
+OR IP LIKE '182.143.%'
 OR IP LIKE '222.208%'
 OR IP LIKE '222.209%'
 OR IP LIKE '222.210%'
@@ -635,6 +808,9 @@ UPDATE RDNS
 SET DOMAIN = 'uga.edu (University of Georgia)'
 WHERE IP LIKE '128.192.%';
 
+UPDATE RDNS
+set DOMAIN = 'Georgia Institute of Technology (gatech.edu)'
+where IP lIKE '128.61.%';
 
 UPDATE RDNS
 SET DOMAIN = 'net.edu.cn (Shanghai Jiaotong University)'
@@ -1071,7 +1247,7 @@ WHERE IP LIKE '129.194.%';
 
 UPDATE RDNS
 SET DOMAIN = 'illinois.edu (University of Illinois)'
-WHERE IP LIKE '128.174.%';
+WHERE IP LIKE '128.174.%' OR IP LIKE '141.142.%';
 
 
 UPDATE RDNS
@@ -1252,7 +1428,7 @@ WHERE IP like '118.138.%';
 
 UPDATE RDNS
 SET DOMAIN='sdsc.edu (San Diego Supercomputer Center)'
-WHERE IP like '132.249.%';
+WHERE IP like '132.249.%' or ip like '198.202.%';
 
 UPDATE RDNS
 SET DOMAIN='ebi.ac.uk (European Bioinformatics Institute)'
@@ -1336,15 +1512,21 @@ where IP like '143.167.%';
 
 UPDATE RDNS
 SET DOMAIN='Tsinghua University (net.edu.cn)'
-where IP like '58.206.%' OR
-IP LIKE '219.246.7%'
+where IP like '58.206.%'
+OR IP LIKE '166.111.%'
+OR IP LIKE '210.36.%'
+OR IP LIKE '210.37.%'
+OR IP LIKE '210.38.%'
+OR IP LIKE '210.39.%'
 OR IP LIKE '211.64.%'
 OR IP LIKE '211.65.%'
 OR IP LIKE '211.66.%'
 OR IP LIKE '211.67.%'
 OR IP LIKE '211.68.%'
 OR IP LIKE '211.69.%'
-OR IP LIKE '166.111.%';
+OR IP LIKE '219.246.7%'
+OR IP LIKE '200a:da:%'
+;
 
 UPDATE RDNS
 SET DOMAIN='net.edu.cn (Huazhong University Of Science And Technology)'
@@ -1615,7 +1797,13 @@ where ip like '72.138.%';
 
 update rdns
 set domain='cernet.edu.cn (Zhejiang University)'
-where ip like '210.32.%' or ip like '222.192.%';
+where ip like '210.32.%'
+or ip like '219.222.%'
+or ip like '219.223.%'
+or ip like '222.192.%'
+or ip like '2001:da8%'
+or ip like '2001:250:%'
+;
 
 update rdns
 set domain='roche.com (Genentech Inc)'
@@ -1720,7 +1908,7 @@ set domain='University of Wyoming (uwyo.edu)'
 where ip like '129.72.%';
 
 update rdns
-set domain='Shadowserver Foundation (shadowserver.org)'
+set domain='Hurricane Electric (he.net)'
 where ip like '2001:470%';
 
 update rdns
@@ -1760,7 +1948,10 @@ where ip like '38.70.%';
 
 update rdns
 set domain='DigitalOcean (digitalocean.com)'
-where ip like '192.241.%';
+where
+IP LIKE '192.241.%' OR
+IP LIKE '144.86.173.%' OR
+IP LIKE '162.243.%';
 
 update rdns
 set domain='Juelich Supercomputing Centre (fz-juelich.de)'
@@ -1770,12 +1961,78 @@ update rdns
 set domain='Speedium.nl (speedium.nl)'
 where ip like '212.6.53.%';
 
+update rdns
+set domain='Zap-Sib TransTeleCom (zsttk.ru)'
+where ip like '109.171.%';
+
+update rdns
+set domain='RWTH Aachen University (rwth-aachen.de)'
+where ip like '134.61.%';
+
+update rdns
+set domain='Flinders University (flinders.edu.au)'
+where ip like '129.96.%';
+
+update rdns
+set domain='cloudflare.com (Cloudflare Inc.)'
+where
+ip like '104.16.%'  or
+ip like '104.17.%'  or
+ip like '104.18.%'  or
+ip like '104.19.%'  or
+ip like '104.20.%'  or
+ip like '104.21.%'  or
+ip like '104.22.%'  or
+ip like '104.23.%'  or
+ip like '104.24.%'  or
+ip like '104.25.%'  or
+ip like '104.26.%'  or
+ip like '104.27.%'  or
+ip like '104.28.%'  or
+ip like '104.29.%'  or
+ip like '104.30.%'  or
+ip like '104.31.%'  or
+ip like '2a09:ba%'
+;
+
+update rdns
+set domain='University of Baltimore (ubalt.edu)'
+where ip like '198.202.5.%' ;
+
+update rdns
+set domain='zscaler.com (ZScaler Inc.)'
+where ip like '136.226.%' or IP like '165.225.%' ;
+
+update rdns
+set domain='Palo Alto Networks (paloaltonetworks.com)'
+where
+ip like '147.185.132.%' or
+ip like '147.185.133.%' or
+ip like '147.185.134.%' or
+ip like '147.185.135.%' or
+ip like '147.185.136.%' or
+ip like '147.185.137.%' or
+ip like '147.185.138.%' or
+ip like '147.185.139.%'
+ ;
+
+update rdns
+set domain='Yandex (yandex.ru)'
+where ip like '213.180.203.%';
+
+
+----------------------------------------------------------------
+
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
 WHERE DOMAIN = 'Unknown'
   AND (IP LIKE '66.249.%'
        OR IP LIKE '34.94.%'
+       OR IP LIKE '34.3.%'
+       OR IP LIKE '34.4.%'
+       OR IP LIKE '34.4%'
+       OR IP LIKE '34.5%'
        OR IP LIKE '34.6%'
        OR IP LIKE '34.7%'
        OR IP LIKE '34.8%'
@@ -1804,6 +2061,9 @@ UPDATE RDNS
 SET DOMAIN='microsoft.com (Azure Cloud)'
 where ip like '2603:1%' or ip like '2a01:111%' or ip like '2620:1ec%' or ip like '2602:f%';
 
+UPDATE RDNS
+SET DOMAIN='amazon.com (AWS Amazon)'
+where ip like '2a05:d0%';
 
 UPDATE RDNS
 SET DOMAIN = 'Codeathon (codeathon.nih.gov)  - Known Virus Team (GCP)'
@@ -1956,7 +2216,12 @@ where IP in (
 '34.86.149.202', '35.199.4.74',
 '3.235.246.35', '34.236.37.231', '44.192.81.182', '3.238.50.204', '44.192.54.107',
 '34.145.176.141', '35.245.167.208',
-'34.85.237.116', '35.236.230.198', '44.200.103.44', '3.236.218.131'
+'34.85.237.116', '35.236.230.198', '44.200.103.44', '3.236.218.131',
+
+'3.215.23.195', '3.227.252.175', '3.236.64.217', '3.237.17.101', '34.145.160.100',
+'34.148.181.26', '34.148.200.164', '34.148.218.163', '34.23.127.238', '34.23.84.253',
+'34.75.252.72', '34.85.237.116', '35.229.23.201', '35.236.230.198', '35.237.104.220',
+'35.237.15.65', '44.192.75.30', '44.200.103.44', '44.213.72.162'
 );
 
 
