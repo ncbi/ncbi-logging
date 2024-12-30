@@ -100,7 +100,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "SELECT source, remote_ip as cloud_uploader, domain, bucket, country_code, http_statuses, count(distinct accession) as num_uploads FROM ncbi-logmon.$DATASET.summary_export where http_operations  like '%P%' and http_statuses like '%20%' and domain not like '%nih.gov%' group by remote_ip, bucket, countrY_code, domain, http_statuses,source order by num_uploads desc"
+    "SELECT source, remote_ip as cloud_uploader, domain, bucket, country_code, http_statuses, count(distinct accession) as num_uploads FROM ncbi-logmon.$DATASET.summary_export where http_operations  like '%P%' and http_statuses like '%20%' and domain not like '%nih.gov%' group by remote_ip, bucket, country_code, domain, http_statuses, source order by num_uploads desc"
 
 bq -q query \
     --use_legacy_sql=false \
