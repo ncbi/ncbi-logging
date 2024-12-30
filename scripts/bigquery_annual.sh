@@ -31,7 +31,7 @@ fi
 if [ "$annual" = true ]; then
     #    for year in $PREVYEARS; do
     #    for year in 2022; do
-    year=2023
+    year=2024
     echo " #### Annual extraction of $year"
 
     QUERY=$(
