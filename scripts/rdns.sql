@@ -1105,7 +1105,20 @@ WHERE IP LIKE '128.227.%';
 
 UPDATE RDNS
 SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
-WHERE IP LIKE '65.196.%' or ip like '71.174.%' or ip like '173.6%' or ip like '173.7%';
+WHERE IP LIKE '65.196.%' or ip like '71.174.%'
+or ip like '173.6%'
+or ip like '173.7%'
+or ip like '100.32.%'
+or ip like '100.33.%'
+or ip like '100.34.%'
+or ip like '100.35.%'
+or ip like '100.36.%'
+or ip like '100.37.%'
+or ip like '100.38.%'
+or ip like '100.39.%'
+or ip like '100.40.%'
+or ip like '100.41.%'
+;
 
 
 UPDATE RDNS
@@ -2020,6 +2033,17 @@ update rdns
 set domain='Yandex (yandex.ru)'
 where ip like '213.180.203.%';
 
+update rdns
+set domain='Juelich Supercomputing Centre (fz-juelich.de)'
+where ip like '134.94.%';
+
+update rdns
+set domain='cogentco.com'
+where ip like '38.70.220.%';
+
+update rdns
+set domain='hetzner.com (Hetzner Online GmbH)'
+where ip like '188.40.%';
 
 ----------------------------------------------------------------
 
