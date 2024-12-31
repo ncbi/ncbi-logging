@@ -2274,6 +2274,7 @@ limit 10;
 .print "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl"
 .print "rm -f rdns.db"
 
+.print "outputting..."
 .headers off
 .output /tmp/rdns.jsonl
-select distinct json(json_object('ip',ip,'domain',domain)) from rdns;
+select distinct json(json_object('ip',ip,'domain',domain)) from rdns order by ip;
