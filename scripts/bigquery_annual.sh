@@ -18,7 +18,8 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 skipload=false
-annual=false
+annual=false # Run after 12/31, set year below
+
 if [ "$#" -eq 1 ]; then
     if [ "$1" = "skipload" ]; then
         skipload=true
@@ -29,24 +30,20 @@ if [ "$#" -eq 1 ]; then
 fi
 
 if [ "$annual" = true ]; then
-    #    for year in $PREVYEARS; do
-    #    for year in 2022; do
-    year=2024
-    echo " #### Annual extraction of $year"
+    LASTYEAR=$((CURYEAR - 1 ))
+    echo " #### Annual extraction of $LASTYEAR"
 
     QUERY=$(
         cat <<- ENDOFQUERY
-        CREATE OR REPLACE TABLE $DATASET.annual_summary_export_$year
+        CREATE OR REPLACE TABLE $DATASET.annual_summary_export_$LASTYEAR
         as SELECT * from $DATASET.summary_export where start_ts between
-        '$year-01-01 00:00:00' and '$year-12-31 23:59:59'
+        '$LASTYEAR-01-01 00:00:00' and '$LASTYEAR-12-31 23:59:59'
 ENDOFQUERY
     )
 
     echo "$QUERY"
     QUERY="${QUERY//\\/}"
     bq query --use_legacy_sql=false --batch=true "$QUERY"
-
-    #    done
 
     exit 0
 fi

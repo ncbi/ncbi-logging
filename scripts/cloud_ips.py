@@ -1,8 +1,13 @@
 #!/usr/bin/env python3.11
 
+import json
+import netaddr
+import sys
+import urllib.request
+
 # Usage:
 # 1) update uniq_ips below, private usually later
-UNIQIPS = "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20241206.private.json"
+UNIQIPS = "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20241230.public.json"
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519
 SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20241223.json"
 # 3) cloud_ips.py > $PANFS/cloud_ips.jsonl
@@ -12,11 +17,6 @@ SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529
 # TODO: Rewrite to check uniq_ips against CIDR ranges, rather than extensively
 # listing
 
-import json
-import sys
-import urllib.request
-
-import netaddr
 
 # dig txt _cloud-netblocks.googleusercontent.com +short
 # for x in $(seq 5); do
