@@ -75,6 +75,13 @@ echo "s3_lister"
 dom=$(date +%e)
 month=$(date +%m)
 
+# Annual refresh on 1/2
+if [ "$month" -eq 1 ]; then
+    if [ "$dom" -eq 2 ]; then
+        ./bigquery_annual.sh annual |& ts >> "$HOME"/logs/bigquery_annual_refresh."$DATE".log
+    fi
+fi
+
 # Kurtis mirrors on 8th of month, pre-check before
 if [ "$dom" -eq 2 ] || [ "$dom" -eq 5 ]; then
     echo "bigqueries"
@@ -87,13 +94,6 @@ if [ "$dom" -eq 2 ] || [ "$dom" -eq 5 ]; then
 
     # cat bigquery_report."$DATE".log | perl -pe 's/\d{1,3}(?=(\d{3})+(?!\d))/$&,/g'
     mailx -s "BigQuery Report" vartanianmh@ncbi.nlm.nih.gov < "$HOME"/logs/bigquery_report."$DATE".log
-fi
-
-# Annual refresh
-if [ "$month" -eq 1 ]; then
-    if [ "$dom" -eq 2 ]; then
-        ./bigquery_annual.sh annual |& ts >> "$HOME"/logs/bigquery_annual_refresh."$DATE".log
-    fi
 fi
 
 DONEFILE="${HOME}/done/daily_${YESTERDAY}.done"
