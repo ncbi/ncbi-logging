@@ -2,7 +2,6 @@
 import datetime
 import json
 import sys
-import urllib
 
 from google.cloud import storage
 
