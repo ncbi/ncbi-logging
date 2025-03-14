@@ -147,7 +147,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        MIRROR="$PANFS/s3_mirror/$PROVIDER/$LOG_BUCKET"
+        MIRROR="$PANFS/s3_mirror/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
