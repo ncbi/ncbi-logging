@@ -136,6 +136,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""linux64"/"linux64/g' |
             sed 's/""mac64"/"mac64/g' |
             sed 's/""windows64"/"windows64/g' | \
+            grep -v 'GCS Lifecycle Management' | \
             time "$HOME/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
                 "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
                 2> "$TGZ.err"

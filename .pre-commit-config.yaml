@@ -20,7 +20,7 @@ repos:
     rev: 22.12.0
     hooks:
     - id: black
-      language_version: python3.9
+      language_version: python3.13
 -   repo: https://github.com/gruntwork-io/pre-commit
     rev: v0.1.17
     hooks:
