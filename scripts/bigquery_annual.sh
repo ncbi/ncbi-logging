@@ -110,6 +110,7 @@ EOF
 
     bq rm -f "$DATASET.gs_parsed" || true
     bq load \
+        --max_bad_records 50000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.gs_parsed" \
         "$PARSE_BUCKET/logs_gs_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" \
@@ -171,7 +172,7 @@ EOF
 
     bq rm -f "$DATASET.s3_parsed" || true
     bq load \
-        --max_bad_records 5000 \
+        --max_bad_records 50000 \
         --ignore_unknown_values \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.s3_parsed" \
@@ -221,13 +222,13 @@ EOF
     jq -S -c -e . < op_schema.json > /dev/null
     jq -S -c .schema.fields < op_schema.json > op_schema_only.json
 
-    gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" | tail
+    gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" | tail -90
 
     bq rm -f "$DATASET.op_parsed" || true
     #        "$PARSE_BUCKET/logs_op_public/recognized.*" \
     #        "gs://logmon_logs_parsed_us/logs_op_public/recognized.*" \
     bq load \
-        --max_bad_records 200000 \
+        --max_bad_records 2000000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.op_parsed" \
         "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" \
