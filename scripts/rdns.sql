@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20241206.private.json  uniq_ips_private
+.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -74,6 +74,33 @@ select count(*) as rdns_count from rdns;
 --select * from rdns limit 5;
 
 select "running updates";
+
+UPDATE RDNS
+SET DOMAIN = 'googleusercontent.com (GCP)'
+WHERE DOMAIN = 'Unknown'
+  AND (IP LIKE '66.249.%'
+       OR IP LIKE '34.94.%'
+       OR IP LIKE '34.3.%'
+       OR IP LIKE '34.4.%'
+       OR IP LIKE '34.4%'
+       OR IP LIKE '34.5%'
+       OR IP LIKE '34.6%'
+       OR IP LIKE '34.7%'
+       OR IP LIKE '34.8%'
+       OR IP LIKE '34.9%'
+       OR IP LIKE '34.12%'
+       OR IP LIKE '34.13%'
+       OR IP LIKE '34.14%'
+       OR IP LIKE '34.15%'
+       OR IP LIKE '34.16%'
+       OR IP LIKE '34.17%'
+       OR IP LIKE '34.18%'
+       OR IP LIKE '34.190.%'
+       OR IP LIKE '34.191.%'
+       OR IP LIKE '35.1%'
+       OR IP LIKE '35.2%'
+       OR IP LIKE '2600:1900:%');
+
 
 UPDATE RDNS
 SET DOMAIN = 'lrz.de'
@@ -885,7 +912,8 @@ WHERE IP LIKE '81.194.28.%';
 UPDATE RDNS
 SET DOMAIN = 'uconn.edu (Connecticut Education Network)'
 WHERE IP LIKE '162.221.11.%'
-OR IP LIKE '155.37.%';
+OR IP LIKE '155.37.%'
+OR IP LIKE '64.251.%';
 
 
 UPDATE RDNS
@@ -1509,7 +1537,7 @@ where IP like '192.26.252.%';
 
 UPDATE RDNS
 SET DOMAIN='Cornell University (cornell.edu)'
-where IP like '132.236.%';
+where IP like '132.236.%' or IP like '128.84.%';
 
 UPDATE RDNS
 SET DOMAIN='University of British Columbia (bc.net)'
@@ -2039,40 +2067,34 @@ where ip like '134.94.%';
 
 update rdns
 set domain='cogentco.com'
-where ip like '38.70.220.%';
+where ip like '38.%';
 
 update rdns
 set domain='hetzner.com (Hetzner Online GmbH)'
 where ip like '188.40.%';
 
+update rdns
+set domain='University of North Carolina at Charlotte (charlotte.edu)'
+where ip like '152.15.%';
+
+udpate rdns
+set domain='Dana-Farber Cancer Institute (dana-farber.org)'
+where ip like '155.52.%';
+
+update rdns
+set domain='Vanderbilt University (vanderbilt.edu)'
+where ip like '129.59.%';
+
+update rdns
+set domain='Merit Networks (merit.edu)'
+where ip like '198.1%';
+
+
+
+
+
 ----------------------------------------------------------------
 
-
-UPDATE RDNS
-SET DOMAIN = 'googleusercontent.com (GCP)'
-WHERE DOMAIN = 'Unknown'
-  AND (IP LIKE '66.249.%'
-       OR IP LIKE '34.94.%'
-       OR IP LIKE '34.3.%'
-       OR IP LIKE '34.4.%'
-       OR IP LIKE '34.4%'
-       OR IP LIKE '34.5%'
-       OR IP LIKE '34.6%'
-       OR IP LIKE '34.7%'
-       OR IP LIKE '34.8%'
-       OR IP LIKE '34.9%'
-       OR IP LIKE '34.12%'
-       OR IP LIKE '34.13%'
-       OR IP LIKE '34.14%'
-       OR IP LIKE '34.15%'
-       OR IP LIKE '34.16%'
-       OR IP LIKE '34.17%'
-       OR IP LIKE '34.18%'
-       OR IP LIKE '34.190.%'
-       OR IP LIKE '34.191.%'
-       OR IP LIKE '35.1%'
-       OR IP LIKE '35.2%'
-       OR IP LIKE '2600:1900:%');
 
 
 

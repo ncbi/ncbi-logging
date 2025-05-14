@@ -184,6 +184,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""mac64"/"mac64/g' |
             sed 's/""windows64"/"windows64/g' | \
             grep -v 'GCS Lifecycle Management' | \
+            grep -v 'file-meta ncbi_location=' | \
             time "$PARSER_BIN" -f -t 2 "$BASE" \
                 > stdout."$BASE" \
                 2> stderr."$BASE"

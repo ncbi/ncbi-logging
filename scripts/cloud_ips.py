@@ -7,9 +7,9 @@ import urllib.request
 
 # Usage:
 # 1) update uniq_ips below, private usually later
-UNIQIPS = "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips.20241230.public.json"
+UNIQIPS = "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips"
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519
-SERVICE_TAGS = "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20241223.json"
+SERVICE_TAGS = "https://download.microsoft.com/download/7/1/d/71d86715-5596-4529-9b13-da13a5de5b63/ServiceTags_Public_20250512.json"
 # 3) cloud_ips.py > $PANFS/cloud_ips.jsonl
 # 4) run rdns.sql
 
