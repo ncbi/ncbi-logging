@@ -67,13 +67,39 @@ log_onprem
       referer SPACE
       { op_start_UserAgent( scanner ); } agent { op_pop_state( scanner ); } SPACE
       forwarded  SPACE
-      port  SPACE
-      req_len
+      tail
     {
         // in case the productions did not find vers/path, set them here to make them at least empty in the ouput
         SET_VALUE( OPReceiver::vers, EmptyTSTR );
         SET_VALUE( OPReceiver::path, EmptyTSTR );
     }
+    ;
+
+tail
+    : tail_elem
+    | tail SPACE tail_elem
+    ;
+
+tail_elem
+    : port
+    | req_len
+    | STR
+    | I64
+    | quoted_freeform
+    ;
+
+quoted_freeform
+    : QUOTE freeform QUOTE;
+
+freeform
+    : freeform_elem
+    | freeform freeform_elem
+    ;
+
+freeform_elem
+    : QSTR
+    | I64
+    | SPACE
     ;
 
 log_onprem_err

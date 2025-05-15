@@ -399,6 +399,12 @@ TEST_F( OPTestFixture, parse_path_with_url_encoded_slash_in_extension )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
+TEST_F( OPTestFixture, parse_error )
+{
+    std::string res = try_to_parse_good( "34.140.130.14 - - [07/May/2025:23:48:24 -0400] \"ftp.ncbi.nih.gov\" \"GET /1000genomes/ftp/phase3/data/HG02025/sequence_read/SRR821984_2.filt.fastq.gz HTTP/1.1\" 200 111014168 0 \"-\" \"Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0\" \"-\" -pct 134311 X \"NCBI-SID: -\" port=443 885 80688 application/x-gzip" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
