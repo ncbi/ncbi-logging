@@ -78,6 +78,7 @@ log_onprem
 tail
     : tail_elem
     | tail SPACE tail_elem
+    | tail UNRECOGNIZED tail_elem
     ;
 
 tail_elem
@@ -85,6 +86,8 @@ tail_elem
     | req_len
     | STR
     | I64
+    | DASH
+    | UNRECOGNIZED
     | quoted_freeform
     ;
 

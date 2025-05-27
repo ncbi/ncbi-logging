@@ -399,9 +399,15 @@ TEST_F( OPTestFixture, parse_path_with_url_encoded_slash_in_extension )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
-TEST_F( OPTestFixture, parse_error )
+TEST_F( OPTestFixture, free_form_tail_VDB_5981 )
 {
     std::string res = try_to_parse_good( "34.140.130.14 - - [07/May/2025:23:48:24 -0400] \"ftp.ncbi.nih.gov\" \"GET /1000genomes/ftp/phase3/data/HG02025/sequence_read/SRR821984_2.filt.fastq.gz HTTP/1.1\" 200 111014168 0 \"-\" \"Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0\" \"-\" -pct 134311 X \"NCBI-SID: -\" port=443 885 80688 application/x-gzip" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_unrecognized )
+{   // skipping unrecognized tokens in the tail
+    std::string res = try_to_parse_good( "2408:8421:1c0:a8c5:29ef:f6ef:630e:13f0 - - [15/May/2025:00:00:35 -0400] \"submit.ncbi.nlm.nih.gov\" \"POST /subs/bioproject/SUB15322657/general_info HTTP/2.0\" 200 12448 19 \"https://submit.ncbi.nlm.nih.gov/subs/bioproject/SUB15322657/general_info\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0\" \"-\" -pct 19219246 - \"NCBI-SID: -\" id=aCVm4xD4sBqr4p-crpVWXgANYQU port=443 6576 12994 text/html loc=\"-\" sslproto=TLSv1.3", true );
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
