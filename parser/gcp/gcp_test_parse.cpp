@@ -324,6 +324,13 @@ TEST_F( GCPTestFixture, LOGMON_208 )
                static_cast<const GCPReceiver&>( pb -> GetReceiver() ) . agent_for_postprocess );
 }
 
+TEST_F( GCPTestFixture, LOGMON_239_EmptyMethod )
+{
+    string res = try_to_parse_good("\"1745735054441785\",\"\",\"\",\"\",\"\",\"\",\"200\",\"\",\"\",\"\",\"\",\"\",\"GCS Lifecycle Management\",\"0fb4c5bb9c78965f21f0b24f3f3b956e\",\"\",\"sra-ca-run-103\",\"\"");
+    ASSERT_NE( "", res );
+    ASSERT_EQ( "", extract_value( res, "method" ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
