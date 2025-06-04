@@ -405,9 +405,16 @@ TEST_F( OPTestFixture, free_form_tail_VDB_5981 )
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
-TEST_F( OPTestFixture, free_form_tail_VDB_5981_unrecognized )
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_noHttpMethod )
 {   // skipping unrecognized tokens in the tail
-    std::string res = try_to_parse_good( "2408:8421:1c0:a8c5:29ef:f6ef:630e:13f0 - - [15/May/2025:00:00:35 -0400] \"submit.ncbi.nlm.nih.gov\" \"POST /subs/bioproject/SUB15322657/general_info HTTP/2.0\" 200 12448 19 \"https://submit.ncbi.nlm.nih.gov/subs/bioproject/SUB15322657/general_info\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0\" \"-\" -pct 19219246 - \"NCBI-SID: -\" id=aCVm4xD4sBqr4p-crpVWXgANYQU port=443 6576 12994 text/html loc=\"-\" sslproto=TLSv1.3", true );
+    std::string res = try_to_parse_good( "2408:8421:1c0:a8c5:29ef:f6ef:630e:13f0 - - [15/May/2025:00:00:35 -0400] \"submit.ncbi.nlm.nih.gov\" \"POST /subs/bioproject/SUB15322657/general_info HTTP/2.0\" 200 12448 19 \"https://submit.ncbi.nlm.nih.gov/subs/bioproject/SUB15322657/general_info\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0\" \"-\" -pct 19219246 - \"NCBI-SID: -\" id=aCVm4xD4sBqr4p-crpVWXgANYQU port=443 6576 12994 text/html loc=\"-\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_URL_query_starts_and_ends_with_ampersand )
+{   // skipping unrecognized tokens in the tail
+    std::string res = try_to_parse_good(
+"210.218.220.52 - - [28/Apr/2025:00:02:06 -0400] \"eutils.ncbi.nlm.nih.gov\" \"GET /entrez/eutils/esearch.fcgi?&retmode=json&version=2.0&db=taxonomy&term=& HTTP/1.1\" 429 87 0 \"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?&retmode=json&version=2.0&db=taxonomy&term=&#34;Haloterrigena+salinisoli&#34;&usehistory=y\" \"-\" \"-\" -pct 3867 - \"NCBI-SID: -\" id=aA79vlj0szU_J3GQ1tT5vwAABps port=443 352 666 application/json loc=\"-\" sslproto=TLSv1.3" );
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 

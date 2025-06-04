@@ -288,6 +288,10 @@ query_list
         {
             $$ = $1;
         }
+    | query_list QUERY_SEP
+        {
+            $$ = $1;
+        }
     | query_list QUERY_SEP query_entry
         {
             // if $3 has more elements than $1, use $3
@@ -323,6 +327,7 @@ query_list
 
 query
     : QMARK query_list { $$ = $2; }
+    | QMARK QUERY_SEP query_list { $$ = $3; }
     | %empty { Init_Node( $$ ); }
     ;
 

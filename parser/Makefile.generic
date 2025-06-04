@@ -57,22 +57,22 @@ $(OBJDIR)/$(PREFIX)_parser.prof.o:  $(OBJDIR)/$(PREFIX)_scanner.prof.o
 $(OBJDIR)/$(CPREFIX)_Interface.dbg.o $(OBJDIR)/$(CPREFIX)_Interface.rel.o $(OBJDIR)/$(CPREFIX)_Interface.prof.o : $(PREFIX)_parser.hpp
 $(PREFIX)_parser.hpp : $(PREFIX)_parser.cpp
 
-$(FWD_TOOL)-dbg: $($(CPREFIX)2JSN_DBG_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) $(LDFLAGS)
+$(FWD_TOOL)-dbg: $($(CPREFIX)2JSN_DBG_OBJ)
+	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) $(LDFLAGS_DBG)
 
-$(FWD_TOOL)-rel: $($(CPREFIX)2JSN_REL_OBJ) $(REL_TOOL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_REL_OBJ) $(LDFLAGS)
+$(FWD_TOOL)-rel: $($(CPREFIX)2JSN_REL_OBJ)
+	$(LD) -o $@ $^ $(COMMON_REL_OBJ) $(LDFLAGS_REL)
 
-$(FWD_TOOL)-prof: $($(CPREFIX)2JSN_PROF_OBJ) $(PROF_TOOL_OBJ)
+$(FWD_TOOL)-prof: $($(CPREFIX)2JSN_PROF_OBJ)
 	$(LD) -o $@ $^ $(COMMON_PROF_OBJ) $(GPROFFLAGS) $(LDFLAGS)
 
-$(REV_TOOL)-dbg: $(JSN2$(CPREFIX)_DBG_OBJ) $(DBG_TOOL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) $(LDFLAGS)
+$(REV_TOOL)-dbg: $(JSN2$(CPREFIX)_DBG_OBJ)
+	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) $(LDFLAGS_DBG)
 
-$(REV_TOOL)-rel: $(JSN2$(CPREFIX)_REL_OBJ) $(REL_TOOL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_REL_OBJ) $(LDFLAGS)
+$(REV_TOOL)-rel: $(JSN2$(CPREFIX)_REL_OBJ)
+	$(LD) -o $@ $^ $(COMMON_REL_OBJ) $(LDFLAGS_REL)
 
-$(REV_TOOL)-prof: $(JSN2$(CPREFIX)_PROF_OBJ) $(PROF_TOOL_OBJ)
+$(REV_TOOL)-prof: $(JSN2$(CPREFIX)_PROF_OBJ)
 	$(LD) -o $@ $^ $(COMMON_PROF_OBJ) $(GPROFFLAGS) $(LDFLAGS)
 
 $(PREFIX): mkdir $(FWD_TOOL)-dbg $(FWD_TOOL)-rel $(REV_TOOL)-dbg $(REV_TOOL)-rel
@@ -98,24 +98,24 @@ $(PREFIX)_TEST_REVERSE_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$($(
 $(PREFIX)_TEST_REVERSE_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$($(PREFIX)_TEST_REVERSE_SRC)))
 
 $(BINDIR)/$(PREFIX)_test_parse-dbg: $($(PREFIX)_TEST_PARSE_DBG_OBJ)
-	$(LD) -o $@ $^  $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS)
+	$(LD) -o $@ $^  $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS_DBG)
 
 $(BINDIR)/$(PREFIX)_test_parse-rel: $($(PREFIX)_TEST_PARSE_REL_OBJ)
-	$(LD) -o $@ $^  $(COMMON_REL_OBJ) -lgtest $(LDFLAGS)
+	$(LD) -o $@ $^  $(COMMON_REL_OBJ) -lgtest $(LDFLAGS_REL)
 
 $(BINDIR)/$(PREFIX)_test_flex-dbg: $($(PREFIX)_TEST_FLEX_DBG_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread $(LDFLAGS)
+	$(LD) -o $@ $^ -lgtest -lpthread $(LDFLAGS_DBG)
 
 $(BINDIR)/$(PREFIX)_test_flex-rel: $($(PREFIX)_TEST_FLEX_REL_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread $(LDFLAGS)
+	$(LD) -o $@ $^ -lgtest -lpthread $(LDFLAGS_REL)
 
 #$(BINDIR)/$(PREFIX)_test_reverse-dbg: $(CPREFIX)_Interface.cpp
 $(BINDIR)/$(PREFIX)_test_reverse-dbg: $($(PREFIX)_TEST_REVERSE_DBG_OBJ)
-	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS)
+	$(LD) -o $@ $^ $(COMMON_DBG_OBJ) -lgtest $(LDFLAGS_DBG)
 
 #$(BINDIR)/$(PREFIX)_test_reverse-rel: $(CPREFIX)_Interface.cpp
 $(BINDIR)/$(PREFIX)_test_reverse-rel: $($(PREFIX)_TEST_REVERSE_REL_OBJ)
-	$(LD) -o $@ $^ $(COMMON_REL_OBJ) -lgtest $(LDFLAGS)
+	$(LD) -o $@ $^ $(COMMON_REL_OBJ) -lgtest $(LDFLAGS_REL)
 
 unittest_parse: $(PREFIX) flex_test $(BINDIR)/$(PREFIX)_test_parse-dbg $(BINDIR)/$(PREFIX)_test_parse-rel
 	$(BINDIR)/$(PREFIX)_test_parse-dbg

@@ -440,3 +440,11 @@ TEST_F( URLTestFixture, LOGMON_217 )
     ASSERT_EQ( "NC_000001", extract_value( res, "filename" ) );
     ASSERT_EQ( ".10.1", extract_value( res, "extension" ) );
 }
+
+TEST_F( URLTestFixture, LOGMON_240 )
+{
+    const std::string res = try_to_parse_good( "/entrez/eutils/esearch.fcgi?&retmode=json&version=2.0&db=taxonomy&term=&", true );
+    ASSERT_EQ( "", extract_value( res, "accession" ) );
+    ASSERT_EQ( "esearch", extract_value( res, "filename" ) );
+    ASSERT_EQ( ".fcgi", extract_value( res, "extension" ) );
+}
