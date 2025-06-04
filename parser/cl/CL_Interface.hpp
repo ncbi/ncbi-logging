@@ -4,7 +4,7 @@
 #include "ParserInterface.hpp"
 
 #include <memory>
-#include <memory>
+#include <string>
 
 namespace NCBI
 {
