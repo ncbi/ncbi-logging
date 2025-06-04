@@ -92,9 +92,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
         continue
     fi
     ls -hl "$TGZ"
+    tar -tvf "$TGZ"
 
     if [ "$PROVIDER" = "OP" ]; then
         wildcard='*access*'
+        wildcard='*'
     else
         wildcard='*'
     fi
