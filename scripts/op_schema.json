@@ -25,9 +25,17 @@
         { "name" : "vdb_phid_guid", "type": "STRING" },
         { "name" : "vdb_phid_session_id", "type": "STRING" },
         { "name" : "vdb_release", "type": "STRING" },
-        { "name" : "vdb_tool", "type": "STRING" }
+        { "name" : "vdb_tool", "type": "STRING" },
+        { "name" : "event", "type": "STRING" },
+        { "name" : "id1", "type": "STRING" },
+        { "name" : "id2", "type": "STRING" },
+        { "name" : "id3", "type": "STRING" },
+        { "name" : "msg", "type": "STRING" },
+        { "name" : "service", "type": "STRING" },
+        { "name" : "jwt", "type": "JSON" },
+        { "name" : "sid", "type": "STRING" }
         ]
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
-    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/recognized.2025-*" ]
+    "sourceUris": [ "gs://logmon_logs_parsed_us/logs_op_public/v3/recognized.*" ]
     }
