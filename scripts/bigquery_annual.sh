@@ -223,6 +223,7 @@ EOF
     jq -S -c .schema.fields < op_schema.json > op_schema_only.json
 
     gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" | tail -90
+    echo "Loading  $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*"
 
     bq rm -f "$DATASET.op_parsed" || true
     #        "$PARSE_BUCKET/logs_op_public/recognized.*" \
