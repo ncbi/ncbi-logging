@@ -216,7 +216,6 @@ EOF
     },
     "sourceFormat": "NEWLINE_DELIMITED_JSON",
     "sourceUris": [ "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}$/v3/recognized.$CURYEAR-*" ]
-    "sourceUris": [ "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}$/v3/recognized.*" ]
     }
 EOF
 
@@ -225,13 +224,22 @@ EOF
 
     bq rm -f "$DATASET.op_parsed" || true
 
+    for MONTH in 01 02 03; do
+        echo "Loading old (pre-v3) $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
+
+        bq load \
+            --max_bad_records 2000000 \
+            --source_format=NEWLINE_DELIMITED_JSON \
+            "$DATASET.op_parsed" \
+            "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*" \
+            op_schema_only.json
+    done
+
     for bucket in OP-web OP-sweb OP-srafiles23 OP-srafiles22 OP-srafiles21 OP-srafiles13 OP-srafiles12 OP-srafiles11 OP-ftp33 OP-ftp32 OP-ftp31 OP-ftp23 OP-ftp22 OP-ftp21 OP-ftp13 OP-ftp12 OP-ftp11 OP-ftp ; do
 
         #TABLE=${bucket//-/_}
-        # gs://logmon_logs_parsed_us/logs_op_public/v3/recognized.OP-faspgap2
-        echo "Loading $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/v3/recognized.$bucket.$CURYEAR*"
+        echo "Loading new (v3) $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/v3/recognized.$bucket.$CURYEAR*"
 
-        #gsutil ls -l "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/v3/recognized.$bucket.$CURYEAR*"
         gsutil ls -l "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/v3/recognized.$bucket.$CURYEAR*" > "rec.$bucket"
         head "rec.$bucket"
         tail "rec.$bucket"
@@ -472,6 +480,8 @@ QUERY=$(
     replace(agent, '-head', '') as user_agent
     FROM \\\`ncbi-logmon.$DATASET.op_parsed\\\`
     WHERE ifnull(accepted,true)=true
+    AND safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time) >= "$CURYEAR-01-01"
+    AND (accession!='' and accession!='Xenla10')
 ENDOFQUERY
 )
 
