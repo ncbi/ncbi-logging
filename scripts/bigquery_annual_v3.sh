@@ -226,19 +226,20 @@ EOF
 
     # gs://logmon_logs_parsed_us/logs_op_public/recognized.2025-03-22.OP-srafiles11.002.jsonl.gz
     # gs://logmon_logs_parsed_us/logs_op_public/recognized.2025-03-13.OP-srafiles11.000.jsonl.gz
-    for MONTH in 01 02 03; do
-        echo "Loading old (pre-v3) $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
+    if [ "$CURYEAR" -eq 2025 ]; then
+        for MONTH in 01 02 03; do
+            echo "Loading old (pre-v3) $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
 
-        gsutil ls -l "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
+            gsutil ls -l "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
 
-        bq load \
-            --max_bad_records 2000000 \
-            --source_format=NEWLINE_DELIMITED_JSON \
-            "$DATASET.op_parsed" \
-            "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*" \
-            op_schema_only.json
-    done
-
+            bq load \
+                --max_bad_records 2000000 \
+                --source_format=NEWLINE_DELIMITED_JSON \
+                "$DATASET.op_parsed" \
+                "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*" \
+                op_schema_only.json
+        done
+    fi
     for bucket in OP-web OP-sweb OP-srafiles23 OP-srafiles22 OP-srafiles21 OP-srafiles13 OP-srafiles12 OP-srafiles11 OP-ftp33 OP-ftp32 OP-ftp31 OP-ftp23 OP-ftp22 OP-ftp21 OP-ftp13 OP-ftp12 OP-ftp11 OP-ftp ; do
 
         #TABLE=${bucket//-/_}
