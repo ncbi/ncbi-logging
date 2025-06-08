@@ -224,8 +224,12 @@ EOF
 
     bq rm -f "$DATASET.op_parsed" || true
 
+    # gs://logmon_logs_parsed_us/logs_op_public/recognized.2025-03-22.OP-srafiles11.002.jsonl.gz
+    # gs://logmon_logs_parsed_us/logs_op_public/recognized.2025-03-13.OP-srafiles11.000.jsonl.gz
     for MONTH in 01 02 03; do
         echo "Loading old (pre-v3) $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
+
+        gsutil ls -l "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
 
         bq load \
             --max_bad_records 2000000 \
@@ -444,6 +448,12 @@ bq show --schema "$DATASET.s3_fixed"
 
 echo " #### op_fixed1"
 # LOGMON-1: Remove multiple -heads from agent
+# case
+#        WHEN accession is null or accession='' THEN
+#            filename
+#        ELSE
+#            accession
+#        END as accession,
 QUERY=$(
     cat <<- ENDOFQUERY
     SELECT
@@ -466,8 +476,8 @@ QUERY=$(
                 interval cast(1000*cast (req_time as float64) as int64)
                 millisecond)
         END as end_ts,
-    accession,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
+    accession,
     case
         WHEN regexp_contains(agent, r'-head') THEN 'HEAD'
         ELSE method
@@ -480,8 +490,13 @@ QUERY=$(
     replace(agent, '-head', '') as user_agent
     FROM \\\`ncbi-logmon.$DATASET.op_parsed\\\`
     WHERE ifnull(accepted,true)=true
-    AND safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time) >= "$CURYEAR-01-01"
-    AND (accession!='' and accession!='Xenla10')
+    AND (
+        safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time) >= "$CURYEAR-01-01" OR
+        safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0500]', time) >= "$CURYEAR-01-01"
+    )
+    AND accession!='Xenla10'
+    AND accession!=''
+    AND accession!='GCF_000001405'
 ENDOFQUERY
 )
 
@@ -1268,5 +1283,5 @@ else # not private
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
 fi # private
 
-echo "bigquery_annual.sh complete"
+echo "bigquery_annual_v3.sh complete"
 date
