@@ -418,11 +418,15 @@ TEST_F( OPTestFixture, free_form_tail_VDB_5981_URL_query_starts_and_ends_with_am
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
-extern "C"
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_empty_query )
 {
-    int main ( int argc, const char * argv [], const char * envp []  )
-    {
-        testing :: InitGoogleTest ( & argc, ( char ** ) argv );
-        return RUN_ALL_TESTS ();
-    }
+    std::string res = try_to_parse_good(
+"14.139.215.100 - - [07/Jun/2025:00:10:16 -0400] \"submit.ncbi.nlm.nih.gov\" \"POST /subs/sra/? HTTP/2.0\" 302 - 0 \"https://submit.ncbi.nlm.nih.gov/subs/sra/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36\" \"-\" -pct 84316 - \"NCBI-SID: -\" id=aEO7qOwPKFXOLvzZm_-qFgAGIQA port=443 2055 251 text/html loc=\"/subs/sra/SUB15373223/submitter\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+int main ( int argc, const char * argv [], const char * envp []  )
+{
+    testing :: InitGoogleTest ( & argc, ( char ** ) argv );
+    return RUN_ALL_TESTS ();
 }

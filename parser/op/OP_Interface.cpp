@@ -49,6 +49,7 @@ ReceiverInterface::Category OPReceiver::post_process( void )
     {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
+        // pb.m_debug = true;
         pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
 
         url_for_postprocess.clear();
