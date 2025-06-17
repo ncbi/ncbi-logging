@@ -238,8 +238,18 @@ agent
     | QUOTE QUOTE       { lib -> set( ReceiverInterface::agent, EmptyTSTR ); }
     ;
 
+forwarded_list
+    : forwarded_token
+    | forwarded_list forwarded_token    { $$ = $1; MERGE_TSTR( $$, $2 ); }
+    ;
+
+forwarded_token
+    : QSTR
+    | SPACE
+    ;
+
 forwarded
-    : QUOTE QSTR QUOTE { SET_VALUE( OPReceiver::forwarded, $2 ); }
+    : QUOTE forwarded_list QUOTE { SET_VALUE( OPReceiver::forwarded, $2 ); }
     ;
 
 port
