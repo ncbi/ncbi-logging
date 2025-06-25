@@ -429,6 +429,12 @@ TEST_F( OPTestFixture, free_form_tail_VDB_5981_multiple_forwarded )
     ASSERT_EQ( "20.171.207.158, 162.158.90.141", extract_value( res, "forwarded" ) );
 }
 
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_more_freeform_variation )
+{
+    std::string res = try_to_parse_good( "130.14.23.73 - - [21/Jun/2025:00:02:40 -0400] \"blast.ncbi.nlm.nih.gov\" \"POST /DB_CUBBY_FORWARD/myblast_forward.cgi HTTP/1.0\" 200 118 1 \"-\" \"asnweb\" \"-\" -pct 1005082 - \"NCBI-SID: -\" id=aFYu4LzA0jG5AoyoRd8-5AAADBU port=443 786 6341 content-type: x-ncbi-data/x-unknown-urlencoded loc=\"-\" sslproto=TLSv1.2", true );
+    ASSERT_EQ( "-", extract_value( res, "forwarded" ) );
+}
+
 int main ( int argc, const char * argv [], const char * envp []  )
 {
     testing :: InitGoogleTest ( & argc, ( char ** ) argv );
