@@ -33,7 +33,7 @@ ACCESSION   {SRA}|{REFSEQ1}|{REFSEQ2}|{WGS}|"hs37d5"
 
 SLASH       (\/|%2F|%2f)
 QMARK       "?"
-QUERY_SEP   [&;]
+QUERY_SEP   [&;]+
 EQUAL       "="
 HASH        "#"
 PERCENT     "%"

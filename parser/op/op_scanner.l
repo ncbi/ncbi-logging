@@ -37,11 +37,11 @@ I64             [-+]?[0-9]+
 FLOAT           [-+]?[0-9]+\.[0-9]+
 
 CHARS           [A-Za-z0-9\-_~!*'();:@&=+$,#\[\]<>|`{}^]
-STR_CHARS       [?\.\/\\%]|{CHARS}|[\x00-\x1f]
+STR_CHARS       [?\.\/%]|{CHARS}|[\x00-\x1f]
 
 QSTR            {STR_CHARS}+
-QSTR_ESC        (\\\"|{STR_CHARS})+
-PATHSTR         {QSTR_ESC}
+QSTR_ESC        (\\\"|\\\\|\\)
+PATHSTR         {QSTR}
 
 SPACE           " "
 STR             [.\-a-zA-Z0-9_]+
@@ -72,16 +72,22 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 <QUOTED>{SPACE}     { MAKE_STR(); return SPACE; }
 <QUOTED>{METHOD}    { MAKE_STR(); return METHOD; }
 <QUOTED>{VERS}      { MAKE_STR(); return VERS; }
-<QUOTED>{QSTR}      { MAKE_STR();           return QSTR; }
-<QUOTED>{QSTR_ESC}  { MAKE_STR();   return QSTR; }
+<QUOTED>{QSTR_ESC}  { MAKE_STR(); return QSTR_ESC; }
+<QUOTED>{QSTR}      { MAKE_STR(); return QSTR; }
 <QUOTED>.           { MAKE_STR(); return UNRECOGNIZED; }
 
+    /* TIMEFMT is pushed by the parser (calls op_start_time) */
 <TIMEFMT>{TIMEFMT}  { yy_pop_state( yyscanner ); MAKE_STR(); return TIME_FMT; }
 <TIMEFMT>.          { yy_pop_state( yyscanner ); MAKE_STR(); return UNRECOGNIZED; }
 
+    /* PATH is pushed and popped by the parser (calls op_start_URL, op_pop_state) */
+<PATH>{QSTR_ESC}    { MAKE_STR(); return QSTR_ESC; }
 <PATH>{PATHSTR}     { MAKE_STR(); return PATHSTR; }
+<PATH>{SPACE}       { MAKE_STR(); return SPACE; }
+<PATH>\"            { yy_pop_state( yyscanner ); return QUOTE; }
 <PATH>.             { MAKE_STR(); return UNRECOGNIZED; };
 
+    /* AGENT is pushed and popped by the parser (calls op_start_UserAgent) */
 <AGENT>\"           { MAKE_STR(); return QUOTE; }
 <AGENT>{AGENTSTR}   { MAKE_STR(); return QSTR; }
 <AGENT>.            { MAKE_STR(); return QSTR; }
