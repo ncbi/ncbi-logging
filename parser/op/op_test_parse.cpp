@@ -441,6 +441,12 @@ TEST_F( OPTestFixture, VDB_5981_multiple_escapes )
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_more_freeform_variation )
+{
+    std::string res = try_to_parse_good( "130.14.23.73 - - [21/Jun/2025:00:02:40 -0400] \"blast.ncbi.nlm.nih.gov\" \"POST /DB_CUBBY_FORWARD/myblast_forward.cgi HTTP/1.0\" 200 118 1 \"-\" \"asnweb\" \"-\" -pct 1005082 - \"NCBI-SID: -\" id=aFYu4LzA0jG5AoyoRd8-5AAADBU port=443 786 6341 content-type: x-ncbi-data/x-unknown-urlencoded loc=\"-\" sslproto=TLSv1.2" );
+    ASSERT_EQ( "-", extract_value( res, "forwarded" ) );
+}
+
 TEST_F( OPTestFixture, VDB_5981_bad_request )
 {
     std::string res = try_to_parse_review( "34.200.223.129 - - [20/Sep/2018:13:32:54 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"\\x16\\x03\\x01\\x00\\xF5\\x01\\x00\\x00\\xF1\\x03\\x03}\\xB0'\\xC8\\xCC\\xBA\\xF6h\\xE9Q^\\xBA\\xA3\\xF6\\xC5\\xD0\\xE6  U\\xE5\\xE5\\x81\\xC4?\\xA3M\\xD7[\\x00\\xA3;\\x00\\x00\\x82\\x003\\x009\\x005\\x00/\\xC0,\\xC00\\x00\\xA3\\x00\\x9F\\xCC\\xA9\\xCC\\xA8\\xCC\\xAA\\xC0\\xAF\\xC0\\xAD\\xC0\\xA3\\xC0\\x9F\\xC0+\\xC0/\\x00\\xA2\\x00\\x9E\\xC0\\xAE\\xC0\\xAC\\xC0\\xA2\\xC0\\x9E\\xC0$\\xC0(\\x00k\\x00j\\xC0s\\xC0w\\x00\\xC4\\x00\\xC3\\xC0#\\xC0'\\x00g\\x00@\\xC0r\\xC0v\\x00\\xBE\\x00\\xBD\\xC0\" 400 166 0.001 \"-\" \"-\" \"-\" port=80 rl=0" );
