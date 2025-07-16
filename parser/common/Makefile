@@ -31,10 +31,10 @@ $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
 
 $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
-	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
+	$(CPP) $(CXXFLAGS) -O3 -march=skylake $< -o $(OBJDIR)/$(*F).rel.o
 
 $(OBJDIR)/%.prof.o: $(CMD_SRC_LOCATION)/%.cpp
-	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).prof.o
+	$(CPP) $(CXXFLAGS) -O3 -march=skylake $< -o $(OBJDIR)/$(*F).prof.o
 
 $(info cmd: mkdir $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(CMD_PROF_OBJ))
 

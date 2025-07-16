@@ -16,7 +16,8 @@ $(OBJDIR)/%.dbg.o: %.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
 
 $(OBJDIR)/%.rel.o: %.cpp
-	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
+	$(CPP) $(CXXFLAGS) -march=skylake -O3 $< -o $(OBJDIR)/$(*F).rel.o
+# lmem12=skylake, lmem14=cascade lake
 
 $(OBJDIR)/%.prof.o: %.cpp
 	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
