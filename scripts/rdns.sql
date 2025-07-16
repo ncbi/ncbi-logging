@@ -22,7 +22,8 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips  uniq_ips_private
+--.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips  uniq_ips_private
+.import /netmnt/vast01/sra/strides-analytics/uniq_ips/uniq_ips  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -43,7 +44,8 @@ create unique index ip_idx on rdns(ip);
 
 drop table if exists cloud_ips_json;
 create table cloud_ips_json(line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/cloud_ips.jsonl cloud_ips_json
+--.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/cloud_ips.jsonl cloud_ips_json
+.import /netmnt/vast01/sra/strides-analytics/cloud_ips.jsonl cloud_ips_json
 
 drop table if exists cloud_ips;
 create table cloud_ips as

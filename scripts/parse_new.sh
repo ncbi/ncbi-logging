@@ -183,6 +183,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""linux64"/"linux64/g' |
             sed 's/""mac64"/"mac64/g' |
             sed 's/""windows64"/"windows64/g' | \
+            grep -v 'GCS Lifecycle Management' | \
             grep -v 'file-meta ncbi_location=' | \
             time "$PARSER_BIN" -f -t 2 "$BASE" \
                 > stdout."$BASE" \
@@ -193,7 +194,6 @@ for LOG_BUCKET in "${buckets[@]}"; do
         head -v stderr."$BASE"
         echo "==="
 
-            #grep -v 'GCS Lifecycle Management' | \
         pwd
         ls -l
 

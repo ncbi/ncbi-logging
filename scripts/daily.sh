@@ -18,6 +18,11 @@ if [ "$panspace" -gt 95 ]; then
     /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | mailx -s "panfs low on space" vartanianmh@ncbi.nlm.nih.gov
 fi
 
+vastspace=$(df -H "$VASTFS" | tail -1 | tr -s ' ' | cut -d' ' -f 5 | tr -d '%')
+if [ "$vastspace" -gt 95 ]; then
+    df -H "$VASTFS" | mailx -s "VAST fs low on space" vartanianmh@ncbi.nlm.nih.gov
+fi
+
 homespace=$(df "$HOME" | tail -1 | tr -s ' ' | cut -d ' ' -f 4)
 if [ "$homespace" -lt 500000 ]; then
     df -HT "$HOME" | mailx -s "$HOME low on space" vartanianmh@ncbi.nlm.nih.gov
@@ -38,6 +43,9 @@ echo "mirror.sh S3"
 # SYS-436845/LOGMON-215
 rm -f /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod/*.err
 find /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod -type f -mtime +30 -delete
+
+rm -f "$VASTFS"/s3_prod/*.err
+find "$VASTFS"/s3_prod -type f -mtime +30 -delete
 
 #echo "mirror.sh Splunk"
 #./mirror.sh Splunk |& ts >> "$HOME"/logs/mirror_splunk."$DATE".log &
