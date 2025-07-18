@@ -101,6 +101,7 @@ freeform
 
 freeform_elem
     : QSTR
+    | QSTR_ESC
     | I64
     | SPACE
     ;

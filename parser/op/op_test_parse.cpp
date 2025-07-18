@@ -453,6 +453,12 @@ TEST_F( OPTestFixture, VDB_5981_bad_request )
     ASSERT_EQ( "80", extract_value( res, "port" ) );
 }
 
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_even_more_freeform_variation )
+{
+    std::string res = try_to_parse_good( "103.75.46.202 - - [15/Jul/2025:00:30:02 -0400] \"www.ncbi.nlm.nih.gov\" \"GET /blast/Blast.cgi?PAGE_TYPE=Blast\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xd3\\xb0\\xef\\xbf\\xbd\\xef\\xbf\\xbd&PROG_DEF=blastn&BLAST_PROG_DEF=megaBlast&BLAST_SPEC=OGP__9606__9558 HTTP/1.1\" 302 1 0 \"https://www.ncbi.nlm.nih.gov/\" \"Baiduspider/2.0+(+http://www.baidu.com/search/spider.htm)\" \"-\" -pct 7174 + \"NCBI-SID: -\" id=aHXZSmLG8FzegxtAIRXP_wAAEJ0 port=443 989 6225 - loc=\"https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=Blast\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xd3\\xb0\\xef\\xbf\\xbd\\xef\\xbf\\xbd&PROG_DEF=blastn&BLAST_PROG_DEF=megaBlast&BLAST_SPEC=OGP__9606__9558\" sslproto=TLSv1.2" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
 int main ( int argc, const char * argv [], const char * envp []  )
 {
     testing :: InitGoogleTest ( & argc, ( char ** ) argv );

@@ -255,6 +255,11 @@ OPReverseBlock::format_specific_parse( const char * line, size_t line_size )
         const JSONValueRef values = JSON::parse( src );
         const JSONObject &obj = values -> toObject();
 
+        if ( obj.isEmpty() )
+        {
+            return false;
+        }
+
         extract_and_set( obj, formatter, "ip" );
         formatter . addNameValue( "", "-" );
         extract_and_set( obj, formatter, "user", sp_auto, true );
