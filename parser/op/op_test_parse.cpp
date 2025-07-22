@@ -459,6 +459,12 @@ TEST_F( OPTestFixture, free_form_tail_VDB_5981_even_more_freeform_variation )
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_and_more_freeform_variation )
+{
+    std::string res = try_to_parse_good( "10.154.26.22 - - [20/Jul/2025:06:03:38 -0400] \"web11.ncbi.nlm.nih.gov\" \"GET\\n\" 400 135073 0 \"-\" \"-\" \"-\" -pct 428 - \"NCBI-SID: -\" id=aHy--n6WW8P5HlvS_vVqNwAACy8 port=80 22 135305 text/html loc=\"-\" sslproto=-" );
+    ASSERT_EQ( "80", extract_value( res, "port" ) );
+}
+
 int main ( int argc, const char * argv [], const char * envp []  )
 {
     testing :: InitGoogleTest ( & argc, ( char ** ) argv );

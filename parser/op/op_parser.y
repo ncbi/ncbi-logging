@@ -169,6 +169,7 @@ request
     : QUOTE method space_and_url SPACE request_tail QUOTE
     | QUOTE method space_and_url SPACE QUOTE
     | QUOTE method space_and_url QUOTE
+    | QUOTE method QSTR_ESC QSTR QUOTE
     | QUOTE method QUOTE
     ;
 
