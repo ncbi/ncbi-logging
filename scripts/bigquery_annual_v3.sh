@@ -1186,23 +1186,23 @@ bq extract \
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression NONE \
     "$DATASET.uniq_ips" \
-    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.json"
+    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*.json"
 
 echo " ###  copy to filesystem"
-#    mkdir -p "$PANFS/detail"
-#    cd "$PANFS/detail" || exit
-#    rm -f "$PANFS"/detail/detail."$DATE".* || true
-#    gsutil cp -r "gs://logmon_export/detail/detail.$DATE.*" "$PANFS/detail/"
+#    mkdir -p "$VASTFS/detail"
+#    cd "$VASTFS/detail" || exit
+#    rm -f "$VASTFS"/detail/detail."$DATE".* || true
+#    gsutil cp -r "gs://logmon_export/detail/detail.$DATE.*" "$VASTFS/detail/"
 
-#    mkdir -p "$PANFS/summary"
-#    cd "$PANFS/summary" || exit
-#    rm -f "$PANFS"/summary/summary."$DATE".* || true
-#    gsutil cp -r "gs://logmon_export/summary/summary.$DATE.*" "$PANFS/summary/"
+#    mkdir -p "$VASTFS/summary"
+#    cd "$VASTFS/summary" || exit
+#    rm -f "$VASTFS"/summary/summary."$DATE".* || true
+#    gsutil cp -r "gs://logmon_export/summary/summary.$DATE.*" "$VASTFS/summary/"
 
-mkdir -p "$PANFS/uniq_ips"
-cd "$PANFS/uniq_ips" || exit
-rm -f "$PANFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
-gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$PANFS/uniq_ips/"
+mkdir -p "$VASTFS/uniq_ips"
+cd "$VASTFS/uniq_ips" || exit
+rm -f "$VASTFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
+gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$VASTFS/uniq_ips/"
 
 if [ "$STRIDES_SCOPE" == "private" ]; then
     QUERY=$(

@@ -8,7 +8,7 @@ buckets=$(sqlcmd "select distinct log_bucket from buckets where cloud_provider='
 echo "buckets is '$buckets'"
 for LOG_BUCKET in $buckets; do
     echo "Processing $LOG_BUCKET"
-    DEST="$PANFS/gs_prod2/$LOG_BUCKET/$YESTERDAY"
+    DEST="$VASTFS/gs_prod2/$LOG_BUCKET/$YESTERDAY"
     mkdir -p "$DEST"
     cd "$DEST" || exit
 

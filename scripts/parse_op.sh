@@ -8,7 +8,6 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 #YESTERDAY="20200605"
-# gsutil -m cp "$PANFS/sra_prod/$YESTERDAY/*gz" "gs://strides_analytics_logs_nginx_public/$YESTERDAY/"
 BUCKETS="sra_prod"
 #  gs://strides_analytics/sra_prod
 for bucket in $BUCKETS; do

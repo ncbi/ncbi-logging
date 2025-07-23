@@ -8,9 +8,9 @@ gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
 export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
 export PATH="$PATH":/opt/sybase/utils/bin
-mkdir -p "$PANFS/sra_main"
+mkdir -p "$VASTFS/sra_main"
 
-cd "$PANFS/sra_main" || exit
+cd "$VASTFS/sra_main" || exit
 
 echo -e "select * from [SRA_Main].[dbo].[SRAFiles] order by acc,file_id;\ngo\n" |
     sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 |

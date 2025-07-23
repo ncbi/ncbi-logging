@@ -11,8 +11,8 @@ do
     outdate=$(echo "$outfile" | pcregrep -o "20[\d]{6}" | head -1)
 #    echo "Processing $outdate"
 
-    mkdir -p "$PANFS/sra_prod/$outdate"
-    cp -n -v "$file" "$PANFS/sra_prod/$outdate/$outfile"
+    mkdir -p "$VASTFS/sra_prod/$outdate"
+    cp -n -v "$file" "$VASTFS/sra_prod/$outdate/$outfile"
 #    mkdir -p "$LOGDIR/sra_prod/$outdate"
 #    cp -v "$file" "$LOGDIR/sra_prod/$outdate/$outfile"
 done

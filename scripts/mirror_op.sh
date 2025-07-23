@@ -17,8 +17,8 @@ for LOG_BUCKET in $buckets; do
     gcloud config set account 1008590670571-compute@developer.gserviceaccount.com
     export CLOUDSDK_CORE_PROJECT="ncbi-sandbox-blast"
 
-    gsutil -m cp "$PANFS/sra_prod/$YESTERDAY/*gz" "gs://strides_analytics_logs_nginx_public/$YESTERDAY/"
-#    gsutil -m rsync -r "$PANFS/sra_prod/$YESTERDAY/" "gs://strides_analytics_logs_nginx_public/$YESTERDAY/"
+    gsutil -m cp "$VASTFS/sra_prod/$YESTERDAY/*gz" "gs://strides_analytics_logs_nginx_public/$YESTERDAY/"
+#    gsutil -m rsync -r "$VASTFS/sra_prod/$YESTERDAY/" "gs://strides_analytics_logs_nginx_public/$YESTERDAY/"
 
     echo
 done

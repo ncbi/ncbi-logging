@@ -17,7 +17,7 @@ bq mk \
 
 bq load --source_format=CSV \
     strides_analytics.public_fix \
-    "$PANFS/public_fix.csv"
+    "$VASTFS/public_fix.csv"
 
 
 export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
@@ -32,7 +32,7 @@ bq mk \
 
 bq load --source_format=CSV \
     strides_analytics.public_fix \
-    "$PANFS/public_fix.csv"
+    "$VASTFS/public_fix.csv"
 
 bq load \
         --source_format=NEWLINE_DELIMITED_JSON \

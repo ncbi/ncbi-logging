@@ -109,8 +109,8 @@ bq extract \
     'strides_analytics.object_delta' \
     "gs://logmon_export/object_delta.$DATE.*.json.gz"
 
-mkdir -p "$PANFS/export/object_delta"
-cd "$PANFS/export/object_delta" || exit
+mkdir -p "$VASTFS/export/object_delta"
+cd "$VASTFS/export/object_delta" || exit
 rm -f object_delta."$DATE".* || true
 gsutil cp -r "gs://logmon_export/object_delta.$DATE.*" .
 
@@ -141,8 +141,8 @@ bq extract \
     'strides_analytics.object_first_appearance' \
     "gs://logmon_export/object_first_appearance.$DATE.*.json.gz"
 
-mkdir -p "$PANFS/export/object_first_appearance"
-cd "$PANFS/export/object_first_appearance" || exit
+mkdir -p "$VASTFS/export/object_first_appearance"
+cd "$VASTFS/export/object_first_appearance" || exit
 rm -f object_first_appearance."$DATE".* || true
 gsutil cp -r "gs://logmon_export/object_first_appearance.$DATE.*" .
 
