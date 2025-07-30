@@ -256,6 +256,7 @@ forwarded_list
 
 forwarded_token
     : QSTR
+    | QSTR_ESC
     | SPACE
     ;
 

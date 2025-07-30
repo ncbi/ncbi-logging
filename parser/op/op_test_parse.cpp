@@ -459,10 +459,16 @@ TEST_F( OPTestFixture, free_form_tail_VDB_5981_even_more_freeform_variation )
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
-TEST_F( OPTestFixture, free_form_tail_VDB_5981_and_more_freeform_variation )
+TEST_F( OPTestFixture, VDB_5981_eol_in_request )
 {
     std::string res = try_to_parse_good( "10.154.26.22 - - [20/Jul/2025:06:03:38 -0400] \"web11.ncbi.nlm.nih.gov\" \"GET\\n\" 400 135073 0 \"-\" \"-\" \"-\" -pct 428 - \"NCBI-SID: -\" id=aHy--n6WW8P5HlvS_vVqNwAACy8 port=80 22 135305 text/html loc=\"-\" sslproto=-" );
     ASSERT_EQ( "80", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_escaped_quotes_in_forwarded )
+{
+    std::string res = try_to_parse_good( "10.154.26.16 - - [27/Jul/2025:21:15:13 -0400] \"web11.be-md.ncbi.nlm.nih.gov\" \"GET /admbook/write.php?name=nessus&email=nessus@10.154.26.16&message=Nessus%20ran%20admbook_cmd_exec.nasl%20at%201753665313 HTTP/1.1\" 404 2127 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" \"127.0.0.1 \\\";system(id);echo \\\"qziLpKkH\\\";echo\\\"\" -pct 15512 - \"NCBI-SID: -\" id=aIbPIY9TqwKu-4EM6O79UQAADZM port=443 1102 8761 text/html loc=\"-\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
 int main ( int argc, const char * argv [], const char * envp []  )
