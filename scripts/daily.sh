@@ -13,10 +13,10 @@ mkdir -p "$HOME"/logs
 find "$HOME/logs" ! -name "*xz" -mtime +1 -size +2M -exec xz -9 {} \;
 find "$HOME/done" -mtime +60 -delete
 
-panspace=$(/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | tail -1 | tr -s ' ' | cut -d ' ' -f 5 | tr -d '%')
-if [ "$panspace" -gt 95 ]; then
-    /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | mailx -s "panfs low on space" vartanianmh@ncbi.nlm.nih.gov
-fi
+#panspace=$(/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | tail -1 | tr -s ' ' | cut -d ' ' -f 5 | tr -d '%')
+#if [ "$panspace" -gt 95 ]; then
+#    /opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | mailx -s "panfs low on space" vartanianmh@ncbi.nlm.nih.gov
+#fi
 
 vastspace=$(df -H "$VASTFS" | tail -1 | tr -s ' ' | cut -d' ' -f 5 | tr -d '%')
 if [ "$vastspace" -gt 95 ]; then
@@ -41,8 +41,8 @@ echo "mirror.sh S3"
 ./mirror.sh S3 |& ts >> "$HOME"/logs/mirror_s3."$DATE".log
 
 # SYS-436845/LOGMON-215
-rm -f /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod/*.err
-find /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod -type f -mtime +30 -delete
+#rm -f /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod/*.err
+#find /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/s3_prod -type f -mtime +30 -delete
 
 rm -f "$VASTFS"/s3_prod/*.err
 find "$VASTFS"/s3_prod -type f -mtime +30 -delete
@@ -107,7 +107,7 @@ fi
 DONEFILE="${HOME}/done/daily_${YESTERDAY}.done"
 if [ ! -e "$DONEFILE" ]; then
     echo "No done"
-    mailx -s "$HOST daily not done $YESTERDAY" vartanianmh@ncbi.nlm.nih.gov
+    echo "No done" | mailx -s "$HOST daily not done $YESTERDAY" vartanianmh@ncbi.nlm.nih.gov
 fi
 DONEFILE="${HOME}/done/daily_${TODAY}.done"
 touch "$DONEFILE"
