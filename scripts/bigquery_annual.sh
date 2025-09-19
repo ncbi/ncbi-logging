@@ -357,6 +357,7 @@ QUERY=$(
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.gs_parsed\\\`
     WHERE ifnull(accepted,true)=true
+    and not (method='GET' and regexp_contains(uri, r'/o\?'))
 ENDOFQUERY
 )
 
