@@ -22,7 +22,7 @@ drop table if exists uniq_ips_public;
 drop table if exists uniq_ips_private;
 create table uniq_ips_public (line text);
 create table uniq_ips_private (line text);
-.import /netmnt/vast01/sra/strides-analytics/uniq_ips/uniq_ips  uniq_ips_private
+.import /netmnt/vast01/sra/strides_analytics/uniq_ips/uniq_ips  uniq_ips_private
 select count(*) as uniq_ips_public_count from uniq_ips_public;
 select count(*) as uniq_ips_private_count from uniq_ips_private;
 
@@ -43,7 +43,7 @@ create unique index ip_idx on rdns(ip);
 
 drop table if exists cloud_ips_json;
 create table cloud_ips_json(line text);
-.import /netmnt/vast01/sra/strides-analytics/cloud_ips.jsonl cloud_ips_json
+.import /netmnt/vast01/sra/strides_analytics/cloud_ips.jsonl cloud_ips_json
 
 drop table if exists cloud_ips;
 create table cloud_ips as
@@ -373,6 +373,7 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '60.162.%'
   OR IP LIKE '60.184.%'
   OR IP LIKE '61.146.%'
+  OR IP LIKE '58.41.%'
   OR IP LIKE '14.23.%';
 
 UPDATE RDNS
@@ -585,6 +586,7 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '219.156.%'
   OR IP LIKE '219.157.%'
   OR IP LIKE '221.206.%'
+  OR IP LIKE '211.9%'
   OR IP LIKE '175.4%';
 
 
@@ -1164,7 +1166,9 @@ WHERE
 IP LIKE '172.3%'
 OR IP LIKE '172.4%'
 OR IP LIKE '172.5%'
-OR IP LIKE '172.6%';
+OR IP LIKE '172.6%'
+OR IP LIKE '2607:FB90%';
+
 
 
 UPDATE RDNS
@@ -1415,6 +1419,10 @@ SET DOMAIN = 'nyu.edu (New York University)'
 WHERE IP LIKE '216.165.%';
 
 UPDATE RDNS
+SET DOMAIN = 'stonybrook.edu (State University of New York at Stony Brook)'
+WHERE IP LIKE '130.245.%';
+
+UPDATE RDNS
 SET DOMAIN = 'embl.org (European Molecular Biology Laboratory)'
 WHERE IP LIKE '194.94.4%'
 OR IP LIKE '185.111.6%';
@@ -1663,7 +1671,7 @@ where IP LIKE '129.130.%';
 
 UPDATE RDNS
 SET DOMAIN='lanl.gov (Los Alamos National Laboratory)'
-WHERE IP LIKE '192.12.184.%';
+WHERE IP LIKE '192.12.184.%' OR IP LIKE '128.165.%';
 
 UPDATE RDNS
 SET DOMAIN='cnnic.cn (Beijing Zhongbangyatong Telecom Technology)'
@@ -2089,12 +2097,17 @@ update rdns
 set domain='Merit Networks (merit.edu)'
 where ip like '198.1%';
 
+update rdns
+set domain='TOT-NET (totisp.net)'
+where ip like '113.53.%';
 
+update rdns
+set domain='Vietnam Posts and Telecommunications Group (vnpt.vn)'
+where ip like '200e:ee0%';
 
-
-
-----------------------------------------------------------------
-
+update rdns
+set domain='Bharti Airtel Office (airtel.com)'
+where ip like '2401:4900:1040%';
 
 
 
