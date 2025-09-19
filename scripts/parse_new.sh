@@ -177,6 +177,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             < "$BASE.good.jsonl" &
 
         set +e
+        # ' /?' removes S3 listings
         tar -xaOf "$TGZ" "$WILDCARD" |
             sed 's/"""linux64""/"linux64/g' |
             sed 's/"""linux64"/"linux64/g' |
@@ -185,6 +186,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""windows64"/"windows64/g' | \
             grep -v 'GCS Lifecycle Management' | \
             grep -v 'file-meta ncbi_location=' | \
+            grep -v 'GET /?' | \
             time "$PARSER_BIN" -f -t 2 "$BASE" \
                 > stdout."$BASE" \
                 2> stderr."$BASE"
