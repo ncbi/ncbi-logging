@@ -1059,7 +1059,7 @@ WHERE IP LIKE '10.10.8%' OR IP LIKE '130.14.%';
 UPDATE RDNS
 SET DOMAIN = 'ncbi.nlm.nih.gov (NCBI)'
 WHERE IP='52.54.203.43' OR IP='35.245.245.236' or IP='35.245.169.105'
-or IP='35.245.47.214';
+or IP='35.245.47.214' or IP='34.85.237.116';
 
 UPDATE RDNS
 SET DOMAIN = 'nih.gov (NIH)'
@@ -1135,7 +1135,15 @@ WHERE IP LIKE '128.227.%';
 
 UPDATE RDNS
 SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
-WHERE IP LIKE '65.196.%' or ip like '71.174.%'
+WHERE IP LIKE '65.196.%'
+or ip like '71.174.%'
+or IP LIKE '108.4%'
+or ip like '72.87.%'
+or ip like '72.88.%'
+or ip like '72.89.%'
+or ip like '72.90.%'
+or ip like '72.91.%'
+or ip like '72.92.%'
 or ip like '173.6%'
 or ip like '173.7%'
 or ip like '100.32.%'
@@ -1148,6 +1156,7 @@ or ip like '100.38.%'
 or ip like '100.39.%'
 or ip like '100.40.%'
 or ip like '100.41.%'
+or ip like '2600:4000%'
 ;
 
 
@@ -1352,10 +1361,6 @@ WHERE IP LIKE '74.118.2%';
 UPDATE RDNS
 SET DOMAIN = 'bit.nl (Keygene N.V.)'
 WHERE IP LIKE '213.136.28.%';
-
-UPDATE RDNS
-SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
-WHERE IP LIKE '108.4%';
 
 UPDATE RDNS
 SET DOMAIN = 'comcast.net (Comcast Cable)'
@@ -1659,7 +1664,9 @@ UPDATE RDNS
 SET DOMAIN='rr.com (Charter Communications)'
 WHERE IP LIKE '76.8%' OR
 IP LIKE '76.9%' OR
-IP LIKE '68.172.%';
+IP LIKE '68.172.%' OR
+IP LIKE '2603:8000:%'
+;
 
 UPDATE RDNS
 SET DOMAIN='kumc.edu (University of Kansas Medical Center)'
@@ -2103,13 +2110,48 @@ where ip like '113.53.%';
 
 update rdns
 set domain='Vietnam Posts and Telecommunications Group (vnpt.vn)'
-where ip like '200e:ee0%';
+where ip like '200e:ee0%'
+or ip like '2001:ee%';
 
 update rdns
 set domain='Bharti Airtel Office (airtel.com)'
-where ip like '2401:4900:1040%';
+where ip like '2401:4900:%';
 
+update rdns
+set domain='Saudi Telecom (stc.com.sa)'
+where ip like '2001:16a%';
 
+update rdns
+set domain='Zain Group (sz.zain.com)'
+where ip like '2a02:cb80:4%';
+
+update rdns
+set domain='Oracle Corpoartion (oracle.com)'
+where
+ip like '129.144.%' or
+ip like '129.145.%' or
+ip like '129.146.%' or
+ip like '129.147.%' or
+ip like '129.148.%' or
+ip like '129.149.%' or
+ip like '129.150.%' or
+ip like '129.151.%' or
+ip like '129.152.%' or
+ip like '129.153.%' or
+ip like '129.154.%' or
+ip like '129.155.%' or
+ip like '129.156.%' or
+ip like '129.157.%' or
+ip like '129.158.%' or
+ip like '129.159.%' ;
+
+update rdns
+set domain='Argonne National Laboratory (anl.gov)'
+where  ip like '140.221.%';
+
+update rdns
+set domain='Reliance Jio Infocomm Limited (ril.com)'
+where ip like '2409:40%';
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
@@ -2301,10 +2343,10 @@ order by count(*) desc
 limit 10;
 
 .width 120 120
--- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
 .print "hints"
-.print "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl"
+.print "gcloud config set account 253716305623-compute@developer.gserviceaccount.com"
 .print "export CLOUDSDK_CORE_PROJECT=ncbi-logmon"
+.print "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl"
 .print "bq rm -f strides_analytics.rdns"
 .print "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl"
 .print "rm -f rdns.db"
