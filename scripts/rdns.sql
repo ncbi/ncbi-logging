@@ -1156,7 +1156,7 @@ or ip like '100.38.%'
 or ip like '100.39.%'
 or ip like '100.40.%'
 or ip like '100.41.%'
-or ip like '2600:4000%'
+or ip like '2600:40%'
 ;
 
 
@@ -1176,8 +1176,7 @@ IP LIKE '172.3%'
 OR IP LIKE '172.4%'
 OR IP LIKE '172.5%'
 OR IP LIKE '172.6%'
-OR IP LIKE '2607:FB90%';
-
+OR IP LIKE '2607:fb9%';
 
 
 UPDATE RDNS
@@ -1665,7 +1664,8 @@ SET DOMAIN='rr.com (Charter Communications)'
 WHERE IP LIKE '76.8%' OR
 IP LIKE '76.9%' OR
 IP LIKE '68.172.%' OR
-IP LIKE '2603:8000:%'
+IP LIKE '2603:8000:%' OR
+IP LIKE '2603:6000:%'
 ;
 
 UPDATE RDNS
@@ -2151,7 +2151,20 @@ where  ip like '140.221.%';
 
 update rdns
 set domain='Reliance Jio Infocomm Limited (ril.com)'
-where ip like '2409:40%';
+where ip like '2409:40%'
+or ip like '2405:20%';
+
+update rdns
+set domain='Sky Broadband (sky.uk)'
+where ip like '2a02:%';
+
+update rdns
+set domain='Claro NXT Telecomunicacoes Ltda (virtua.com.br)'
+where ip like '2804:%';
+
+update rdns
+set domain='British Telcom (bt.com)'
+where ip like '2a00:23%';
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
