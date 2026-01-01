@@ -1157,6 +1157,8 @@ or ip like '100.39.%'
 or ip like '100.40.%'
 or ip like '100.41.%'
 or ip like '2600:40%'
+or ip like '2600:100'
+or ip like '2600:101'
 ;
 
 
@@ -1456,7 +1458,8 @@ WHERE IP LIKE '137.53.%';
 
 UPDATE RDNS
 SET DOMAIN = 'cox.com (Cox Communications Inc.)'
-WHERE IP LIKE '98.17%' OR IP LIKE '98.18%';
+WHERE IP LIKE '98.17%' OR IP LIKE '98.18%'
+or IP LIKE '2600:8800%';
 
 UPDATE RDNS
 SET DOMAIN = 'icr.ac.uk (Institute of Cancer Research)'
@@ -1664,8 +1667,8 @@ SET DOMAIN='rr.com (Charter Communications)'
 WHERE IP LIKE '76.8%' OR
 IP LIKE '76.9%' OR
 IP LIKE '68.172.%' OR
-IP LIKE '2603:8000:%' OR
-IP LIKE '2603:6000:%'
+IP LIKE '2603:80%' OR
+IP LIKE '2603:60%'
 ;
 
 UPDATE RDNS
