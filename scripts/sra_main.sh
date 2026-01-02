@@ -12,11 +12,11 @@ mkdir -p "$VASTFS/sra_main"
 
 cd "$VASTFS/sra_main" || exit
 
-echo -e "SELECT [service_name] + '://' + bucket as full_bucket, [service_name] ,[bucket] ,[geo_region] ,[storage_class] ,[status] ,[created] ,[root_url] ,[sra_owned] ,[file_cnt] ,[protected] ,[open_data] ,[restricted] ,[mirrors] FROM [SRA_Main].[dbo].[SRAFilesDomain] where service_name in ('s3','gs') and bucket like 'sra-%' order by status desc, storage_class desc, service_name, bucket;\ngo\n" | \
-    sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 | \
-    zstd -19 -c > "sra_buckets.$DATE.csv.zstd"
+echo -e "SELECT [service_name] + '://' + bucket as full_bucket, [service_name] ,[bucket] ,[geo_region] ,[storage_class] ,[status] ,[created] ,[root_url] ,[sra_owned] ,[file_cnt] ,[protected] ,[open_data] ,[restricted] ,[mirrors] FROM [SRA_Main].[dbo].[SRAFilesDomain] (nolock) where service_name in ('s3','gs') and bucket like 'sra-%' order by status desc, storage_class desc, service_name, bucket;\ngo\n" | \
+    sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 \
+    > "sra_buckets.$DATE.csv"
 
-echo -e "select * from [SRA_Main].[dbo].[SRAFiles] order by acc,file_id;\ngo\n" |
+echo -e "select * from [SRA_Main].[dbo].[SRAFiles] (nolock) order by acc,file_id;\ngo\n" |
     sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 |
     zstd -19 -c > "sramain.$DATE.csv.zstd"
 
