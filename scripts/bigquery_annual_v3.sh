@@ -18,7 +18,7 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 skipload=false
-annual=false # Run after 12/31, set year below
+annual=false # Run after 12/31, should be automatic in daily.sh
 
 if [ "$#" -eq 1 ]; then
     if [ "$1" = "skipload" ]; then
