@@ -82,6 +82,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
     df -HT .
 
     SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    if [ "$STRIDES_SCOPE" = "private" ]; then
+        SRC_BUCKET="gs://logmon_logs_private/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    fi
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
     echo "  Copying $TGZ to $PARSE_DEST"
 
