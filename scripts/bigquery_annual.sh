@@ -18,7 +18,7 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 skipload=false
-annual=false # Run after 12/31, set year below
+annual=false # Run after 12/31, should be automatic in daily.sh
 
 if [ "$#" -eq 1 ]; then
     if [ "$1" = "skipload" ]; then
@@ -357,6 +357,7 @@ QUERY=$(
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.gs_parsed\\\`
     WHERE ifnull(accepted,true)=true
+    and not (method='GET' and regexp_contains(uri, r'/o\?'))
 ENDOFQUERY
 )
 

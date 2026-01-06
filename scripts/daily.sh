@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo "    --- Daily Processing Beginning ($$) ---"
-
 cd "$HOME/ncbi-logging/scripts" || exit
 
 # shellcheck source=strides_env.sh
 . ./strides_env.sh
+
+echo "    --- Daily Processing for $DATE Beginning ($$) ---"
 
 set +e
 
@@ -112,5 +112,5 @@ fi
 DONEFILE="${HOME}/done/daily_${TODAY}.done"
 touch "$DONEFILE"
 
-echo "    --- Daily Processing Complete ($$) ---"
+echo "    --- Daily Processing for $DATE Complete ($$) ---"
 date

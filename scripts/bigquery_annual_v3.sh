@@ -18,7 +18,7 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 skipload=false
-annual=false # Run after 12/31, set year below
+annual=false # Run after 12/31, should be automatic in daily.sh
 
 if [ "$#" -eq 1 ]; then
     if [ "$1" = "skipload" ]; then
@@ -43,7 +43,7 @@ ENDOFQUERY
 
     echo "$QUERY"
     QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+    bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
     exit 0
 fi
@@ -110,6 +110,7 @@ EOF
 
     bq rm -f "$DATASET.gs_parsed" || true
     bq load \
+        --quiet \
         --max_bad_records 50000 \
         --source_format=NEWLINE_DELIMITED_JSON \
         "$DATASET.gs_parsed" \
@@ -171,7 +172,9 @@ EOF
     gsutil ls -lR "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" | tail
 
     bq rm -f "$DATASET.s3_parsed" || true
+
     bq load \
+        --quiet \
         --max_bad_records 50000 \
         --ignore_unknown_values \
         --source_format=NEWLINE_DELIMITED_JSON \
@@ -233,6 +236,7 @@ EOF
             gsutil ls -l "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*"
 
             bq load \
+                --quiet \
                 --max_bad_records 2000000 \
                 --source_format=NEWLINE_DELIMITED_JSON \
                 "$DATASET.op_parsed" \
@@ -251,6 +255,7 @@ EOF
         rm -f "rec.$bucket"
 
         bq load \
+            --quiet \
             --max_bad_records 2000000000 \
             --source_format=NEWLINE_DELIMITED_JSON \
             "$DATASET.op_parsed" \
@@ -378,19 +383,22 @@ QUERY=$(
     regexp_extract(path,r'[DES]R[RZ][0-9]{5,10}') as accession,
     result_bytes as bytes_sent,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
-    $DATASET.expand_bucket(bucket, path) as bucket,
+    replace($DATASET.expand_bucket(bucket, path), "'", "") as bucket,
     ifnull(source,'GS') as source,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.gs_parsed\\\`
     WHERE ifnull(accepted,true)=true
+    and not (method='GET' and regexp_contains(uri, r'/o\?alt'))
 ENDOFQUERY
 )
+# Remove listings (LOGMON-242) 2and not (method='GET' and regexp_contains(uri, # r'/o\?'))
 
 # TODO Hack, cause I can't understand bash backtick quoting
 QUERY="${QUERY//\\/}"
 bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.gs_fixed" \
     --use_legacy_sql=false \
@@ -438,6 +446,7 @@ QUERY="${QUERY//\\/}"
 bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.s3_fixed" \
     --use_legacy_sql=false \
@@ -544,6 +553,7 @@ bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
 # shellcheck disable=SC2016
 
 bq query \
+    --quiet \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.op_fixed" \
     --time_partitioning_field=start_ts \
@@ -595,6 +605,7 @@ QUERY="${QUERY//\\/}"
 bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export_gs" \
     --use_legacy_sql=false \
@@ -643,6 +654,7 @@ QUERY="${QUERY//\\/}"
 bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_s3" || true
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export_s3" \
     --use_legacy_sql=false \
@@ -691,6 +703,7 @@ QUERY="${QUERY//\\/}"
 bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export_op" \
     --use_legacy_sql=false \
@@ -714,6 +727,7 @@ QUERY="${QUERY//\\/}"
 bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --project_id ncbi-logmon \
     --destination_table "$DATASET.detail_export" \
     --use_legacy_sql=false \
@@ -786,6 +800,7 @@ QUERY="${QUERY//\\/}"
 bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped" || true
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --destination_table "$DATASET.summary_grouped" \
     --use_legacy_sql=false \
     --batch=true \
@@ -851,6 +866,7 @@ fi # public
 QUERY="${QUERY//\\/}"
 
 bq query \
+    --quiet \
     --use_legacy_sql=false \
     --batch=true \
     "$QUERY"
@@ -870,10 +886,10 @@ ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
 
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ###  uniq_ips"
-bq query --use_legacy_sql=false --batch=true "DROP TABLE IF EXISTS $DATASET.uniq_ips"
+bq query --quiet --use_legacy_sql=false --batch=true "DROP TABLE IF EXISTS $DATASET.uniq_ips"
 
 QUERY=$(
     cat <<- ENDOFQUERY
@@ -902,7 +918,7 @@ ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
 
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 RUN="yes"
 if [ "$RUN" = "yes" ]; then
@@ -921,7 +937,7 @@ ENDOFQUERY
     #WHERE remote_ip like '%.%'
     QUERY="${QUERY//\\/}"
 
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+    bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
     echo " ###  iplookup_new3"
     QUERY=$(
@@ -934,7 +950,7 @@ ENDOFQUERY
      city_name string)
 ENDOFQUERY
     )
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+    bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
     #step=429496729
     step=100000000
@@ -956,7 +972,7 @@ ENDOFQUERY
         #echo $QUERY
 
         echo "   ipint between $part and $top"
-        bq query --use_legacy_sql=false --batch=true "$QUERY"
+        bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
     done
 fi # RUN
 
@@ -969,7 +985,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Find internal PUT/POST IPs"
 QUERY=$(
@@ -984,7 +1000,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 # https://confluence.ncbi.nlm.nih.gov/pages/viewpage.action?spaceKey=Edu&title=NCBI+Cloud+Education+Onboarding+Reference+Page
 echo " ### Find internal IAMs IPs"
@@ -1022,7 +1038,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 QUERY=$(
     cat <<- ENDOFQUERY
@@ -1031,7 +1047,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 QUERY=$(
     cat <<- ENDOFQUERY
@@ -1041,7 +1057,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### Update RDNS"
 QUERY=$(
@@ -1052,7 +1068,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 QUERY=$(
     cat <<- ENDOFQUERY
@@ -1063,7 +1079,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 QUERY=$(
     cat <<- ENDOFQUERY
@@ -1073,7 +1089,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 # fi # public
 
 echo " ###  annual_summary_export_$CURYEAR"
@@ -1126,6 +1142,7 @@ bq rm --project_id ncbi-logmon -f "$DATASET.annual_summary_export_$CURYEAR" || t
 
 # shellcheck disable=SC2016
 bq query \
+    --quiet \
     --destination_table "$DATASET.annual_summary_export_$CURYEAR" \
     --use_legacy_sql=false \
     --batch=true \
@@ -1147,7 +1164,7 @@ QUERY=$(
 ENDOFQUERY
 )
 QUERY="${QUERY//\\/}"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ### union previous years into summary_export"
 first=true
@@ -1164,7 +1181,7 @@ done
 
 QUERY="${QUERY//\\/}"
 echo "$QUERY"
-bq query --use_legacy_sql=false --batch=true "$QUERY"
+bq query --quiet -use_legacy_sql=false --batch=true "$QUERY"
 
 echo " ###  export to GS"
 gsutil rm -f "gs://logmon_export/detail/detail.$DATE.*.json.gz" || true
@@ -1214,7 +1231,7 @@ if [ "$STRIDES_SCOPE" == "private" ]; then
 ENDOFQUERY
     )
     QUERY="${QUERY//\\/}"
-    bq query --use_legacy_sql=false --batch=true "$QUERY"
+    bq query --quiet --use_legacy_sql=false --batch=true "$QUERY"
 
     QUERY=$(
         cat <<- ENDOFQUERY
@@ -1269,17 +1286,17 @@ ENDOFQUERY
 else # not private
     echo "Cleanup large temp tables"
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
-    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
+#    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_s3" || true
 
     bq rm --project_id ncbi-logmon -f "$DATASET.cloudian_fixed" || true
-    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
+#    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
 
-    bq rm --project_id ncbi-logmon -f "$DATASET.gs_parsed" || true
+#    bq rm --project_id ncbi-logmon -f "$DATASET.gs_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
 fi # private
