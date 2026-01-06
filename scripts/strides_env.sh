@@ -17,7 +17,6 @@ export LD_LIBRARY_PATH="$HOME/lib:$HOME/.local/lib:$LD_LIBRARY_PATH"
 export LOGDIR=$HOME
 export PYTHONWARNINGS="ignore::DeprecationWarning" # bq still uses deprecated imp
 export VASTFS="/netmnt/vast01/sra/strides_analytics"
-#export PANFS="$VASTFS"
 DATE=$(date "+%Y%m%d") #_%H%M%S
 export DATE
 export "RAMDISK=/dev/shm"
