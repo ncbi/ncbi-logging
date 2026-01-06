@@ -1083,7 +1083,7 @@ echo " ###  export to GS"
     --destination_format NEWLINE_DELIMITED_JSON \
     --compression NONE \
     "$DATASET.uniq_ips" \
-    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.json"
+    "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*.json"
 
 
 

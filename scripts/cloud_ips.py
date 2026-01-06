@@ -6,6 +6,7 @@ import sys
 import urllib.request
 
 # Usage:
+# 0) sort -u uniq_ips* into uniq_ips file
 # 1) update uniq_ips below, private usually later
 UNIQIPS = "/netmnt/vast01/sra/strides_analytics/uniq_ips/uniq_ips"
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519

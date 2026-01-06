@@ -18,19 +18,17 @@ pragma page_size = 32768;
 
 
 drop table if exists uniq_ips;
-drop table if exists uniq_ips_public;
-drop table if exists uniq_ips_private;
-create table uniq_ips_public (line text);
-create table uniq_ips_private (line text);
-.import /netmnt/vast01/sra/strides_analytics/uniq_ips/uniq_ips  uniq_ips_private
-select count(*) as uniq_ips_public_count from uniq_ips_public;
-select count(*) as uniq_ips_private_count from uniq_ips_private;
+--drop table if exists uniq_ips_public;
+--drop table if exists uniq_ips_private;
+--create table uniq_ips_public (line text);
+--create table uniq_ips_private (line text);
+create table uniq_ips (line text);
+.import /netmnt/vast01/sra/strides_analytics/uniq_ips/uniq_ips  uniq_ips
+--select count(*) as uniq_ips_public_count from uniq_ips;
+--select count(*) as uniq_ips_public_count from uniq_ips_public;
+--select count(*) as uniq_ips_private_count from uniq_ips_private;
 
-create table uniq_ips as
-    select distinct line from
-    (select line from uniq_ips_public
-        union all
-     select line from uniq_ips_private);
+--create table uniq_ips as select distinct line from (select line from uniq_ips_public union all select line from uniq_ips_private);
 
 select count(*) as uniq_ips_count from uniq_ips;
 
