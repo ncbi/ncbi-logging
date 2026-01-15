@@ -27,6 +27,12 @@ if [ "$#" -eq 1 ]; then
     if [ "$1" = "annual" ]; then
         annual=true
     fi
+
+    PY="$PREVYEARS"
+    if echo " $PY " | grep -Fq "$1"; then
+        CURYEAR=$1
+        echo "Redoing year $CURYEAR"
+    fi
 fi
 
 if [ "$annual" = true ]; then
@@ -244,7 +250,8 @@ EOF
                 op_schema_only.json
         done
     fi
-    for bucket in OP-web OP-sweb OP-srafiles23 OP-srafiles22 OP-srafiles21 OP-srafiles13 OP-srafiles12 OP-srafiles11 OP-ftp33 OP-ftp32 OP-ftp31 OP-ftp23 OP-ftp22 OP-ftp21 OP-ftp13 OP-ftp12 OP-ftp11 OP-ftp ; do
+    set +e
+    for bucket in OP-web OP-sweb OP-sweb1 OP-sweb2 OP-web11  OP-web12 OP-web21 OP-web22 OP-web31 OP-web32 OP-web11 OP-web23 OP-srafiles11 OP-srafiles12 OP-srafiles13 OP-srafiles21 OP-srafiles22 OP-srafiles23 OP-srafiles31 OP-srafiles32 OP-srafiles33 OP-srafiles34 OP-srafiles34 OP-srafiles36 OP-ftp33 OP-ftp32 OP-ftp31 OP-ftp23 OP-ftp22 OP-ftp21 OP-ftp13 OP-ftp12 OP-ftp11 OP-ftp OP-ftp11 OP-ftp-12 OP-ftp13 OP-ftp21 OP-ftp22 OP-ftp23 OP-ftp31 OP-ftp-32 OP-ftp-33  ; do
 
         #TABLE=${bucket//-/_}
         echo "Loading new (v3) $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/v3/recognized.$bucket.$CURYEAR*"
@@ -263,10 +270,13 @@ EOF
             op_schema_only.json || true
 
     done
+    set -e
 
     rm -f op_schema.json op_schema_only.json
 
     bq show --schema "$DATASET.op_parsed"
+
+    bq -q query --use_legacy_sql=false "update $DATASET.op_parsed set accepted=true, source='OP' where accepted is null or source is null"
 
     echo " #### Parsed results"
     bq -q query \
@@ -525,7 +535,18 @@ bq query \
 
 bq show --schema "$DATASET.op_fixed1"
 
-echo " #### op_fixed"
+
+# LOGMON-244
+echo "LOGMON-244, load op_zq to determine when OP accession was switched from orig to delite"
+gsutil cp "$VASTFS/sra_main/op_zq_annot3.csv" "gs://logmon_export/uniq_ips/op_zq_annot3.csv"
+bq query --quiet --use_legacy_sql=false --batch=true "DROP TABLE IF EXISTS $DATASET.op_zq"
+bq mk --table "$DATASET.op_zq" "acc:STRING,min_date:DATE"
+bq load --source_format=CSV --skip_leading_rows=1 "$DATASET.op_zq" "gs://logmon_export/uniq_ips/op_zq_annot3.csv"
+
+
+# WHEN contains_substr(path, '-zq-') THEN bucket || ' (ETL - BQS)'
+#    $DATASET.expand_bucket(host, request_uri) as host,
+echo " #### op_fixed, including join with op_zq"
 QUERY=$(
     cat <<- ENDOFQUERY
     SELECT
@@ -536,15 +557,23 @@ QUERY=$(
     version,
     http_operation,
     http_status,
-    $DATASET.expand_bucket(host, request_uri) as host,
+    CASE
+        WHEN min_date is null    THEN host || " (Unknown)"
+        WHEN start_ts > min_date THEN host || " (ETL - BQS)"
+        ELSE                          host || " (ETL + BQS)"
+        END AS host,
     bytes_sent,
     request_uri,
     $DATASET.map_extension(request_uri) as extension,
     referer,
     'OP' as source,
     user_agent,
-    current_datetime() as fixed_time
-    FROM \\\`ncbi-logmon.$DATASET.op_fixed1\\\`
+    current_datetime() as fixed_time,
+    min_date
+    FROM \\\`ncbi-logmon.$DATASET.op_fixed1\\\` A
+    LEFT OUTER JOIN
+    \\\`ncbi-logmon.$DATASET.op_zq\\\` B
+    ON A.accession = B.acc
 ENDOFQUERY
 )
 
@@ -1292,8 +1321,8 @@ else # not private
 
     bq rm --project_id ncbi-logmon -f "$DATASET.cloudian_fixed" || true
 #    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
-    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
-    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
+#    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
+#    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
 
 #    bq rm --project_id ncbi-logmon -f "$DATASET.gs_parsed" || true

@@ -20,4 +20,24 @@ echo -e "select * from [SRA_Main].[dbo].[SRAFiles] (nolock) order by acc,file_id
     sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 |
     zstd -19 -c > "sramain.$DATE.csv.zstd"
 
+
+#echo -e "SELECT acc, create_date FROM [SRA_Main].[dbo].[SRAFiles] (nolock) where semantic_name='run.zq' and is_current=1 and file_id in ( select file_id FROM [SRA_Main].[dbo].[SRAFilesLocation]  (nolock) where domain_id in ( select domain_id FROM [SRA_Main].[dbo].[SRAFilesDomain] (nolock) where service_name='sra-sos') and availability='live') order by acc;\ngo\n" | \
+#    sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 | \
+#    zstd -19 -c > "op_zq.$DATE.csv.zstd"
+
+#echo -e "SELECT  acc, create_date, semantic_name, is_current FROM [SRA_Main].[dbo].[SRAFiles] (nolock) where is_current=1 and file_id in ( SELECT [file_id] FROM [SRA_Main].[dbo].[SRAFilesAnnotation] (nolock) where annot_type='delite') order by acc;\ngo\n" |\
+#    sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 | \
+#    zstd -19 -c > "op_zq_annot.$DATE.csv.zstd"
+
+#echo -e "SELECT sf.file_id, acc, create_date, last_update from [SRA_Main].[dbo].SRAFiles sf (nolock), [SRA_Main].[dbo].SRAFilesAnnotation sfa (nolock) where sf.file_id=sfa.file_id and annot_type='delite' and is_current=1 order by acc;\ngo\n" |\
+#    sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 | \
+#    zstd -19 -c > "op_zq_annot2.$DATE.csv.zstd"
+
+echo -e "SELECT acc, min(cast(create_date as Date)) as min_date from [SRA_Main].[dbo].SRAFiles sf (nolock), [SRA_Main].[dbo].SRAFilesAnnotation sfa (nolock) where sf.file_id=sfa.file_id and annot_type='delite' and is_current=1 group by acc order by min_date, acc;\ngo\n" |\
+    sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 | \
+    zstd -19 -c > "op_zq_annot3.$DATE.csv.zstd"
+
+zstd -d -c "op_zq_annot3.$DATE.csv.zstd" > "op_zq_annot3.csv"
+
+
 find "$VASTFS"/sra_main/ -type f -mtime +30 -delete
