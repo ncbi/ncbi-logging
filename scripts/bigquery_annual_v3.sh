@@ -36,6 +36,7 @@ if [ "$#" -eq 1 ]; then
 fi
 
 if [ "$annual" = true ]; then
+#    LASTYEAR=2022 # TODO
     LASTYEAR=$((CURYEAR - 1 ))
     echo " #### Annual extraction of $LASTYEAR"
 
@@ -248,8 +249,10 @@ EOF
                 "$DATASET.op_parsed" \
                 "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/recognized.2025-${MONTH}*" \
                 op_schema_only.json
+
+            echo
         done
-    fi
+    fi # CURYEAR=2025
     set +e
     for bucket in OP-web OP-sweb OP-sweb1 OP-sweb2 OP-web11  OP-web12 OP-web21 OP-web22 OP-web31 OP-web32 OP-web11 OP-web23 OP-srafiles11 OP-srafiles12 OP-srafiles13 OP-srafiles21 OP-srafiles22 OP-srafiles23 OP-srafiles31 OP-srafiles32 OP-srafiles33 OP-srafiles34 OP-srafiles34 OP-srafiles36 OP-ftp33 OP-ftp32 OP-ftp31 OP-ftp23 OP-ftp22 OP-ftp21 OP-ftp13 OP-ftp12 OP-ftp11 OP-ftp OP-ftp11 OP-ftp-12 OP-ftp13 OP-ftp21 OP-ftp22 OP-ftp23 OP-ftp31 OP-ftp-32 OP-ftp-33  ; do
 
@@ -269,6 +272,7 @@ EOF
             "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}/v3/recognized.$bucket.$CURYEAR*" \
             op_schema_only.json || true
 
+        echo
     done
     set -e
 
@@ -276,7 +280,7 @@ EOF
 
     bq show --schema "$DATASET.op_parsed"
 
-    bq -q query --use_legacy_sql=false "update $DATASET.op_parsed set accepted=true, source='OP' where accepted is null or source is null"
+#    bq -q query --use_legacy_sql=false "update $DATASET.op_parsed set accepted=true, source='OP' where accepted is null or source is null"
 
     echo " #### Parsed results"
     bq -q query \
@@ -284,6 +288,8 @@ EOF
         "select source, accepted, min(time) as min_time, max(time) as max_time, count(*) as parsed_count from (select source, accepted, cast(time as string) as time from $DATASET.gs_parsed union all select source, accepted, cast(time as string) as time from $DATASET.s3_parsed union all select source, accepted, time as time from $DATASET.op_parsed) group by source, accepted order by source"
 
 fi # skipload
+
+echo "Loading finished (or skipload if $skipload)"
 
 echo " #### UDFs"
 QUERY=$(
@@ -421,6 +427,7 @@ bq show --schema "$DATASET.gs_fixed"
 #parse_datetime('%d.%m.%Y:%H:%M:%S 0', time) as start_ts,
 #[17/May/2019:23:19:24 +0000]
 echo " #### s3_fixed"
+gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 # LOGMON-1: Remove multiple -heads from agent
 QUERY=$(
     cat <<- ENDOFQUERY
@@ -593,6 +600,7 @@ bq query \
 
 bq show --schema "$DATASET.op_fixed"
 
+gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 echo " ##### detail_export"
 echo " ##### detail_export_gs"
 QUERY=$(
@@ -741,6 +749,7 @@ bq query \
     --time_partitioning_field=start_ts \
     "$QUERY"
 
+gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 echo " ##### detail_export_union"
 QUERY=$(
     cat <<- ENDOFQUERY

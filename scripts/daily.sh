@@ -28,14 +28,18 @@ if [ "$homespace" -lt 500000 ]; then
     df -HT "$HOME" | mailx -s "$HOME low on space" vartanianmh@ncbi.nlm.nih.gov
 fi
 
+echo "mirror.sh OP"
+./mirror.sh OP |& ts >> "$HOME"/logs/mirror_op."$DATE".log
+
+echo "s3_lister"
+./s3_lister.sh |& ts >> "$HOME"/logs/s3_lister."$DATE".log
+./mirror_obj.sh |& ts >> "$HOME"/logs/mirror_obj."$DATE".log
+
 echo "mirror.sh GS"
 ./mirror.sh GS |& ts >> "$HOME"/logs/mirror_gs."$DATE".log
 
 echo "sra_prod.sh"
 ./sra_prod.sh |& ts >>  "$HOME"/logs/sra_prod."$DATE".log
-
-echo "mirror.sh OP"
-./mirror.sh OP |& ts >> "$HOME"/logs/mirror_op."$DATE".log
 
 echo "mirror.sh S3"
 ./mirror.sh S3 |& ts >> "$HOME"/logs/mirror_s3."$DATE".log
@@ -74,10 +78,6 @@ date
 #echo "parse Splunk"
 #./parse.sh Splunk   |& ts >> "$HOME"/logs/parse_splunk."$DATE".log
 #./parse_new.sh Splunk   |& ts >> "$HOME"/logs/parse_new_splunk."$DATE".log
-
-echo "s3_lister"
-./s3_lister.sh |& ts >> "$HOME"/logs/s3_lister."$DATE".log
-./mirror_obj.sh |& ts >> "$HOME"/logs/mirror_obj."$DATE".log
 
 #dow=$(date +%u) # 1=Monday
 dom=$(date +%e)
