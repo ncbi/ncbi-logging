@@ -10,7 +10,7 @@ echo "    --- Daily Processing for $DATE Beginning ($$) ---"
 set +e
 
 mkdir -p "$HOME"/logs
-find "$HOME/logs" ! -name "*xz" -mtime +1 -size +2M -exec xz -9 {} \;
+find "$HOME/logs" ! -name "*zstd" -mtime +1 -size +1M -exec zstd --rm -19 {} \;
 find "$HOME/done" -mtime +60 -delete
 
 #panspace=$(/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/ | tail -1 | tr -s ' ' | cut -d ' ' -f 5 | tr -d '%')
