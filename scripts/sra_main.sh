@@ -37,6 +37,10 @@ echo -e "SELECT acc, min(cast(create_date as Date)) as min_date from [SRA_Main].
     sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 | \
     zstd -9 -c > "op_zq_annot3.$DATE.csv.zstd"
 
+echo -e "SELECT acc, min(cast(last_update as Date)) as min_date from [SRA_Main].[dbo].SRAFiles sf (nolock), [SRA_Main].[dbo].SRAFilesAnnotation sfa (nolock) where sf.file_id=sfa.file_id and annot_type='delite' and is_current=1 group by acc order by min_date, acc;\ngo\n" |\
+    sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 | \
+    zstd -9 -c > "op_zq_annot4.$DATE.csv.zstd"
+
 zstd -d -c "op_zq_annot3.$DATE.csv.zstd" > "op_zq_annot3.csv"
 
 
