@@ -185,7 +185,6 @@ fi
 
 if [ "$annual" = true ]; then
     LASTYEAR=$((CURYEAR - 1 ))
-    LASTYEAR=2022 # TODO
     echo " #### Annual extraction of $LASTYEAR"
 
     QUERY=$(
@@ -1218,20 +1217,61 @@ ENDOFQUERY
 )
 bq_query "$QUERY"
 
+
+# Recompute 2018 and 2019
+if [ "$CURYEAR" -lt 2020 ]; then
+    for REYEAR in 2018 2019; do
+        QUERY=$(
+            cat <<- ENDOFQUERY
+        CREATE OR REPLACE TABLE
+        \\\`ncbi-logmon.strides_analytics.annual_summary_export_${REYEAR}_zq_fixed\\\`
+        AS
+        SELECT *
+        EXCEPT (min_date, acc)
+        REPLACE (
+        CASE
+                WHEN min_date is null    THEN host || " (Unknown)"
+                WHEN start_ts > min_date THEN host || " (ETL - BQS)"
+                ELSE                          host || " (ETL + BQS)"
+                END
+        AS host
+        ,
+        CASE
+                WHEN min_date is null    THEN host || " (Unknown)"
+                WHEN start_ts > min_date THEN host || " (ETL - BQS)"
+                ELSE                          host || " (ETL + BQS)"
+                END
+        AS bucket
+        )
+        FROM \\\```ncbi-logmon.strides_analytics.annual_summary_export_${REYEAR}\\\` A
+        LEFT OUTER JOIN \\\`ncbi-logmon.strides_analytics.op_zq\\\` B ON A.accession = B.acc
+        WHERE source='OP'
+ENDOFQUERY
+        )
+        bq_query "$QUERY"
+    done
+fi
+
 echo " ### union previous years into summary_export"
 first=true
 QUERY="CREATE OR REPLACE TABLE $DATASET.summary_export AS "
-ALLYEARS="$PREVYEARS $CURYEAR"
+ALLYEARS="$PREVYEARS $CURYEAR 2018_zq_fixed 2019_zq_fixed"
 for year in $ALLYEARS; do
     if [ "$first" = true ]; then
         first=false
     else
         QUERY="$QUERY union all "
     fi
-    QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year "
+
+    if [ "$year" = "2018" ] || [ "$year" = "2019" ]; then
+        QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year where source!='OP'"
+    else
+        QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year "
+    fi
 done
 
 bq_query "$QUERY"
+bq_query "DELETE FROM $DATASET.summary_export WHERE source='OP' and start_ts < '2021-01-01' and not contains_substr(host, ' (' )"
 
 echo " ###  export to GS"
 gsutil rm -f "gs://logmon_export/detail/detail.$DATE.*.json.gz" || true
