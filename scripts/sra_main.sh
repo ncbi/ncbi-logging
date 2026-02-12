@@ -42,6 +42,6 @@ echo -e "SELECT acc, min(cast(last_update as Date)) as min_date from [SRA_Main].
     zstd -9 -c > "op_zq_annot4.$DATE.csv.zstd"
 
 zstd -d -c "op_zq_annot3.$DATE.csv.zstd" > "op_zq_annot3.csv"
-
+zstd -d -c "op_zq_annot4.$DATE.csv.zstd" > "op_zq_annot4.csv"
 
 find "$VASTFS"/sra_main/ -type f -mtime +10 -delete
