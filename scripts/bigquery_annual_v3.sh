@@ -331,15 +331,21 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com 2> 
 
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com 2> /dev/null
     bq rm -f "$DATASET.s3_parsed" || true
-    echo "Loading s3_parsed..."
-    bq load \
-        --quiet \
-        --max_bad_records 50000 \
-        --ignore_unknown_values \
-        --source_format=NEWLINE_DELIMITED_JSON \
-        "$DATASET.s3_parsed" \
-        "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" \
-        s3_schema_only.json
+
+
+    for MONTH in 01 02 03 04 05 06 07 08 09 10 11 12; do
+        echo "Loading s3_parsed for $CURYEAR-$MONTH..."
+        gsutil ls -l "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-$MONTH-*" | cat -n | tail -5
+
+        bq load \
+            --quiet \
+            --max_bad_records 50000 \
+            --ignore_unknown_values \
+            --source_format=NEWLINE_DELIMITED_JSON \
+            "$DATASET.s3_parsed" \
+            "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-$MONTH-*" \
+            s3_schema_only.json
+    done
 
     bq show --schema "$DATASET.s3_parsed"
 
@@ -665,10 +671,10 @@ bq_query_to_table op_fixed1 "$QUERY"
 
 # LOGMON-244
 echo "LOGMON-244, load op_zq to determine when OP accession was switched from orig to delite"
-gsutil cp "$VASTFS/sra_main/op_zq_annot3.csv" "gs://logmon_export/uniq_ips/op_zq_annot3.csv"
+gsutil cp "$VASTFS/sra_main/op_zq_annot4.csv" "gs://logmon_export/uniq_ips/op_zq_annot4.csv"
 bq_query "DROP TABLE IF EXISTS $DATASET.op_zq"
 bq mk --table "$DATASET.op_zq" "acc:STRING,min_date:DATE"
-bq load --source_format=CSV --skip_leading_rows=1 "$DATASET.op_zq" "gs://logmon_export/uniq_ips/op_zq_annot3.csv"
+bq load --source_format=CSV --skip_leading_rows=1 "$DATASET.op_zq" "gs://logmon_export/uniq_ips/op_zq_annot4.csv"
 
 
 # WHEN contains_substr(path, '-zq-') THEN bucket || ' (ETL - BQS)'
@@ -1218,44 +1224,10 @@ ENDOFQUERY
 bq_query "$QUERY"
 
 
-# Recompute 2018 and 2019
-if [ "$CURYEAR" -lt 2020 ]; then
-    for REYEAR in 2018 2019; do
-        QUERY=$(
-            cat <<- ENDOFQUERY
-        CREATE OR REPLACE TABLE
-        \\\`ncbi-logmon.strides_analytics.annual_summary_export_${REYEAR}_zq_fixed\\\`
-        AS
-        SELECT *
-        EXCEPT (min_date, acc)
-        REPLACE (
-        CASE
-                WHEN min_date is null    THEN host || " (Unknown)"
-                WHEN start_ts > min_date THEN host || " (ETL - BQS)"
-                ELSE                          host || " (ETL + BQS)"
-                END
-        AS host
-        ,
-        CASE
-                WHEN min_date is null    THEN host || " (Unknown)"
-                WHEN start_ts > min_date THEN host || " (ETL - BQS)"
-                ELSE                          host || " (ETL + BQS)"
-                END
-        AS bucket
-        )
-        FROM \\\```ncbi-logmon.strides_analytics.annual_summary_export_${REYEAR}\\\` A
-        LEFT OUTER JOIN \\\`ncbi-logmon.strides_analytics.op_zq\\\` B ON A.accession = B.acc
-        WHERE source='OP'
-ENDOFQUERY
-        )
-        bq_query "$QUERY"
-    done
-fi
-
-echo " ### union previous years into summary_export"
+echo " ### union previous years into summary_union"
 first=true
-QUERY="CREATE OR REPLACE TABLE $DATASET.summary_export AS "
-ALLYEARS="$PREVYEARS $CURYEAR 2018_zq_fixed 2019_zq_fixed"
+QUERY="CREATE OR REPLACE TABLE $DATASET.summary_union AS "
+ALLYEARS="$PREVYEARS $CURYEAR"
 for year in $ALLYEARS; do
     if [ "$first" = true ]; then
         first=false
@@ -1263,15 +1235,44 @@ for year in $ALLYEARS; do
         QUERY="$QUERY union all "
     fi
 
-    if [ "$year" = "2018" ] || [ "$year" = "2019" ]; then
-        QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year where source!='OP'"
-    else
-        QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year "
-    fi
+    QUERY="$QUERY  SELECT * FROM $DATASET.annual_summary_export_$year "
 done
 
 bq_query "$QUERY"
-bq_query "DELETE FROM $DATASET.summary_export WHERE source='OP' and start_ts < '2021-01-01' and not contains_substr(host, ' (' )"
+
+QUERY=$(
+    cat <<- ENDOFQUERY
+CREATE OR REPLACE TABLE
+\\\`ncbi-logmon.strides_analytics.summary_union_op\\\`
+AS
+    SELECT *
+    EXCEPT (min_date, acc)
+    REPLACE (
+    CASE
+        WHEN min_date is null    THEN split(host," ")[0] || " (Unknown)"
+        WHEN start_ts > min_date THEN split(host," ")[0] || " (ETL - BQS)"
+        ELSE                          split(host," ")[0] || " (ETL + BQS)"
+        END
+    AS host
+    ,
+    CASE
+        WHEN min_date is null    THEN split(host," ")[0] || " (Unknown)"
+        WHEN start_ts > min_date THEN split(host," ")[0] || " (ETL - BQS)"
+        ELSE                          split(host," ")[0] || " (ETL + BQS)"
+        END
+    AS bucket
+    )
+FROM \\\```ncbi-logmon.strides_analytics.summary_union\\\` A
+LEFT OUTER JOIN \\\`ncbi-logmon.strides_analytics.op_zq\\\` B ON A.accession = B.acc
+WHERE source="OP"
+ENDOFQUERY
+)
+bq_query "$QUERY"
+
+#bq_query "DELETE FROM $DATASET.summary_union WHERE source='OP'" # and start_ts < '2021-01-01'"
+
+bq_query_to_table summary_export "select * from $DATASET.summary_union where source!='OP' UNION ALL $DATASET.summary_union_op"
+
 
 echo " ###  export to GS"
 gsutil rm -f "gs://logmon_export/detail/detail.$DATE.*.json.gz" || true
@@ -1312,6 +1313,7 @@ rm -f "$VASTFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
 gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$VASTFS/uniq_ips/"
 
 if [ "$STRIDES_SCOPE" = "private" ]; then
+    echo " ###  masking"
     QUERY=$(
         cat <<- ENDOFQUERY
     DELETE from $DATASET.summary_export
@@ -1359,7 +1361,6 @@ ENDOFQUERY
 
     # TODO: Use cloud_analytics.isConsentPublic()
 
-    echo " ###  masking"
     bq cp -f "strides_analytics.summary_export_ca_masked" "strides_analytics.summary_export_ca_masked_$YESTERDAY" || true
 
     bq_query_to_table "summary_export_ca_masked" "$QUERY"
