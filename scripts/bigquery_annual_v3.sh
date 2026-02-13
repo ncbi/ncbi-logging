@@ -344,8 +344,12 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com 2> 
             --source_format=NEWLINE_DELIMITED_JSON \
             "$DATASET.s3_parsed" \
             "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-$MONTH-*" \
-            s3_schema_only.json
+            s3_schema_only.json &
     done
+
+    jobs
+
+    wait
 
     bq show --schema "$DATASET.s3_parsed"
 
@@ -1271,7 +1275,7 @@ bq_query "$QUERY"
 
 #bq_query "DELETE FROM $DATASET.summary_union WHERE source='OP'" # and start_ts < '2021-01-01'"
 
-bq_query_to_table summary_export "select * from $DATASET.summary_union where source!='OP' UNION ALL $DATASET.summary_union_op"
+bq_query_to_table summary_export "select * from $DATASET.summary_union where source!='OP' UNION ALL select * from $DATASET.summary_union_op"
 
 
 echo " ###  export to GS"
