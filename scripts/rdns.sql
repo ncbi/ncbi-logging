@@ -479,7 +479,12 @@ OR IP LIKE '223.7%'
 OR IP LIKE '223.8%'
 OR IP LIKE '223.9%'
 OR IP LIKE '223.1%'
-OR IP LIKE '111.5%';
+OR IP LIKE '111.5%'
+OR IP LIKE '2409:8000%';
+
+
+
+
 
 
 UPDATE RDNS
@@ -2209,6 +2214,9 @@ update rdns
 set domain='Niigatga University (niigata-u.ac.jp)'
 where ip like '133.25.%';
 
+update rdns
+set domain='Philippine Long Distance Telephone Co. (pltd.net)'
+where ip like '2004:4450%';
 
 
 
