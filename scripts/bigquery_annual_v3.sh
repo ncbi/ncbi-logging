@@ -335,7 +335,7 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com 2> 
 
     for MONTH in 01 02 03 04 05 06 07 08 09 10 11 12; do
         echo "Loading s3_parsed for $CURYEAR-$MONTH..."
-        gsutil ls -l "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-$MONTH-*" | cat -n | tail -5
+        gsutil ls -l "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-$MONTH-*" | cat -n | tail -5 || true
 
         bq load \
             --quiet \
@@ -344,7 +344,7 @@ gcloud config set account 253716305623-compute@developer.gserviceaccount.com 2> 
             --source_format=NEWLINE_DELIMITED_JSON \
             "$DATASET.s3_parsed" \
             "$PARSE_BUCKET/logs_s3_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-$MONTH-*" \
-            s3_schema_only.json &
+            s3_schema_only.json || true &
     done
 
     jobs
@@ -1379,11 +1379,12 @@ else # not private
 #    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
 #    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
 #    bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed1" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.s3_fixed" || true
 
-#    bq rm --project_id ncbi-logmon -f "$DATASET.gs_parsed" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.gs_parsed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_union" || true
 fi # private
 
 echo "bigquery_annual_v3.sh complete"
