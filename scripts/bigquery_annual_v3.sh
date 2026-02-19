@@ -676,7 +676,7 @@ bq_query_to_table op_fixed1 "$QUERY"
 # LOGMON-244
 echo "LOGMON-244, load op_zq to determine when OP accession was switched from orig to delite"
 gsutil cp "$VASTFS/sra_main/op_zq_annot4.csv" "gs://logmon_export/uniq_ips/op_zq_annot4.csv"
-bq_query "DROP TABLE IF EXISTS $DATASET.op_zq"
+bq rm --project_id ncbi-logmon -f "$DATASET.op_zq" || true
 bq mk --table "$DATASET.op_zq" "acc:STRING,min_date:DATE"
 bq load --source_format=CSV --skip_leading_rows=1 "$DATASET.op_zq" "gs://logmon_export/uniq_ips/op_zq_annot4.csv"
 
