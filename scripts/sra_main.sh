@@ -44,4 +44,17 @@ echo -e "SELECT acc, min(cast(last_update as Date)) as min_date from [SRA_Main].
 zstd -d -c "op_zq_annot3.$DATE.csv.zstd" > "op_zq_annot3.csv"
 zstd -d -c "op_zq_annot4.$DATE.csv.zstd" > "op_zq_annot4.csv"
 
+ZQCNT=$(wc -l op_zq_annot4.csv | cut -d' ' -f 1)
+
+if [ "$ZQCNT" -lt 44441225 ]; then
+    echo "$ZQCNT" | mailx -s "Low zq4 count $ZQCNT" vartanianmh@ncbi.nlm.nih.gov
+fi
+
 find "$VASTFS"/sra_main/ -type f -mtime +10 -delete
+
+cut -d, -f 1 sra_buckets."$DATE".csv  > bucket_today
+cut -d, -f 1 sra_buckets."$YESTERDAY".csv > bucket_yesterday
+
+if ! diff bucket_today bucket_yesterday; then
+    diff bucket_today bucket_yesterday | mailx -s "Bucket Difference" vartanianmh@ncbi.nlm.nih.gov
+fi
