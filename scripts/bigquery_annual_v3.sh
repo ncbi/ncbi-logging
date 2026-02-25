@@ -695,9 +695,10 @@ QUERY=$(
     http_operation,
     http_status,
     CASE
-        WHEN min_date is null    THEN host || " (Unknown)"
-        WHEN start_ts > min_date THEN host || " (ETL - BQS)"
-        ELSE                          host || " (ETL + BQS)"
+        WHEN start_ts > '2024-01-01' THEN host || " (ETL - BQS)"
+        WHEN min_date is null        THEN host || " (Unknown)"
+        WHEN start_ts > min_date     THEN host || " (ETL - BQS)"
+        ELSE                              host || " (ETL + BQS)"
         END AS host,
     bytes_sent,
     request_uri,
@@ -1253,16 +1254,18 @@ AS
     EXCEPT (min_date, acc)
     REPLACE (
     CASE
-        WHEN min_date is null    THEN split(host," ")[0] || " (Unknown)"
-        WHEN start_ts > min_date THEN split(host," ")[0] || " (ETL - BQS)"
-        ELSE                          split(host," ")[0] || " (ETL + BQS)"
+        WHEN start_ts > '2024-01-01' THEN split(host," ")[0] || " (ETL - BQS)"
+        WHEN min_date is null        THEN split(host," ")[0] || " (Unknown)"
+        WHEN start_ts > min_date     THEN split(host," ")[0] || " (ETL - BQS)"
+        ELSE                              split(host," ")[0] || " (ETL + BQS)"
         END
     AS host
     ,
     CASE
-        WHEN min_date is null    THEN split(host," ")[0] || " (Unknown)"
-        WHEN start_ts > min_date THEN split(host," ")[0] || " (ETL - BQS)"
-        ELSE                          split(host," ")[0] || " (ETL + BQS)"
+        WHEN start_ts > '2024-01-01' THEN split(host," ")[0] || " (ETL - BQS)"
+        WHEN min_date is null        THEN split(host," ")[0] || " (Unknown)"
+        WHEN start_ts > min_date     THEN split(host," ")[0] || " (ETL - BQS)"
+        ELSE                              split(host," ")[0] || " (ETL + BQS)"
         END
     AS bucket
     )
