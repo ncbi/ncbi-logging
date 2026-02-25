@@ -16,6 +16,8 @@ echo -e "SELECT [service_name] + '://' + bucket as full_bucket, [service_name] ,
     sqsh-ms-lb -m csv -h -S SRA_BATCH -U anyone -a 1 \
     > "sra_buckets.$DATE.csv"
 
+wc -l sra_buckets."$DATE".csv
+
 cut -d, -f 1 sra_buckets."$DATE".csv  > bucket_today
 cut -d, -f 1 sra_buckets."$YESTERDAY".csv > bucket_yesterday
 
@@ -43,6 +45,8 @@ ZQCNT=$(wc -l op_zq_annot4.csv | cut -d' ' -f 1)
 
 if [ "$ZQCNT" -lt 44441225 ]; then
     echo "$ZQCNT" | mailx -s "Low zq4 count $ZQCNT" vartanianmh@ncbi.nlm.nih.gov
+else
+    echo "ZQCNT is $ZQCNT"
 fi
 
 find "$VASTFS"/sra_main/ -type f -mtime +10 -delete
