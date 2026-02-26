@@ -184,6 +184,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""linux64"/"linux64/g' |
             sed 's/""mac64"/"mac64/g' |
             sed 's/""windows64"/"windows64/g' | \
+            sed 's/ us-east-1$//' | \
             grep -v 'GCS Lifecycle Management' | \
             grep -v 'file-meta ncbi_location=' | \
             grep -v 'GET /?' | \
