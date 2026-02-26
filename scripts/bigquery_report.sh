@@ -61,22 +61,22 @@ bq -q query \
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
-    "select source, count(*) as external_records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source order by source "
+    "select source, count(*) as external_records, sum(num_requests) as total_requests_ext, sum(bytes_sent) as total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source order by source, total_bytes_sent desc "
 
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
-    "select source, count(*) as internal_records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain like '%nih.gov%' group by source order by source "
+    "select source, count(*) as internal_records, sum(num_requests) as total_requests_int, sum(bytes_sent) as total_bytes_sent from $DATASET.summary_export where domain like '%nih.gov%' group by source order by source, total_bytes_sent desc"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select source, count(*) as records, regexp_extract(bucket,r' \(.+\)') as format, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, format order by source, format"
+    "select source, count(*) as records, regexp_extract(bucket,r' \(.+\)') as format, sum(num_requests) as total_requests_ext, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, format order by source, format"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select datetime_trunc(start_ts, month) as month, source, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, month order by month desc"
+    "select datetime_trunc(start_ts, month) as month, source, count(*) as records, sum(num_requests) as total_requests_ext, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, month order by month desc"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -97,7 +97,7 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-    "select datetime_trunc(start_ts, day) as day, source, count(*) as records, sum(num_requests) as total_download_requests, sum(bytes_sent) total_bytes_downloaded from $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and domain not like '%nih.gov%' and start_ts >= '2022-06-01' group by source, day order by day desc, source limit 50"
+    "select datetime_trunc(start_ts, day) as day, source, count(*) as records, sum(num_requests) as total_download_requests, sum(bytes_sent) total_bytes_downloaded from $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and domain not like '%nih.gov%' and start_ts >= '2022-06-01' group by source, day order by source, day desc limit 50"
 
 bq -q query \
     --use_legacy_sql=false \

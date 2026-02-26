@@ -1373,10 +1373,10 @@ ENDOFQUERY
     bq_query_to_table "summary_export_ca_masked" "$QUERY"
 else # not private
     echo "Cleanup large temp tables"
-#    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
-#    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_s3" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_gs" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_op" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.detail_export_s3" || true
 
     bq rm --project_id ncbi-logmon -f "$DATASET.cloudian_fixed" || true
 #    bq rm --project_id ncbi-logmon -f "$DATASET.gs_fixed" || true
@@ -1388,6 +1388,7 @@ else # not private
     bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.summary_union" || true
+    bq rm --project_id ncbi-logmon -f "$DATASET.summary_union_op" || true
 fi # private
 
 echo "bigquery_annual_v3.sh complete"
