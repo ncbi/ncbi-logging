@@ -2207,7 +2207,7 @@ where ip like '2a00:23%';
 
 update rdns
 set domain='Universidad de Alicante (ua.es)'
-where ip like '193.154.%';
+where ip like '193.154.%' or ip like '193.145.%';
 
 
 update rdns
@@ -2218,7 +2218,14 @@ update rdns
 set domain='Philippine Long Distance Telephone Co. (pltd.net)'
 where ip like '2004:4450%';
 
+update rdns
+set domain='Virgin Media Consumer Broadband UK (virginmedia.com)'
+where ip like '82.28.8%'
+or ip like '82.28.9%';
 
+update rdns
+set domain='Wellcome Trust Sanger Institute (jisc.ac.uk)'
+where ip like '193.62.2%';
 
 
 
