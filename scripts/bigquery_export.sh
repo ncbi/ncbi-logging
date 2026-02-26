@@ -386,6 +386,13 @@ ENDOFQUERY
 
     bq show --schema "$DATASET.s3_fixed"
 
+# LOGMON-244
+echo "LOGMON-244, load op_zq to determine when OP accession was switched from orig to delite"
+gsutil cp "$VASTFS/sra_main/op_zq_annot3.csv" "gs://logmon_export/uniq_ips/op_zq_annot3.csv"
+bq query --quiet --use_legacy_sql=false --batch=true "DROP TABLE IF EXISTS $DATASET.op_zq"
+bq mk --table "$DATASET.op_zq" "acc:STRING,min_date:DATE"
+bq load --source_format=CSV --skip_leading_rows=1 "$DATASET.op_zq" "gs://logmon_export/uniq_ips/op_zq_annot3.csv"
+
 echo " #### op_fixed1"
     # LOGMON-1: Remove multiple -heads from agent
     QUERY=$(cat <<-ENDOFQUERY
@@ -441,8 +448,9 @@ ENDOFQUERY
 
     bq show --schema "$DATASET.op_fixed1"
 
-echo " #### op_fixed"
-    QUERY=$(cat <<-ENDOFQUERY
+echo " #### op_fixed, including join with op_zq"
+QUERY=$(
+    cat <<- ENDOFQUERY
     SELECT
     remote_ip,
     start_ts,
@@ -451,17 +459,26 @@ echo " #### op_fixed"
     version,
     http_operation,
     http_status,
-    $DATASET.expand_bucket(host, request_uri) as host,
+    CASE
+        WHEN start_ts > '2024-01-01' THEN host || " (ETL - BQS)"
+        WHEN min_date is null        THEN host || " (Unknown)"
+        WHEN start_ts > min_date     THEN host || " (ETL - BQS)"
+        ELSE                              host || " (ETL + BQS)"
+        END AS host,
     bytes_sent,
     request_uri,
     $DATASET.map_extension(request_uri) as extension,
     referer,
     'OP' as source,
     user_agent,
-    current_datetime() as fixed_time
-    FROM \\\`ncbi-logmon.$DATASET.op_fixed1\\\`
+    current_datetime() as fixed_time,
+    min_date
+    FROM \\\`ncbi-logmon.$DATASET.op_fixed1\\\` A
+    LEFT OUTER JOIN
+    \\\`ncbi-logmon.$DATASET.op_zq\\\` B
+    ON A.accession = B.acc
 ENDOFQUERY
-    )
+)
 
     QUERY="${QUERY//\\/}"
     bq rm --project_id ncbi-logmon -f "$DATASET.op_fixed" || true
