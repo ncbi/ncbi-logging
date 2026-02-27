@@ -649,6 +649,15 @@ TEST_F( AWSTestFixture, MultiThreading )
     fclose( ss );
 }
 
+TEST_F( AWSTestFixture, VDB_6294 )
+{
+    std::string res = try_to_parse_good(
+"922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-hold [25/Feb/2026:02:56:44 +0000] 18.204.2.104 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-055eca8ff43098453 X9JSS1E6Y9EZ46G3 REST.HEAD.OBJECT sra/SRR24901166/SRR24901166.1 \"HEAD /sra/SRR24901166/SRR24901166.1 HTTP/1.1\" 200 - - 1140085608 46 - \"-\" \"aws-cli/1.18.147 Python/2.7.18 Linux/4.14.355-275.591.amzn2.x86_64 botocore/1.18.6\" - 9YWddnPUPawlxj2QcYwXe3jz4zuyByw89/E/2djyCMDpk+1QGnbi9PpjFhDG1Av4nzmpmc6i1TPIkZlfVio21mqsFhZOELdw SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-hold.s3.amazonaws.com TLSv1.2 - - us-east-1"
+    );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "us-east-1", extract_value( res, "_extra" ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
