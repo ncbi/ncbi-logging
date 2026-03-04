@@ -104,10 +104,10 @@ $(BINDIR)/$(PREFIX)_test_parse-rel: $($(PREFIX)_TEST_PARSE_REL_OBJ)
 	$(LD) -o $@ $^  $(COMMON_REL_OBJ) -lgtest $(LDFLAGS)
 
 $(BINDIR)/$(PREFIX)_test_flex-dbg: $($(PREFIX)_TEST_FLEX_DBG_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread
+	$(LD) -o $@ $^ -lgtest -lpthread $(LDFLAGS)
 
 $(BINDIR)/$(PREFIX)_test_flex-rel: $($(PREFIX)_TEST_FLEX_REL_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread
+	$(LD) -o $@ $^ -lgtest -lpthread $(LDFLAGS)
 
 #$(BINDIR)/$(PREFIX)_test_reverse-dbg: $(CPREFIX)_Interface.cpp
 $(BINDIR)/$(PREFIX)_test_reverse-dbg: $($(PREFIX)_TEST_REVERSE_DBG_OBJ)
