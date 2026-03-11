@@ -643,12 +643,21 @@ TEST_F( AWSTestFixture, MultiThreading )
 }
 
 TEST_F( AWSTestFixture, Region )
-{
+{   // VDB-6294
     std::string res = try_to_parse_good(
 "922194806485875312b252374a3644f1feecd16802a50d4729885c1d11e1fd37 sra-pub-hold [25/Feb/2026:02:56:44 +0000] 18.204.2.104 arn:aws:sts::783971887864:assumed-role/sra-developer-instance-profile-role/i-055eca8ff43098453 X9JSS1E6Y9EZ46G3 REST.HEAD.OBJECT sra/SRR24901166/SRR24901166.1 \"HEAD /sra/SRR24901166/SRR24901166.1 HTTP/1.1\" 200 - - 1140085608 46 - \"-\" \"aws-cli/1.18.147 Python/2.7.18 Linux/4.14.355-275.591.amzn2.x86_64 botocore/1.18.6\" - 9YWddnPUPawlxj2QcYwXe3jz4zuyByw89/E/2djyCMDpk+1QGnbi9PpjFhDG1Av4nzmpmc6i1TPIkZlfVio21mqsFhZOELdw SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader sra-pub-hold.s3.amazonaws.com TLSv1.2 - - us-east-1"
     );
     ASSERT_FALSE( res.empty() );
     ASSERT_EQ( "us-east-1", extract_value( res, "region" ) );
+}
+
+TEST_F( AWSTestFixture, NoRegion )
+{   // VDB-6294
+    std::string res = try_to_parse_good(
+"7dd4dcfe9b004fb7433c61af3e87972f2e9477fa7f0760a02827f771b41b3455 sra-pub-run-odp [27/Feb/2026:23:31:47 +0000] 129.186.192.162 - J1NHY2NYN9RKVB77 REST.GET.OBJECT sra/SRR29929795/SRR29929795 \"GET /sra/SRR29929795/SRR29929795 HTTP/1.1\" 206 - 262144 13903640152 28 26 \"-\" \"mac64 sra-toolkit fasterq-dump.3.3.0 (phid=noc4b0ed3b,libc=,bmap=)\" - a6hUw94S2aSCI4EQG/O/TBiTNbN7OQ6P3MeGJDw7+7TYyWDbv00wTaDRR/4NDzclb/J4+meCdOI= - ECDHE-RSA-AES128-GCM-SHA256 - sra-pub-run-odp.s3.amazonaws.com TLSv1.2 - -"
+    );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "", extract_value( res, "region" ) );
 }
 
 extern "C"

@@ -52,7 +52,6 @@ namespace NCBI
                     p . setDebug( debug );
                     p . parse_all_lines(); // does the parsing and generates the report
                     pb = p.getParseBlock();
-    cout << s_outputs.get_review() << endl;
                 }
 
                 std::string try_to_parse_good( const std::string &line, bool debug = false )
