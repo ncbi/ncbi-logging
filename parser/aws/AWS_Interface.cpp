@@ -47,6 +47,7 @@ void AWSReceiver::set( AWS_Members m, const t_str & v )
     CASE( tls_version )
     CASE( access_point )
     CASE( acl_required )
+    CASE( region )
     CASE( _extra )
 
     default: ReceiverInterface::set((ReceiverInterface::Members)m, v);
@@ -279,6 +280,7 @@ AWSReverseBlock::format_specific_parse( const char * line, size_t line_size )
         extract_and_set( obj, formatter, "tls_version" );
         extract_and_set( obj, formatter, "access_point" );
         extract_and_set( obj, formatter, "acl_required" );
+        extract_and_set( obj, formatter, "region" );
 
         receiver . SetCategory( ReceiverInterface::cat_good );
 

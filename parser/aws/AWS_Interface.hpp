@@ -39,6 +39,7 @@ namespace NCBI
                 tls_version,
                 access_point,
                 acl_required,
+                region,
                 _extra,
                 AWS_LastMemberId = _extra
             } AWS_Members; // all are t_str values

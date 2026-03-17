@@ -10,6 +10,8 @@
 #include "ReceiverInterface.hpp"
 #include "LineSplitters.hpp"
 
+using namespace std;
+
 namespace NCBI
 {
     namespace Logging

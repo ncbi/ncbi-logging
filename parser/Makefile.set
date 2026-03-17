@@ -38,7 +38,7 @@ JWT_TOOL ?= ../../../ncbi-vdb3/jwt-tool
 
 CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/utf8proc -I$(JWT_TOOL)/tool
 
-LDFLAGS = -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+LDFLAGS += -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
 
 #################################################
 

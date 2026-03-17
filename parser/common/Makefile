@@ -110,10 +110,10 @@ cmn_test: mkdir $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
 cmn_prof: mkdir $(COMMON_PROF_OBJ) $(CMD_PROF_OBJ)
 
 $(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ) $(CMD_DBG_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
+	$(LD) $(LDFLAGS) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
 
 $(BINDIR)/test_common-rel: $(TEST_SUPPORT_REL_OBJ) $(CMD_REL_OBJ)
-	$(LD) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
+	$(LD) $(LDFLAGS) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
 
 .PHONY: common cmn_clean cmn_test
 
