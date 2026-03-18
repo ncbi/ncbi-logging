@@ -15,7 +15,7 @@ using namespace std;
 using namespace NCBI::Logging;
 using namespace ncbi;
 
-std::string tool_version( "1.0.0" );
+std::string tool_version( "1.2.0" );
 
 static JSONValueRef ToJsonString( const t_str & in )
 {
