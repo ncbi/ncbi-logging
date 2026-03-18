@@ -42,7 +42,7 @@ $(OBJDIR)/%.dbg.o: %.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
 
 $(OBJDIR)/%.rel.o: %.cpp
-	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).rel.o
+	$(CPP) $(CXXFLAGS) -O3 -march=skylake $< -o $(OBJDIR)/$(*F).rel.o
 
 $(OBJDIR)/%.prof.o: %.cpp
 	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
