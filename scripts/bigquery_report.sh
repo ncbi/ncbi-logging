@@ -171,6 +171,11 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
+    "select source, bucket as recent_bucket, count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > date_sub(current_date(), interval 1 month) GROUP BY source, bucket ORDER BY num_accessions desc"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
     "select remote_ip as null_city_ip, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export where city_name='Unknown' or city_name is null GROUP BY remote_ip, domain ORDER BY num_accessions desc"
 
 bq -q query \
