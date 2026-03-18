@@ -141,10 +141,6 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""linux64"/"linux64/g' |
             sed 's/""mac64"/"mac64/g' |
             sed 's/""windows64"/"windows64/g' | \
-            sed 's/ us-east-1$//' | \
-            sed 's/ us-east-2$//' | \
-            sed 's/ us-west-2$//' | \
-            sed 's/ ap-southeast-1$//' |\
             grep -v 'GCS Lifecycle Management' | \
             grep -v 'file-meta ncbi_location=' | \
             grep -v 'GET /?' | \
@@ -190,7 +186,10 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     ls -l
     echo "  Gzipping..."
-    gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl &
+    for x in ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl; do
+        gzip -f -9 "$x" &
+    done
+    jobs
     wait
     ls -l
 
