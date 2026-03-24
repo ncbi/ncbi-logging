@@ -1319,6 +1319,8 @@ cd "$VASTFS/uniq_ips" || exit
 rm -f "$VASTFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
 gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$VASTFS/uniq_ips/"
 
+find "$VASTFS/uniq_ips" -name "*json" -ctime +30 -delete
+
 if [ "$STRIDES_SCOPE" = "private" ]; then
     echo " ###  masking"
     QUERY=$(
