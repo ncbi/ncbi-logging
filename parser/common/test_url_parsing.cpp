@@ -440,3 +440,10 @@ TEST_F( URLTestFixture, LOGMON_217 )
     ASSERT_EQ( "NC_000001", extract_value( res, "filename" ) );
     ASSERT_EQ( ".10.1", extract_value( res, "extension" ) );
 }
+
+TEST_F( URLTestFixture, VDB_6314 )
+{
+    const std::string res = try_to_parse_good( "/Traces/solr-proxy-be/solr-proxy-be.cgi?&core=run_sel_index" );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "solr-proxy-be", extract_value( res, "filename" ) );
+}

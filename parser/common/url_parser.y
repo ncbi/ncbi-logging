@@ -323,6 +323,7 @@ query_list
 
 query
     : QMARK query_list { $$ = $2; }
+    | QMARK QUERY_SEP query_list { $$ = $3; }
     | %empty { Init_Node( $$ ); }
     ;
 

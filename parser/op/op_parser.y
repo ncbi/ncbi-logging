@@ -226,6 +226,7 @@ line_tail_elem
     | QUOTE
     | QSTR
     | NAMEVALUE
+    | DASH
     ;
 
 port
