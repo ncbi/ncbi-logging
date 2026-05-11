@@ -79,6 +79,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         fi
     fi
 
+    echo
     echo "Processing $LOG_BUCKET"
     echo "BUCKET_NAME is $BUCKET_NAME"
 
@@ -141,7 +142,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
             #                continue
             #            fi
             echo "  $x -> $newfile"
+            ls -l "$x"
             zcat "$x" > "$newfile" || true # Some files are corrupt, continue
+            ls -l "$newfile"
         done
         WILDCARD="+*"
     fi
@@ -220,7 +223,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
     # ls -lh
-
+    echo
     echo "synced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
     find . -name "$WILDCARD" -print0 | sort -z | tar -caf "$TGZ" --null --files-from -
@@ -256,6 +259,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     # cp "$TGZ" "$VASTFS/$PROVIDER/"
     echo "Done with $LOG_BUCKET"
+    echo
 done
 
 # gzip -9 -v "$LOGFILE"
