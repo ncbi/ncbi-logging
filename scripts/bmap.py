@@ -57,4 +57,6 @@ for tool in tools:
                     opts.append(arg)
         print(opts, file=sys.stderr)
         opts = " ".join(opts)
+        if opts == "":
+            opts = "(None)"
         print(f"{tool},{bmap:X},{opts}")
