@@ -57,4 +57,4 @@ for tool in tools:
                     opts.append(arg)
         print(opts, file=sys.stderr)
         opts = " ".join(opts)
-        print(f"{tool},{bmap:x},{opts}")
+        print(f"{tool},{bmap:X},{opts}")
