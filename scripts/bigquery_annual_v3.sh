@@ -44,9 +44,10 @@ fi
         query="${query//\\/}" # TODO Hack, cause I can't understand bash backtick quoting
         query="${query//$'\n'/ }"
         local cleanquery
-        cleanquery=$(echo "$query" | fmt -w 120 | tr -s ' ' | sed 's/^/  /')
-        >&2 echo "Running: $cleanquery"
-        echo "$query"
+        #cleanquery=$(echo "$query" | fmt -w 120 | tr -s ' ' | sed 's/^/  /')
+        cleanquery=$(echo "$query" | tr -s ' ' | sed 's/^/  /')
+        echo "Running:   $query" >&2
+        echo "$cleanquery"
 
         return 0
     }
@@ -73,15 +74,19 @@ fi
 
         query=$(clean_query "$query")
 
-        # --dry_run={true|false}
-
-        dry=$(bq query \
+        set +e
+        if !  dry=$(bq query \
             --dry_run=true \
             --project_id ncbi-logmon \
             --use_legacy_sql=false \
             --batch=true \
-            "$query")
-
+            "$query") 2> "$TMP/err";
+        then
+            echo "Query problem with $query"
+            cat "$TMP/err"
+            exit 0
+        fi
+        set -e
         estimate_cost "$dry"
 
         bq query \
@@ -207,8 +212,12 @@ if [ "$skipload" = false ]; then
     gsutil du -s -h "$MIRROR_BUCKET/gs_$STRIDES_SCOPE"
     gsutil du -s -h "$MIRROR_BUCKET/op_$STRIDES_SCOPE"
     gsutil du -s -h "$MIRROR_BUCKET/s3_$STRIDES_SCOPE"
+    gsutil du -s -h gs://logmon_objects
     gsutil du -s -h gs://logmon_objects/gs
     gsutil du -s -h gs://logmon_objects/s3
+    gsutil du -s -h gs://logmon_logs_parsed_us
+    gsutil du -s -h gs://logmon_logs
+    gsutil du -s -h gs://logmon_export
 
     # TODO: Partition/cluster large tables for incremental inserts and retrievals
     # TODO: Materialized views that automatically refresh
@@ -998,7 +1007,7 @@ QUERY=$(
     FROM (
     select remote_ip from \\\`ncbi-logmon.strides_analytics.summary_grouped\\\`
     union all
-    select remote_ip from \\\`ncbi-logmon.strides_analytics.summary_export\\\`
+    select remote_ip from \\\`ncbi-logmon.strides_analytics.summary_export_all\\\`
     union all
     select remote_ip from \\\`ncbi-logmon.strides_analytics_private.summary_grouped\\\`
         )
@@ -1278,7 +1287,37 @@ bq_query "$QUERY"
 
 #bq_query "DELETE FROM $DATASET.summary_union WHERE source='OP'" # and start_ts < '2021-01-01'"
 
-bq_query_to_table summary_export "select * from $DATASET.summary_union where source!='OP' UNION ALL select * from $DATASET.summary_union_op"
+bq_query_to_table summary_export_all "select * from $DATASET.summary_union where source!='OP' UNION ALL select * from $DATASET.summary_union_op"
+
+# user_agent
+#  Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36
+#  linux64 ncbi-vdb.3.2.1 (phid=noc26fenos,libc=,bmap=nob)
+#  linux64 sra-toolkit sra-stat.3.4.1 (phid=nocbc09nos,libc=,bmap=nob)
+#  windows64 sra-toolkit prefetch.exe.3.4.1 (phid=noc936a099,libc=,bmap=nob)
+#  linux64 sra-toolkit fastq-dump.3.2.1 (phid=noc5b5207d,libc=,bmap=8100800)
+#   ... bmap=8100800
+#   ... bmap=2128090
+#   ... bmap=2128010
+
+# tools=['prefetch', 'fasterq-dump', 'fastq-dump', 'sam-dump', 'sra-pileup', 'vdb-dump']
+QUERY=$(
+    cat <<- ENDOFQUERY
+    SELECT *
+        EXCEPT (bmap,options,vdb_tool),
+        options as vdb_options,
+        regexp_extract(user_agent,r'prefetch|fasterq-dump|fastq-dump|sam-dump|sra-pileup|vdb-dump') as vdb_tool
+    FROM \\\`ncbi-logmon.$DATASET.summary_export_all\\\` sea
+    LEFT JOIN
+    \\\`ncbi-logmon.$DATASET.vdb_cli\\\` vdb_cli
+    ON
+    vdb_cli.vdb_tool=regexp_extract(user_agent,r'prefetch|fasterq-dump|fastq-dump|sam-dump|sra-pileup|vdb-dump')
+    AND
+    vdb_cli.bmap=substr(regexp_extract(user_agent,r'bmap=[0-9A-F]+'),6)
+ENDOFQUERY
+)
+
+bq_query_to_table summary_export "$QUERY"
+
 
 
 echo " ###  export to GS"
