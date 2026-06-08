@@ -238,6 +238,10 @@ else
 #        --format "$FORMAT" \
 #        "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from $DATASET.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from $DATASET.objects) order by unlisted_bucket"
 
+    bq -q query \
+        --use_legacy_sql=false \
+        --format "$FORMAT" \
+        "select vdb_tool, vdb_options, count(*) as cnt from $DATASET.summary_export where vdb_options is not null group by vdb_tool, vdb_options order by cnt desc limit 30"
 fi # public
 
 for SOURCE in GS S3 OP; do
