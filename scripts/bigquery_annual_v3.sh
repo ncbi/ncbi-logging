@@ -1431,7 +1431,7 @@ else # not private
     bq rm --project_id ncbi-logmon -f "$DATASET.summary_union" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.summary_union_op" || true
-    bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_all" || true
+    # bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_all" || true
 fi # private
 
 echo "bigquery_annual_v3.sh complete"
