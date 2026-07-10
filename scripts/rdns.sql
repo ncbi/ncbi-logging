@@ -1854,7 +1854,7 @@ where ip like '156.145.%';
 
 update rdns
 set domain='umn.edu (University of Minnesota)'
-where ip like '128.101.%';
+where ip like '128.101.%' or ip like '131.212.%' or ip like '134.84.%' or ip like '146.57.%' or ip like '160.94.%' or ip like '192.35.86.%' or ip like '192.154.%';
 
 update rdns
 set domain='buffalo.edu (SUNY Buffalo)'
