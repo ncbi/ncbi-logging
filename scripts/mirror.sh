@@ -79,6 +79,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         fi
     fi
 
+    echo
     echo "Processing $LOG_BUCKET"
     echo "BUCKET_NAME is $BUCKET_NAME"
 
@@ -113,7 +114,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
         #        fi
 
         if [ "$YESTERDAY" -lt "20180701" ]; then
-            files=$(find "$PANFS/restore" -type f -name "*$YESTERDAY*")
+            files=$(find "$VASTFS/restore" -type f -name "*$YESTERDAY*")
         elif [ "$YESTERDAY" -gt "20200706" ]; then
             files=""
             echo "Recent, LOG_BUCKET=$LOG_BUCKET"
@@ -125,7 +126,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             #            files=$(/bin/ls -1 $LOG_BUCKET)
             #            files=$(find $LOG_BUCKET -type f)
         else
-            files=$(find "$PANFS/sra_prod/$YESTERDAY" -type f -name "*$YESTERDAY*")
+            files=$(find "$VASTFS/sra_prod/$YESTERDAY" -type f -name "*$YESTERDAY*")
         fi
         echo "files is $files"
         LOG_BUCKET="OP-${BUCKET_NAME}"
@@ -141,13 +142,15 @@ for LOG_BUCKET in "${buckets[@]}"; do
             #                continue
             #            fi
             echo "  $x -> $newfile"
+            ls -l "$x"
             zcat "$x" > "$newfile" || true # Some files are corrupt, continue
+            ls -l "$newfile"
         done
         WILDCARD="+*"
     fi
 
     if [ "$PROVIDER" = "S3" ]; then
-        MIRROR="$PANFS/s3_mirror/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
+        MIRROR="$VASTFS/s3_mirror/$PROVIDER/$LOG_BUCKET/$YESTERDAY"
         mkdir -p "$MIRROR"
         cd "$MIRROR" || exit
 
@@ -220,7 +223,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
 
     # ls -lh
-
+    echo
     echo "synced to $MIRROR, tarring $WILDCARD to $TGZ ..."
 
     find . -name "$WILDCARD" -print0 | sort -z | tar -caf "$TGZ" --null --files-from -
@@ -254,8 +257,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
         rm -rf "$MIRROR"
     fi
 
-    # cp "$TGZ" "$PANFS/$PROVIDER/"
+    # cp "$TGZ" "$VASTFS/$PROVIDER/"
     echo "Done with $LOG_BUCKET"
+    echo
 done
 
 # gzip -9 -v "$LOGFILE"

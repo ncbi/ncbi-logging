@@ -18,19 +18,17 @@ pragma page_size = 32768;
 
 
 drop table if exists uniq_ips;
-drop table if exists uniq_ips_public;
-drop table if exists uniq_ips_private;
-create table uniq_ips_public (line text);
-create table uniq_ips_private (line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips  uniq_ips_private
-select count(*) as uniq_ips_public_count from uniq_ips_public;
-select count(*) as uniq_ips_private_count from uniq_ips_private;
+--drop table if exists uniq_ips_public;
+--drop table if exists uniq_ips_private;
+--create table uniq_ips_public (line text);
+--create table uniq_ips_private (line text);
+create table uniq_ips (line text);
+.import /netmnt/vast01/sra/strides_analytics/uniq_ips/uniq_ips  uniq_ips
+--select count(*) as uniq_ips_public_count from uniq_ips;
+--select count(*) as uniq_ips_public_count from uniq_ips_public;
+--select count(*) as uniq_ips_private_count from uniq_ips_private;
 
-create table uniq_ips as
-    select distinct line from
-    (select line from uniq_ips_public
-        union all
-     select line from uniq_ips_private);
+--create table uniq_ips as select distinct line from (select line from uniq_ips_public union all select line from uniq_ips_private);
 
 select count(*) as uniq_ips_count from uniq_ips;
 
@@ -43,7 +41,7 @@ create unique index ip_idx on rdns(ip);
 
 drop table if exists cloud_ips_json;
 create table cloud_ips_json(line text);
-.import /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/cloud_ips.jsonl cloud_ips_json
+.import /netmnt/vast01/sra/strides_analytics/cloud_ips.jsonl cloud_ips_json
 
 drop table if exists cloud_ips;
 create table cloud_ips as
@@ -373,7 +371,10 @@ WHERE IP LIKE '222.178.%'
   OR IP LIKE '60.162.%'
   OR IP LIKE '60.184.%'
   OR IP LIKE '61.146.%'
-  OR IP LIKE '14.23.%';
+  OR IP LIKE '58.41.%'
+  OR IP LIKE '14.23.%'
+  OR IP LIKE '2409:8000%'
+;
 
 UPDATE RDNS
 SET DOMAIN = 'pku.edu.cn'
@@ -478,7 +479,12 @@ OR IP LIKE '223.7%'
 OR IP LIKE '223.8%'
 OR IP LIKE '223.9%'
 OR IP LIKE '223.1%'
-OR IP LIKE '111.5%';
+OR IP LIKE '111.5%'
+OR IP LIKE '2409:8000%';
+
+
+
+
 
 
 UPDATE RDNS
@@ -585,6 +591,7 @@ WHERE IP LIKE '119.188.52.%'
   OR IP LIKE '219.156.%'
   OR IP LIKE '219.157.%'
   OR IP LIKE '221.206.%'
+  OR IP LIKE '211.9%'
   OR IP LIKE '175.4%';
 
 
@@ -646,6 +653,8 @@ OR IP LIKE '111.78.%'
 OR IP LIKE '111.79.%'
 OR IP LIKE '113.128.%'
 OR IP LIKE '113.129.%'
+OR IP LIKE '114.8%'
+OR IP LIKE '114.9%'
 OR IP LIKE '171.2%'
 OR IP LIKE '171.60.%'
 OR IP LIKE '171.61.%'
@@ -1057,7 +1066,7 @@ WHERE IP LIKE '10.10.8%' OR IP LIKE '130.14.%';
 UPDATE RDNS
 SET DOMAIN = 'ncbi.nlm.nih.gov (NCBI)'
 WHERE IP='52.54.203.43' OR IP='35.245.245.236' or IP='35.245.169.105'
-or IP='35.245.47.214';
+or IP='35.245.47.214' or IP='34.85.237.116';
 
 UPDATE RDNS
 SET DOMAIN = 'nih.gov (NIH)'
@@ -1133,7 +1142,15 @@ WHERE IP LIKE '128.227.%';
 
 UPDATE RDNS
 SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
-WHERE IP LIKE '65.196.%' or ip like '71.174.%'
+WHERE IP LIKE '65.196.%'
+or ip like '71.174.%'
+or IP LIKE '108.4%'
+or ip like '72.87.%'
+or ip like '72.88.%'
+or ip like '72.89.%'
+or ip like '72.90.%'
+or ip like '72.91.%'
+or ip like '72.92.%'
 or ip like '173.6%'
 or ip like '173.7%'
 or ip like '100.32.%'
@@ -1146,12 +1163,30 @@ or ip like '100.38.%'
 or ip like '100.39.%'
 or ip like '100.40.%'
 or ip like '100.41.%'
+or ip like '2600:40%'
+or ip like '2600:100%'
+or ip like '2600:101%'
 ;
 
 
+-- level 3 is 4.0 - 4.127
 UPDATE RDNS
 SET DOMAIN = 'level3.com (Level 3 Communications)'
-WHERE IP LIKE '4.16.%' or IP LIKE '8.29.8%';
+WHERE ip LIKE '8.29.8%'
+or ip like '4.%'
+or ip like '4.0.%'
+or ip like '4.1.%'
+or ip like '4.2.%'
+or ip like '4.3.%'
+or ip like '4.4.%'
+or ip like '4.5.%'
+or ip like '4.6.%'
+or ip like '4.7.%'
+or ip like '4.8.%'
+or ip like '4.9.%'
+or ip like '4.1%'
+;
+--Azure will take 4.128-255
 
 
 UPDATE RDNS
@@ -1164,7 +1199,8 @@ WHERE
 IP LIKE '172.3%'
 OR IP LIKE '172.4%'
 OR IP LIKE '172.5%'
-OR IP LIKE '172.6%';
+OR IP LIKE '172.6%'
+OR IP LIKE '2607:fb9%';
 
 
 UPDATE RDNS
@@ -1350,12 +1386,9 @@ SET DOMAIN = 'bit.nl (Keygene N.V.)'
 WHERE IP LIKE '213.136.28.%';
 
 UPDATE RDNS
-SET DOMAIN = 'verizonbusiness.com (Verizon Business)'
-WHERE IP LIKE '108.4%';
-
-UPDATE RDNS
 SET DOMAIN = 'comcast.net (Comcast Cable)'
-WHERE IP LIKE '69.140.%' or IP LIKE '69.251.%';
+WHERE IP LIKE '69.140.%' or IP LIKE '69.251.%'
+or ip like '2601:6%';
 
 UPDATE RDNS
 SET DOMAIN = 'toh.ca (The Ottawa Hospital)'
@@ -1415,6 +1448,10 @@ SET DOMAIN = 'nyu.edu (New York University)'
 WHERE IP LIKE '216.165.%';
 
 UPDATE RDNS
+SET DOMAIN = 'stonybrook.edu (State University of New York at Stony Brook)'
+WHERE IP LIKE '130.245.%';
+
+UPDATE RDNS
 SET DOMAIN = 'embl.org (European Molecular Biology Laboratory)'
 WHERE IP LIKE '194.94.4%'
 OR IP LIKE '185.111.6%';
@@ -1444,7 +1481,8 @@ WHERE IP LIKE '137.53.%';
 
 UPDATE RDNS
 SET DOMAIN = 'cox.com (Cox Communications Inc.)'
-WHERE IP LIKE '98.17%' OR IP LIKE '98.18%';
+WHERE IP LIKE '98.17%' OR IP LIKE '98.18%'
+or IP LIKE '2600:88%';
 
 UPDATE RDNS
 SET DOMAIN = 'icr.ac.uk (Institute of Cancer Research)'
@@ -1566,6 +1604,9 @@ OR IP LIKE '211.67.%'
 OR IP LIKE '211.68.%'
 OR IP LIKE '211.69.%'
 OR IP LIKE '219.246.7%'
+OR IP LIKE '222.196.%'
+OR IP LIKE '222.197.%'
+OR IP LIKE '222.198.%'
 OR IP LIKE '200a:da:%'
 ;
 
@@ -1589,6 +1630,11 @@ UPDATE RDNS
 SET DOMAIN='Alibaba Cloud (alibaba.com)'
 WHERE IP LIKE '47.25%'
 OR IP LIKE '47.116.%'
+OR IP LIKE '47.91.%'
+OR IP LIKE '47.92.%'
+OR IP LIKE '47.93.%'
+OR IP LIKE '47.94.%'
+OR IP LIKE '47.95.%'
 OR IP LIKE '101.132.%'
 OR IP LIKE '101.133.%';
 
@@ -1606,7 +1652,8 @@ WHERE IP LIKE '141.65.%';
 
 UPDATE RDNS
 SET DOMAIN='Friedrich-Loeffler-Institut (fli.de)'
-where IP LIKE '193.22.11%';
+where IP LIKE '193.22.11%'
+or IP LIKE '2001:638%';
 
 UPDATE RDNS
 SET DOMAIN='Edinburgh University (ed.ac.uk)'
@@ -1651,7 +1698,11 @@ UPDATE RDNS
 SET DOMAIN='rr.com (Charter Communications)'
 WHERE IP LIKE '76.8%' OR
 IP LIKE '76.9%' OR
-IP LIKE '68.172.%';
+IP LIKE '68.172.%' OR
+IP LIKE '2603:80%' OR
+IP LIKE '2603:60%' OR
+IP LIKE '2600:6C%'
+;
 
 UPDATE RDNS
 SET DOMAIN='kumc.edu (University of Kansas Medical Center)'
@@ -1663,7 +1714,7 @@ where IP LIKE '129.130.%';
 
 UPDATE RDNS
 SET DOMAIN='lanl.gov (Los Alamos National Laboratory)'
-WHERE IP LIKE '192.12.184.%';
+WHERE IP LIKE '192.12.184.%' OR IP LIKE '128.165.%';
 
 UPDATE RDNS
 SET DOMAIN='cnnic.cn (Beijing Zhongbangyatong Telecom Technology)'
@@ -1786,7 +1837,8 @@ or ip like '104.187.%'
 or ip like '104.188.%'
 or ip like '104.189.%'
 or ip like '104.190.%'
-or ip like '104.191.%' ;
+or ip like '104.191.%'
+or ip like '2600:170%';
 
 update rdns
 set domain='nih.go.jp (Japan National Institute of Infectious Diseases)'
@@ -1802,7 +1854,7 @@ where ip like '156.145.%';
 
 update rdns
 set domain='umn.edu (University of Minnesota)'
-where ip like '128.101.%';
+where ip like '128.101.%' or ip like '131.212.%' or ip like '134.84.%' or ip like '146.57.%' or ip like '160.94.%' or ip like '192.35.86.%' or ip like '192.154.%';
 
 update rdns
 set domain='buffalo.edu (SUNY Buffalo)'
@@ -1909,7 +1961,9 @@ where ip like '137.205.%';
 
 update rdns
 set domain='Vodafone NRW GmbH (unitymedia.de)'
-where ip like '92.50.%';
+where ip like '92.50.%'
+or ip like '2402:81%'
+or ip like '2402:3a80%';
 
 update rdns
 set domain='Centurylink (lumen.com)'
@@ -1962,22 +2016,22 @@ ip like '80.39.%';
 update rdns
 set domain='Jackson Laboratory (jax.org)'
 where
-ip like '64.147.48' or
-ip like '64.147.49' or
-ip like '64.147.50' or
-ip like '64.147.51' or
-ip like '64.147.52' or
-ip like '64.147.53' or
-ip like '64.147.54' or
-ip like '64.147.55' or
-ip like '64.147.56' or
-ip like '64.147.57' or
-ip like '64.147.58' or
-ip like '64.147.59' or
-ip like '64.147.60' or
-ip like '64.147.61' or
-ip like '64.147.62' or
-ip like '64.147.63';
+ip like '64.147.48.%' or
+ip like '64.147.49.%' or
+ip like '64.147.50.%' or
+ip like '64.147.51.%' or
+ip like '64.147.52.%' or
+ip like '64.147.53.%' or
+ip like '64.147.54.%' or
+ip like '64.147.55.%' or
+ip like '64.147.56.%' or
+ip like '64.147.57.%' or
+ip like '64.147.58.%' or
+ip like '64.147.59.%' or
+ip like '64.147.60.%' or
+ip like '64.147.61.%' or
+ip like '64.147.62.%' or
+ip like '64.147.63.%';
 
 update rdns
 set domain='Mayo Clinic (mayo.edu)'
@@ -2089,12 +2143,89 @@ update rdns
 set domain='Merit Networks (merit.edu)'
 where ip like '198.1%';
 
+update rdns
+set domain='TOT-NET (totisp.net)'
+where ip like '113.53.%';
+
+update rdns
+set domain='Vietnam Posts and Telecommunications Group (vnpt.vn)'
+where ip like '200e:ee0%'
+or ip like '2001:ee%';
+
+update rdns
+set domain='Bharti Airtel Office (airtel.com)'
+where ip like '2401:4900:%';
+
+update rdns
+set domain='Saudi Telecom (stc.com.sa)'
+where ip like '2001:16a%';
+
+update rdns
+set domain='Zain Group (sz.zain.com)'
+where ip like '2a02:cb80:4%';
+
+update rdns
+set domain='Oracle Corpoartion (oracle.com)'
+where
+ip like '129.144.%' or
+ip like '129.145.%' or
+ip like '129.146.%' or
+ip like '129.147.%' or
+ip like '129.148.%' or
+ip like '129.149.%' or
+ip like '129.150.%' or
+ip like '129.151.%' or
+ip like '129.152.%' or
+ip like '129.153.%' or
+ip like '129.154.%' or
+ip like '129.155.%' or
+ip like '129.156.%' or
+ip like '129.157.%' or
+ip like '129.158.%' or
+ip like '129.159.%' ;
+
+update rdns
+set domain='Argonne National Laboratory (anl.gov)'
+where  ip like '140.221.%';
+
+update rdns
+set domain='Reliance Jio Infocomm Limited (ril.com)'
+where ip like '2409:40%'
+or ip like '2405:20%';
+
+update rdns
+set domain='Sky Broadband (sky.uk)'
+where ip like '2a02:%';
+
+update rdns
+set domain='Claro NXT Telecomunicacoes Ltda (virtua.com.br)'
+where ip like '2804:%';
+
+update rdns
+set domain='British Telcom (bt.com)'
+where ip like '2a00:23%';
+
+update rdns
+set domain='Universidad de Alicante (ua.es)'
+where ip like '193.154.%' or ip like '193.145.%';
 
 
+update rdns
+set domain='Niigatga University (niigata-u.ac.jp)'
+where ip like '133.25.%';
 
+update rdns
+set domain='Philippine Long Distance Telephone Co. (pltd.net)'
+where ip like '2004:4450%';
 
-----------------------------------------------------------------
+update rdns
+set domain='Virgin Media Consumer Broadband UK (virginmedia.com)'
+where ip like '82.28.8%'
+or ip like '82.28.9%';
 
+update rdns
+set domain='Wellcome Trust Sanger Institute (jisc.ac.uk)'
+where ip like '193.62.2%';
 
 
 
@@ -2105,7 +2236,40 @@ WHERE DOMAIN = 'bc.googleusercontent.com (GCP)'
 
 UPDATE RDNS
 SET DOMAIN='microsoft.com (Azure Cloud)'
-where ip like '2603:1%' or ip like '2a01:111%' or ip like '2620:1ec%' or ip like '2602:f%';
+where ip like '2603:1%' or ip like '2a01:111%' or ip like '2620:1ec%' or ip like '2602:f%'
+or ip like '4.128.%'
+or ip like '4.129.%'
+or ip like '4.130.%'
+or ip like '4.131.%'
+or ip like '4.132.%'
+or ip like '4.133.%'
+or ip like '4.134.%'
+or ip like '4.135.%'
+or ip like '4.136.%'
+or ip like '4.137.%'
+or ip like '4.139.%'
+or ip like '4.140.%'
+or ip like '4.141.%'
+or ip like '4.142.%'
+or ip like '4.143.%'
+or ip like '4.144.%'
+or ip like '4.145.%'
+or ip like '4.146.%'
+or ip like '4.147.%'
+or ip like '4.148.%'
+or ip like '4.149.%'
+or ip like '4.15%'
+or ip like '4.16%'
+or ip like '4.17%'
+or ip like '4.18%'
+or ip like '4.19%'
+or ip like '4.20%'
+or ip like '4.21%'
+or ip like '4.22%'
+or ip like '4.23%'
+or ip like '4.24%'
+or ip like '4.25%'
+;
 
 UPDATE RDNS
 SET DOMAIN='amazon.com (AWS Amazon)'
@@ -2288,10 +2452,10 @@ order by count(*) desc
 limit 10;
 
 .width 120 120
--- gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl
 .print "hints"
-.print "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl"
+.print "gcloud config set account 253716305623-compute@developer.gserviceaccount.com"
 .print "export CLOUDSDK_CORE_PROJECT=ncbi-logmon"
+.print "gsutil cp /tmp/rdns.jsonl gs://logmon_cfg/rdns.jsonl"
 .print "bq rm -f strides_analytics.rdns"
 .print "bq load --source_format=NEWLINE_DELIMITED_JSON --autodetect strides_analytics.rdns gs://logmon_cfg/rdns.jsonl"
 .print "rm -f rdns.db"

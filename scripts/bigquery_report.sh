@@ -11,7 +11,8 @@ fi
 export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
-/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
+#/opt/panfs/bin/pan_df -H /panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/
+df -HT "$VASTFS"
 
 #bq -q query \
 #    --format "$FORMAT" \
@@ -29,7 +30,8 @@ fi
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "WITH day_counts AS ( select day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests FROM $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2021-01-01' ) group by day having s3_requests <  $REQUEST_CUTOFF or gs_requests < $REQUEST_CUTOFF or op_requests < $REQUEST_CUTOFF ), pop AS ( SELECT * FROM UNNEST(GENERATE_DATE_ARRAY('2021-01-01', current_date(), INTERVAL 1 DAY)) AS missing_day) select missing_day, gs_requests, s3_requests, op_requests from day_counts, pop where missing_day=day order by day desc "
+    --max_rows 1000 \
+    "WITH day_counts AS ( select day, sum(s3_requests) as s3_requests, sum(gs_requests) as gs_requests, sum(op_requests) as op_requests from ( SELECT datetime_trunc(start_ts, day) as day, case when source='S3' then num_requests else 0 end as s3_requests, case when source='GS' then num_requests else 0 end as gs_requests, case when source='OP' then num_requests else 0 end as op_requests FROM $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and start_ts > '2019-01-01' ) group by day having s3_requests <  $REQUEST_CUTOFF or gs_requests < $REQUEST_CUTOFF or op_requests < $REQUEST_CUTOFF ), pop AS ( SELECT * FROM UNNEST(GENERATE_DATE_ARRAY('2019-01-01', current_date(), INTERVAL 1 DAY)) AS missing_day) select missing_day, gs_requests, s3_requests, op_requests from day_counts, pop where missing_day=day order by day desc "
 
 #bq -q query \
 #    --format "$FORMAT" \
@@ -59,22 +61,22 @@ bq -q query \
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
-    "select source, count(*) as external_records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source order by source "
+    "select source, count(*) as external_records, sum(num_requests) as total_requests_ext, sum(bytes_sent) as total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source order by source, total_bytes_sent desc "
 
 bq -q query \
     --format "$FORMAT" \
     --use_legacy_sql=false \
-    "select source, count(*) as internal_records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain like '%nih.gov%' group by source order by source "
+    "select source, count(*) as internal_records, sum(num_requests) as total_requests_int, sum(bytes_sent) as total_bytes_sent from $DATASET.summary_export where domain like '%nih.gov%' group by source order by source, total_bytes_sent desc"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select source, count(*) as records, regexp_extract(bucket,r' \(.+\)') as format, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, format order by source, format"
+    "select source, count(*) as records, regexp_extract(bucket,r' \(.+\)') as format, sum(num_requests) as total_requests_ext, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, format order by source, format"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select datetime_trunc(start_ts, month) as month, source, count(*) as records, sum(num_requests) as total_requests, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, month order by month desc"
+    "select datetime_trunc(start_ts, month) as month, source, count(*) as records, sum(num_requests) as total_requests_ext, sum(bytes_sent) total_bytes_sent from $DATASET.summary_export where domain not like '%nih.gov%' group by source, month order by month desc"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -95,7 +97,7 @@ bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     --max_rows 10000 \
-    "select datetime_trunc(start_ts, day) as day, source, count(*) as records, sum(num_requests) as total_download_requests, sum(bytes_sent) total_bytes_downloaded from $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and domain not like '%nih.gov%' and start_ts >= '2022-06-01' group by source, day order by day desc, source limit 50"
+    "select datetime_trunc(start_ts, day) as day, source, count(*) as records, sum(num_requests) as total_download_requests, sum(bytes_sent) total_bytes_downloaded from $DATASET.summary_export where (http_operations like '%GET%' or http_operations like '%HEAD%' ) and domain not like '%nih.gov%' and start_ts >= '2022-06-01' group by source, day order by source, day desc limit 50"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -110,7 +112,7 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "SELECT source, domain as unknown_domain, remote_ip, count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export where domain like '%known%' or domain is null  group by source, domain, remote_ip order by num_accessions desc limit 10"
+    "SELECT source, domain as unknown_domain, remote_ip, count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export where (domain like '%known%' or domain is null) and start_ts > '2025-01-01' group by source, domain, remote_ip order by num_accessions desc limit 10"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -139,32 +141,37 @@ bq -q query \
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "SELECT remote_ip as possible_mirror, domain, source, count(distinct accession) as uniq_accs  FROM ncbi-logmon.$DATASET.summary_export where domain not like '%nih.gov%' and start_ts > '2020-05-01' group by remote_ip, source, domain order by uniq_accs desc limit 10"
+    "SELECT remote_ip as possible_mirror, domain, source, count(distinct accession) as uniq_accs  FROM ncbi-logmon.$DATASET.summary_export where domain not like '%nih.gov%' and start_ts > '2025-01-01' group by remote_ip, source, domain order by uniq_accs desc limit 10"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "SELECT source, domain, remote_ip, COUNT(DISTINCT accession) AS numacc FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > '2019-03-01' and domain not like '%nih.gov%' GROUP BY source, domain, remote_ip ORDER BY numacc DESC LIMIT 100"
+    "SELECT source, domain, remote_ip, COUNT(DISTINCT accession) AS numacc FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > '2025-01-01' and domain not like '%nih.gov%' GROUP BY source, domain, remote_ip ORDER BY numacc DESC LIMIT 100"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "SELECT source, domain, COUNT(DISTINCT accession) AS numacc FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > '2019-03-01' and domain not like '%nih.gov%' GROUP BY source, domain ORDER BY numacc DESC LIMIT 100"
+    "SELECT source, domain, COUNT(DISTINCT accession) AS numacc FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > '2025-01-01' and domain not like '%nih.gov%' GROUP BY source, domain ORDER BY numacc DESC LIMIT 100"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select source, datetime_trunc(start_ts, day) as day, remote_ip as ip_lots_accessions, domain, count(distinct accession) AS num_accessions_busy FROM ncbi-logmon.$DATASET.summary_export WHERE source!='OP' and start_ts > '2019-03-01' and domain not like '%nih.gov%' GROUP BY day, source, domain, remote_ip having num_accessions_busy > 5000 ORDER BY day, source DESC LIMIT 1000"
+    "select source, datetime_trunc(start_ts, day) as day, remote_ip as ip_lots_accessions, domain, count(distinct accession) AS num_accessions_busy FROM ncbi-logmon.$DATASET.summary_export WHERE source!='OP' and start_ts > '2025-01-01' and domain not like '%nih.gov%' GROUP BY day, source, domain, remote_ip having num_accessions_busy > 5000 ORDER BY day, source DESC LIMIT 1000"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
-    "select source, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > '2019-03-01' GROUP BY source, domain ORDER BY num_accessions desc limit 10"
+    "select source, domain, count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > '2025-01-01' GROUP BY source, domain ORDER BY num_accessions desc limit 10"
 
 bq -q query \
     --use_legacy_sql=false \
     --format "$FORMAT" \
     "select source, bucket , count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export GROUP BY source, bucket ORDER BY num_accessions desc"
+
+bq -q query \
+    --use_legacy_sql=false \
+    --format "$FORMAT" \
+    "select source, bucket as recent_bucket, count(distinct accession) as num_accessions FROM ncbi-logmon.$DATASET.summary_export WHERE start_ts > date_sub(current_date(), interval 1 month) GROUP BY source, bucket ORDER BY num_accessions desc"
 
 bq -q query \
     --use_legacy_sql=false \
@@ -231,6 +238,10 @@ else
 #        --format "$FORMAT" \
 #        "SELECT distinct source || '/' || regexp_extract(bucket,r'^[\S]+') as unlisted_bucket from $DATASET.summary_export where source || '/' || regexp_extract(bucket,r'^[\S]+') not in (select distinct source || '/' || bucket from $DATASET.objects) order by unlisted_bucket"
 
+    bq -q query \
+        --use_legacy_sql=false \
+        --format "$FORMAT" \
+        "select vdb_tool, vdb_options, count(*) as cnt from $DATASET.summary_export where vdb_options is not null group by vdb_tool, vdb_options order by cnt desc limit 30"
 fi # public
 
 for SOURCE in GS S3 OP; do

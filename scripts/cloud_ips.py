@@ -6,11 +6,12 @@ import sys
 import urllib.request
 
 # Usage:
+# 0) sort -u uniq_ips* into uniq_ips file
 # 1) update uniq_ips below, private usually later
-UNIQIPS = "/panfs/traces01.be-md.ncbi.nlm.nih.gov/strides-analytics/uniq_ips/uniq_ips"
+UNIQIPS = "/netmnt/vast01/sra/strides_analytics/uniq_ips/uniq_ips"
 # 2) https://www.microsoft.com/en-us/download/details.aspx?id=56519
-SERVICE_TAGS = "https://download.microsoft.com/download/7/1/d/71d86715-5596-4529-9b13-da13a5de5b63/ServiceTags_Public_20250512.json"
-# 3) cloud_ips.py > $PANFS/cloud_ips.jsonl
+SERVICE_TAGS = "https://download.microsoft.com/download/7/1/d/71d86715-5596-4529-9b13-da13a5de5b63/ServiceTags_Public_20260706.json"
+# 3) ./cloud_ips.py > $VASTFS/cloud_ips.jsonl
 # 4) run rdns.sql
 
 

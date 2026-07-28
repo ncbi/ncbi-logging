@@ -93,13 +93,9 @@ log_aws
       aws_auth SPACE
       aws_host_hdr SPACE
       { aws_start_TLS_vers( scanner ); } aws_tls_vers { aws_pop_state( scanner ); } SPACE
-      aws_accessPoint
+      aws_accessPoint SPACE
+      aws_aclRequired
       tail;
-
-tail
-    : SPACE aws_aclRequired rest_of_line
-    | %empty    { SET_VALUE( AWSReceiver::acl_required, EmptyTSTR ); };
-    ;
 
 dash
     : DASH                  { EMPTY_TSTR($$); }
@@ -129,6 +125,12 @@ aws_auth       : string_or_dash             { SET_VALUE( AWSReceiver::auth_type,
 aws_host_hdr   : string_or_dash             { SET_VALUE( AWSReceiver::host_header, $1 ); };
 aws_accessPoint: string_or_dash             { SET_VALUE( AWSReceiver::access_point, $1 ); };
 aws_aclRequired: string_or_dash             { SET_VALUE( AWSReceiver::acl_required, $1 ); };
+aws_region     : string_or_dash             { SET_VALUE( AWSReceiver::region, $1 ); };
+
+tail
+    : SPACE aws_region rest_of_line
+    | %empty    { SET_VALUE( AWSReceiver::region, EmptyTSTR ); };
+    ;
 
 aws_key
     : PATHSTR               {

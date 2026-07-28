@@ -119,6 +119,7 @@ $(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ) $(CMD_DBG_OBJ)
 
 $(BINDIR)/test_common-rel: $(TEST_SUPPORT_REL_OBJ) $(CMD_REL_OBJ)
 	$(LD) -o $@ $^ $(LDFLAGS_DBG) -lgtest
+	$(LD) $(LDFLAGS) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
 
 .PHONY: common cmn_clean cmn_test
 

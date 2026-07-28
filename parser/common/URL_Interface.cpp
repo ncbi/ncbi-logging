@@ -48,6 +48,7 @@ URLParseBlock::format_specific_parse( const char * line, size_t line_size )
     url_set_debug( m_debug ? 1 : 0, m_sc );   // flex
 
     YY_BUFFER_STATE bs = url_scan_bytes( line, line_size, m_sc );
+
     int ret = url_parse( m_sc, & m_receiver );
     url__delete_buffer( bs, m_sc );
 

@@ -177,13 +177,16 @@ for LOG_BUCKET in "${buckets[@]}"; do
             < "$BASE.good.jsonl" &
 
         set +e
+        # ' /?' removes S3 listings
         tar -xaOf "$TGZ" "$WILDCARD" |
             sed 's/"""linux64""/"linux64/g' |
             sed 's/"""linux64"/"linux64/g' |
             sed 's/""linux64"/"linux64/g' |
             sed 's/""mac64"/"mac64/g' |
             sed 's/""windows64"/"windows64/g' | \
+            grep -v 'GCS Lifecycle Management' | \
             grep -v 'file-meta ncbi_location=' | \
+            grep -v 'GET /?' | \
             time "$PARSER_BIN" -f -t 2 "$BASE" \
                 > stdout."$BASE" \
                 2> stderr."$BASE"
@@ -193,7 +196,6 @@ for LOG_BUCKET in "${buckets[@]}"; do
         head -v stderr."$BASE"
         echo "==="
 
-            #grep -v 'GCS Lifecycle Management' | \
         pwd
         ls -l
 
@@ -240,7 +242,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
         #fi
 
         echo "  Gzipping ..."
-        gzip -f -v ./*recognized."$BASE"*jsonl
+        for x in ./*recognized."$BASE"*jsonl; do
+            gzip -9 -f "$x" &
+        done
+        jobs
+        wait
         find ./ -name "*$BASE*" -size 0c -delete
 
         {

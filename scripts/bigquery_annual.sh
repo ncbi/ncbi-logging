@@ -18,7 +18,7 @@ export CLOUDSDK_CORE_PROJECT="ncbi-logmon"
 gcloud config set account 253716305623-compute@developer.gserviceaccount.com
 
 skipload=false
-annual=false # Run after 12/31, set year below
+annual=false # Run after 12/31, should be automatic in daily.sh
 
 if [ "$#" -eq 1 ]; then
     if [ "$1" = "skipload" ]; then
@@ -223,6 +223,7 @@ EOF
     jq -S -c .schema.fields < op_schema.json > op_schema_only.json
 
     gsutil ls -lR "$PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*" | tail -90
+    echo "Loading  $PARSE_BUCKET/logs_op_${STRIDES_SCOPE}${PARSE_VER}/recognized.$CURYEAR-*"
 
     bq rm -f "$DATASET.op_parsed" || true
     #        "$PARSE_BUCKET/logs_op_public/recognized.*" \
@@ -356,6 +357,7 @@ QUERY=$(
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.gs_parsed\\\`
     WHERE ifnull(accepted,true)=true
+    and not (method='GET' and regexp_contains(uri, r'/o\?'))
 ENDOFQUERY
 )
 
@@ -1149,20 +1151,20 @@ bq extract \
     "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.json"
 
 echo " ###  copy to filesystem"
-#    mkdir -p "$PANFS/detail"
-#    cd "$PANFS/detail" || exit
-#    rm -f "$PANFS"/detail/detail."$DATE".* || true
-#    gsutil cp -r "gs://logmon_export/detail/detail.$DATE.*" "$PANFS/detail/"
+#    mkdir -p "$VASTFS/detail"
+#    cd "$VASTFS/detail" || exit
+#    rm -f "$VASTFS"/detail/detail."$DATE".* || true
+#    gsutil cp -r "gs://logmon_export/detail/detail.$DATE.*" "$VASTFS/detail/"
 
-#    mkdir -p "$PANFS/summary"
-#    cd "$PANFS/summary" || exit
-#    rm -f "$PANFS"/summary/summary."$DATE".* || true
-#    gsutil cp -r "gs://logmon_export/summary/summary.$DATE.*" "$PANFS/summary/"
+#    mkdir -p "$VASTFS/summary"
+#    cd "$VASTFS/summary" || exit
+#    rm -f "$VASTFS"/summary/summary."$DATE".* || true
+#    gsutil cp -r "gs://logmon_export/summary/summary.$DATE.*" "$VASTFS/summary/"
 
-mkdir -p "$PANFS/uniq_ips"
-cd "$PANFS/uniq_ips" || exit
-rm -f "$PANFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
-gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$PANFS/uniq_ips/"
+mkdir -p "$VASTFS/uniq_ips"
+cd "$VASTFS/uniq_ips" || exit
+rm -f "$VASTFS/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE".* || true
+gsutil cp -r "gs://logmon_export/uniq_ips/uniq_ips.$DATE.$STRIDES_SCOPE.*" "$VASTFS/uniq_ips/"
 
 if [ "$STRIDES_SCOPE" == "private" ]; then
     QUERY=$(

@@ -3,7 +3,7 @@
 
 using namespace NCBI::Logging;
 
-std::string tool_version( "1.1.3" );
+std::string tool_version( "1.2.1" );
 
 int main ( int argc, char * argv [], const char * envp []  )
 {

@@ -43,7 +43,7 @@ using namespace NCBI::Logging;
 %define api.value.type {t_str}
 
 %token STR IPV4 IPV6 FLOAT I64 METHOD VERS QSTR QSTR_ESC SPACE
-%token DASH QUOTE PORT RL UNRECOGNIZED
+%token DASH QUOTE PORT RL NAMEVALUE UNRECOGNIZED
 %token PATHSTR AGENTSTR TIME_FMT
 
 %start line
@@ -67,28 +67,12 @@ log_onprem
       referer SPACE
       { op_start_UserAgent( scanner ); } agent { op_pop_state( scanner ); } SPACE
       forwarded  SPACE
-      tail
-    {
+      line_tail
+      {
         // in case the productions did not find vers/path, set them here to make them at least empty in the ouput
         SET_VALUE( OPReceiver::vers, EmptyTSTR );
         SET_VALUE( OPReceiver::path, EmptyTSTR );
-    }
-    ;
-
-tail
-    : tail_elem
-    | tail tail_elem
-    ;
-
-tail_elem
-    : port
-    | req_len
-    | STR
-    | I64
-    | DASH
-    | UNRECOGNIZED
-    | SPACE
-    | quoted_freeform
+      }
     ;
 
 quoted_freeform
@@ -262,6 +246,23 @@ forwarded_token
 
 forwarded
     : QUOTE forwarded_list QUOTE { SET_VALUE( OPReceiver::forwarded, $2 ); }
+    ;
+
+line_tail
+    : line_tail_elem           { }
+    | line_tail line_tail_elem { }
+    ;
+
+line_tail_elem
+    : port
+    | req_len
+    | SPACE
+    | STR
+    | I64
+    | QUOTE
+    | QSTR
+    | NAMEVALUE
+    | DASH
     ;
 
 port

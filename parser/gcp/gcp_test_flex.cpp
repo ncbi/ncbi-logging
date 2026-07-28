@@ -118,7 +118,7 @@ TEST_F ( GCP_TestFlexFixture, QuotedEscapedQuote )
 }
 TEST_F ( GCP_TestFlexFixture, AgentDoubledQuote )
 {
-    ASSERT_EQ( QSTR, StartAgent("\"\"\"", true) );  /* """" */
+    ASSERT_EQ( QSTR, StartAgent("\"\"\"") );  /* """" */
     ASSERT_EQ( "\"\"", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
     #undef str

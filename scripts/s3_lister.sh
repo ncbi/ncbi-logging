@@ -9,7 +9,7 @@ buckets=$(sqlcmd "select bucket_name from buckets where cloud_provider='S3' and 
 
 echo "buckets is '$buckets'"
 
-mkdir -p "$PANFS/s3_prod/objects/"
+mkdir -p "$VASTFS/s3_prod/objects/"
 
 for BUCKET in $buckets; do
     profile=$(sqlcmd "select service_account from buckets where cloud_provider='S3' and bucket_name='$BUCKET'")
@@ -21,7 +21,7 @@ for BUCKET in $buckets; do
 
         "./s3_lister.py" "$BUCKET" "$profile" |
             gzip -9 -c > \
-                "$PANFS/s3_prod/objects/$DATE.s3.objects-$BUCKET.gz" &
+                "$VASTFS/s3_prod/objects/$DATE.s3.objects-$BUCKET.gz" &
     fi
 done
 

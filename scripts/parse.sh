@@ -82,6 +82,9 @@ for LOG_BUCKET in "${buckets[@]}"; do
     df -HT .
 
     SRC_BUCKET="gs://logmon_logs/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    if [ "$STRIDES_SCOPE" = "private" ]; then
+        SRC_BUCKET="gs://logmon_logs_private/${PROVIDER_LC}_${STRIDES_SCOPE}/"
+    fi
     TGZ="$YESTERDAY_DASH.$LOG_BUCKET.tar.gz"
     echo "  Copying $TGZ to $PARSE_DEST"
 
@@ -92,9 +95,11 @@ for LOG_BUCKET in "${buckets[@]}"; do
         continue
     fi
     ls -hl "$TGZ"
+    tar -tvf "$TGZ"
 
     if [ "$PROVIDER" = "OP" ]; then
         wildcard='*access*'
+        wildcard='*'
     else
         wildcard='*'
     fi
@@ -138,6 +143,7 @@ for LOG_BUCKET in "${buckets[@]}"; do
             sed 's/""windows64"/"windows64/g' | \
             grep -v 'GCS Lifecycle Management' | \
             grep -v 'file-meta ncbi_location=' | \
+            grep -v 'GET /?' | \
             time "$HOME/ncbi-logging/parser/bin/log2jsn-rel" "$PARSER" > \
                 "$YESTERDAY_DASH.${LOG_BUCKET}.json" \
                 2> "$TGZ.err"
@@ -180,7 +186,10 @@ for LOG_BUCKET in "${buckets[@]}"; do
 
     ls -l
     echo "  Gzipping..."
-    gzip -f -v -9 ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl &
+    for x in ./*ecognized."$YESTERDAY_DASH.${LOG_BUCKET}"*.jsonl; do
+        gzip -f -9 "$x" &
+    done
+    jobs
     wait
     ls -l
 

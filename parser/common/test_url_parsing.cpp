@@ -443,7 +443,7 @@ TEST_F( URLTestFixture, LOGMON_217 )
 
 TEST_F( URLTestFixture, LOGMON_240_1_query_starts_with_separator )
 {   // query starts with '&'
-    const std::string res = try_to_parse_good( "/entrez/eutils/esearch.fcgi?&retmode=json&version=2.0&db=taxonomy&term=&", true );
+    const std::string res = try_to_parse_good( "/entrez/eutils/esearch.fcgi?&retmode=json&version=2.0&db=taxonomy&term=&" );
     ASSERT_EQ( "", extract_value( res, "accession" ) );
     ASSERT_EQ( "esearch", extract_value( res, "filename" ) );
     ASSERT_EQ( ".fcgi", extract_value( res, "extension" ) );
@@ -455,4 +455,10 @@ TEST_F( URLTestFixture, LOGMON_240_duplicated_query_separator )
     ASSERT_EQ( "", extract_value( res, "accession" ) );
     ASSERT_EQ( "index", extract_value( res, "filename" ) );
     ASSERT_EQ( ".php", extract_value( res, "extension" ) );
+}
+TEST_F( URLTestFixture, VDB_6314 )
+{
+    const std::string res = try_to_parse_good( "/Traces/solr-proxy-be/solr-proxy-be.cgi?&core=run_sel_index" );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "solr-proxy-be", extract_value( res, "filename" ) );
 }
