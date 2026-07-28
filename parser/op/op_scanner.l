@@ -44,7 +44,7 @@ QSTR_ESC        (\\\"|{STR_CHARS})+
 PATHSTR         {QSTR_ESC}
 
 SPACE           " "
-STR             [.\-a-zA-Z0-9_]+
+STR             [.\-a-zA-Z0-9_+/]+
 
 AGENTCHARS      [A-Za-z0-9\-_~!*';:@&+$%#\[\]<>|`{}^?/(),=\\. ]
 AGENTSTR        (\\\"|{AGENTCHARS})+
@@ -66,6 +66,7 @@ TIMEFMT         "["{INT2}"/"{MONTH}"/"{INT4}":"{INT2}":"{INT2}":"{INT2}" "{TIMEZ
 
 "port="         { return PORT; }
 "rl="           { return RL; }
+{STR}=          { return NAMEVALUE; }
 
 \"                  { yy_push_state( QUOTED, yyscanner ); return QUOTE; }
 <QUOTED>\"          { yy_pop_state( yyscanner ); return QUOTE; }

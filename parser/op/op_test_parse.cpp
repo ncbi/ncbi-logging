@@ -399,6 +399,20 @@ TEST_F( OPTestFixture, parse_path_with_url_encoded_slash_in_extension )
     ASSERT_EQ( "", extract_value( res, "extension" ) );
 }
 
+TEST_F( OPTestFixture, VDB_6314_1 )
+{
+    std::string res = try_to_parse_good( R"(213.180.203.204 - - [05/Apr/2026:00:00:55 -0400] "www.ncbi.nlm.nih.gov" "GET /Structure/cdd/wrpsb.cgi?SEQUENCE=MRTDSGARLEEGHLRPPRALPPVPSQDDIPLSRPKKKKPRTKNTPASASLEGLAQTAGRRPSEGNEPSTKELKEHPEAPVQRRQKKTRLPLELETSSTQKKSSSSSLLRNENGIDAEPAEEAVIQKPRRKTKKTQPAELQYANELGVEDEDIITDEQTTVEQQSVFTAPTGISQPVGKVFVEKSRRFQAADRSELIKTTENIDVSMDVKPSWTTRDVALTVHRAFRMIGLFSHGFLAGCAVWNIVVIYVLAGDQLSNLSNLLQQYKTLAYPFQSLLYLLLALSTISAFDRIDFAKISVAIRNFLALDPTALASFLYFTALILSLSQQMTSDRIHLYTPSSVNGSLWEAGIEEQILQPWIVVNLVVALLVGLSWLFLSYRPGMDLSEELMFSSEVEEYPDKEKEIKASS HTTP/1.1" 200 10800 0 "-" "Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0" "-" 26pct 520104 + "NCBI-SID: 90C66B989D1DE771_0000SID" id=adHed71DIpK0Jewq3tLWSQAAF44 port=443 1400 17942 text/html loc="-" sslproto=TLSv1.3 ja3sig="-")" );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_6314_2 )
+{
+    std::string res = try_to_parse_good( R"(202.223.152.1 - - [16/Apr/2026:00:03:23 -0400] "www.ncbi.nlm.nih.gov" "POST /Traces/solr-proxy-be/solr-proxy-be.cgi?&core=run_sel_index HTTP/2.0" 200 3973 0 "https://www.ncbi.nlm.nih.gov/Traces/study/?page=2&acc=PRJNA1072134&o=acc_s%3Aa&s=SRR27841308,SRR27841309,SRR27841310,SRR27841311,SRR27841312,SRR27841313,SRR27841314" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36" "-" 3pct 44957 - "NCBI-SID: 3775795255A01BB3_3600SID" id=aeBfi0jVeTsS60JFq_iMLgAeR2o port=443 2639 4240 text/plain loc="-" sslproto=TLSv1.3 ja3sig="-")" );
+    ASSERT_FALSE( res.empty() );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
 extern "C"
 {
     int main ( int argc, const char * argv [], const char * envp []  )
