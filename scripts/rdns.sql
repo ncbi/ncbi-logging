@@ -2077,7 +2077,7 @@ update rdns
 set domain='University of North Carolina at Charlotte (charlotte.edu)'
 where ip like '152.15.%';
 
-udpate rdns
+update rdns
 set domain='Dana-Farber Cancer Institute (dana-farber.org)'
 where ip like '155.52.%';
 
