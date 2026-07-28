@@ -49,6 +49,7 @@ ReceiverInterface::Category OPReceiver::post_process( void )
     {
         URLReceiver url( m_fmt );
         URLParseBlock pb ( url );
+        // pb.m_debug = true;
         pb.format_specific_parse( url_for_postprocess.c_str(), url_for_postprocess.size() );
 
         url_for_postprocess.clear();
@@ -158,20 +159,34 @@ static void
 extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const char * fieldname,
     QuoteSpaces quote_spaces = sp_auto, bool empty_is_dash = false )
 {
-    const JSONValue &entry = obj . getValue ( fieldname );
-    const String &S = entry . toString();
-    if ( S . isEmpty() )
+    if ( obj.exists( fieldname ) )
     {
-        if ( empty_is_dash )
-            formatter . addNameValue( fieldname, "-" );
-    }
-    else
-    {
-        switch ( quote_spaces )
+        const JSONValue &entry = obj . getValue ( fieldname );
+        const String &S = entry . toString();
+        if ( S . isEmpty() )
         {
-            case sp_auto:
-                {
-                    if ( S . find( ' ' ) != String::npos )
+            if ( empty_is_dash )
+                formatter . addNameValue( fieldname, "-" );
+        }
+        else
+        {
+            switch ( quote_spaces )
+            {
+                case sp_auto:
+                    {
+                        if ( S . find( ' ' ) != String::npos )
+                        {
+                            std::stringstream ss;
+                            ss . put ( '"' );
+                            ss . write( S . data(), S . size() );
+                            ss . put ( '"' );
+                            formatter . addNameValue( fieldname, ss . str() );
+                        }
+                        else
+                            formatter . addNameValue( fieldname, S . toSTLString() );
+                    }
+                    break;
+                case sp_force:
                     {
                         std::stringstream ss;
                         ss . put ( '"' );
@@ -179,22 +194,11 @@ extract_and_set( const JSONObject &obj, FormatterInterface &formatter, const cha
                         ss . put ( '"' );
                         formatter . addNameValue( fieldname, ss . str() );
                     }
-                    else
-                        formatter . addNameValue( fieldname, S . toSTLString() );
-                }
-                break;
-            case sp_force:
-                {
-                    std::stringstream ss;
-                    ss . put ( '"' );
-                    ss . write( S . data(), S . size() );
-                    ss . put ( '"' );
-                    formatter . addNameValue( fieldname, ss . str() );
-                }
-                break;
-            case sp_off:
-                formatter . addNameValue( fieldname, S.toSTLString() );
-                break;
+                    break;
+                case sp_off:
+                    formatter . addNameValue( fieldname, S.toSTLString() );
+                    break;
+            }
         }
     }
 }
@@ -206,21 +210,30 @@ extract_and_set_request( const JSONObject &obj, FormatterInterface &formatter )
 
     ss . put( '"' );
 
-    const String & method = obj . getValue ( "method" ) . toString();
-    ss . write( method . data(), method . size() );
-
-    const String & path = obj . getValue ( "path" ) . toString();
-    if ( ! path.isEmpty() )
+    if ( obj.exists( "method" ) )
     {
-        ss . put( ' ' );
-        ss . write( path . data(), path . size() );
+        const String & method = obj . getValue ( "method" ) . toString();
+        ss . write( method . data(), method . size() );
     }
 
-    const String & vers = obj . getValue ( "vers" ) . toString();
-    if ( ! vers.isEmpty() )
+    if ( obj.exists( "path" ) )
     {
-        ss . put( ' ' );
-        ss . write( vers . data(), vers . size() );
+        const String & path = obj . getValue ( "path" ) . toString();
+        if ( ! path.isEmpty() )
+        {
+            ss . put( ' ' );
+            ss . write( path . data(), path . size() );
+        }
+    }
+
+    if ( obj.exists( "vers" ) )
+    {
+        const String & vers = obj . getValue ( "vers" ) . toString();
+        if ( ! vers.isEmpty() )
+        {
+            ss . put( ' ' );
+            ss . write( vers . data(), vers . size() );
+        }
     }
 
     ss . put( '"' );
@@ -242,6 +255,11 @@ OPReverseBlock::format_specific_parse( const char * line, size_t line_size )
         const JSONValueRef values = JSON::parse( src );
         const JSONObject &obj = values -> toObject();
 
+        if ( obj.isEmpty() )
+        {
+            return false;
+        }
+
         extract_and_set( obj, formatter, "ip" );
         formatter . addNameValue( "", "-" );
         extract_and_set( obj, formatter, "user", sp_auto, true );
@@ -255,12 +273,14 @@ OPReverseBlock::format_specific_parse( const char * line, size_t line_size )
         extract_and_set( obj, formatter, "agent", sp_force );
         extract_and_set( obj, formatter, "forwarded", sp_force );
 
+        if ( obj.exists( "port" ) )
         {
             stringstream ss;
             ss << "port=" << obj . getValue ( "port" ) . toString() . toSTLString();
             formatter . addNameValue( "port", ss.str() );
         }
 
+        if ( obj.exists( "req_len" ) )
         {
             stringstream ss;
             ss << "rl=" << obj . getValue ( "req_len" ) . toString() . toSTLString();

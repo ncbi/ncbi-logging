@@ -109,7 +109,7 @@ TEST_F ( OP_TestFlexFixture, Embedded_CtlChars )
 }
 TEST_F ( OP_TestFlexFixture, QuotedString )
 {
-    #define str ".Bl0-_~!*'();:@&=+$,/%#[]?\\<>|`{}^"
+    #define str ".Bl0-_~!*'();:@&=+$,/%#[]?<>|`{}^"
     ASSERT_EQ( QUOTE, StartScan("\"" str "\"") );
     ASSERT_EQ( QSTR, NextTokenType() ); ASSERT_EQ( str, TokenValue() );
     #undef str
@@ -127,11 +127,20 @@ TEST_F ( OP_TestFlexFixture, QuotedNonAscii )
 }
 TEST_F ( OP_TestFlexFixture, QuotedEscapedQuote )
 {
-    ASSERT_EQ( QUOTE, StartScan("\"\\\"\"") );  /* "\"" */
-    ASSERT_EQ( QSTR, NextTokenType() );
-    ASSERT_EQ( "\\\"", TokenValue() ); // needs to be unescaped later
+    ASSERT_EQ( QUOTE, StartScan( R"("\"")" ) );
+    ASSERT_EQ( QSTR_ESC, NextTokenType() );
+    ASSERT_EQ( R"(\")", TokenValue() ); // needs to be unescaped later
     ASSERT_EQ( QUOTE, NextTokenType() );
-    #undef str
+}
+
+TEST_F ( OP_TestFlexFixture, QuotedEscapedBackslash )
+{
+    ASSERT_EQ( QUOTE, StartScan( R"("\\\"")" ) ); // an escaped backslash followed by an escaped quote
+    ASSERT_EQ( QSTR_ESC, NextTokenType() );
+    ASSERT_EQ( "\\\\", TokenValue() );  // escaped backslash
+    ASSERT_EQ( QSTR_ESC, NextTokenType() );
+    ASSERT_EQ( "\\\"", TokenValue() );  // escaped quote
+    ASSERT_EQ( QUOTE, NextTokenType() );
 }
 
 TEST_F ( OP_TestFlexFixture, IPV4 )

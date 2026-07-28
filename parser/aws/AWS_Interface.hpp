@@ -3,6 +3,7 @@
 #include "ReceiverInterface.hpp"
 #include "ParserInterface.hpp"
 
+#include <memory>
 #include <string>
 
 namespace NCBI

@@ -27,10 +27,10 @@ MSG_TEST_FLEX_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(MSG_TEST_FL
 MSG_TEST_FLEX_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(MSG_TEST_FLEX_SRC)))
 
 $(BINDIR)/msg_test_flex-dbg: $(MSG_TEST_FLEX_DBG_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread
+	$(LD) -o $@ $^ -lgtest $(LDFLAGS_DBG)
 
 $(BINDIR)/msg_test_flex-rel: $(MSG_TEST_FLEX_REL_OBJ)
-	$(LD) -o $@ $^ -lgtest -lpthread
+	$(LD) -o $@ $^ -lgtest $(LDFLAGS_REL)
 
 flex_test: msg_flex_test
 

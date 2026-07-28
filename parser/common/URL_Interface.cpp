@@ -53,7 +53,9 @@ URLParseBlock::format_specific_parse( const char * line, size_t line_size )
     url__delete_buffer( bs, m_sc );
 
     if ( ret != 0 )
+    {
         m_receiver . SetCategory( ReceiverInterface::cat_ugly );
+    }
     else if ( m_receiver .GetCategory() == ReceiverInterface::cat_unknown )
         m_receiver . SetCategory( ReceiverInterface::cat_good );
     return ret == 0;

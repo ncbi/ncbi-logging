@@ -81,7 +81,7 @@ TEST_F( MSGParseTestFixture, host )
 
 TEST_F( MSGParseTestFixture, trailing_space )
 {
-    std::string res = try_to_parse_good( "ModSecurity for nginx (STABLE)/2.9.3 (http://www.modsecurity.org/) configured.: ", true );
+    std::string res = try_to_parse_good( "ModSecurity for nginx (STABLE)/2.9.3 (http://www.modsecurity.org/) configured.: " );
     ASSERT_NE( "", res );
 }
 

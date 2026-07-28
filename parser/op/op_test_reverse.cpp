@@ -28,6 +28,7 @@ TEST( OPReverseBlockTest, ReverseEmptyJson )
     // if an empty json is given ( is in the json-source-file ) we want it to be in the unrecog-file
     OPReverseBlockFactory factory;
     auto pb = factory . MakeParseBlock();
+    pb->SetDebug(true);
     string line( "{}" );
     bool res = pb -> format_specific_parse( line.c_str(), line . size() );
     ASSERT_FALSE( res );

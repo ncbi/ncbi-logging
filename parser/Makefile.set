@@ -16,7 +16,8 @@ $(OBJDIR)/%.dbg.o: %.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
 
 $(OBJDIR)/%.rel.o: %.cpp
-	$(CPP) $(CXXFLAGS) -O3 -march=skylake $< -o $(OBJDIR)/$(*F).rel.o
+	$(CPP) $(CXXFLAGS) -march=skylake -O3 $< -o $(OBJDIR)/$(*F).rel.o
+# lmem12=skylake, lmem14=cascade lake
 
 $(OBJDIR)/%.prof.o: %.cpp
 	$(CPP) $(CXXFLAGS) $(GPROFFLAGS) $< -o $(OBJDIR)/$(*F).prof.o
@@ -34,11 +35,17 @@ $(OBJDIR)/%.prof.o: %.cpp
 
 #################################################
 # Specify location of ncbi-vdb3/jwt-tool in JWT_TOOL if different
-JWT_TOOL ?= ../../../ncbi-vdb3/jwt-tool
+JWT_TOOL ?= $(abspath ../../../ncbi-vdb3/jwt-tool)
 
-CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/utf8proc -I$(JWT_TOOL)/tool
+GTEST ?= $(JWT_TOOL)/../external/googletest
+GTESTLIB ?= $(JWT_TOOL)/../external/lib
 
-LDFLAGS += -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lpthread
+CXXFLAGS += -I$(JWT_TOOL)/inc -I$(JWT_TOOL)/utf8proc -I$(JWT_TOOL)/tool -I $(GTEST)/googletest/include
+
+LDFLAGS = -L$(JWT_TOOL)/lib -L$(GTESTLIB) -lutf8proc -lmbedcrypto -lpthread
+
+LDFLAGS_DBG = -lncbi-json-dbg -lncbi-secure-dbg  $(LDFLAGS)
+LDFLAGS_REL = -lncbi-json-rel -lncbi-secure-rel  $(LDFLAGS)
 
 #################################################
 

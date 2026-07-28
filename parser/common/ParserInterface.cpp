@@ -33,11 +33,24 @@ ParseBlockInterface :: receive_one_line( const char * line, size_t line_size, si
 
     if ( ! format_specific_parse( line, line_size ) )
     {
+        if ( m_debug)
+        {
+            cout<<"ParseBlockInterface :: receive_one_line(): format_specific_parse failed " << endl;
+        }
         receiver . SetCategory( ReceiverInterface::cat_ugly );
     }
     else if ( receiver . GetCategory() == ReceiverInterface::cat_good )
     {
-        receiver . SetCategory( receiver.post_process() );
+        if ( m_debug)
+        {
+            cout<<"ParseBlockInterface :: receive_one_line(): format_specific_parse succeeded " << endl;
+        }
+        ReceiverInterface::Category post_cat = receiver.post_process();
+        if ( m_debug)
+        {
+            cout<<"ParseBlockInterface :: receive_one_line(): post_process = " << post_cat << endl;
+        }
+        receiver . SetCategory( post_cat );
     }
 
     if ( receiver . GetCategory() != ReceiverInterface::cat_good )

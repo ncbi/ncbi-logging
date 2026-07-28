@@ -413,11 +413,80 @@ TEST_F( OPTestFixture, VDB_6314_2 )
     ASSERT_EQ( "443", extract_value( res, "port" ) );
 }
 
-extern "C"
+TEST_F( OPTestFixture, free_form_tail_VDB_5981 )
 {
-    int main ( int argc, const char * argv [], const char * envp []  )
-    {
-        testing :: InitGoogleTest ( & argc, ( char ** ) argv );
-        return RUN_ALL_TESTS ();
-    }
+    std::string res = try_to_parse_good( "34.140.130.14 - - [07/May/2025:23:48:24 -0400] \"ftp.ncbi.nih.gov\" \"GET /1000genomes/ftp/phase3/data/HG02025/sequence_read/SRR821984_2.filt.fastq.gz HTTP/1.1\" 200 111014168 0 \"-\" \"Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0\" \"-\" -pct 134311 X \"NCBI-SID: -\" port=443 885 80688 application/x-gzip" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_noHttpMethod )
+{   // skipping unrecognized tokens in the tail
+    std::string res = try_to_parse_good( "2408:8421:1c0:a8c5:29ef:f6ef:630e:13f0 - - [15/May/2025:00:00:35 -0400] \"submit.ncbi.nlm.nih.gov\" \"POST /subs/bioproject/SUB15322657/general_info HTTP/2.0\" 200 12448 19 \"https://submit.ncbi.nlm.nih.gov/subs/bioproject/SUB15322657/general_info\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0\" \"-\" -pct 19219246 - \"NCBI-SID: -\" id=aCVm4xD4sBqr4p-crpVWXgANYQU port=443 6576 12994 text/html loc=\"-\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_URL_query_starts_and_ends_with_ampersand )
+{   // skipping unrecognized tokens in the tail
+    std::string res = try_to_parse_good( "210.218.220.52 - - [28/Apr/2025:00:02:06 -0400] \"eutils.ncbi.nlm.nih.gov\" \"GET /entrez/eutils/esearch.fcgi?&retmode=json&version=2.0&db=taxonomy&term=& HTTP/1.1\" 429 87 0 \"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?&retmode=json&version=2.0&db=taxonomy&term=&#34;Haloterrigena+salinisoli&#34;&usehistory=y\" \"-\" \"-\" -pct 3867 - \"NCBI-SID: -\" id=aA79vlj0szU_J3GQ1tT5vwAABps port=443 352 666 application/json loc=\"-\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_empty_query )
+{
+    std::string res = try_to_parse_good( "14.139.215.100 - - [07/Jun/2025:00:10:16 -0400] \"submit.ncbi.nlm.nih.gov\" \"POST /subs/sra/? HTTP/2.0\" 302 - 0 \"https://submit.ncbi.nlm.nih.gov/subs/sra/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36\" \"-\" -pct 84316 - \"NCBI-SID: -\" id=aEO7qOwPKFXOLvzZm_-qFgAGIQA port=443 2055 251 text/html loc=\"/subs/sra/SUB15373223/submitter\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_multiple_forwarded )
+{
+    std::string res = try_to_parse_good( "130.14.29.110 - - [09/Jun/2025:23:59:59 -0400] \"www.ncbi.nlm.nih.gov\" \"GET /redirect/pmc/articles/PMC4155689/ HTTP/1.1\" 301 257 0 \"-\" \"Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)\" \"20.171.207.158, 162.158.90.141\" -pct 474 + \"NCBI-SID: -\" id=aEetv43G411Wt01HtJrjmgAACYQ port=443 816 715 text/html loc=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC4155689/\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "20.171.207.158, 162.158.90.141", extract_value( res, "forwarded" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_duplicated_query_separator )
+{
+    std::string res = try_to_parse_good( "10.154.26.16 - - [29/Jun/2025:20:52:48 -0400] \"web11.be-md.ncbi.nlm.nih.gov\" \"GET /phpfm/index.php?&&path=&action=upload HTTP/1.1\" 404 2127 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" \"-\" -pct 1538 - \"NCBI-SID: -\" id=aGHf4Arhj6xPs5IcQIfgPQAACCM port=443 970 8761 text/html loc=\"-\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_multiple_escapes )
+{
+    std::string res = try_to_parse_good( "2409:8a6c:580:4334:446b:203b:a97e:3180 - - [29/Jun/2025:07:55:48 -0400] \"www.ncbi.nlm.nih.gov\" \"GET\" 200 43 0 \"https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE183904\\\\\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0\" \"-\" -pct 14522 - \"NCBI-SID: -\" id=aGEpxDT9G0vKgfBpuVuKVwAJFj8 port=443 2524 399 image/gif loc=\"-\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_more_freeform_variation )
+{
+    std::string res = try_to_parse_good( "130.14.23.73 - - [21/Jun/2025:00:02:40 -0400] \"blast.ncbi.nlm.nih.gov\" \"POST /DB_CUBBY_FORWARD/myblast_forward.cgi HTTP/1.0\" 200 118 1 \"-\" \"asnweb\" \"-\" -pct 1005082 - \"NCBI-SID: -\" id=aFYu4LzA0jG5AoyoRd8-5AAADBU port=443 786 6341 content-type: x-ncbi-data/x-unknown-urlencoded loc=\"-\" sslproto=TLSv1.2" );
+    ASSERT_EQ( "-", extract_value( res, "forwarded" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_bad_request )
+{
+    std::string res = try_to_parse_review( "34.200.223.129 - - [20/Sep/2018:13:32:54 -0400] \"sra-download.ncbi.nlm.nih.gov\" \"\\x16\\x03\\x01\\x00\\xF5\\x01\\x00\\x00\\xF1\\x03\\x03}\\xB0'\\xC8\\xCC\\xBA\\xF6h\\xE9Q^\\xBA\\xA3\\xF6\\xC5\\xD0\\xE6  U\\xE5\\xE5\\x81\\xC4?\\xA3M\\xD7[\\x00\\xA3;\\x00\\x00\\x82\\x003\\x009\\x005\\x00/\\xC0,\\xC00\\x00\\xA3\\x00\\x9F\\xCC\\xA9\\xCC\\xA8\\xCC\\xAA\\xC0\\xAF\\xC0\\xAD\\xC0\\xA3\\xC0\\x9F\\xC0+\\xC0/\\x00\\xA2\\x00\\x9E\\xC0\\xAE\\xC0\\xAC\\xC0\\xA2\\xC0\\x9E\\xC0$\\xC0(\\x00k\\x00j\\xC0s\\xC0w\\x00\\xC4\\x00\\xC3\\xC0#\\xC0'\\x00g\\x00@\\xC0r\\xC0v\\x00\\xBE\\x00\\xBD\\xC0\" 400 166 0.001 \"-\" \"-\" \"-\" port=80 rl=0" );
+    ASSERT_EQ( "80", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, free_form_tail_VDB_5981_even_more_freeform_variation )
+{
+    std::string res = try_to_parse_good( "103.75.46.202 - - [15/Jul/2025:00:30:02 -0400] \"www.ncbi.nlm.nih.gov\" \"GET /blast/Blast.cgi?PAGE_TYPE=Blast\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xd3\\xb0\\xef\\xbf\\xbd\\xef\\xbf\\xbd&PROG_DEF=blastn&BLAST_PROG_DEF=megaBlast&BLAST_SPEC=OGP__9606__9558 HTTP/1.1\" 302 1 0 \"https://www.ncbi.nlm.nih.gov/\" \"Baiduspider/2.0+(+http://www.baidu.com/search/spider.htm)\" \"-\" -pct 7174 + \"NCBI-SID: -\" id=aHXZSmLG8FzegxtAIRXP_wAAEJ0 port=443 989 6225 - loc=\"https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=Blast\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xef\\xbf\\xbd\\xd3\\xb0\\xef\\xbf\\xbd\\xef\\xbf\\xbd&PROG_DEF=blastn&BLAST_PROG_DEF=megaBlast&BLAST_SPEC=OGP__9606__9558\" sslproto=TLSv1.2" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_eol_in_request )
+{
+    std::string res = try_to_parse_good( "10.154.26.22 - - [20/Jul/2025:06:03:38 -0400] \"web11.ncbi.nlm.nih.gov\" \"GET\\n\" 400 135073 0 \"-\" \"-\" \"-\" -pct 428 - \"NCBI-SID: -\" id=aHy--n6WW8P5HlvS_vVqNwAACy8 port=80 22 135305 text/html loc=\"-\" sslproto=-" );
+    ASSERT_EQ( "80", extract_value( res, "port" ) );
+}
+
+TEST_F( OPTestFixture, VDB_5981_escaped_quotes_in_forwarded )
+{
+    std::string res = try_to_parse_good( "10.154.26.16 - - [27/Jul/2025:21:15:13 -0400] \"web11.be-md.ncbi.nlm.nih.gov\" \"GET /admbook/write.php?name=nessus&email=nessus@10.154.26.16&message=Nessus%20ran%20admbook_cmd_exec.nasl%20at%201753665313 HTTP/1.1\" 404 2127 0 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)\" \"127.0.0.1 \\\";system(id);echo \\\"qziLpKkH\\\";echo\\\"\" -pct 15512 - \"NCBI-SID: -\" id=aIbPIY9TqwKu-4EM6O79UQAADZM port=443 1102 8761 text/html loc=\"-\" sslproto=TLSv1.3" );
+    ASSERT_EQ( "443", extract_value( res, "port" ) );
+}
+
+int main ( int argc, const char * argv [], const char * envp []  )
+{
+    testing :: InitGoogleTest ( & argc, ( char ** ) argv );
+    return RUN_ALL_TESTS ();
 }

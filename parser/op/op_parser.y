@@ -75,6 +75,21 @@ log_onprem
       }
     ;
 
+quoted_freeform
+    : QUOTE freeform QUOTE;
+
+freeform
+    : freeform_elem
+    | freeform freeform_elem
+    ;
+
+freeform_elem
+    : QSTR
+    | QSTR_ESC
+    | I64
+    | SPACE
+    ;
+
 log_onprem_err
     : ip error
     ;
@@ -102,12 +117,22 @@ server
     | STR               { SET_VALUE( OPReceiver::server, $1 ); }
     ;
 
+path_token
+    : PATHSTR
+    | QSTR_ESC
+    ;
+
+path_list
+    : path_token
+    | path_list path_token    { $$ = $1; MERGE_TSTR( $$, $2 ); }
+    ;
+
 space_and_url
-    : SPACE { op_start_URL ( scanner ); } PATHSTR
+    : SPACE { op_start_URL ( scanner ); } path_list
         {
             lib -> url_for_postprocess = string( $3.p, $3.n );
             SET_VALUE( OPReceiver::path, $3 );
-            op_pop_state ( scanner );
+            op_pop_state ( scanner ); // pop out of QUOTED
         }
     ;
 
@@ -125,14 +150,15 @@ request_tail
     ;
 
 request
-    : QUOTE method space_and_url SPACE request_tail QUOTE { }
-    | QUOTE method space_and_url SPACE QUOTE { }
-    | QUOTE method space_and_url QUOTE { }
-    | QUOTE method QUOTE { }
+    : QUOTE method space_and_url SPACE request_tail QUOTE
+    | QUOTE method space_and_url SPACE QUOTE
+    | QUOTE method space_and_url QUOTE
+    | QUOTE method QSTR_ESC QSTR QUOTE
+    | QUOTE method QUOTE
     ;
 
 server_and_request
-    : server SPACE request              {  }
+    : server SPACE request
     | server SPACE quoted_list
     {
         lib->reportField( "Invalid request" );
@@ -152,13 +178,12 @@ quoted_list_elem
     : QSTR      { $$ = $1; }
     | VERS      { $$ = $1; }
     | QSTR_ESC  { $$ = $1; }
+    | SPACE     { $$ = $1; }
     ;
 
 quoted_list_body
-    : quoted_list_elem                          { $$ = $1; }
-    | quoted_list_body SPACE quoted_list_elem   { $$ = $1; $$.n += 1 + $3.n; }
-    | quoted_list_body SPACE                    { $$ = $1; $$.n += 1; }
-    | quoted_list_body METHOD                   { $$ = $1; $$.n += $2.n; }
+    : quoted_list_elem                    { $$ = $1; }
+    | quoted_list_body quoted_list_elem   { $$ = $1; $$.n += $2.n; }
     ;
 
 result_code
@@ -208,8 +233,19 @@ agent
     | QUOTE QUOTE       { lib -> set( ReceiverInterface::agent, EmptyTSTR ); }
     ;
 
+forwarded_list
+    : forwarded_token
+    | forwarded_list forwarded_token    { $$ = $1; MERGE_TSTR( $$, $2 ); }
+    ;
+
+forwarded_token
+    : QSTR
+    | QSTR_ESC
+    | SPACE
+    ;
+
 forwarded
-    : QUOTE QSTR QUOTE { SET_VALUE( OPReceiver::forwarded, $2 ); }
+    : QUOTE forwarded_list QUOTE { SET_VALUE( OPReceiver::forwarded, $2 ); }
     ;
 
 line_tail

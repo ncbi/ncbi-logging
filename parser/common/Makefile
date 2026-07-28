@@ -1,7 +1,7 @@
 # COMMON_SRC
 include ../Makefile.set
 
-all: cmd common
+all:  common
 
 test: cmn_test
 
@@ -20,9 +20,12 @@ mkdir:
 CMD_SRC_LOCATION = $(JWT_TOOL)/tool
 CMD_SRC = $(CMD_SRC_LOCATION)/cmdline.cpp
 
-CMD_DBG_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
-CMD_REL_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
+CMD_DBG_OBJ  = $(addprefix $(OBJDIR)/,$(subst .cpp,.dbg.o,$(notdir $(CMD_SRC))))
+CMD_REL_OBJ  = $(addprefix $(OBJDIR)/,$(subst .cpp,.rel.o,$(notdir $(CMD_SRC))))
 CMD_PROF_OBJ = $(addprefix $(OBJDIR)/,$(subst .cpp,.prof.o,$(notdir $(CMD_SRC))))
+
+$(info CMD_SRC_LOCATION=$(CMD_SRC_LOCATION))
+$(info $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp)
 
 $(OBJDIR)/%.dbg.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -g $< -o $(OBJDIR)/$(*F).dbg.o
@@ -31,7 +34,9 @@ $(OBJDIR)/%.rel.o: $(CMD_SRC_LOCATION)/%.cpp
 	$(CPP) $(CXXFLAGS) -O3 -march=skylake $< -o $(OBJDIR)/$(*F).rel.o
 
 $(OBJDIR)/%.prof.o: $(CMD_SRC_LOCATION)/%.cpp
-	$(CPP) $(CXXFLAGS) -O3 $< -o $(OBJDIR)/$(*F).prof.o
+	$(CPP) $(CXXFLAGS) -O3 -march=skylake $< -o $(OBJDIR)/$(*F).prof.o
+
+$(info cmd: mkdir $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(CMD_PROF_OBJ))
 
 cmd: mkdir $(CMD_DBG_OBJ) $(CMD_REL_OBJ) $(CMD_PROF_OBJ)
 
@@ -110,10 +115,11 @@ cmn_test: mkdir $(BINDIR)/test_common-dbg $(BINDIR)/test_common-rel
 cmn_prof: mkdir $(COMMON_PROF_OBJ) $(CMD_PROF_OBJ)
 
 $(BINDIR)/test_common-dbg: $(TEST_SUPPORT_DBG_OBJ) $(CMD_DBG_OBJ)
-	$(LD) $(LDFLAGS) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
+	$(LD) -o $@ $^ $(LDFLAGS_DBG) -lgtest
 
 $(BINDIR)/test_common-rel: $(TEST_SUPPORT_REL_OBJ) $(CMD_REL_OBJ)
-	$(LD) $(LDFLAGS) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-rel -lncbi-secure-rel -lutf8proc -lmbedcrypto -lgtest -lpthread
+	$(LD) -o $@ $^ $(LDFLAGS_DBG) -lgtest
+	$(LD) $(LDFLAGS) -o $@ $^ -L$(JWT_TOOL)/lib -lncbi-json-dbg -lncbi-secure-dbg -lutf8proc -lmbedcrypto -lgtest -lpthread
 
 .PHONY: common cmn_clean cmn_test
 
