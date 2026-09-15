@@ -504,6 +504,7 @@ AS
         WHEN regexp_contains(path, r'-ca-run-') THEN bucket || ' (Controlled Access ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-run-') THEN bucket || ' (ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-src-') THEN bucket || ' (Original)'
+        WHEN regexp_contains(path, r'-rnaseq-analysis') THEN bucket || ' (RNASeq gene counts in TSV format)'
     ELSE ifnull(bucket,'') || ' (Unknown)'
     END)
 ENDOFQUERY
