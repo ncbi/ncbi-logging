@@ -2431,7 +2431,6 @@ update rdns
 set domain='Universidad de Alicante (ua.es)'
 where ip like '193.154.%' or ip like '193.145.%';
 
-
 update rdns
 set domain='Niigatga University (niigata-u.ac.jp)'
 where ip like '133.25.%';
@@ -2448,6 +2447,9 @@ or ip like '82.28.89.%'
 or ip like '82.28.90.%'
 or ip like '82.28.91.%';
 
+update rdns
+set domain='National Research Center, Kurchatov Institute (kiae.ru)'
+where ip like '144.206.%';
 
 update rdns
 set domain='Wellcome Trust Sanger Institute (jisc.ac.uk)'
@@ -2504,8 +2506,13 @@ ip like '96.9.209.%' or
 ip like '96.9.209.%' or
 ip like '96.9.210.%';
 
+update rdns
+set domain='MB Eisina (Lithunia)'
+where ip like '2a13:dc%';
 
-
+update rdns
+set domain='Correos Telecom (correos.com)'
+where ip like '158.172.%';
 
 
 UPDATE RDNS
