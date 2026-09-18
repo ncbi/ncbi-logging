@@ -65,6 +65,8 @@ case "$PROVIDER" in
         ;;
 esac
 
+date
+
 buckets=$(sqlcmd "select distinct log_bucket from buckets where scope='$STRIDES_SCOPE' and cloud_provider='$PROVIDER' order by log_bucket desc")
 readarray -t buckets <<< "$buckets"
 echo "buckets has ${#buckets[@]}, is ' " "${buckets[*]}" "'"
@@ -264,4 +266,5 @@ done
 
 # gzip -9 -v "$LOGFILE"
 
+date
 echo "Done"
