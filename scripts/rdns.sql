@@ -9,28 +9,19 @@
 
 -- Speed inserts and updates at risk of corruption if system crashes
 -- Since DB is temporary, we don't care
-pragma journal_mode = off;
-pragma synchronous = off;
-pragma locking_mode = exclusive;
-pragma temp_store = memory;
-pragma mmap_size = 100000000000;
-pragma page_size = 32768;
-
+PRAGMA journal_mode = off;
+PRAGMA synchronous = off;
+PRAGMA locking_mode = exclusive;
+PRAGMA temp_store = memory;
+PRAGMA mmap_size = 100000000000;
+PRAGMA page_size = 32768;
 
 drop table if exists uniq_ips;
---drop table if exists uniq_ips_public;
---drop table if exists uniq_ips_private;
---create table uniq_ips_public (line text);
---create table uniq_ips_private (line text);
 create table uniq_ips (line text);
+
 .timer on
 .echo on
 .import /netmnt/vast01/sra/strides_analytics/uniq_ips/uniq_ips  uniq_ips
---select count(*) as uniq_ips_public_count from uniq_ips;
---select count(*) as uniq_ips_public_count from uniq_ips_public;
---select count(*) as uniq_ips_private_count from uniq_ips_private;
-
---create table uniq_ips as select distinct line from (select line from uniq_ips_public union all select line from uniq_ips_private);
 
 select count(*) as uniq_ips_count from uniq_ips;
 
@@ -55,6 +46,9 @@ select json_extract(line, '$.ip') as ip,
 select count(*) as cloud_ips from cloud_ips;
 create unique index cloud_ip_idx on cloud_ips(ip);
 
+PRAGMA analysis_limit=1000;
+ANALYZE;
+
 delete from rdns where ip in (select ip from cloud_ips);
 select count(*) as rdns_count_cloud_ips_deleted from rdns;
 insert into rdns select ip, domain from cloud_ips;
@@ -76,7 +70,7 @@ select count(*) as rdns_count from rdns;
 --select * from rdns limit 5;
 .timer off
 .echo off
-select "running updates";
+select 'running updates';
 
 UPDATE RDNS
 SET DOMAIN = 'googleusercontent.com (GCP)'
