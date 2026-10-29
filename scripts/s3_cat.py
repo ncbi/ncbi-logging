@@ -1,7 +1,8 @@
 #!/usr/bin/env python3.13
-import boto3
 import sys
 from io import BytesIO
+
+import boto3
 
 
 def main():

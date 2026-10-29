@@ -1,8 +1,9 @@
 #!/usr/bin/env python3.13
-import boto3
 import datetime
 import json
 import sys
+
+import boto3
 
 
 def main():

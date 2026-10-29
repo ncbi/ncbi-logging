@@ -1,9 +1,10 @@
 #!/usr/bin/env python3.13
 
 import json
-import netaddr
 import sys
 import urllib.request
+
+import netaddr
 
 # Usage:
 # 0) sort -u uniq_ips* into uniq_ips file
