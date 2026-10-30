@@ -505,7 +505,7 @@ AS
         WHEN regexp_contains(path, r'-pub-run-') THEN bucket || ' (ETL + BQS)'
         WHEN regexp_contains(path, r'-pub-src-') THEN bucket || ' (Original)'
         WHEN contains_substr(bucket, 'sra-rnaseq-analysis') THEN bucket || ' (RNASeq gene counts in TSV format)'
-    ELSE ifnull(bucket,'') || ' (Unknown)'
+    ELSE IFNULL(bucket,'') || ' (Unknown)'
     END)
 ENDOFQUERY
 )
@@ -578,10 +578,10 @@ QUERY=$(
     result_bytes as bytes_sent,
     substr(regexp_extract(path,r'[0-9]\.[0-9]{1,2}'),3) as version,
     replace($DATASET.expand_bucket(bucket, path), "'", "") as bucket,
-    ifnull(source,'GS') as source,
+    IFNULL(source,'GS') as source,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.gs_parsed\\\`
-    WHERE ifnull(accepted,true)=true
+    WHERE IFNULL(accepted,true)=true
     and not (method='GET' and regexp_contains(uri, r'/o\?alt'))
 ENDOFQUERY
 )
@@ -617,11 +617,11 @@ QUERY=$(
     $DATASET.map_extension(path) as extension,
     referer as referer,
     replace(agent, '-head', '') as user_agent,
-    ifnull(source,'S3') as source,
+    IFNULL(source,'S3') as source,
     $DATASET.expand_bucket(bucket, path) as bucket,
     current_datetime() as fixed_time
     FROM \\\`ncbi-logmon.$DATASET.s3_parsed\\\`
-    WHERE ifnull(accepted,true)=true
+    WHERE IFNULL(accepted,true)=true
 ENDOFQUERY
 )
 
@@ -670,7 +670,7 @@ QUERY=$(
     referer as referer,
     replace(agent, '-head', '') as user_agent
     FROM \\\`ncbi-logmon.$DATASET.op_parsed\\\`
-    WHERE ifnull(accepted,true)=true
+    WHERE IFNULL(accepted,true)=true
     AND (
         safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0400]', time) >= "$CURYEAR-01-01" OR
         safe.parse_datetime('[%d/%b/%Y:%H:%M:%S -0500]', time) >= "$CURYEAR-01-01"
@@ -975,7 +975,7 @@ QUERY=$(
     cat <<- ENDOFQUERY
         update $DATASET.summary_grouped
         set
-        bucket=ifnull(bucket,'(Unknown)'),
+        bucket=IFNULL(bucket,'(Unknown)'),
         http_operations=replace(http_operations,' ',','),
         http_statuses=replace(http_statuses,' ',','),
         user_agent=replace(user_agent, '-head', '')
@@ -1200,11 +1200,15 @@ QUERY=$(
             THEN 'Unknown (' || country_code || ')'
         ELSE rdns.domain
     END as domain,
-    ifnull(region_name,'Unknown') as region_name,
-    ifnull(country_code,'Unknown') as country_code,
-    ifnull(city_name,'Unknown') as city_name,
-    ifnull(organism, 'Unknown') as ScientificName,
-    ifnull(consent,'Unknown') as consent,
+    IFNULL(region_name,'Unknown') as region_name,
+    IFNULL(country_code,'Unknown') as country_code,
+    IFNULL(city_name,'Unknown') as city_name,
+    IFNULL(organism, 'Unknown') as ScientificName,
+    CASE
+        WHEN contains_substr(bucket, 'sra-rnaseq-analysis') THEN 'public'
+    ELSE
+        IFNULL(consent,'Unknown')
+    END as consent,
     cast (mbytes as int64) as accession_size_mb
     FROM \\\`$DATASET.summary_grouped\\\` grouped
     LEFT JOIN \\\`strides_analytics.rdns\\\` rdns
