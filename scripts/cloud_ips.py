@@ -113,12 +113,7 @@ for value in AZURE_JSON["values"]:
     name = name.replace("Azure", "")
     for prefix in value["properties"]["addressPrefixes"]:
         # print(f"Azure prefix {prefix}", file=sys.stderr)
-        if (
-            prefix.startswith("2603:1")
-            or prefix.startswith("2a01:111:")
-            or prefix.startswith("2602:f")
-            or prefix.startswith("2620:1ec:")
-        ):
+        if prefix.startswith(("2603:1", "2a01:111:", "2602:f", "2620:1ec:")):
             # Dealt with in rdns.sql
             continue
         nums = int(prefix.split("/")[1])
