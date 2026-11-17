@@ -1434,7 +1434,10 @@ else # not private
     bq rm --project_id ncbi-logmon -f "$DATASET.op_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.s3_parsed" || true
     bq rm --project_id ncbi-logmon -f "$DATASET.summary_union" || true
-    bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped" || true
+
+    # needed by dbgap bigquery_export
+    # bq rm --project_id ncbi-logmon -f "$DATASET.summary_grouped" || true
+
     bq rm --project_id ncbi-logmon -f "$DATASET.summary_union_op" || true
     # bq rm --project_id ncbi-logmon -f "$DATASET.summary_export_all" || true
 fi # private
