@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+export PATH="$HOME/bin:$HOME/.local/bin:/opt/python-all/bin:$HOME/google-cloud-sdk/bin:/netopt/ncbi_tools64/bin/:$PATH"
+
 umask u=rwx,g=,o=
 
 set -u
